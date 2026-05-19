@@ -1,347 +1,279 @@
 <!DOCTYPE html>
 <html lang="uz">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Avlod Academy</title>
-
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-    <style>
-
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-        }
-
-        body{
-            background:#0f172a;
-            color:white;
-            font-family:Arial;
-            padding:20px;
-        }
-
-        .header{
-            margin-bottom:25px;
-        }
-
-        .title{
-            font-size:32px;
-            font-weight:bold;
-        }
-
-        .subtitle{
-            opacity:0.7;
-            margin-top:5px;
-        }
-
-        .card{
-            background:#1e293b;
-            border-radius:20px;
-            padding:20px;
-            margin-bottom:15px;
-        }
-
-        .balance{
-            font-size:40px;
-            font-weight:bold;
-            margin-top:10px;
-        }
-
-        .grid{
-            display:grid;
-            grid-template-columns:1fr 1fr;
-            gap:15px;
-        }
-
-        .small-card{
-            background:#1e293b;
-            border-radius:20px;
-            padding:20px;
-        }
-
-        .small-title{
-            opacity:0.7;
-            font-size:14px;
-        }
-
-        .small-value{
-            font-size:28px;
-            font-weight:bold;
-            margin-top:10px;
-        }
-
-        .loading{
-            text-align:center;
-            margin-top:100px;
-            opacity:0.7;
-        }
-
-        .hw-item{
-            margin-top:15px;
-            background:#0f172a;
-            padding:15px;
-            border-radius:15px;
-        }
-
-        .hw-title{
-            font-weight:bold;
-            margin-bottom:8px;
-        }
-
-        .hw-status{
-            margin-top:8px;
-            opacity:0.8;
-        }
-
-        .buttons{
-            display:grid;
-            grid-template-columns:1fr 1fr;
-            gap:10px;
-            margin-top:20px;
-        }
-
-        .btn{
-            background:#2563eb;
-            border:none;
-            color:white;
-            padding:15px;
-            border-radius:15px;
-            font-size:16px;
-            font-weight:bold;
-        }
-
-    </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>A Avlod Academy</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0d0d14;--surface:#161622;--surface2:#1e1e2e;--border:rgba(255,255,255,0.07);--accent:#7c3aed;--accent-light:#a78bfa;--gold:#f59e0b;--green:#10b981;--red:#ef4444;--text:#f8fafc;--muted:#64748b;--muted2:#94a3b8;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;padding-bottom:72px;}
+.nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:100;}
+.nav-btn{flex:1;border:none;background:transparent;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;font-size:10px;transition:color .2s;}
+.nav-btn.active{color:var(--accent-light);}
+.nav-btn svg{width:22px;height:22px;stroke-width:1.8;}
+.screen{display:none;padding:16px;animation:fadeIn .2s ease;}
+.screen.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.hero{background:linear-gradient(135deg,#1e1040 0%,#2d1b69 50%,#1e1040 100%);border:1px solid rgba(124,58,237,0.3);border-radius:20px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden;}
+.hero::after{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:rgba(124,58,237,0.15);border-radius:50%;}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.hero-label{font-size:11px;color:var(--accent-light);opacity:.8;margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px;}
+.hero-amount{font-size:40px;font-weight:700;letter-spacing:-2px;line-height:1;}
+.hero-unit{font-size:14px;font-weight:400;color:var(--accent-light);margin-left:4px;}
+.hero-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-light));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0;z-index:1;}
+.hero-meta{display:flex;gap:20px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);}
+.hero-meta-val{font-size:16px;font-weight:600;color:#fff;}
+.hero-meta-key{font-size:10px;color:var(--accent-light);opacity:.7;margin-top:1px;}
+.xp-bar-wrap{margin-bottom:14px;}
+.xp-bar-header{display:flex;justify-content:space-between;margin-bottom:6px;}
+.xp-bar-header span{font-size:12px;color:var(--muted2);}
+.xp-bar-header strong{font-size:12px;color:var(--accent-light);}
+.xp-bar{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-light));border-radius:3px;transition:width .6s ease;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px;}
+.card-icon{font-size:22px;margin-bottom:8px;}
+.card-val{font-size:24px;font-weight:700;line-height:1;}
+.card-key{font-size:11px;color:var(--muted);margin-top:3px;}
+.sec{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:0 0 10px;}
+.hw{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;display:flex;align-items:flex-start;gap:12px;}
+.hw-left{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.hw-left.new{background:rgba(124,58,237,.15);}
+.hw-left.review{background:rgba(245,158,11,.15);}
+.hw-left.done{background:rgba(16,185,129,.15);}
+.hw-body{flex:1;min-width:0;}
+.hw-title{font-size:14px;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hw-sub{font-size:12px;color:var(--muted);}
+.hw-badge{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;flex-shrink:0;}
+.badge-new{background:rgba(124,58,237,.2);color:#a78bfa;}
+.badge-review{background:rgba(245,158,11,.2);color:#fbbf24;}
+.badge-done{background:rgba(16,185,129,.2);color:#34d399;}
+.mod{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;}
+.mod-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.mod-body{flex:1;min-width:0;}
+.mod-title{font-size:14px;font-weight:600;margin-bottom:4px;}
+.mod-sub{font-size:11px;color:var(--muted);}
+.mod-prog{height:4px;background:var(--surface2);border-radius:2px;margin-top:8px;overflow:hidden;}
+.mod-prog-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent-light));}
+.mod-pct{font-size:12px;font-weight:600;color:var(--accent-light);flex-shrink:0;}
+.mod-locked{opacity:.4;}
+.market-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.mcard{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.mcard-img{height:72px;display:flex;align-items:center;justify-content:center;font-size:32px;}
+.mcard-body{padding:10px;}
+.mcard-name{font-size:13px;font-weight:600;margin-bottom:2px;}
+.mcard-sub{font-size:11px;color:var(--muted);margin-bottom:8px;}
+.mcard-price{font-size:13px;font-weight:700;color:var(--accent-light);}
+.mcard-btn{width:100%;margin-top:8px;padding:7px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:var(--accent-light);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;}
+.tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .2s;}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.prof-head{text-align:center;margin-bottom:20px;}
+.prof-av{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-light));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#fff;margin:0 auto 12px;border:3px solid rgba(124,58,237,.4);}
+.prof-name{font-size:20px;font-weight:700;margin-bottom:3px;}
+.prof-user{font-size:13px;color:var(--muted);}
+.prof-rank{display:inline-block;margin-top:10px;padding:5px 16px;border-radius:20px;background:rgba(124,58,237,.2);color:var(--accent-light);font-size:13px;font-weight:600;}
+.tx{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.tx-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.tx-ic.plus{background:rgba(16,185,129,.15);}
+.tx-ic.minus{background:rgba(239,68,68,.15);}
+.tx-info{flex:1;}
+.tx-reason{font-size:13px;font-weight:500;}
+.tx-date{font-size:11px;color:var(--muted);margin-top:2px;}
+.tx-amt{font-size:14px;font-weight:700;}
+.tx-amt.plus{color:var(--green);}
+.tx-amt.minus{color:var(--red);}
+.ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.ach{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;}
+.ach-icon{font-size:28px;margin-bottom:6px;}
+.ach-name{font-size:11px;font-weight:600;}
+.ach.locked{opacity:.3;}
+.loading{text-align:center;padding:40px 20px;color:var(--muted);}
+.spinner{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--accent-light);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:32px;color:var(--muted);font-size:13px;}
+.empty-icon{font-size:36px;margin-bottom:8px;}
+</style>
 </head>
-
 <body>
-
-<div id="app">
-
-    <div class="loading">
-        Yuklanmoqda...
+<div class="screen active" id="s-home">
+  <div class="hero">
+    <div class="hero-top">
+      <div>
+        <div class="hero-label">Sizning balansingiz</div>
+        <div class="hero-amount"><span id="h-bal">0</span><span class="hero-unit">bayt</span></div>
+      </div>
+      <div class="hero-avatar" id="h-av">?</div>
     </div>
-
+    <div class="hero-meta">
+      <div class="hero-meta-item"><div class="hero-meta-val" id="h-rank">Junior</div><div class="hero-meta-key">Daraja</div></div>
+      <div class="hero-meta-item"><div class="hero-meta-val" id="h-streak">0 🔥</div><div class="hero-meta-key">Streak</div></div>
+      <div class="hero-meta-item"><div class="hero-meta-val" id="h-earned">0</div><div class="hero-meta-key">Jami</div></div>
+    </div>
+  </div>
+  <div class="xp-bar-wrap">
+    <div class="xp-bar-header"><span id="h-rank-label">Junior darajasi</span><strong id="h-xp-pct">0%</strong></div>
+    <div class="xp-bar"><div class="xp-bar-fill" id="h-xp-fill" style="width:0%"></div></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><div class="card-icon">📝</div><div class="card-val" id="h-active">0</div><div class="card-key">Faol vazifalar</div></div>
+    <div class="card"><div class="card-icon">✅</div><div class="card-val" id="h-done">0</div><div class="card-key">Bajarilgan</div></div>
+  </div>
+  <div class="sec">Faol vazifalar</div>
+  <div id="h-hw"><div class="loading"><div class="spinner"></div>Yuklanmoqda...</div></div>
 </div>
 
+<div class="screen" id="s-lessons">
+  <div class="sec" style="margin-bottom:14px;">O'quv modullari</div>
+  <div class="mod"><div class="mod-icon" style="background:rgba(16,185,129,.15);">🎬</div><div class="mod-body"><div class="mod-title">Blogging asoslari</div><div class="mod-sub">8 ta dars</div><div class="mod-prog"><div class="mod-prog-fill" style="width:100%;background:#10b981;"></div></div></div><div class="mod-pct" style="color:#10b981;">✅</div></div>
+  <div class="mod" style="border-color:rgba(124,58,237,.35);"><div class="mod-icon" style="background:rgba(124,58,237,.15);">📱</div><div class="mod-body"><div class="mod-title">Rils suratga olish</div><div class="mod-sub">5 / 8 dars</div><div class="mod-prog"><div class="mod-prog-fill" style="width:62%;"></div></div></div><div class="mod-pct">62%</div></div>
+  <div class="mod mod-locked"><div class="mod-icon" style="background:var(--surface2);">🔒</div><div class="mod-body"><div class="mod-title">Video montaj</div><div class="mod-sub">10-darajadan ochiladi</div></div></div>
+  <div class="mod mod-locked"><div class="mod-icon" style="background:var(--surface2);">🔒</div><div class="mod-body"><div class="mod-title">Storytelling</div><div class="mod-sub">12-darajadan ochiladi</div></div></div>
+  <div class="mod mod-locked"><div class="mod-icon" style="background:var(--surface2);">🔒</div><div class="mod-body"><div class="mod-title">Brand yaratish</div><div class="mod-sub">15-darajadan ochiladi</div></div></div>
+  <div class="mod mod-locked"><div class="mod-icon" style="background:var(--surface2);">🔒</div><div class="mod-body"><div class="mod-title">AI bilan ishlash</div><div class="mod-sub">20-darajadan ochiladi</div></div></div>
+</div>
+
+<div class="screen" id="s-homework">
+  <div class="tabs">
+    <button class="tab active" onclick="filterHw('all',this)">Barchasi</button>
+    <button class="tab" onclick="filterHw('new',this)">Faol</button>
+    <button class="tab" onclick="filterHw('review',this)">Tekshirilmoqda</button>
+    <button class="tab" onclick="filterHw('done',this)">Bajarildi</button>
+  </div>
+  <div id="hw-list"><div class="loading"><div class="spinner"></div>Yuklanmoqda...</div></div>
+</div>
+
+<div class="screen" id="s-market">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+    <div class="sec" style="margin:0;">Sovgalar marketi</div>
+    <span style="font-size:12px;color:var(--accent-light);" id="mkt-bal">0 bayt</span>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="filterMkt('all',this)">Barchasi</button>
+    <button class="tab" onclick="filterMkt('ai',this)">AI</button>
+    <button class="tab" onclick="filterMkt('travel',this)">Sayohat</button>
+    <button class="tab" onclick="filterMkt('clothes',this)">Kiyim</button>
+    <button class="tab" onclick="filterMkt('tech',this)">Texnika</button>
+  </div>
+  <div class="market-grid" id="mkt-grid">
+    <div class="mcard" data-cat="ai"><div class="mcard-img" style="background:rgba(16,185,129,.1);">🤖</div><div class="mcard-body"><div class="mcard-name">ChatGPT Plus</div><div class="mcard-sub">1 oy</div><div class="mcard-price">2,000 bayt</div><button class="mcard-btn">Olish</button></div></div>
+    <div class="mcard" data-cat="ai"><div class="mcard-img" style="background:rgba(99,102,241,.1);">✨</div><div class="mcard-body"><div class="mcard-name">Claude Pro</div><div class="mcard-sub">1 oy</div><div class="mcard-price">2,500 bayt</div><button class="mcard-btn">Olish</button></div></div>
+    <div class="mcard" data-cat="travel"><div class="mcard-img" style="background:rgba(245,158,11,.1);">✈️</div><div class="mcard-body"><div class="mcard-name">Oilaviy tur</div><div class="mcard-sub">Samarqand</div><div class="mcard-price">15,000 bayt</div><button class="mcard-btn">Olish</button></div></div>
+    <div class="mcard" data-cat="clothes"><div class="mcard-img" style="background:rgba(99,102,241,.1);">👕</div><div class="mcard-body"><div class="mcard-name">Kuz toplami</div><div class="mcard-sub">Kiyim</div><div class="mcard-price">8,000 bayt</div><button class="mcard-btn">Olish</button></div></div>
+    <div class="mcard" data-cat="tech"><div class="mcard-img" style="background:rgba(239,68,68,.1);">🎧</div><div class="mcard-body"><div class="mcard-name">Quloqchin</div><div class="mcard-sub">Simsiz</div><div class="mcard-price">5,000 bayt</div><button class="mcard-btn">Olish</button></div></div>
+    <div class="mcard" data-cat="tech"><div class="mcard-img" style="background:rgba(16,185,129,.1);">🎬</div><div class="mcard-body"><div class="mcard-name">Video suratga olish</div><div class="mcard-sub">Professional</div><div class="mcard-price">3,000 bayt</div><button class="mcard-btn">Olish</button></div></div>
+  </div>
+</div>
+
+<div class="screen" id="s-profile">
+  <div class="prof-head">
+    <div class="prof-av" id="p-av">?</div>
+    <div class="prof-name" id="p-name">Yuklanmoqda...</div>
+    <div class="prof-user" id="p-user"></div>
+    <div class="prof-rank" id="p-rank">Junior · Level 1</div>
+  </div>
+  <div class="grid2" style="margin-bottom:14px;">
+    <div class="card"><div class="card-icon">💾</div><div class="card-val" id="p-bal">0</div><div class="card-key">Bayt</div></div>
+    <div class="card"><div class="card-icon">📝</div><div class="card-val" id="p-hw">0</div><div class="card-key">Bajarilgan</div></div>
+    <div class="card"><div class="card-icon">🔥</div><div class="card-val" id="p-streak">0</div><div class="card-key">Streak kun</div></div>
+    <div class="card"><div class="card-icon">📈</div><div class="card-val" id="p-total">0</div><div class="card-key">Jami ishlangan</div></div>
+  </div>
+  <div class="sec">Yutuqlar</div>
+  <div class="ach-grid">
+    <div class="ach locked" id="ach-1"><div class="ach-icon">🏆</div><div class="ach-name">Birinchi 100 bayt</div></div>
+    <div class="ach locked" id="ach-2"><div class="ach-icon">🔥</div><div class="ach-name">10 kun streak</div></div>
+    <div class="ach locked" id="ach-3"><div class="ach-icon">⭐</div><div class="ach-name">Alochi</div></div>
+    <div class="ach locked"><div class="ach-icon">🎬</div><div class="ach-name">Birinchi video</div></div>
+    <div class="ach locked"><div class="ach-icon">👑</div><div class="ach-name">Lider</div></div>
+    <div class="ach locked"><div class="ach-icon">🚀</div><div class="ach-name">Senior darajasi</div></div>
+  </div>
+  <div class="sec">Oxirgi operatsiyalar</div>
+  <div id="p-tx"><div class="loading"><div class="spinner"></div>Yuklanmoqda...</div></div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="go('home',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Bosh</button>
+  <button class="nav-btn" onclick="go('lessons',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>Darslar</button>
+  <button class="nav-btn" onclick="go('homework',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Vazifalar</button>
+  <button class="nav-btn" onclick="go('market',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Market</button>
+  <button class="nav-btn" onclick="go('profile',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil</button>
+</nav>
+
 <script>
-
-    const tg = window.Telegram.WebApp;
-
-    tg.expand();
-
-    async function loadProfile(){
-
-        try{
-
-            const user = tg.initDataUnsafe.user;
-
-            if(!user){
-
-                document.getElementById("app").innerHTML = `
-                    <h2>Telegram user topilmadi</h2>
-                `;
-
-                return;
-            }
-
-            const response = await fetch(
-                `/api/profile?user_id=${user.id}`
-            );
-
-            let data = await response.json();
-
-            console.log(data);
-
-            // fallback values
-            data.full_name = data.full_name || user.first_name || "O'quvchi";
-            data.bytes_balance = data.bytes_balance || 0;
-            data.level = data.level || 1;
-            data.streak_days = data.streak_days || 0;
-            data.homeworks_active = data.homeworks_active || 0;
-            data.total_earned = data.total_earned || 0;
-
-            document.getElementById("app").innerHTML = `
-                
-                <div class="header">
-
-                    <div class="title">
-                        👋 Salom, ${data.full_name}
-                    </div>
-
-                    <div class="subtitle">
-                        A Avlod Academy
-                    </div>
-
-                </div>
-
-                <div class="card">
-
-                    <div>
-                        💰 Sizning balansingiz
-                    </div>
-
-                    <div class="balance">
-                        ${data.bytes_balance} bayt
-                    </div>
-
-                </div>
-
-                <div class="grid">
-
-                    <div class="small-card">
-
-                        <div class="small-title">
-                            🏆 Daraja
-                        </div>
-
-                        <div class="small-value">
-                            ${data.level}
-                        </div>
-
-                    </div>
-
-                    <div class="small-card">
-
-                        <div class="small-title">
-                            🔥 Streak
-                        </div>
-
-                        <div class="small-value">
-                            ${data.streak_days}
-                        </div>
-
-                    </div>
-
-                    <div class="small-card">
-
-                        <div class="small-title">
-                            📝 Vazifalar
-                        </div>
-
-                        <div class="small-value">
-                            ${data.homeworks_active}
-                        </div>
-
-                    </div>
-
-                    <div class="small-card">
-
-                        <div class="small-title">
-                            🎁 Jami topilgan
-                        </div>
-
-                        <div class="small-value">
-                            ${data.total_earned}
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="buttons">
-
-                    <button class="btn" onclick="loadHomeworks()">
-                        📝 Vazifalar
-                    </button>
-
-                    <button class="btn" onclick="tg.close()">
-                        ❌ Yopish
-                    </button>
-
-                </div>
-
-                <div id="homeworks"></div>
-
-            `;
-
-        }catch(error){
-
-            document.getElementById("app").innerHTML = `
-                <h2>Xatolik yuz berdi</h2>
-                <p>${error}</p>
-            `;
-
-        }
-
-    }
-
-
-    async function loadHomeworks(){
-
-        try{
-
-            const user = tg.initDataUnsafe.user;
-
-            const response = await fetch(
-                `/api/homeworks?user_id=${user.id}`
-            );
-
-            const data = await response.json();
-
-            let html = `
-                <div class="card">
-                    <h2>📝 Uy Vazifalar</h2>
-            `;
-
-            if(!data.homeworks || data.homeworks.length === 0){
-
-                html += `
-                    <p style="margin-top:15px;opacity:0.7;">
-                        Hozircha vazifalar yo'q
-                    </p>
-                `;
-
-            }else{
-
-                data.homeworks.forEach(hw => {
-
-                    let status = "🟡 Jarayonda";
-
-                    if(hw.status === "done"){
-                        status = "🟢 Bajarilgan";
-                    }
-
-                    html += `
-                        <div class="hw-item">
-
-                            <div class="hw-title">
-                                📌 ${hw.title}
-                            </div>
-
-                            <div>
-                                💰 +${hw.reward} bayt
-                            </div>
-
-                            <div class="hw-status">
-                                ${status}
-                            </div>
-
-                        </div>
-                    `;
-
-                });
-
-            }
-
-            html += `</div>`;
-
-            document.getElementById("homeworks").innerHTML = html;
-
-        }catch(error){
-
-            console.log(error);
-
-        }
-
-    }
-
-    loadProfile();
-
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand();}
+const BASE=window.location.origin;
+let uid=tg?.initDataUnsafe?.user?.id||new URLSearchParams(location.search).get('user_id')||'0';
+let profile=null,homeworks=[];
+function go(n,b){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));document.getElementById('s-'+n).classList.add('active');b.classList.add('active');if(n==='homework'&&!homeworks.length)loadHw();if(n==='profile')loadProfile();}
+function ini(name){return(name||'?').split(' ').map(n=>n[0]||'').join('').slice(0,2).toUpperCase()||'?';}
+function fmt(n){return Number(n||0).toLocaleString();}
+async function loadHome(){
+  try{
+    const r=await fetch(`${BASE}/api/profile?user_id=${uid}`);
+    if(!r.ok){document.getElementById('h-hw').innerHTML='<div class="empty"><div class="empty-icon">👋</div>Botni oching va /start bosing</div>';return;}
+    const d=await r.json();profile=d;
+    document.getElementById('h-av').textContent=ini(d.full_name);
+    document.getElementById('h-bal').textContent=fmt(d.bytes_balance);
+    document.getElementById('h-rank').textContent=d.rank+' Lv'+d.level;
+    document.getElementById('h-streak').textContent=d.streak_days+'🔥';
+    document.getElementById('h-earned').textContent=fmt(d.total_earned);
+    document.getElementById('h-active').textContent=d.homeworks_active||0;
+    document.getElementById('h-done').textContent=d.homeworks_done||0;
+    document.getElementById('mkt-bal').textContent=fmt(d.bytes_balance)+' bayt';
+    const xp=Math.min(((d.bytes_balance%1000)/1000)*100,100);
+    document.getElementById('h-xp-fill').style.width=xp+'%';
+    document.getElementById('h-xp-pct').textContent=Math.round(xp)+'%';
+    const hr=await fetch(`${BASE}/api/homeworks?user_id=${uid}`);
+    const hd=await hr.json();homeworks=hd.homeworks||[];
+    const act=homeworks.filter(h=>h.status==='new').slice(0,3);
+    const c=document.getElementById('h-hw');
+    if(!act.length){c.innerHTML='<div class="empty"><div class="empty-icon">🎉</div>Barcha vazifalar bajarildi!</div>';return;}
+    c.innerHTML=act.map(h=>`<div class="hw"><div class="hw-left new">📝</div><div class="hw-body"><div class="hw-title">${h.title}</div><div class="hw-sub">+${h.reward_bytes} bayt mukofot</div></div><span class="hw-badge badge-new">Faol</span></div>`).join('');
+  }catch(e){document.getElementById('h-hw').innerHTML='<div class="empty">Xatolik yuz berdi</div>';}
+}
+async function loadHw(){
+  try{
+    if(!homeworks.length){const r=await fetch(`${BASE}/api/homeworks?user_id=${uid}`);const d=await r.json();homeworks=d.homeworks||[];}
+    renderHw('all');
+  }catch(e){document.getElementById('hw-list').innerHTML='<div class="empty">Xatolik</div>';}
+}
+const hwI={new:'📝',review:'🔍',done:'✅'};
+const hwL={new:'Faol',review:'Tekshirilmoqda',done:'Bajarildi'};
+function renderHw(f){
+  const list=f==='all'?homeworks:homeworks.filter(h=>h.status===f);
+  const c=document.getElementById('hw-list');
+  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">📭</div>Vazifalar yoq</div>';return;}
+  c.innerHTML=list.map(h=>`<div class="hw"><div class="hw-left ${h.status}">${hwI[h.status]||'📝'}</div><div class="hw-body"><div class="hw-title">${h.title}</div><div class="hw-sub">+${h.reward_bytes} bayt</div></div><span class="hw-badge badge-${h.status}">${hwL[h.status]||h.status}</span></div>`).join('');
+}
+function filterHw(f,b){document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));b.classList.add('active');renderHw(f);}
+function filterMkt(cat,b){document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.mcard').forEach(c=>{c.style.display=cat==='all'||c.dataset.cat===cat?'':'none';});}
+async function loadProfile(){
+  try{
+    if(!profile){const r=await fetch(`${BASE}/api/profile?user_id=${uid}`);profile=await r.json();}
+    const d=profile;
+    document.getElementById('p-av').textContent=ini(d.full_name);
+    document.getElementById('p-name').textContent=d.full_name||'—';
+    document.getElementById('p-user').textContent=d.username?'@'+d.username:'';
+    document.getElementById('p-rank').textContent='🎖 '+d.rank+' · Level '+d.level;
+    document.getElementById('p-bal').textContent=fmt(d.bytes_balance);
+    document.getElementById('p-hw').textContent=d.homeworks_done||0;
+    document.getElementById('p-streak').textContent=d.streak_days||0;
+    document.getElementById('p-total').textContent=fmt(d.total_earned);
+    if(d.bytes_balance>=100)document.getElementById('ach-1').classList.remove('locked');
+    if(d.streak_days>=10)document.getElementById('ach-2').classList.remove('locked');
+    if(d.homeworks_done>=5)document.getElementById('ach-3').classList.remove('locked');
+    const tr=await fetch(`${BASE}/api/transactions?user_id=${uid}`);
+    const td=await tr.json();const txs=td.transactions||[];
+    const tc=document.getElementById('p-tx');
+    if(!txs.length){tc.innerHTML='<div class="empty">Operatsiyalar yoq</div>';return;}
+    tc.innerHTML=txs.map(t=>`<div class="tx"><div class="tx-ic ${t.amount>0?'plus':'minus'}">${t.amount>0?'➕':'➖'}</div><div class="tx-info"><div class="tx-reason">${t.reason||'Sabab korsatilmagan'}</div><div class="tx-date">${(t.created_at||'').slice(0,16)}</div></div><div class="tx-amt ${t.amount>0?'plus':'minus'}">${t.amount>0?'+':''}${t.amount} bayt</div></div>`).join('');
+  }catch(e){console.error(e);}
+}
+loadHome();
 </script>
-
 </body>
 </html>
