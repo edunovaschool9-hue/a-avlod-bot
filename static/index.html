@@ -4,40 +4,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>A Avlod Academy</title>
 
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             background: #0f172a;
             color: white;
             font-family: Arial;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            margin-bottom: 25px;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            opacity: 0.7;
+            margin-top: 5px;
         }
 
         .card {
             background: #1e293b;
-            padding: 30px;
             border-radius: 20px;
-            text-align: center;
+            padding: 20px;
+            margin-bottom: 15px;
         }
 
-        h1 {
-            margin-bottom: 10px;
+        .balance {
+            font-size: 40px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .small-card {
+            background: #1e293b;
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        .small-title {
+            opacity: 0.7;
+            font-size: 14px;
+        }
+
+        .small-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            margin-top: 100px;
+            opacity: 0.7;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="card">
-        <h1>🚀 A Avlod Academy</h1>
-        <p>Mini App ishlayapti ✅</p>
+<div id="app">
+
+    <div class="loading">
+        Yuklanmoqda...
     </div>
 
-</body>
+</div>
 
+<script>
+
+    const tg = window.Telegram.WebApp;
+
+    tg.expand();
+
+    async function loadProfile() {
+
+        try {
+
+            const user = tg.initDataUnsafe.user;
+
+            if (!user) {
+                document.getElementById("app").innerHTML =
+                    "<h2>Telegram user topilmadi</h2>";
+                return;
+            }
+
+            const response = await fetch(
+                `/api/profile?user_id=${user.id}`
+            );
+
+            const data = await response.json();
+
+            document.getElementById("app").innerHTML = `
+                
+                <div class="header">
+                    <div class="title">
+                        👋 Salom, ${data.full_name}
+                    </div>
+
+                    <div class="subtitle">
+                        A Avlod Academy
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div>💰 Sizning balansingiz</div>
+
+                    <div class="balance">
+                        ${data.bytes_balance} bayt
+                    </div>
+                </div>
+
+                <div class="grid">
+
+                    <div class="small-card">
+                        <div class="small-title">
+                            🏆 Daraja
+                        </div>
+
+                        <div class="small-value">
+                            ${data.level}
+                        </div>
+                    </div>
+
+                    <div class="small-card">
+                        <div class="small-title">
+                            🔥 Streak
+                        </div>
+
+                        <div class="small-value">
+                            ${data.streak_days}
+                        </div>
+                    </div>
+
+                    <div class="small-card">
+                        <div class="small-title">
+                            📝 Vazifalar
+                        </div>
+
+                        <div class="small-value">
+                            ${data.homeworks_active}
+                        </div>
+                    </div>
+
+                    <div class="small-card">
+                        <div class="small-title">
+                            🎁 Jami topilgan
+                        </div>
+
+                        <div class="small-value">
+                            ${data.total_earned}
+                        </div>
+                    </div>
+
+                </div>
+
+            `;
+
+        } catch (error) {
+
+            document.getElementById("app").innerHTML = `
+                <h2>Xatolik yuz berdi</h2>
+                <p>${error}</p>
+            `;
+
+        }
+
+    }
+
+    loadProfile();
+
+</script>
+
+</body>
 </html>
