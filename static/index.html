@@ -4,100 +4,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>A Avlod Academy</title>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
         }
 
-        body {
-            background: #0f172a;
-            color: white;
-            font-family: Arial;
-            padding: 20px;
+        body{
+            background:#0f172a;
+            color:white;
+            font-family:Arial;
+            padding:20px;
         }
 
-        .header {
-            margin-bottom: 25px;
+        .header{
+            margin-bottom:25px;
         }
 
-        .title {
-            font-size: 32px;
-            font-weight: bold;
+        .title{
+            font-size:32px;
+            font-weight:bold;
         }
 
-        .subtitle {
-            opacity: 0.7;
-            margin-top: 5px;
+        .subtitle{
+            opacity:0.7;
+            margin-top:5px;
         }
 
-        .card {
-            background: #1e293b;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 15px;
+        .card{
+            background:#1e293b;
+            border-radius:20px;
+            padding:20px;
+            margin-bottom:15px;
         }
 
-        .balance {
-            font-size: 40px;
-            font-weight: bold;
-            margin-top: 10px;
+        .balance{
+            font-size:40px;
+            font-weight:bold;
+            margin-top:10px;
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        .grid{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:15px;
         }
 
-        .small-card {
-            background: #1e293b;
-            border-radius: 20px;
-            padding: 20px;
+        .small-card{
+            background:#1e293b;
+            border-radius:20px;
+            padding:20px;
         }
 
-        .small-title {
-            opacity: 0.7;
-            font-size: 14px;
+        .small-title{
+            opacity:0.7;
+            font-size:14px;
         }
 
-        .small-value {
-            font-size: 28px;
-            font-weight: bold;
-            margin-top: 10px;
+        .small-value{
+            font-size:28px;
+            font-weight:bold;
+            margin-top:10px;
         }
 
-        .loading {
-            text-align: center;
-            margin-top: 100px;
-            opacity: 0.7;
+        .loading{
+            text-align:center;
+            margin-top:100px;
+            opacity:0.7;
         }
 
-        .hw-item {
-            margin-top: 15px;
-            background: #0f172a;
-            padding: 15px;
-            border-radius: 15px;
+        .hw-item{
+            margin-top:15px;
+            background:#0f172a;
+            padding:15px;
+            border-radius:15px;
         }
 
-        .hw-title {
-            font-weight: bold;
-            margin-bottom: 8px;
+        .hw-title{
+            font-weight:bold;
+            margin-bottom:8px;
         }
 
-        .hw-status {
-            margin-top: 8px;
-            opacity: 0.8;
+        .hw-status{
+            margin-top:8px;
+            opacity:0.8;
+        }
+
+        .buttons{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:10px;
+            margin-top:20px;
+        }
+
+        .btn{
+            background:#2563eb;
+            border:none;
+            color:white;
+            padding:15px;
+            border-radius:15px;
+            font-size:16px;
+            font-weight:bold;
         }
 
     </style>
+
 </head>
 
 <body>
@@ -116,16 +133,17 @@
 
     tg.expand();
 
-    async function loadProfile() {
+    async function loadProfile(){
 
-        try {
+        try{
 
             const user = tg.initDataUnsafe.user;
 
-            if (!user) {
+            if(!user){
 
-                document.getElementById("app").innerHTML =
-                    "<h2>Telegram user topilmadi</h2>";
+                document.getElementById("app").innerHTML = `
+                    <h2>Telegram user topilmadi</h2>
+                `;
 
                 return;
             }
@@ -134,7 +152,17 @@
                 `/api/profile?user_id=${user.id}`
             );
 
-            const data = await response.json();
+            let data = await response.json();
+
+            console.log(data);
+
+            // fallback values
+            data.full_name = data.full_name || user.first_name || "O'quvchi";
+            data.bytes_balance = data.bytes_balance || 0;
+            data.level = data.level || 1;
+            data.streak_days = data.streak_days || 0;
+            data.homeworks_active = data.homeworks_active || 0;
+            data.total_earned = data.total_earned || 0;
 
             document.getElementById("app").innerHTML = `
                 
@@ -214,9 +242,23 @@
 
                 </div>
 
+                <div class="buttons">
+
+                    <button class="btn" onclick="loadHomeworks()">
+                        📝 Vazifalar
+                    </button>
+
+                    <button class="btn" onclick="tg.close()">
+                        ❌ Yopish
+                    </button>
+
+                </div>
+
+                <div id="homeworks"></div>
+
             `;
 
-        } catch (error) {
+        }catch(error){
 
             document.getElementById("app").innerHTML = `
                 <h2>Xatolik yuz berdi</h2>
@@ -228,9 +270,9 @@
     }
 
 
-    async function loadHomeworks() {
+    async function loadHomeworks(){
 
-        try {
+        try{
 
             const user = tg.initDataUnsafe.user;
 
@@ -245,7 +287,7 @@
                     <h2>📝 Uy Vazifalar</h2>
             `;
 
-            if (data.homeworks.length === 0) {
+            if(!data.homeworks || data.homeworks.length === 0){
 
                 html += `
                     <p style="margin-top:15px;opacity:0.7;">
@@ -253,13 +295,13 @@
                     </p>
                 `;
 
-            } else {
+            }else{
 
                 data.homeworks.forEach(hw => {
 
                     let status = "🟡 Jarayonda";
 
-                    if (hw.status === "done") {
+                    if(hw.status === "done"){
                         status = "🟢 Bajarilgan";
                     }
 
@@ -280,15 +322,16 @@
 
                         </div>
                     `;
+
                 });
 
             }
 
             html += `</div>`;
 
-            document.getElementById("app").innerHTML += html;
+            document.getElementById("homeworks").innerHTML = html;
 
-        } catch (error) {
+        }catch(error){
 
             console.log(error);
 
@@ -296,9 +339,7 @@
 
     }
 
-
     loadProfile();
-    loadHomeworks();
 
 </script>
 
