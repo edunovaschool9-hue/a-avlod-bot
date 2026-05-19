@@ -10,6 +10,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
+
         * {
             margin: 0;
             padding: 0;
@@ -78,6 +79,24 @@
             margin-top: 100px;
             opacity: 0.7;
         }
+
+        .hw-item {
+            margin-top: 15px;
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .hw-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .hw-status {
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+
     </style>
 </head>
 
@@ -104,8 +123,10 @@
             const user = tg.initDataUnsafe.user;
 
             if (!user) {
+
                 document.getElementById("app").innerHTML =
                     "<h2>Telegram user topilmadi</h2>";
+
                 return;
             }
 
@@ -118,6 +139,7 @@
             document.getElementById("app").innerHTML = `
                 
                 <div class="header">
+
                     <div class="title">
                         👋 Salom, ${data.full_name}
                     </div>
@@ -125,19 +147,25 @@
                     <div class="subtitle">
                         A Avlod Academy
                     </div>
+
                 </div>
 
                 <div class="card">
-                    <div>💰 Sizning balansingiz</div>
+
+                    <div>
+                        💰 Sizning balansingiz
+                    </div>
 
                     <div class="balance">
                         ${data.bytes_balance} bayt
                     </div>
+
                 </div>
 
                 <div class="grid">
 
                     <div class="small-card">
+
                         <div class="small-title">
                             🏆 Daraja
                         </div>
@@ -145,9 +173,11 @@
                         <div class="small-value">
                             ${data.level}
                         </div>
+
                     </div>
 
                     <div class="small-card">
+
                         <div class="small-title">
                             🔥 Streak
                         </div>
@@ -155,9 +185,11 @@
                         <div class="small-value">
                             ${data.streak_days}
                         </div>
+
                     </div>
 
                     <div class="small-card">
+
                         <div class="small-title">
                             📝 Vazifalar
                         </div>
@@ -165,9 +197,11 @@
                         <div class="small-value">
                             ${data.homeworks_active}
                         </div>
+
                     </div>
 
                     <div class="small-card">
+
                         <div class="small-title">
                             🎁 Jami topilgan
                         </div>
@@ -175,6 +209,7 @@
                         <div class="small-value">
                             ${data.total_earned}
                         </div>
+
                     </div>
 
                 </div>
@@ -192,7 +227,78 @@
 
     }
 
+
+    async function loadHomeworks() {
+
+        try {
+
+            const user = tg.initDataUnsafe.user;
+
+            const response = await fetch(
+                `/api/homeworks?user_id=${user.id}`
+            );
+
+            const data = await response.json();
+
+            let html = `
+                <div class="card">
+                    <h2>📝 Uy Vazifalar</h2>
+            `;
+
+            if (data.homeworks.length === 0) {
+
+                html += `
+                    <p style="margin-top:15px;opacity:0.7;">
+                        Hozircha vazifalar yo'q
+                    </p>
+                `;
+
+            } else {
+
+                data.homeworks.forEach(hw => {
+
+                    let status = "🟡 Jarayonda";
+
+                    if (hw.status === "done") {
+                        status = "🟢 Bajarilgan";
+                    }
+
+                    html += `
+                        <div class="hw-item">
+
+                            <div class="hw-title">
+                                📌 ${hw.title}
+                            </div>
+
+                            <div>
+                                💰 +${hw.reward} bayt
+                            </div>
+
+                            <div class="hw-status">
+                                ${status}
+                            </div>
+
+                        </div>
+                    `;
+                });
+
+            }
+
+            html += `</div>`;
+
+            document.getElementById("app").innerHTML += html;
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+
+    }
+
+
     loadProfile();
+    loadHomeworks();
 
 </script>
 
