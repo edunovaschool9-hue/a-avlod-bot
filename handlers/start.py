@@ -1,7 +1,8 @@
 from aiogram import Router, types
 from aiogram.filters import CommandStart
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from database import register_student, get_student
-from config import TEACHER_ID
+from config import TEACHER_ID, MINI_APP_URL
 
 router = Router()
 
@@ -31,19 +32,23 @@ async def cmd_start(message: types.Message):
         full_name=full_name
     )
 
+    # Кнопка открытия Mini App
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(
+            text="🎓 Akademiyani ochish",
+            web_app=WebAppInfo(url=MINI_APP_URL)
+        )]
+    ])
+
     if is_new:
         await message.answer(
             f"🎉 <b>A Avlod Academy</b> ga xush kelibsiz, {user.first_name}!\n\n"
-            f"💾 Siz o'z hisobingizni yaratdingiz.\n"
             f"Bu yerda siz:\n"
-            f"  • Uy vazifalarini olasiz\n"
+            f"  • Darslarni o'qib testlar topshirasiz 🧪\n"
             f"  • <b>Bayt</b> 💾 ishlaysiz\n"
-            f"  • Baytlarni sovg'alarga almashtirasiz\n\n"
-            f"<b>Buyruqlar:</b>\n"
-            f"💰 /balance — balansingiz\n"
-            f"👤 /profile — profilingiz\n"
-            f"📝 /homework — uy vazifalaringiz\n"
-            f"❓ /help — yordam"
+            f"  • Baytlarni sovg'alarga almashtirasiz 🎁\n\n"
+            f"Bosing va akademiyaga kiring! 👇",
+            reply_markup=keyboard
         )
     else:
         student = await get_student(user.id)
@@ -51,7 +56,8 @@ async def cmd_start(message: types.Message):
             f"Qaytib keldingiz, {user.first_name}! 👋\n\n"
             f"💾 Balans: <b>{student['bytes_balance']} bayt</b>\n"
             f"🎖 Daraja: {student['rank']} · {student['level']}\n\n"
-            f"Buyruqlar ro'yxati: /help"
+            f"Akademiyaga kirish uchun bosing! 👇",
+            reply_markup=keyboard
         )
 
 
@@ -69,10 +75,19 @@ async def cmd_help(message: types.Message):
             "📈 /stats — umumiy statistika"
         )
     else:
+        from aiogram.types import WebAppInfo
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(
+                text="🎓 Akademiyani ochish",
+                web_app=WebAppInfo(url=MINI_APP_URL)
+            )]
+        ])
         await message.answer(
             "<b>📚 Buyruqlar:</b>\n\n"
             "💰 /balance — bayt balansi\n"
             "👤 /profile — mening profilim\n"
             "📝 /homework — uy vazifalarim\n"
-            "📜 /history — bayt tarixi"
+            "📜 /history — bayt tarixi\n\n"
+            "Yoki pastdagi tugmani bosing 👇",
+            reply_markup=keyboard
         )
