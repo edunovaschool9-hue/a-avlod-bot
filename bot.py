@@ -17,6 +17,7 @@ from handlers.start import router as start_router
 from handlers.student import router as student_router
 from handlers.teacher import router as teacher_router
 from handlers.homework import router as homework_router
+from handlers.lessons import router as lessons_router
 from api import create_app
 
 logging.basicConfig(
@@ -33,6 +34,7 @@ bot = Bot(
 )
 dp = Dispatcher()
 
+dp.include_router(lessons_router)
 dp.include_router(homework_router)
 dp.include_router(teacher_router)
 dp.include_router(student_router)
@@ -41,6 +43,7 @@ dp.include_router(start_router)
 async def set_bot_commands():
     student_commands = [
         BotCommand(command="start", description="🚀 Boshlash"),
+        BotCommand(command="darslar", description="📚 Darslar va testlar"),
         BotCommand(command="profile", description="👤 Profil"),
         BotCommand(command="balance", description="💰 Baytlar"),
         BotCommand(command="homework", description="📝 Uy vazifalar"),
