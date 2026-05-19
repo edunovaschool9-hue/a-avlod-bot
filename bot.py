@@ -10,12 +10,11 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.types import (
     BotCommand,
     BotCommandScopeDefault,
-    BotCommandScopeChat,
     MenuButtonWebApp,
     WebAppInfo,
 )
 
-from config import BOT_TOKEN, TEACHER_ID, MINI_APP_URL
+from config import BOT_TOKEN, MINI_APP_URL
 from database import init_db
 
 from handlers.start import router as start_router
@@ -64,25 +63,10 @@ async def set_bot_commands():
         BotCommand(command="help", description="❓ Yordam"),
     ]
 
-    teacher_commands = [
-        BotCommand(command="students", description="👥 O'quvchilar"),
-        BotCommand(command="stats", description="📊 Statistika"),
-        BotCommand(command="new_hw", description="📝 Vazifa yaratish"),
-        BotCommand(command="help", description="❓ Yordam"),
-    ]
-
-    # Student commands
+    # Student commands only
     await bot.set_my_commands(
         student_commands,
         scope=BotCommandScopeDefault()
-    )
-
-    # Teacher commands
-    await bot.set_my_commands(
-        teacher_commands,
-        scope=BotCommandScopeChat(
-            chat_id=int(TEACHER_ID)
-        )
     )
 
     # Mini App button
