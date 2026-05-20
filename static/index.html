@@ -7,247 +7,272 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--bg:#0d0d14;--s:#161622;--s2:#1e1e2e;--brd:rgba(255,255,255,.07);--ac:#7c3aed;--al:#a78bfa;--gn:#10b981;--rd:#ef4444;--go:#f59e0b;--tx:#f8fafc;--mu:#64748b;--mu2:#94a3b8}
+:root{--bg:#0a0a12;--s:#13131f;--s2:#1a1a2a;--brd:rgba(255,255,255,.07);--ac:#7c3aed;--al:#a78bfa;--gn:#10b981;--rd:#ef4444;--go:#f59e0b;--tx:#f1f5f9;--mu:#64748b;--mu2:#94a3b8}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding-bottom:72px;overflow-x:hidden}
 .nav{position:fixed;bottom:0;left:0;right:0;background:var(--s);border-top:1px solid var(--brd);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:100}
 .nb{flex:1;border:none;background:transparent;color:var(--mu);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;font-size:10px;transition:color .2s}
 .nb.active{color:var(--al)}
 .nb svg{width:22px;height:22px;stroke-width:1.8}
-.sc{display:none;padding:16px;animation:fi .2s ease}
+.sc{display:none;padding:0}
 .sc.active{display:block}
-@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.hero{background:linear-gradient(135deg,#1e1040,#2d1b69,#1e1040);border:1px solid rgba(124,58,237,.3);border-radius:20px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden}
-.hero::after{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:rgba(124,58,237,.15);border-radius:50%}
-.hero-top{display:flex;justify-content:space-between;align-items:flex-start}
-.hero-label{font-size:11px;color:var(--al);opacity:.8;margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px}
-.hero-amount{font-size:40px;font-weight:700;letter-spacing:-2px;line-height:1}
-.hero-unit{font-size:14px;font-weight:400;color:var(--al);margin-left:4px}
-.hav{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--al));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0;z-index:1}
-.hero-meta{display:flex;gap:20px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08)}
-.hmv{font-size:16px;font-weight:600;color:#fff}
-.hmk{font-size:10px;color:var(--al);opacity:.7;margin-top:1px}
-.xpw{margin-bottom:14px}
-.xph{display:flex;justify-content:space-between;margin-bottom:6px}
-.xph span{font-size:12px;color:var(--mu2)}
-.xph strong{font-size:12px;color:var(--al)}
-.xpb{height:6px;background:var(--s2);border-radius:3px;overflow:hidden}
-.xpf{height:100%;background:linear-gradient(90deg,var(--ac),var(--al));border-radius:3px;transition:width .6s ease}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.card{background:var(--s);border:1px solid var(--brd);border-radius:16px;padding:14px}
-.ci{font-size:22px;margin-bottom:8px}
-.cv{font-size:24px;font-weight:700;line-height:1}
-.ck{font-size:11px;color:var(--mu);margin-top:3px}
-.sec{font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;margin:0 0 10px}
-.hw{background:var(--s);border:1px solid var(--brd);border-radius:14px;padding:14px;margin-bottom:10px;display:flex;align-items:flex-start;gap:12px}
-.hwl{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.hwl.new{background:rgba(124,58,237,.15)}
-.hwl.review{background:rgba(245,158,11,.15)}
-.hwl.done{background:rgba(16,185,129,.15)}
-.hwb{flex:1;min-width:0}
-.hwt{font-size:14px;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hws{font-size:12px;color:var(--mu)}
-.badge{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;flex-shrink:0}
-.bn{background:rgba(124,58,237,.2);color:#a78bfa}
-.br{background:rgba(245,158,11,.2);color:#fbbf24}
-.bd{background:rgba(16,185,129,.2);color:#34d399}
-/* LESSONS */
-.lcard{background:var(--s);border:1px solid var(--brd);border-radius:16px;padding:14px;margin-bottom:10px;cursor:pointer;transition:border-color .2s}
-.lcard:active{border-color:var(--al)}
-.lcard-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-.lcard-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.lcard-title{font-size:14px;font-weight:600;margin-bottom:3px}
-.lcard-sub{font-size:12px;color:var(--mu)}
-.lcard-meta{display:flex;justify-content:space-between;align-items:center}
-.lcard-reward{font-size:12px;font-weight:600;color:var(--al)}
-.lcard-week{font-size:11px;color:var(--mu)}
+
+/* HOME */
+.home-inner{padding:14px}
+.balances{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.bal-card{border-radius:14px;padding:12px}
+.bal-card.som{background:linear-gradient(135deg,#0c2340,#1a3a6b);border:1px solid rgba(59,130,246,.3)}
+.bal-card.bayt{background:linear-gradient(135deg,#1a0c40,#2d1b69);border:1px solid rgba(124,58,237,.3)}
+.bal-label{font-size:10px;margin-bottom:4px;opacity:.8}
+.bal-label.som{color:#7dd3fc}
+.bal-label.bayt{color:#c4b5fd}
+.bal-val{font-size:20px;font-weight:700;color:#fff;line-height:1}
+.bal-unit{font-size:10px;font-weight:400;opacity:.7;margin-left:2px}
+
+/* CALF CARD */
+.calf-card{background:var(--s);border:1px solid var(--brd);border-radius:20px;padding:18px;margin-bottom:14px;text-align:center;position:relative}
+.calf-week{display:inline-block;background:rgba(16,185,129,.15);color:#34d399;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;margin-bottom:10px}
+.calf-emoji{font-size:80px;line-height:1;margin:4px 0;display:block;transition:all .3s}
+.calf-kg{font-size:28px;font-weight:700;color:var(--tx);margin:6px 0 2px}
+.calf-kg span{font-size:14px;font-weight:400;color:var(--mu2)}
+.calf-prog-wrap{margin:10px 20px}
+.calf-prog-label{display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-bottom:4px}
+.calf-prog{height:6px;background:var(--s2);border-radius:3px;overflow:hidden}
+.calf-prog-fill{height:100%;background:linear-gradient(90deg,#22c55e,#86efac);border-radius:3px;transition:width .8s ease}
+.feed-btn{background:linear-gradient(135deg,var(--ac),var(--al));border:none;color:#fff;font-size:15px;font-weight:600;padding:13px 28px;border-radius:14px;cursor:pointer;margin-top:12px;transition:opacity .2s}
+.feed-btn:disabled{background:var(--s2);color:var(--mu);cursor:default}
+.feed-hint{font-size:11px;color:var(--mu);margin-top:6px}
+
+/* BOTTOM BTNS */
+.home-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.hbtn{padding:14px 10px;border-radius:14px;border:1px solid var(--brd);background:var(--s);color:var(--tx);font-size:14px;font-weight:600;cursor:pointer;text-align:center;transition:all .2s}
+.hbtn.test{border-color:rgba(124,58,237,.4);background:rgba(124,58,237,.1);color:var(--al)}
+.hbtn.lesson{color:var(--mu);cursor:default}
+
+/* LESSONS SCREEN */
+.lessons-inner{padding:14px}
+.lesson-label{font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+.collage{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.coll-item{border-radius:16px;padding:14px;min-height:100px;position:relative;overflow:hidden;border:1px solid var(--brd);cursor:pointer;transition:all .2s}
+.coll-item.active{background:var(--s);border-color:rgba(124,58,237,.4)}
+.coll-item.locked{background:var(--s2);cursor:default;opacity:.6}
+.coll-item.done{background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.3)}
+.coll-num{font-size:11px;color:var(--mu);margin-bottom:6px}
+.coll-icon{font-size:28px;margin-bottom:6px;display:block}
+.coll-title{font-size:12px;font-weight:600;line-height:1.3}
+.coll-badge{position:absolute;top:8px;right:8px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px}
+.coll-badge.open{background:rgba(124,58,237,.2);color:#a78bfa}
+.coll-badge.done{background:rgba(16,185,129,.2);color:#34d399}
+.coll-badge.lock{background:rgba(100,116,139,.15);color:var(--mu)}
+.coming-section{}
+.coming-label{font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.coming-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.coming-item{background:var(--s2);border:1px dashed rgba(100,116,139,.3);border-radius:14px;padding:12px;text-align:center;opacity:.6}
+.coming-icon{font-size:22px;display:block;margin-bottom:4px}
+.coming-name{font-size:11px;font-weight:600;color:var(--mu2);margin-bottom:2px}
+.coming-soon{font-size:10px;color:var(--mu)}
+
 /* TEST SCREEN */
-.test-header{background:var(--s);border:1px solid var(--brd);border-radius:16px;padding:14px;margin-bottom:14px}
-.test-title{font-size:16px;font-weight:700;margin-bottom:6px}
-.test-prog-wrap{display:flex;align-items:center;gap:10px}
-.test-prog{flex:1;height:6px;background:var(--s2);border-radius:3px;overflow:hidden}
-.test-prog-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--al));border-radius:3px;transition:width .4s ease}
-.test-prog-txt{font-size:12px;color:var(--mu2);white-space:nowrap}
-.question-card{background:var(--s);border:1px solid var(--brd);border-radius:16px;padding:16px;margin-bottom:14px}
-.question-text{font-size:15px;font-weight:600;line-height:1.5;margin-bottom:4px}
-.option-btn{width:100%;padding:12px 14px;margin-bottom:8px;background:var(--s2);border:1px solid var(--brd);border-radius:12px;color:var(--tx);font-size:14px;text-align:left;cursor:pointer;transition:all .2s}
-.option-btn:active{transform:scale(.98)}
-.option-btn.correct{background:rgba(16,185,129,.15);border-color:var(--gn);color:#34d399}
-.option-btn.wrong{background:rgba(239,68,68,.15);border-color:var(--rd);color:#f87171}
-.option-btn.show-correct{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3);color:#34d399}
-.option-btn:disabled{cursor:default}
-.next-btn{width:100%;padding:14px;background:var(--ac);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:6px;transition:opacity .2s}
-.next-btn:active{opacity:.85}
-/* RESULT */
-.result-card{background:var(--s);border:1px solid var(--brd);border-radius:20px;padding:24px;text-align:center;margin-bottom:14px}
-.result-emoji{font-size:56px;margin-bottom:12px}
-.result-title{font-size:20px;font-weight:700;margin-bottom:4px}
-.result-sub{font-size:14px;color:var(--mu2);margin-bottom:16px}
-.result-score{font-size:36px;font-weight:700;color:var(--al);margin-bottom:4px}
-.result-score-sub{font-size:13px;color:var(--mu);margin-bottom:16px}
-.result-bytes{background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);border-radius:12px;padding:12px;font-size:15px;font-weight:600;color:var(--al);margin-bottom:8px}
-.result-pending{font-size:13px;color:var(--mu2);line-height:1.5}
-.back-btn{width:100%;padding:14px;background:var(--s2);border:1px solid var(--brd);border-radius:12px;color:var(--tx);font-size:14px;font-weight:600;cursor:pointer;margin-top:10px}
+.test-screen{padding:14px}
+.test-top{background:var(--s);border:1px solid var(--brd);border-radius:16px;padding:14px;margin-bottom:14px}
+.test-top-title{font-size:15px;font-weight:600;margin-bottom:8px}
+.prog-row{display:flex;align-items:center;gap:10px}
+.prog-bar{flex:1;height:6px;background:var(--s2);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--al));border-radius:3px;transition:width .4s}
+.prog-txt{font-size:12px;color:var(--mu2);white-space:nowrap}
+.q-card{background:var(--s);border:1px solid var(--brd);border-radius:16px;padding:16px;margin-bottom:12px}
+.q-text{font-size:15px;font-weight:600;line-height:1.5}
+.opt{width:100%;padding:13px 14px;margin-bottom:8px;background:var(--s2);border:1px solid var(--brd);border-radius:12px;color:var(--tx);font-size:14px;text-align:left;cursor:pointer;transition:all .2s}
+.opt:active{transform:scale(.98)}
+.opt.correct{background:rgba(16,185,129,.15);border-color:var(--gn);color:#34d399}
+.opt.wrong{background:rgba(239,68,68,.15);border-color:var(--rd);color:#f87171}
+.opt:disabled{cursor:default}
+.next-btn{width:100%;padding:14px;background:var(--ac);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;display:none;margin-top:4px}
+
+/* RESULT SCREEN */
+.result-screen{padding:14px}
+.res-card{background:var(--s);border:1px solid var(--brd);border-radius:20px;padding:24px;text-align:center;margin-bottom:14px}
+.res-emoji{font-size:60px;display:block;margin-bottom:10px}
+.res-title{font-size:20px;font-weight:700;margin-bottom:4px}
+.res-score{font-size:40px;font-weight:700;color:var(--al);margin:12px 0 4px}
+.res-score-sub{font-size:13px;color:var(--mu);margin-bottom:14px}
+.res-bytes{background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);border-radius:12px;padding:12px;font-size:15px;font-weight:600;color:var(--al);margin-bottom:8px}
+.res-pending{font-size:13px;color:var(--mu2);line-height:1.6}
+.back-btn{width:100%;padding:13px;background:var(--s2);border:1px solid var(--brd);border-radius:12px;color:var(--tx);font-size:14px;font-weight:600;cursor:pointer;margin-top:10px}
+
 /* MARKET */
-.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.mc{background:var(--s);border:1px solid var(--brd);border-radius:14px;overflow:hidden}
-.mci{height:72px;display:flex;align-items:center;justify-content:center;font-size:32px}
-.mcb{padding:10px}
-.mcn{font-size:13px;font-weight:600;margin-bottom:2px}
-.mcs{font-size:11px;color:var(--mu);margin-bottom:8px}
-.mcp{font-size:13px;font-weight:700;color:var(--al)}
-.mcbtn{width:100%;margin-top:8px;padding:7px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:var(--al);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer}
-/* TABS */
-.tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px}
-.tabs::-webkit-scrollbar{display:none}
-.tab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--brd);background:var(--s);color:var(--mu);cursor:pointer;white-space:nowrap;transition:all .2s}
-.tab.active{background:var(--ac);color:#fff;border-color:var(--ac)}
+.market-inner{padding:14px}
+.coming-big{background:var(--s);border:1px solid var(--brd);border-radius:20px;padding:40px 20px;text-align:center}
+.coming-big-icon{font-size:60px;display:block;margin-bottom:12px}
+.coming-big-title{font-size:18px;font-weight:600;margin-bottom:6px}
+.coming-big-sub{font-size:14px;color:var(--mu)}
+
 /* PROFILE */
-.pav{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--al));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#fff;margin:0 auto 12px;border:3px solid rgba(124,58,237,.4)}
-.pname{font-size:20px;font-weight:700;margin-bottom:3px;text-align:center}
-.puser{font-size:13px;color:var(--mu);text-align:center}
-.prank{display:inline-block;margin-top:10px;padding:5px 16px;border-radius:20px;background:rgba(124,58,237,.2);color:var(--al);font-size:13px;font-weight:600}
-.tx{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--brd)}
-.txi{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.profile-inner{padding:14px}
+.prof-head{text-align:center;margin-bottom:18px}
+.pav{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--al));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#fff;margin:0 auto 10px;border:3px solid rgba(124,58,237,.3)}
+.pname{font-size:20px;font-weight:700;margin-bottom:3px}
+.puser{font-size:13px;color:var(--mu);margin-bottom:8px}
+.prank{display:inline-block;padding:5px 16px;border-radius:20px;background:rgba(124,58,237,.2);color:var(--al);font-size:13px;font-weight:600}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.card{background:var(--s);border:1px solid var(--brd);border-radius:14px;padding:12px}
+.ci{font-size:20px;margin-bottom:6px}
+.cv{font-size:22px;font-weight:700;line-height:1}
+.ck{font-size:11px;color:var(--mu);margin-top:2px}
+.sec{font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;margin:0 0 10px}
+.tx{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--brd)}
+.txi{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
 .txi.plus{background:rgba(16,185,129,.15)}
 .txi.minus{background:rgba(239,68,68,.15)}
 .txr{font-size:13px;font-weight:500}
-.txd{font-size:11px;color:var(--mu);margin-top:2px}
-.txa{font-size:14px;font-weight:700;margin-left:auto}
+.txd{font-size:11px;color:var(--mu);margin-top:1px}
+.txa{font-size:13px;font-weight:700;margin-left:auto}
 .txa.plus{color:var(--gn)}
 .txa.minus{color:var(--rd)}
-.ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.ach{background:var(--s);border:1px solid var(--brd);border-radius:12px;padding:12px;text-align:center}
-.ach-icon{font-size:28px;margin-bottom:6px}
-.ach-name{font-size:11px;font-weight:600}
-.ach.locked{opacity:.3}
-.loading{text-align:center;padding:40px;color:var(--mu)}
-.spin{width:28px;height:28px;border:2px solid var(--brd);border-top-color:var(--al);border-radius:50%;animation:sp .7s linear infinite;margin:0 auto 10px}
+.spin{width:24px;height:24px;border:2px solid var(--brd);border-top-color:var(--al);border-radius:50%;animation:sp .7s linear infinite;margin:0 auto 8px}
 @keyframes sp{to{transform:rotate(360deg)}}
-.empty{text-align:center;padding:32px;color:var(--mu);font-size:13px}
+.loading{text-align:center;padding:30px;color:var(--mu);font-size:13px}
 </style>
 </head>
 <body>
 
 <!-- HOME -->
 <div class="sc active" id="s-home">
-  <div class="hero">
-    <div class="hero-top">
-      <div>
-        <div class="hero-label">Sizning balansingiz</div>
-        <div class="hero-amount"><span id="h-bal">0</span><span class="hero-unit">bayt</span></div>
+<div class="home-inner">
+  <div class="balances">
+    <div class="bal-card som">
+      <div class="bal-label som">💰 Asosiy hisob</div>
+      <div class="bal-val"><span id="h-som">0</span><span class="bal-unit">so'm</span></div>
+    </div>
+    <div class="bal-card bayt">
+      <div class="bal-label bayt">💾 Bayt hisob</div>
+      <div class="bal-val"><span id="h-bayt">0</span><span class="bal-unit">bayt</span></div>
+    </div>
+  </div>
+
+  <div class="calf-card">
+    <div class="calf-week" id="calf-week">1-hafta</div>
+    <span class="calf-emoji" id="calf-emoji">🐄</span>
+    <div class="calf-kg"><span id="calf-kg">40</span><span> kg</span></div>
+    <div class="calf-prog-wrap">
+      <div class="calf-prog-label">
+        <span id="calf-from">40 kg</span>
+        <span id="calf-to">50 kg</span>
       </div>
-      <div class="hav" id="h-av">?</div>
+      <div class="calf-prog"><div class="calf-prog-fill" id="calf-fill" style="width:0%"></div></div>
     </div>
-    <div class="hero-meta">
-      <div><div class="hmv" id="h-rank">Junior</div><div class="hmk">Daraja</div></div>
-      <div><div class="hmv" id="h-streak">0🔥</div><div class="hmk">Streak</div></div>
-      <div><div class="hmv" id="h-earned">0</div><div class="hmk">Jami</div></div>
-    </div>
+    <button class="feed-btn" id="feed-btn" disabled onclick="feedCalf()">🌿 Ovqat berish</button>
+    <div class="feed-hint" id="feed-hint">Vazifa bajarsangiz faollashadi</div>
   </div>
-  <div class="xpw">
-    <div class="xph"><span id="h-rl">Junior darajasi</span><strong id="h-xp">0%</strong></div>
-    <div class="xpb"><div class="xpf" id="h-xpf" style="width:0%"></div></div>
+
+  <div class="home-btns">
+    <button class="hbtn test" onclick="goTest()">🧪 Test</button>
+    <button class="hbtn lesson" id="lesson-btn" onclick="goLesson()">📚 Dars 🔒</button>
   </div>
-  <div class="g2">
-    <div class="card"><div class="ci">📝</div><div class="cv" id="h-act">0</div><div class="ck">Faol vazifalar</div></div>
-    <div class="card"><div class="ci">✅</div><div class="cv" id="h-don">0</div><div class="ck">Bajarilgan</div></div>
-  </div>
-  <div class="sec">Faol vazifalar</div>
-  <div id="h-hw"><div class="loading"><div class="spin"></div>Yuklanmoqda...</div></div>
+</div>
 </div>
 
 <!-- LESSONS -->
 <div class="sc" id="s-lessons">
-  <div id="lesson-list-view">
-    <div class="sec" style="margin-bottom:14px">📚 Darslar va Testlar</div>
-    <div id="lessons-container"><div class="loading"><div class="spin"></div>Yuklanmoqda...</div></div>
+<div class="lessons-inner">
+  <div class="lesson-label">📚 Testlar va darslar</div>
+
+  <div class="collage" id="collage">
+    <!-- filled by JS -->
   </div>
-  <div id="test-view" style="display:none">
-    <div class="test-header">
-      <div class="test-title" id="test-lesson-title">Test</div>
-      <div class="test-prog-wrap">
-        <div class="test-prog"><div class="test-prog-fill" id="test-prog-fill" style="width:0%"></div></div>
-        <div class="test-prog-txt" id="test-prog-txt">0/5</div>
+
+  <div class="coming-section">
+    <div class="coming-label">Tez kunda ochiladi</div>
+    <div class="coming-grid">
+      <div class="coming-item">
+        <span class="coming-icon">📖</span>
+        <div class="coming-name">Kitob</div>
+        <div class="coming-soon">Tez kunda</div>
+      </div>
+      <div class="coming-item">
+        <span class="coming-icon">🤖</span>
+        <div class="coming-name">AI ga buyruq</div>
+        <div class="coming-soon">Tez kunda</div>
+      </div>
+      <div class="coming-item">
+        <span class="coming-icon">🎤</span>
+        <div class="coming-name">Tez gapirish</div>
+        <div class="coming-soon">Tez kunda</div>
+      </div>
+      <div class="coming-item">
+        <span class="coming-icon">🎬</span>
+        <div class="coming-name">Video darslik</div>
+        <div class="coming-soon">Tez kunda</div>
       </div>
     </div>
-    <div class="question-card">
-      <div class="question-text" id="q-text">Savol...</div>
-    </div>
-    <div id="options-container"></div>
-    <button class="next-btn" id="next-btn" style="display:none" onclick="nextQuestion()">Keyingisi →</button>
-  </div>
-  <div id="result-view" style="display:none">
-    <div class="result-card">
-      <div class="result-emoji" id="res-emoji">🏆</div>
-      <div class="result-title" id="res-title">Ajoyib!</div>
-      <div class="result-sub" id="res-sub">Testni muvaffaqiyatli yakunladingiz</div>
-      <div class="result-score" id="res-score">5/5</div>
-      <div class="result-score-sub">to'g'ri javoblar</div>
-      <div class="result-bytes" id="res-bytes">+25 bayt mukofot</div>
-      <div class="result-pending">⏳ O'qituvchi natijangizni tekshirmoqda...<br>Tasdiqlangandan so'ng baytlar hisobingizga tushadi!</div>
-    </div>
-    <button class="back-btn" onclick="showLessonList()">⬅️ Darslarga qaytish</button>
   </div>
 </div>
+</div>
 
-<!-- HOMEWORK -->
-<div class="sc" id="s-homework">
-  <div class="tabs">
-    <button class="tab active" onclick="fhw('all',this)">Barchasi</button>
-    <button class="tab" onclick="fhw('new',this)">Faol</button>
-    <button class="tab" onclick="fhw('review',this)">Tekshirilmoqda</button>
-    <button class="tab" onclick="fhw('done',this)">Bajarildi</button>
+<!-- TEST SCREEN (inside lessons) -->
+<div class="sc" id="s-test">
+<div class="test-screen">
+  <div class="test-top">
+    <div class="test-top-title" id="test-title">Test</div>
+    <div class="prog-row">
+      <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="prog-txt" id="prog-txt">1/5</div>
+    </div>
   </div>
-  <div id="hw-list"><div class="loading"><div class="spin"></div>Yuklanmoqda...</div></div>
+  <div class="q-card"><div class="q-text" id="q-text">Savol...</div></div>
+  <div id="opts"></div>
+  <button class="next-btn" id="next-btn" onclick="nextQ()">Keyingisi →</button>
+</div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div class="sc" id="s-result">
+<div class="result-screen">
+  <div class="res-card">
+    <span class="res-emoji" id="res-emoji">🏆</span>
+    <div class="res-title" id="res-title">Mukammal!</div>
+    <div class="res-score" id="res-score">5/5</div>
+    <div class="res-score-sub">to'g'ri javoblar</div>
+    <div class="res-bytes" id="res-bytes">+25 bayt kutilmoqda</div>
+    <div class="res-pending">⏳ O'qituvchi natijangizni tekshirmoqda...<br>Tasdiqlangandan so'ng baytlar va navbatdagi dars ochiladi!</div>
+  </div>
+  <button class="back-btn" onclick="backToLessons()">⬅️ Darslarga qaytish</button>
+</div>
 </div>
 
 <!-- MARKET -->
 <div class="sc" id="s-market">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-    <div class="sec" style="margin:0">Sovgalar marketi</div>
-    <span style="font-size:12px;color:var(--al)" id="mkt-bal">0 bayt</span>
+<div class="market-inner">
+  <div class="coming-big">
+    <span class="coming-big-icon">🛍️</span>
+    <div class="coming-big-title">Market tez kunda ochiladi!</div>
+    <div class="coming-big-sub">Baytlaringizni to'plang —<br>sovg'alar kutmoqda 🎁</div>
   </div>
-  <div class="mgrid">
-    <div class="mc" data-cat="ai"><div class="mci" style="background:rgba(16,185,129,.1)">🤖</div><div class="mcb"><div class="mcn">ChatGPT Plus</div><div class="mcs">1 oy</div><div class="mcp">2,000 bayt</div><button class="mcbtn">Olish</button></div></div>
-    <div class="mc" data-cat="ai"><div class="mci" style="background:rgba(99,102,241,.1)">✨</div><div class="mcb"><div class="mcn">Claude Pro</div><div class="mcs">1 oy</div><div class="mcp">2,500 bayt</div><button class="mcbtn">Olish</button></div></div>
-    <div class="mc" data-cat="travel"><div class="mci" style="background:rgba(245,158,11,.1)">✈️</div><div class="mcb"><div class="mcn">Oilaviy tur</div><div class="mcs">Samarqand</div><div class="mcp">15,000 bayt</div><button class="mcbtn">Olish</button></div></div>
-    <div class="mc" data-cat="clothes"><div class="mci" style="background:rgba(99,102,241,.1)">👕</div><div class="mcb"><div class="mcn">Kuz toplami</div><div class="mcs">Kiyim</div><div class="mcp">8,000 bayt</div><button class="mcbtn">Olish</button></div></div>
-    <div class="mc" data-cat="tech"><div class="mci" style="background:rgba(239,68,68,.1)">🎧</div><div class="mcb"><div class="mcn">Quloqchin</div><div class="mcs">Simsiz</div><div class="mcp">5,000 bayt</div><button class="mcbtn">Olish</button></div></div>
-    <div class="mc" data-cat="tech"><div class="mci" style="background:rgba(16,185,129,.1)">🎬</div><div class="mcb"><div class="mcn">Video suratga olish</div><div class="mcs">Professional</div><div class="mcp">3,000 bayt</div><button class="mcbtn">Olish</button></div></div>
-  </div>
+</div>
 </div>
 
 <!-- PROFILE -->
 <div class="sc" id="s-profile">
-  <div style="text-align:center;margin-bottom:20px">
+<div class="profile-inner">
+  <div class="prof-head">
     <div class="pav" id="p-av">?</div>
-    <div class="pname" id="p-name">Yuklanmoqda...</div>
+    <div class="pname" id="p-name">...</div>
     <div class="puser" id="p-user"></div>
-    <div style="display:flex;justify-content:center"><span class="prank" id="p-rank">Junior · Level 1</span></div>
+    <span class="prank" id="p-rank">Junior · Lv1</span>
   </div>
   <div class="g2" style="margin-bottom:14px">
-    <div class="card"><div class="ci">💾</div><div class="cv" id="p-bal">0</div><div class="ck">Bayt</div></div>
-    <div class="card"><div class="ci">📝</div><div class="cv" id="p-hw">0</div><div class="ck">Bajarilgan</div></div>
-    <div class="card"><div class="ci">🔥</div><div class="cv" id="p-str">0</div><div class="ck">Streak</div></div>
-    <div class="card"><div class="ci">📈</div><div class="cv" id="p-tot">0</div><div class="ck">Jami ishlangan</div></div>
-  </div>
-  <div class="sec">Yutuqlar</div>
-  <div class="ach-grid">
-    <div class="ach locked" id="ach-1"><div class="ach-icon">🏆</div><div class="ach-name">Birinchi 100 bayt</div></div>
-    <div class="ach locked" id="ach-2"><div class="ach-icon">🔥</div><div class="ach-name">10 kun streak</div></div>
-    <div class="ach locked" id="ach-3"><div class="ach-icon">⭐</div><div class="ach-name">5 ta vazifa</div></div>
-    <div class="ach locked"><div class="ach-icon">🎬</div><div class="ach-name">Birinchi video</div></div>
-    <div class="ach locked"><div class="ach-icon">👑</div><div class="ach-name">Lider</div></div>
-    <div class="ach locked"><div class="ach-icon">🚀</div><div class="ach-name">Senior daraja</div></div>
+    <div class="card"><div class="ci">💰</div><div class="cv" id="p-som">0</div><div class="ck">so'm</div></div>
+    <div class="card"><div class="ci">💾</div><div class="cv" id="p-bayt">0</div><div class="ck">bayt</div></div>
+    <div class="card"><div class="ci">🐮</div><div class="cv" id="p-kg">40</div><div class="ck">kg</div></div>
+    <div class="card"><div class="ci">🔥</div><div class="cv" id="p-str">0</div><div class="ck">streak</div></div>
   </div>
   <div class="sec">Oxirgi operatsiyalar</div>
   <div id="p-tx"><div class="loading"><div class="spin"></div>Yuklanmoqda...</div></div>
+</div>
 </div>
 
 <nav class="nav">
   <button class="nb active" onclick="go('home',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Bosh</button>
   <button class="nb" onclick="go('lessons',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>Darslar</button>
-  <button class="nb" onclick="go('homework',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Vazifalar</button>
   <button class="nb" onclick="go('market',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Market</button>
   <button class="nb" onclick="go('profile',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil</button>
 </nav>
@@ -257,182 +282,195 @@ const tg=window.Telegram?.WebApp;
 if(tg){tg.ready();tg.expand();}
 const BASE=window.location.origin;
 let uid=tg?.initDataUnsafe?.user?.id||new URLSearchParams(location.search).get('user_id')||'0';
-let profile=null,homeworks=[],lessons=[],currentLesson=null,currentQIdx=0,answers=[],testAnswers=[];
+let profile=null,lessonAccess=[],lessons=[],currentLesson=null,curQ=0,testAnswers=[],navBtns=document.querySelectorAll('.nb');
 
-function go(n,b){
-  document.querySelectorAll('.sc').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nb').forEach(x=>x.classList.remove('active'));
-  document.getElementById('s-'+n).classList.add('active');
-  b.classList.add('active');
-  if(n==='homework'&&!homeworks.length)loadHw();
-  if(n==='profile')loadProfile();
-  if(n==='lessons'&&!lessons.length)loadLessons();
+const calfStages=[
+  {min:0,max:45,emoji:'🐄',label:'Yangi tug\'ilgan'},
+  {min:45,max:55,emoji:'🐄',label:'1-hafta'},
+  {min:55,max:70,emoji:'🐄',label:'2-hafta'},
+  {min:70,max:90,emoji:'🐂',label:'3-hafta'},
+  {min:90,max:120,emoji:'🐂',label:'4-hafta'},
+  {min:120,max:999,emoji:'🐃',label:'Katta buzoq'},
+];
+
+function getStage(kg){
+  return calfStages.find(s=>kg>=s.min&&kg<s.max)||calfStages[calfStages.length-1];
 }
 
+function fmt(n){return Number(n||0).toLocaleString('ru');}
 function ini(name){return(name||'?').split(' ').map(n=>n[0]||'').join('').slice(0,2).toUpperCase()||'?';}
-function fmt(n){return Number(n||0).toLocaleString();}
+
+function go(n,b){
+  if(n==='test'||n==='result')return;
+  document.querySelectorAll('.sc').forEach(s=>s.classList.remove('active'));
+  navBtns.forEach(x=>x.classList.remove('active'));
+  document.getElementById('s-'+n).classList.add('active');
+  if(b)b.classList.add('active');
+  if(n==='lessons')renderLessons();
+  if(n==='profile')loadProfile();
+}
+
+function showScreen(id){
+  document.querySelectorAll('.sc').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goTest(){
+  if(!lessons.length){alert('Yuklanmoqda, kuting...');return;}
+  const accessible=lessonAccess.filter(a=>!a.test_passed);
+  if(!accessible.length){
+    const allDone=lessonAccess.every(a=>a.test_passed);
+    if(allDone)alert("Barcha testlar o'tilgan! Ustoz yangi dars ochadi.");
+    else alert("Avval faollashtirilishingiz kerak. Ustozga murojaat qiling.");
+    return;
+  }
+  const first=accessible.sort((a,b)=>a.lesson_id-b.lesson_id)[0];
+  openTest(first.lesson_id);
+}
+
+function goLesson(){
+  if(!profile?.is_active){
+    alert("Darslar faqat faollashtirilgan o'quvchilar uchun.\nUstozga murojaat qiling.");
+    return;
+  }
+  go('lessons',null);
+  navBtns[1].classList.add('active');
+}
 
 async function loadHome(){
   try{
     const r=await fetch(`${BASE}/api/profile?user_id=${uid}`);
-    if(!r.ok){document.getElementById('h-hw').innerHTML='<div class="empty">👋 Botni oching va /start bosing</div>';return;}
+    if(!r.ok){return;}
     const d=await r.json();profile=d;
-    document.getElementById('h-av').textContent=ini(d.full_name);
-    document.getElementById('h-bal').textContent=fmt(d.bytes_balance);
-    document.getElementById('h-rank').textContent=d.rank+' Lv'+d.level;
-    document.getElementById('h-streak').textContent=d.streak_days+'🔥';
-    document.getElementById('h-earned').textContent=fmt(d.total_earned);
-    document.getElementById('h-act').textContent=d.homeworks_active||0;
-    document.getElementById('h-don').textContent=d.homeworks_done||0;
-    document.getElementById('mkt-bal').textContent=fmt(d.bytes_balance)+' bayt';
-    const xp=Math.min(((d.bytes_balance%1000)/1000)*100,100);
-    document.getElementById('h-xpf').style.width=xp+'%';
-    document.getElementById('h-xp').textContent=Math.round(xp)+'%';
-    const hr=await fetch(`${BASE}/api/homeworks?user_id=${uid}`);
-    const hd=await hr.json();homeworks=hd.homeworks||[];
-    const act=homeworks.filter(h=>h.status==='new').slice(0,3);
-    const c=document.getElementById('h-hw');
-    if(!act.length){c.innerHTML='<div class="empty">🎉 Barcha vazifalar bajarildi!</div>';return;}
-    c.innerHTML=act.map(h=>`<div class="hw"><div class="hwl new">📝</div><div class="hwb"><div class="hwt">${h.title}</div><div class="hws">+${h.reward_bytes} bayt</div></div><span class="badge bn">Faol</span></div>`).join('');
-  }catch(e){document.getElementById('h-hw').innerHTML='<div class="empty">Xatolik yuz berdi</div>';}
+    document.getElementById('h-som').textContent=fmt(d.som_balance||0);
+    document.getElementById('h-bayt').textContent=fmt(d.bytes_balance||0);
+    const kg=d.calf_kg||40;
+    const stage=getStage(kg);
+    document.getElementById('calf-emoji').textContent=stage.emoji;
+    document.getElementById('calf-week').textContent=stage.label;
+    document.getElementById('calf-kg').textContent=Math.round(kg);
+    const nextStage=calfStages.find(s=>kg<s.max)||calfStages[calfStages.length-1];
+    const pct=Math.min(((kg-nextStage.min)/(nextStage.max-nextStage.min))*100,100);
+    document.getElementById('calf-fill').style.width=pct+'%';
+    document.getElementById('calf-from').textContent=nextStage.min+' kg';
+    document.getElementById('calf-to').textContent=nextStage.max+' kg';
+    if(d.is_active){
+      document.getElementById('lesson-btn').textContent='📚 Dars';
+      document.getElementById('lesson-btn').classList.remove('lesson');
+      document.getElementById('lesson-btn').style.borderColor='rgba(16,185,129,.4)';
+      document.getElementById('lesson-btn').style.background='rgba(16,185,129,.1)';
+      document.getElementById('lesson-btn').style.color='#34d399';
+    }
+    const la=await fetch(`${BASE}/api/lesson_access?user_id=${uid}`);
+    const ld=await la.json();
+    lessonAccess=ld.access||[];
+    const hasActive=lessonAccess.some(a=>!a.test_passed);
+    if(hasActive&&d.is_active){
+      document.getElementById('feed-btn').disabled=false;
+      document.getElementById('feed-hint').textContent='Testni o\'ting va g\'alaba qozonin!';
+    }
+  }catch(e){console.error(e);}
 }
 
 async function loadLessons(){
   try{
     const r=await fetch(`${BASE}/api/lessons`);
-    const d=await r.json();lessons=d.lessons||[];
-    renderLessons();
-  }catch(e){document.getElementById('lessons-container').innerHTML='<div class="empty">Xatolik yuz berdi</div>';}
+    const d=await r.json();
+    lessons=d.lessons||[];
+  }catch(e){}
 }
 
-const lessonIcons=['🤖','📱','🧠','🎤','🚀','😊','🌍','🎬'];
-const lessonColors=['rgba(124,58,237,.15)','rgba(16,185,129,.15)','rgba(59,130,246,.15)','rgba(245,158,11,.15)','rgba(239,68,68,.15)','rgba(236,72,153,.15)','rgba(16,185,129,.15)','rgba(124,58,237,.15)'];
+const lessonIcons=['🤖','📱','🧠','🎤','🚀'];
+const lessonColors=['rgba(124,58,237,.15)','rgba(16,185,129,.15)','rgba(59,130,246,.15)','rgba(245,158,11,.15)','rgba(239,68,68,.15)'];
 
 function renderLessons(){
-  const c=document.getElementById('lessons-container');
-  if(!lessons.length){c.innerHTML='<div class="empty">Darslar topilmadi</div>';return;}
-  c.innerHTML=lessons.map((l,i)=>`
-    <div class="lcard" onclick="openLesson(${l.id})">
-      <div class="lcard-top">
-        <div class="lcard-icon" style="background:${lessonColors[i%lessonColors.length]}">${lessonIcons[i%lessonIcons.length]}</div>
-        <div>
-          <div class="lcard-title">${l.id}-dars: ${l.title}</div>
-          <div class="lcard-sub">${l.description}</div>
-        </div>
-      </div>
-      <div class="lcard-meta">
-        <span class="lcard-week">📅 ${l.week}-hafta</span>
-        <span class="lcard-reward">🧪 Test: +${l.bytes_reward} bayt</span>
-      </div>
-    </div>`).join('');
+  const c=document.getElementById('collage');
+  if(!lessons.length){c.innerHTML='<div class="loading"><div class="spin"></div></div>';loadLessons().then(renderLessons);return;}
+  c.innerHTML=lessons.map((l,i)=>{
+    const access=lessonAccess.find(a=>a.lesson_id===l.id);
+    const isDone=access?.test_passed;
+    const isOpen=access&&!isDone;
+    const isLocked=!access;
+    let cls=isLocked?'locked':isDone?'done':'active';
+    let badge=isLocked?'<span class="coll-badge lock">🔒 Yopiq</span>':isDone?'<span class="coll-badge done">✅ O\'tildi</span>':'<span class="coll-badge open">📖 Ochiq</span>';
+    let click=isOpen?`onclick="openTest(${l.id})"`:isDone?`onclick="alert('Bu test allaqachon o\\'tilgan!')"`:isLocked?`onclick="alert('Bu dars hali yopiq. Avvalgi darsni o\\'ting!')"` :'';
+    return `<div class="coll-item ${cls}" ${click} style="background:${isDone?'rgba(16,185,129,.08)':isOpen?lessonColors[i%lessonColors.length]:''}">
+      ${badge}
+      <div class="coll-num">${l.id}-dars</div>
+      <span class="coll-icon">${lessonIcons[i%lessonIcons.length]}</span>
+      <div class="coll-title">${l.title}</div>
+    </div>`;
+  }).join('');
 }
 
-async function openLesson(lessonId){
+async function openTest(lessonId){
   try{
     const r=await fetch(`${BASE}/api/lessons/${lessonId}`);
     currentLesson=await r.json();
-    currentQIdx=0;
-    answers=[];
+    curQ=0;
     testAnswers=new Array(currentLesson.tests.length).fill(null);
-    showTestView();
-    showQuestion(0);
+    showScreen('s-test');
+    showQ(0);
   }catch(e){alert('Xatolik yuz berdi');}
 }
 
-function showTestView(){
-  document.getElementById('lesson-list-view').style.display='none';
-  document.getElementById('test-view').style.display='block';
-  document.getElementById('result-view').style.display='none';
-  document.getElementById('test-lesson-title').textContent=currentLesson.title;
-}
-
-function showLessonList(){
-  document.getElementById('lesson-list-view').style.display='block';
-  document.getElementById('test-view').style.display='none';
-  document.getElementById('result-view').style.display='none';
-}
-
-function showQuestion(idx){
+function showQ(idx){
   const q=currentLesson.tests[idx];
   const total=currentLesson.tests.length;
-  const pct=((idx)/total)*100;
-  document.getElementById('test-prog-fill').style.width=pct+'%';
-  document.getElementById('test-prog-txt').textContent=`${idx+1}/${total}`;
+  document.getElementById('test-title').textContent=currentLesson.title;
+  document.getElementById('prog-fill').style.width=((idx/total)*100)+'%';
+  document.getElementById('prog-txt').textContent=`${idx+1}/${total}`;
   document.getElementById('q-text').textContent=q.question;
   document.getElementById('next-btn').style.display='none';
-  const c=document.getElementById('options-container');
-  c.innerHTML=q.options.map((opt,i)=>
-    `<button class="option-btn" onclick="selectAnswer(${i})" id="opt-${i}">${opt}</button>`
+  document.getElementById('opts').innerHTML=q.options.map((opt,i)=>
+    `<button class="opt" onclick="selectAns(${i})" id="opt${i}">${opt}</button>`
   ).join('');
 }
 
-function selectAnswer(selected){
-  if(testAnswers[currentQIdx]!==null)return;
-  testAnswers[currentQIdx]=selected;
-  const btns=document.querySelectorAll('.option-btn');
-  btns.forEach(b=>b.disabled=true);
-  btns[selected].classList.add(selected===selected?'correct':'wrong');
+function selectAns(sel){
+  if(testAnswers[curQ]!==null)return;
+  testAnswers[curQ]=sel;
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  document.getElementById(`opt${sel}`).classList.add('correct');
   document.getElementById('next-btn').style.display='block';
-  const btn=document.getElementById(`opt-${selected}`);
-  btn.classList.remove('correct');
-  btn.classList.add('correct');
 }
 
-function nextQuestion(){
-  currentQIdx++;
-  if(currentQIdx<currentLesson.tests.length){
-    showQuestion(currentQIdx);
-  }else{
-    submitTest();
-  }
+function nextQ(){
+  curQ++;
+  if(curQ<currentLesson.tests.length){showQ(curQ);}
+  else{submitTest();}
 }
 
 async function submitTest(){
+  showScreen('s-result');
+  document.getElementById('res-emoji').textContent='⏳';
+  document.getElementById('res-title').textContent='Yuklanmoqda...';
   try{
-    document.getElementById('test-view').style.display='none';
-    document.getElementById('result-view').style.display='block';
-    document.getElementById('res-emoji').textContent='⏳';
-    document.getElementById('res-title').textContent='Yuklanmoqda...';
-
     const r=await fetch(`${BASE}/api/lessons/${currentLesson.id}/submit`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({user_id:uid,answers:testAnswers})
     });
     const d=await r.json();
-
-    document.getElementById('res-emoji').textContent=d.result_emoji.split(' ')[0];
-    document.getElementById('res-title').textContent=d.result_emoji;
-    document.getElementById('res-sub').textContent=currentLesson.title;
+    const emojis=['💪','👍','⭐','🏆'];
+    const pct=d.score/d.total;
+    const ei=pct<0.4?0:pct<0.6?1:pct<1?2:3;
+    document.getElementById('res-emoji').textContent=emojis[ei];
+    document.getElementById('res-title').textContent=d.result_emoji||'Natija';
     document.getElementById('res-score').textContent=`${d.score}/${d.total}`;
-    document.getElementById('res-bytes').textContent=`+${d.bytes_earned} bayt mukofot`;
+    document.getElementById('res-bytes').textContent=`+${d.bytes_earned} bayt kutilmoqda`;
   }catch(e){
     document.getElementById('res-emoji').textContent='❌';
-    document.getElementById('res-title').textContent='Xatolik yuz berdi';
+    document.getElementById('res-title').textContent='Xatolik';
   }
 }
 
-async function loadHw(){
-  try{
-    if(!homeworks.length){const r=await fetch(`${BASE}/api/homeworks?user_id=${uid}`);const d=await r.json();homeworks=d.homeworks||[];}
-    renderHw('all');
-  }catch(e){document.getElementById('hw-list').innerHTML='<div class="empty">Xatolik</div>';}
+function backToLessons(){
+  go('lessons',navBtns[1]);
 }
 
-function renderHw(f){
-  const list=f==='all'?homeworks:homeworks.filter(h=>h.status===f);
-  const c=document.getElementById('hw-list');
-  if(!list.length){c.innerHTML='<div class="empty">📭 Vazifalar yoq</div>';return;}
-  const icons={new:'📝',review:'🔍',done:'✅'};
-  const labels={new:'Faol',review:'Tekshirilmoqda',done:'Bajarildi'};
-  const badges={new:'bn',review:'br',done:'bd'};
-  c.innerHTML=list.map(h=>`<div class="hw"><div class="hwl ${h.status}">${icons[h.status]||'📝'}</div><div class="hwb"><div class="hwt">${h.title}</div><div class="hws">+${h.reward_bytes} bayt</div></div><span class="badge ${badges[h.status]||'bn'}">${labels[h.status]||h.status}</span></div>`).join('');
-}
-
-function fhw(f,b){
-  document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
-  b.classList.add('active');
-  renderHw(f);
+function feedCalf(){
+  alert("Ovqat berish funksiyasi tez kunda!\nHozircha testlarni bajaring va bayt to'plang 🐮");
 }
 
 async function loadProfile(){
@@ -442,23 +480,21 @@ async function loadProfile(){
     document.getElementById('p-av').textContent=ini(d.full_name);
     document.getElementById('p-name').textContent=d.full_name||'—';
     document.getElementById('p-user').textContent=d.username?'@'+d.username:'';
-    document.getElementById('p-rank').textContent='🎖 '+d.rank+' · Level '+d.level;
-    document.getElementById('p-bal').textContent=fmt(d.bytes_balance);
-    document.getElementById('p-hw').textContent=d.homeworks_done||0;
+    document.getElementById('p-rank').textContent='🎖 '+d.rank+' · Lv'+d.level;
+    document.getElementById('p-som').textContent=fmt(d.som_balance||0);
+    document.getElementById('p-bayt').textContent=fmt(d.bytes_balance||0);
+    document.getElementById('p-kg').textContent=Math.round(d.calf_kg||40);
     document.getElementById('p-str').textContent=d.streak_days||0;
-    document.getElementById('p-tot').textContent=fmt(d.total_earned);
-    if(d.bytes_balance>=100)document.getElementById('ach-1').classList.remove('locked');
-    if(d.streak_days>=10)document.getElementById('ach-2').classList.remove('locked');
-    if(d.homeworks_done>=5)document.getElementById('ach-3').classList.remove('locked');
     const tr=await fetch(`${BASE}/api/transactions?user_id=${uid}`);
     const td=await tr.json();const txs=td.transactions||[];
     const tc=document.getElementById('p-tx');
-    if(!txs.length){tc.innerHTML='<div class="empty">Operatsiyalar yoq</div>';return;}
-    tc.innerHTML=txs.map(t=>`<div class="tx"><div class="txi ${t.amount>0?'plus':'minus'}">${t.amount>0?'➕':'➖'}</div><div><div class="txr">${t.reason||'Sabab korsatilmagan'}</div><div class="txd">${(t.created_at||'').slice(0,16)}</div></div><div class="txa ${t.amount>0?'plus':'minus'}">${t.amount>0?'+':''}${t.amount} bayt</div></div>`).join('');
+    if(!txs.length){tc.innerHTML='<div class="loading">Operatsiyalar yoq</div>';return;}
+    tc.innerHTML=txs.map(t=>`<div class="tx"><div class="txi ${t.amount>0?'plus':'minus'}">${t.amount>0?'➕':'➖'}</div><div><div class="txr">${t.reason||'—'}</div><div class="txd">${(t.created_at||'').slice(0,16)}</div></div><div class="txa ${t.amount>0?'plus':'minus'}">${t.amount>0?'+':''}${t.amount} bayt</div></div>`).join('');
   }catch(e){console.error(e);}
 }
 
 loadHome();
+loadLessons();
 </script>
 </body>
 </html>
