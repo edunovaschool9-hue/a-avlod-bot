@@ -1,6 +1,7 @@
 from aiohttp import web
 from aiogram import Bot
-from database import get_student, get_transactions, get_student_homeworks, get_lesson_access
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from database import get_student, get_transactions, get_student_homeworks, get_lesson_access, add_bytes, unlock_next_lesson, update_calf
 from lessons_data import MONTHLY_LESSONS
 from config import BOT_TOKEN, TEACHER_ID
 
@@ -95,7 +96,6 @@ async def submit_test(request):
     if not uid:
         return web.json_response({"error": "No user_id"}, status=400)
 
-    # Serverda tekshirish
     score = sum(
         1 for i, a in enumerate(answers)
         if i < len(lesson["tests"]) and a == lesson["tests"][i]["correct"]
@@ -111,9 +111,7 @@ async def submit_test(request):
     pending_tests[key] = {
         "student_id": int(uid),
         "student_name": student_name,
-        "username": username,
         "lesson_id": lid,
-        "lesson_title": lesson["title"],
         "score": score,
         "total": total,
         "bytes_earned": bytes_earned,
@@ -128,22 +126,33 @@ async def submit_test(request):
     else:
         emoji = "💪 Davom eting!"
 
-    # Ustozga xabar yuborish
+    # Ustozga kнопки yuborish
     try:
         bot = Bot(token=BOT_TOKEN)
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✅ Tasdiqlash",
+                    callback_data=f"tapprove_{uid}_{lid}_{bytes_earned}_{score}_{total}"
+                ),
+                InlineKeyboardButton(
+                    text="❌ Rad etish",
+                    callback_data=f"treject_{uid}_{lid}"
+                )
+            ]
+        ])
         await bot.send_message(
             TEACHER_ID,
             f"📋 <b>Yangi test natijasi!</b>\n\n"
-            f"👤 O'quvchi: {student_name} ({username})\n"
-            f"📚 Dars: {lid}-dars — {lesson['title']}\n"
-            f"📊 Natija: <b>{score}/{total}</b>\n"
-            f"💾 Mukofot: <b>+{bytes_earned} bayt</b>\n\n"
-            f"Tasdiqlash uchun:\n"
-            f"<code>/approve_test {username} {lid}</code>"
+            f"👤 {student_name} ({username})\n"
+            f"📚 {lid}-dars: {lesson['title']}\n"
+            f"📊 Natija: <b>{score}/{total}</b> — {emoji}\n"
+            f"💾 Mukofot: <b>+{bytes_earned} bayt</b>",
+            reply_markup=keyboard
         )
         await bot.session.close()
     except Exception as e:
-        print(f"Ustoz xabardor qilinmadi: {e}")
+        print(f"Xato: {e}")
 
     return web.json_response({
         "success": True,
@@ -151,7 +160,6 @@ async def submit_test(request):
         "total": total,
         "bytes_earned": bytes_earned,
         "result_emoji": emoji,
-        "pending_key": key,
     })
 
 
