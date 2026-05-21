@@ -15,8 +15,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .nb svg{width:22px;height:22px;stroke-width:1.8}
 .sc{display:none;padding:0}
 .sc.active{display:block}
-
-/* HOME */
 .home-inner{padding:14px}
 .balances{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .bal-card{border-radius:14px;padding:12px}
@@ -27,32 +25,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .bal-label.bayt{color:#c4b5fd}
 .bal-val{font-size:20px;font-weight:700;color:#fff;line-height:1}
 .bal-unit{font-size:10px;font-weight:400;opacity:.7;margin-left:2px}
-
-/* CALF CARD */
-.calf-card{background:var(--s);border:1px solid var(--brd);border-radius:20px;padding:18px;margin-bottom:14px;text-align:center;position:relative}
+.calf-card{background:var(--s);border:1px solid var(--brd);border-radius:20px;padding:18px;margin-bottom:14px;text-align:center}
 .calf-week{display:inline-block;background:rgba(16,185,129,.15);color:#34d399;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;margin-bottom:10px}
-.calf-emoji{font-size:80px;line-height:1;margin:4px 0;display:block;transition:all .3s}
+.calf-emoji{font-size:80px;line-height:1;margin:4px 0;display:block}
 .calf-kg{font-size:28px;font-weight:700;color:var(--tx);margin:6px 0 2px}
 .calf-kg span{font-size:14px;font-weight:400;color:var(--mu2)}
 .calf-prog-wrap{margin:10px 20px}
 .calf-prog-label{display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-bottom:4px}
 .calf-prog{height:6px;background:var(--s2);border-radius:3px;overflow:hidden}
 .calf-prog-fill{height:100%;background:linear-gradient(90deg,#22c55e,#86efac);border-radius:3px;transition:width .8s ease}
-.feed-btn{background:linear-gradient(135deg,var(--ac),var(--al));border:none;color:#fff;font-size:15px;font-weight:600;padding:13px 28px;border-radius:14px;cursor:pointer;margin-top:12px;transition:opacity .2s}
+.feed-btn{background:linear-gradient(135deg,var(--ac),var(--al));border:none;color:#fff;font-size:15px;font-weight:600;padding:13px 28px;border-radius:14px;cursor:pointer;margin-top:12px}
 .feed-btn:disabled{background:var(--s2);color:var(--mu);cursor:default}
 .feed-hint{font-size:11px;color:var(--mu);margin-top:6px}
-
-/* BOTTOM BTNS */
 .home-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.hbtn{padding:14px 10px;border-radius:14px;border:1px solid var(--brd);background:var(--s);color:var(--tx);font-size:14px;font-weight:600;cursor:pointer;text-align:center;transition:all .2s}
+.hbtn{padding:14px 10px;border-radius:14px;border:1px solid var(--brd);background:var(--s);color:var(--tx);font-size:14px;font-weight:600;cursor:pointer;text-align:center}
 .hbtn.test{border-color:rgba(124,58,237,.4);background:rgba(124,58,237,.1);color:var(--al)}
-.hbtn.lesson{color:var(--mu);cursor:default}
-
-/* LESSONS SCREEN */
+.hbtn.lesson-locked{color:var(--mu);cursor:default}
+.hbtn.lesson-open{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.1);color:#34d399}
 .lessons-inner{padding:14px}
 .lesson-label{font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
 .collage{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
-.coll-item{border-radius:16px;padding:14px;min-height:100px;position:relative;overflow:hidden;border:1px solid var(--brd);cursor:pointer;transition:all .2s}
+.coll-item{border-radius:16px;padding:14px;min-height:100px;position:relative;overflow:hidden;border:1px solid var(--brd);cursor:pointer}
 .coll-item.active{background:var(--s);border-color:rgba(124,58,237,.4)}
 .coll-item.locked{background:var(--s2);cursor:default;opacity:.6}
 .coll-item.done{background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.3)}
@@ -63,15 +56,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .coll-badge.open{background:rgba(124,58,237,.2);color:#a78bfa}
 .coll-badge.done{background:rgba(16,185,129,.2);color:#34d399}
 .coll-badge.lock{background:rgba(100,116,139,.15);color:var(--mu)}
-.coming-section{}
 .coming-label{font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
 .coming-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .coming-item{background:var(--s2);border:1px dashed rgba(100,116,139,.3);border-radius:14px;padding:12px;text-align:center;opacity:.6}
 .coming-icon{font-size:22px;display:block;margin-bottom:4px}
 .coming-name{font-size:11px;font-weight:600;color:var(--mu2);margin-bottom:2px}
 .coming-soon{font-size:10px;color:var(--mu)}
-
-/* TEST SCREEN */
 .test-screen{padding:14px}
 .test-top{background:var(--s);border:1px solid var(--brd);border-radius:16px;padding:14px;margin-bottom:14px}
 .test-top-title{font-size:15px;font-weight:600;margin-bottom:8px}
@@ -81,14 +71,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .prog-txt{font-size:12px;color:var(--mu2);white-space:nowrap}
 .q-card{background:var(--s);border:1px solid var(--brd);border-radius:16px;padding:16px;margin-bottom:12px}
 .q-text{font-size:15px;font-weight:600;line-height:1.5}
-.opt{width:100%;padding:13px 14px;margin-bottom:8px;background:var(--s2);border:1px solid var(--brd);border-radius:12px;color:var(--tx);font-size:14px;text-align:left;cursor:pointer;transition:all .2s}
-.opt:active{transform:scale(.98)}
+.opt{width:100%;padding:13px 14px;margin-bottom:8px;background:var(--s2);border:1px solid var(--brd);border-radius:12px;color:var(--tx);font-size:14px;text-align:left;cursor:pointer}
 .opt.correct{background:rgba(16,185,129,.15);border-color:var(--gn);color:#34d399}
 .opt.wrong{background:rgba(239,68,68,.15);border-color:var(--rd);color:#f87171}
 .opt:disabled{cursor:default}
 .next-btn{width:100%;padding:14px;background:var(--ac);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;display:none;margin-top:4px}
-
-/* RESULT SCREEN */
 .result-screen{padding:14px}
 .res-card{background:var(--s);border:1px solid var(--brd);border-radius:20px;padding:24px;text-align:center;margin-bottom:14px}
 .res-emoji{font-size:60px;display:block;margin-bottom:10px}
@@ -98,15 +85,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .res-bytes{background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);border-radius:12px;padding:12px;font-size:15px;font-weight:600;color:var(--al);margin-bottom:8px}
 .res-pending{font-size:13px;color:var(--mu2);line-height:1.6}
 .back-btn{width:100%;padding:13px;background:var(--s2);border:1px solid var(--brd);border-radius:12px;color:var(--tx);font-size:14px;font-weight:600;cursor:pointer;margin-top:10px}
-
-/* MARKET */
 .market-inner{padding:14px}
 .coming-big{background:var(--s);border:1px solid var(--brd);border-radius:20px;padding:40px 20px;text-align:center}
 .coming-big-icon{font-size:60px;display:block;margin-bottom:12px}
 .coming-big-title{font-size:18px;font-weight:600;margin-bottom:6px}
 .coming-big-sub{font-size:14px;color:var(--mu)}
-
-/* PROFILE */
 .profile-inner{padding:14px}
 .prof-head{text-align:center;margin-bottom:18px}
 .pav{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--al));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#fff;margin:0 auto 10px;border:3px solid rgba(124,58,237,.3)}
@@ -135,7 +118,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </head>
 <body>
 
-<!-- HOME -->
 <div class="sc active" id="s-home">
 <div class="home-inner">
   <div class="balances">
@@ -148,67 +130,38 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="bal-val"><span id="h-bayt">0</span><span class="bal-unit">bayt</span></div>
     </div>
   </div>
-
   <div class="calf-card">
     <div class="calf-week" id="calf-week">1-hafta</div>
     <span class="calf-emoji" id="calf-emoji">🐄</span>
     <div class="calf-kg"><span id="calf-kg">40</span><span> kg</span></div>
     <div class="calf-prog-wrap">
-      <div class="calf-prog-label">
-        <span id="calf-from">40 kg</span>
-        <span id="calf-to">50 kg</span>
-      </div>
+      <div class="calf-prog-label"><span id="calf-from">40 kg</span><span id="calf-to">50 kg</span></div>
       <div class="calf-prog"><div class="calf-prog-fill" id="calf-fill" style="width:0%"></div></div>
     </div>
     <button class="feed-btn" id="feed-btn" disabled onclick="feedCalf()">🌿 Ovqat berish</button>
     <div class="feed-hint" id="feed-hint">Vazifa bajarsangiz faollashadi</div>
   </div>
-
   <div class="home-btns">
     <button class="hbtn test" onclick="goTest()">🧪 Test</button>
-    <button class="hbtn lesson" id="lesson-btn" onclick="goLesson()">📚 Dars 🔒</button>
+    <button class="hbtn lesson-locked" id="lesson-btn" onclick="goLesson()">📚 Dars 🔒</button>
   </div>
 </div>
 </div>
 
-<!-- LESSONS -->
 <div class="sc" id="s-lessons">
 <div class="lessons-inner">
   <div class="lesson-label">📚 Testlar va darslar</div>
-
-  <div class="collage" id="collage">
-    <!-- filled by JS -->
-  </div>
-
-  <div class="coming-section">
-    <div class="coming-label">Tez kunda ochiladi</div>
-    <div class="coming-grid">
-      <div class="coming-item">
-        <span class="coming-icon">📖</span>
-        <div class="coming-name">Kitob</div>
-        <div class="coming-soon">Tez kunda</div>
-      </div>
-      <div class="coming-item">
-        <span class="coming-icon">🤖</span>
-        <div class="coming-name">AI ga buyruq</div>
-        <div class="coming-soon">Tez kunda</div>
-      </div>
-      <div class="coming-item">
-        <span class="coming-icon">🎤</span>
-        <div class="coming-name">Tez gapirish</div>
-        <div class="coming-soon">Tez kunda</div>
-      </div>
-      <div class="coming-item">
-        <span class="coming-icon">🎬</span>
-        <div class="coming-name">Video darslik</div>
-        <div class="coming-soon">Tez kunda</div>
-      </div>
-    </div>
+  <div class="collage" id="collage"><div class="loading"><div class="spin"></div></div></div>
+  <div class="coming-label">Tez kunda ochiladi</div>
+  <div class="coming-grid">
+    <div class="coming-item"><span class="coming-icon">📖</span><div class="coming-name">Kitob</div><div class="coming-soon">Tez kunda</div></div>
+    <div class="coming-item"><span class="coming-icon">🤖</span><div class="coming-name">AI ga buyruq</div><div class="coming-soon">Tez kunda</div></div>
+    <div class="coming-item"><span class="coming-icon">🎤</span><div class="coming-name">Tez gapirish</div><div class="coming-soon">Tez kunda</div></div>
+    <div class="coming-item"><span class="coming-icon">🎬</span><div class="coming-name">Video darslik</div><div class="coming-soon">Tez kunda</div></div>
   </div>
 </div>
 </div>
 
-<!-- TEST SCREEN (inside lessons) -->
 <div class="sc" id="s-test">
 <div class="test-screen">
   <div class="test-top">
@@ -224,7 +177,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 </div>
 
-<!-- RESULT SCREEN -->
 <div class="sc" id="s-result">
 <div class="result-screen">
   <div class="res-card">
@@ -239,7 +191,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 </div>
 
-<!-- MARKET -->
 <div class="sc" id="s-market">
 <div class="market-inner">
   <div class="coming-big">
@@ -250,7 +201,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 </div>
 
-<!-- PROFILE -->
 <div class="sc" id="s-profile">
 <div class="profile-inner">
   <div class="prof-head">
@@ -285,7 +235,7 @@ let uid=tg?.initDataUnsafe?.user?.id||new URLSearchParams(location.search).get('
 let profile=null,lessonAccess=[],lessons=[],currentLesson=null,curQ=0,testAnswers=[],navBtns=document.querySelectorAll('.nb');
 
 const calfStages=[
-  {min:0,max:45,emoji:'🐄',label:'Yangi tug\'ilgan'},
+  {min:0,max:45,emoji:'🐄',label:"Yangi tug'ilgan"},
   {min:45,max:55,emoji:'🐄',label:'1-hafta'},
   {min:55,max:70,emoji:'🐄',label:'2-hafta'},
   {min:70,max:90,emoji:'🐂',label:'3-hafta'},
@@ -293,12 +243,17 @@ const calfStages=[
   {min:120,max:999,emoji:'🐃',label:'Katta buzoq'},
 ];
 
-function getStage(kg){
-  return calfStages.find(s=>kg>=s.min&&kg<s.max)||calfStages[calfStages.length-1];
-}
-
+function getStage(kg){return calfStages.find(s=>kg>=s.min&&kg<s.max)||calfStages[calfStages.length-1];}
 function fmt(n){return Number(n||0).toLocaleString('ru');}
 function ini(name){return(name||'?').split(' ').map(n=>n[0]||'').join('').slice(0,2).toUpperCase()||'?';}
+
+async function reloadAccess(){
+  try{
+    const la=await fetch(`${BASE}/api/lesson_access?user_id=${uid}`);
+    const ld=await la.json();
+    lessonAccess=ld.access||[];
+  }catch(e){lessonAccess=[];}
+}
 
 function go(n,b){
   if(n==='test'||n==='result')return;
@@ -306,7 +261,9 @@ function go(n,b){
   navBtns.forEach(x=>x.classList.remove('active'));
   document.getElementById('s-'+n).classList.add('active');
   if(b)b.classList.add('active');
-  if(n==='lessons')renderLessons();
+  if(n==='lessons'){
+    reloadAccess().then(()=>renderLessons());
+  }
   if(n==='profile')loadProfile();
 }
 
@@ -319,9 +276,8 @@ function goTest(){
   if(!lessons.length){alert('Yuklanmoqda, kuting...');return;}
   const accessible=lessonAccess.filter(a=>!a.test_passed);
   if(!accessible.length){
-    const allDone=lessonAccess.every(a=>a.test_passed);
-    if(allDone)alert("Barcha testlar o'tilgan! Ustoz yangi dars ochadi.");
-    else alert("Avval faollashtirilishingiz kerak. Ustozga murojaat qiling.");
+    if(!profile?.is_active){alert("Avval faollashtirilishingiz kerak.\nUstozga murojaat qiling.");}
+    else{alert("Barcha testlar o'tilgan! Ustoz yangi dars ochadi.");}
     return;
   }
   const first=accessible.sort((a,b)=>a.lesson_id-b.lesson_id)[0];
@@ -333,15 +289,15 @@ function goLesson(){
     alert("Darslar faqat faollashtirilgan o'quvchilar uchun.\nUstozga murojaat qiling.");
     return;
   }
-  go('lessons',null);
-  navBtns[1].classList.add('active');
+  go('lessons',navBtns[1]);
 }
 
 async function loadHome(){
   try{
     const r=await fetch(`${BASE}/api/profile?user_id=${uid}`);
-    if(!r.ok){return;}
-    const d=await r.json();profile=d;
+    if(!r.ok)return;
+    const d=await r.json();
+    profile=d;
     document.getElementById('h-som').textContent=fmt(d.som_balance||0);
     document.getElementById('h-bayt').textContent=fmt(d.bytes_balance||0);
     const kg=d.calf_kg||40;
@@ -349,25 +305,21 @@ async function loadHome(){
     document.getElementById('calf-emoji').textContent=stage.emoji;
     document.getElementById('calf-week').textContent=stage.label;
     document.getElementById('calf-kg').textContent=Math.round(kg);
-    const nextStage=calfStages.find(s=>kg<s.max)||calfStages[calfStages.length-1];
-    const pct=Math.min(((kg-nextStage.min)/(nextStage.max-nextStage.min))*100,100);
+    const ns=calfStages.find(s=>kg<s.max)||calfStages[calfStages.length-1];
+    const pct=Math.min(((kg-ns.min)/(ns.max-ns.min))*100,100);
     document.getElementById('calf-fill').style.width=pct+'%';
-    document.getElementById('calf-from').textContent=nextStage.min+' kg';
-    document.getElementById('calf-to').textContent=nextStage.max+' kg';
+    document.getElementById('calf-from').textContent=ns.min+' kg';
+    document.getElementById('calf-to').textContent=ns.max+' kg';
     if(d.is_active){
-      document.getElementById('lesson-btn').textContent='📚 Dars';
-      document.getElementById('lesson-btn').classList.remove('lesson');
-      document.getElementById('lesson-btn').style.borderColor='rgba(16,185,129,.4)';
-      document.getElementById('lesson-btn').style.background='rgba(16,185,129,.1)';
-      document.getElementById('lesson-btn').style.color='#34d399';
+      const lb=document.getElementById('lesson-btn');
+      lb.textContent='📚 Dars';
+      lb.className='hbtn lesson-open';
     }
-    const la=await fetch(`${BASE}/api/lesson_access?user_id=${uid}`);
-    const ld=await la.json();
-    lessonAccess=ld.access||[];
+    await reloadAccess();
     const hasActive=lessonAccess.some(a=>!a.test_passed);
     if(hasActive&&d.is_active){
       document.getElementById('feed-btn').disabled=false;
-      document.getElementById('feed-hint').textContent='Testni o\'ting va g\'alaba qozonin!';
+      document.getElementById('feed-hint').textContent="Testni o'ting va g'alaba qozonin!";
     }
   }catch(e){console.error(e);}
 }
@@ -380,21 +332,30 @@ async function loadLessons(){
   }catch(e){}
 }
 
-const lessonIcons=['🤖','📱','🧠','🎤','🚀'];
-const lessonColors=['rgba(124,58,237,.15)','rgba(16,185,129,.15)','rgba(59,130,246,.15)','rgba(245,158,11,.15)','rgba(239,68,68,.15)'];
+const lessonIcons=['🤖','📱','🧠','🎤','🚀','😊','🌍','🎬'];
+const lessonColors=['rgba(124,58,237,.15)','rgba(16,185,129,.15)','rgba(59,130,246,.15)','rgba(245,158,11,.15)','rgba(239,68,68,.15)','rgba(236,72,153,.15)','rgba(16,185,129,.15)','rgba(124,58,237,.15)'];
 
 function renderLessons(){
   const c=document.getElementById('collage');
-  if(!lessons.length){c.innerHTML='<div class="loading"><div class="spin"></div></div>';loadLessons().then(renderLessons);return;}
+  if(!lessons.length){
+    c.innerHTML='<div class="loading"><div class="spin"></div></div>';
+    loadLessons().then(()=>renderLessons());
+    return;
+  }
   c.innerHTML=lessons.map((l,i)=>{
-    const access=lessonAccess.find(a=>a.lesson_id===l.id);
-    const isDone=access?.test_passed;
+    const access=lessonAccess.find(a=>Number(a.lesson_id)===Number(l.id));
+    const isDone=access&&Number(access.test_passed)===1;
     const isOpen=access&&!isDone;
     const isLocked=!access;
     let cls=isLocked?'locked':isDone?'done':'active';
-    let badge=isLocked?'<span class="coll-badge lock">🔒 Yopiq</span>':isDone?'<span class="coll-badge done">✅ O\'tildi</span>':'<span class="coll-badge open">📖 Ochiq</span>';
-    let click=isOpen?`onclick="openTest(${l.id})"`:isDone?`onclick="alert('Bu test allaqachon o\\'tilgan!')"`:isLocked?`onclick="alert('Bu dars hali yopiq. Avvalgi darsni o\\'ting!')"` :'';
-    return `<div class="coll-item ${cls}" ${click} style="background:${isDone?'rgba(16,185,129,.08)':isOpen?lessonColors[i%lessonColors.length]:''}">
+    let badge=isLocked?'<span class="coll-badge lock">🔒 Yopiq</span>':
+              isDone?'<span class="coll-badge done">✅ Otildi</span>':
+              '<span class="coll-badge open">📖 Ochiq</span>';
+    let click=isOpen?`onclick="openTest(${l.id})"`:
+              isDone?`onclick="alert('Bu test allaqachon otilgan!')"`:
+              `onclick="alert('Bu dars hali yopiq. Avvalgi darsni oting!')"`;
+    let bg=isDone?'rgba(16,185,129,.08)':isOpen?lessonColors[i%lessonColors.length]:'';
+    return `<div class="coll-item ${cls}" ${click} style="background:${bg}">
       ${badge}
       <div class="coll-num">${l.id}-dars</div>
       <span class="coll-icon">${lessonIcons[i%lessonIcons.length]}</span>
@@ -437,8 +398,8 @@ function selectAns(sel){
 
 function nextQ(){
   curQ++;
-  if(curQ<currentLesson.tests.length){showQ(curQ);}
-  else{submitTest();}
+  if(curQ<currentLesson.tests.length)showQ(curQ);
+  else submitTest();
 }
 
 async function submitTest(){
@@ -470,13 +431,14 @@ function backToLessons(){
 }
 
 function feedCalf(){
-  alert("Ovqat berish funksiyasi tez kunda!\nHozircha testlarni bajaring va bayt to'plang 🐮");
+  alert("Ovqat berish funksiyasi tez kunda!\nHozircha testlarni bajaring va bayt toplang 🐮");
 }
 
 async function loadProfile(){
   try{
-    if(!profile){const r=await fetch(`${BASE}/api/profile?user_id=${uid}`);profile=await r.json();}
-    const d=profile;
+    const r=await fetch(`${BASE}/api/profile?user_id=${uid}`);
+    const d=await r.json();
+    profile=d;
     document.getElementById('p-av').textContent=ini(d.full_name);
     document.getElementById('p-name').textContent=d.full_name||'—';
     document.getElementById('p-user').textContent=d.username?'@'+d.username:'';
@@ -486,7 +448,8 @@ async function loadProfile(){
     document.getElementById('p-kg').textContent=Math.round(d.calf_kg||40);
     document.getElementById('p-str').textContent=d.streak_days||0;
     const tr=await fetch(`${BASE}/api/transactions?user_id=${uid}`);
-    const td=await tr.json();const txs=td.transactions||[];
+    const td=await tr.json();
+    const txs=td.transactions||[];
     const tc=document.getElementById('p-tx');
     if(!txs.length){tc.innerHTML='<div class="loading">Operatsiyalar yoq</div>';return;}
     tc.innerHTML=txs.map(t=>`<div class="tx"><div class="txi ${t.amount>0?'plus':'minus'}">${t.amount>0?'➕':'➖'}</div><div><div class="txr">${t.reason||'—'}</div><div class="txd">${(t.created_at||'').slice(0,16)}</div></div><div class="txa ${t.amount>0?'plus':'minus'}">${t.amount>0?'+':''}${t.amount} bayt</div></div>`).join('');
