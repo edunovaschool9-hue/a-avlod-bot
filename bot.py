@@ -8,10 +8,11 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.types import (
     BotCommand,
     BotCommandScopeDefault,
+    BotCommandScopeChat,
     MenuButtonWebApp,
     WebAppInfo,
 )
-from config import BOT_TOKEN, MINI_APP_URL
+from config import BOT_TOKEN, MINI_APP_URL, TEACHER_ID
 from database import init_db
 from handlers.start import router as start_router
 from handlers.student import router as student_router
@@ -40,6 +41,7 @@ dp.include_router(teacher_router)
 dp.include_router(student_router)
 dp.include_router(start_router)
 
+
 async def set_bot_commands():
     student_commands = [
         BotCommand(command="start", description="🚀 Boshlash"),
@@ -49,10 +51,31 @@ async def set_bot_commands():
         BotCommand(command="homework", description="📝 Uy vazifalar"),
         BotCommand(command="help", description="❓ Yordam"),
     ]
+
+    teacher_commands = [
+        BotCommand(command="add_student", description="➕ O'quvchi qo'shish"),
+        BotCommand(command="students", description="👥 O'quvchilar ro'yxati"),
+        BotCommand(command="approve_test", description="✅ Testni tasdiqlash"),
+        BotCommand(command="add_bytes", description="💾 Bayt qo'shish"),
+        BotCommand(command="sub_bytes", description="💸 Bayt ayirish"),
+        BotCommand(command="warn", description="⚠️ Ogohlantirish"),
+        BotCommand(command="new_hw", description="📝 Yangi vazifa"),
+        BotCommand(command="stats", description="📊 Statistika"),
+    ]
+
     await bot.set_my_commands(
         student_commands,
         scope=BotCommandScopeDefault()
     )
+
+    try:
+        await bot.set_my_commands(
+            teacher_commands,
+            scope=BotCommandScopeChat(chat_id=TEACHER_ID)
+        )
+    except Exception as e:
+        logger.warning(f"Teacher commands error: {e}")
+
     if MINI_APP_URL:
         await bot.set_chat_menu_button(
             menu_button=MenuButtonWebApp(
@@ -62,12 +85,14 @@ async def set_bot_commands():
         )
         logger.info(f"✅ Mini App tugmasi o'rnatildi: {MINI_APP_URL}")
 
+
 async def run_bot():
     await set_bot_commands()
     logger.info("✅ Handlerlar yuklandi")
     logger.info("🤖 Bot ishga tushdi")
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
+
 
 async def run_api():
     app = create_app()
@@ -82,6 +107,7 @@ async def run_api():
     await site.start()
     logger.info(f"🌐 API server ishladi: {port}")
 
+
 async def main():
     logger.info("🚀 A Avlod Academy ishga tushmoqda...")
     await init_db()
@@ -90,6 +116,7 @@ async def main():
         run_bot(),
         run_api()
     )
+
 
 if __name__ == "__main__":
     try:
