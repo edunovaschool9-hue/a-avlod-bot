@@ -13,6 +13,18 @@ async def get_pool():
         _pool = await asyncpg.create_pool(DATABASE_URL, min_size=1, max_size=5)
     return _pool
 
+def serialize_row(row):
+    """Convert asyncpg Record to dict, converting datetime to string"""
+    if row is None:
+        return None
+    result = {}
+    for key, value in dict(row).items():
+        if isinstance(value, datetime):
+            result[key] = value.isoformat()
+        else:
+            result[key] = value
+    return result
+
 async def init_db():
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -110,7 +122,7 @@ async def activate_student(telegram_id, som_amount):
             INSERT INTO som_transactions (student_id, amount, reason)
             VALUES ($1, $2, $3)
         """, telegram_id, som_amount, "Kurs to'lovi")
-        return True
+    return True
 
 async def get_student(telegram_id):
     pool = await get_pool()
@@ -118,7 +130,7 @@ async def get_student(telegram_id):
         row = await conn.fetchrow(
             "SELECT * FROM students WHERE telegram_id = $1", telegram_id
         )
-        return dict(row) if row else None
+        return serialize_row(row)
 
 async def get_student_by_username(username):
     username = username.lstrip('@')
@@ -127,7 +139,7 @@ async def get_student_by_username(username):
         row = await conn.fetchrow(
             "SELECT * FROM students WHERE username = $1", username
         )
-        return dict(row) if row else None
+        return serialize_row(row)
 
 async def find_student_by_username(username):
     return await get_student_by_username(username)
@@ -138,7 +150,7 @@ async def get_all_students():
         rows = await conn.fetch(
             "SELECT * FROM students ORDER BY bytes_balance DESC"
         )
-        return [dict(row) for row in rows]
+        return [serialize_row(row) for row in rows]
 
 async def add_bytes(student_id, amount, reason=""):
     pool = await get_pool()
@@ -203,7 +215,7 @@ async def get_transactions(student_id, limit=10):
             WHERE student_id = $1
             ORDER BY created_at DESC LIMIT $2
         """, student_id, limit)
-        return [dict(row) for row in rows]
+        return [serialize_row(row) for row in rows]
 
 async def get_student_homeworks(student_id, status=None):
     pool = await get_pool()
@@ -218,7 +230,7 @@ async def get_student_homeworks(student_id, status=None):
                 "SELECT * FROM homeworks WHERE student_id = $1 ORDER BY created_at DESC",
                 student_id
             )
-        return [dict(row) for row in rows]
+        return [serialize_row(row) for row in rows]
 
 async def submit_homework(homework_id, photo_file_id):
     pool = await get_pool()
@@ -244,7 +256,7 @@ async def get_lesson_access(student_id):
         rows = await conn.fetch(
             "SELECT * FROM lesson_access WHERE student_id = $1", student_id
         )
-        return [dict(row) for row in rows]
+        return [serialize_row(row) for row in rows]
 
 async def unlock_next_lesson(student_id, current_lesson_id):
     next_id = current_lesson_id + 1
@@ -259,7 +271,7 @@ async def unlock_next_lesson(student_id, current_lesson_id):
             UPDATE lesson_access SET test_passed = 1
             WHERE student_id = $1 AND lesson_id = $2
         """, student_id, current_lesson_id)
-        return True
+    return True
 
 async def add_warning(student_id):
     pool = await get_pool()
