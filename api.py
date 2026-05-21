@@ -47,8 +47,12 @@ async def get_access(request):
     uid = get_uid(request)
     if not uid:
         return web.json_response({"error": "No user_id"}, status=400)
-    access = await get_lesson_access(int(uid))
-    return web.json_response({"access": access})
+    try:
+        access = await get_lesson_access(int(uid))
+        return web.json_response({"access": access})
+    except Exception as e:
+        print(f"lesson_access error: {e}")
+        return web.json_response({"access": []})
 
 
 @routes.get("/api/lessons")
