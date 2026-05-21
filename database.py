@@ -7,13 +7,11 @@ DEFAULT_BALANCE = 0
 
 _pool = None
 
-
 async def get_pool():
     global _pool
     if _pool is None:
         _pool = await asyncpg.create_pool(DATABASE_URL)
     return _pool
-
 
 async def init_db():
     pool = await get_pool()
@@ -79,7 +77,6 @@ async def init_db():
             )
         """)
 
-
 async def register_student(telegram_id, username, full_name):
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -98,7 +95,6 @@ async def register_student(telegram_id, username, full_name):
         """, telegram_id, username, full_name, DEFAULT_BALANCE, 0)
         return True
 
-
 async def activate_student(telegram_id, som_amount):
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -116,7 +112,6 @@ async def activate_student(telegram_id, som_amount):
         """, telegram_id, som_amount, "Kurs to'lovi")
         return True
 
-
 async def get_student(telegram_id):
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -124,7 +119,6 @@ async def get_student(telegram_id):
             "SELECT * FROM students WHERE telegram_id = $1", telegram_id
         )
         return dict(row) if row else None
-
 
 async def get_student_by_username(username):
     username = username.lstrip('@')
@@ -135,10 +129,8 @@ async def get_student_by_username(username):
         )
         return dict(row) if row else None
 
-
 async def find_student_by_username(username):
     return await get_student_by_username(username)
-
 
 async def get_all_students():
     pool = await get_pool()
@@ -147,7 +139,6 @@ async def get_all_students():
             "SELECT * FROM students ORDER BY bytes_balance DESC"
         )
         return [dict(row) for row in rows]
-
 
 async def add_bytes(student_id, amount, reason=""):
     pool = await get_pool()
@@ -170,7 +161,6 @@ async def add_bytes(student_id, amount, reason=""):
         )
         return True
 
-
 async def add_som(student_id, amount, reason=""):
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -190,7 +180,6 @@ async def add_som(student_id, amount, reason=""):
         )
         return True
 
-
 async def update_calf(student_id, kg_change):
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -206,7 +195,6 @@ async def update_calf(student_id, kg_change):
         )
         return True
 
-
 async def get_transactions(student_id, limit=10):
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -216,7 +204,6 @@ async def get_transactions(student_id, limit=10):
             ORDER BY created_at DESC LIMIT $2
         """, student_id, limit)
         return [dict(row) for row in rows]
-
 
 async def get_student_homeworks(student_id, status=None):
     pool = await get_pool()
@@ -233,7 +220,6 @@ async def get_student_homeworks(student_id, status=None):
             )
         return [dict(row) for row in rows]
 
-
 async def submit_homework(homework_id, photo_file_id):
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -242,7 +228,6 @@ async def submit_homework(homework_id, photo_file_id):
             photo_file_id, datetime.now(), homework_id
         )
         return True
-
 
 async def create_homework(student_id, title, description, reward_bytes, deadline=None):
     pool = await get_pool()
@@ -253,7 +238,6 @@ async def create_homework(student_id, title, description, reward_bytes, deadline
         """, student_id, title, description, reward_bytes, deadline)
         return row['id']
 
-
 async def get_lesson_access(student_id):
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -261,7 +245,6 @@ async def get_lesson_access(student_id):
             "SELECT * FROM lesson_access WHERE student_id = $1", student_id
         )
         return [dict(row) for row in rows]
-
 
 async def unlock_next_lesson(student_id, current_lesson_id):
     next_id = current_lesson_id + 1
@@ -277,7 +260,6 @@ async def unlock_next_lesson(student_id, current_lesson_id):
             WHERE student_id = $1 AND lesson_id = $2
         """, student_id, current_lesson_id)
         return True
-
 
 async def add_warning(student_id):
     pool = await get_pool()
