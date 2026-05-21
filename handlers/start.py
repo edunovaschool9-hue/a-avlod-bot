@@ -1,11 +1,10 @@
-from aiogram import Router, types
+from aiogram import Router, types, Bot
 from aiogram.filters import CommandStart, Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from database import register_student, get_student, activate_student
 from config import TEACHER_ID, MINI_APP_URL
 
 router = Router()
-
 
 def get_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[[
@@ -15,9 +14,28 @@ def get_keyboard():
         )
     ]])
 
+def get_approval_keyboard(user_id: int, som_amount: int = 500000):
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="✅ Qabul qilish (500k)",
+                callback_data=f"approve_student_{user_id}_500000"
+            ),
+            InlineKeyboardButton(
+                text="✅ Qabul (800k)",
+                callback_data=f"approve_student_{user_id}_800000"
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                text="❌ Rad etish",
+                callback_data=f"reject_student_{user_id}"
+            )
+        ]
+    ])
 
 @router.message(CommandStart())
-async def cmd_start(message: types.Message):
+async def cmd_start(message: types.Message, bot: Bot):
     user = message.from_user
     is_teacher = user.id == TEACHER_ID
 
@@ -25,7 +43,7 @@ async def cmd_start(message: types.Message):
     deep_link = args[1].strip() if len(args) > 1 else ""
 
     full_name = f"{user.first_name} {user.last_name or ''}".strip()
-    await register_student(
+    is_new = await register_student(
         telegram_id=user.id,
         username=user.username or "",
         full_name=full_name
@@ -77,11 +95,93 @@ async def cmd_start(message: types.Message):
     else:
         await message.answer(
             f"🎉 <b>A Avlod Academy</b> ga xush kelibsiz, {user.first_name}!\n\n"
-            f"Kursga kirish uchun ustozdan havola oling.\n\n"
-            f"Akademiyani ochib ko'rishingiz mumkin 👇",
+            f"Arizangiz ustozga yuborildi.\n"
+            f"Ustoz qabul qilgandan so'ng darslar ochiladi! ⏳",
             reply_markup=get_keyboard()
         )
 
+        # Ustozga xabarnoma yuborish
+        username_text = f"@{user.username}" if user.username else f"ID: {user.id}"
+        try:
+            await bot.send_message(
+                TEACHER_ID,
+                f"🔔 <b>Yangi o'quvchi!</b>\n\n"
+                f"👤 <b>{full_name}</b>\n"
+                f"🔗 {username_text}\n"
+                f"🆔 ID: <code>{user.id}</code>\n\n"
+                f"Qabul qilasizmi?",
+                reply_markup=get_approval_keyboard(user.id)
+            )
+        except Exception as e:
+            print(f"Ustoz xabarnomasi xatosi: {e}")
+
+@router.callback_query(lambda c: c.data and c.data.startswith("approve_student_"))
+async def approve_student_callback(callback: types.CallbackQuery, bot: Bot):
+    if callback.from_user.id != TEACHER_ID:
+        await callback.answer("Bu tugma faqat ustoz uchun!", show_alert=True)
+        return
+
+    parts = callback.data.split("_")
+    # approve_student_{user_id}_{som_amount}
+    student_id = int(parts[2])
+    som_amount = int(parts[3])
+
+    await activate_student(student_id, som_amount)
+
+    student = await get_student(student_id)
+    full_name = student['full_name'] if student else f"ID:{student_id}"
+
+    await callback.message.edit_text(
+        callback.message.text + f"\n\n✅ <b>Qabul qilindi!</b> ({som_amount:,} so'm)",
+        reply_markup=None
+    )
+    await callback.answer("✅ O'quvchi qabul qilindi!")
+
+    try:
+        await bot.send_message(
+            student_id,
+            f"🎉 <b>Tabriklaymiz!</b>\n\n"
+            f"Siz A Avlod Academy ga qabul qilindingiz!\n\n"
+            f"💰 Asosiy hisob: <b>{som_amount:,} so'm</b>\n"
+            f"🐮 Buzoqchangiz: <b>40 kg</b>\n"
+            f"📚 1-dars testi ochiq!\n\n"
+            f"Bosing va boshlang! 👇",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[[
+                InlineKeyboardButton(
+                    text="🎓 Akademiyani ochish",
+                    web_app=WebAppInfo(url=MINI_APP_URL)
+                )
+            ]])
+        )
+    except Exception as e:
+        print(f"O'quvchiga xabar xatosi: {e}")
+
+@router.callback_query(lambda c: c.data and c.data.startswith("reject_student_"))
+async def reject_student_callback(callback: types.CallbackQuery, bot: Bot):
+    if callback.from_user.id != TEACHER_ID:
+        await callback.answer("Bu tugma faqat ustoz uchun!", show_alert=True)
+        return
+
+    parts = callback.data.split("_")
+    student_id = int(parts[2])
+
+    student = await get_student(student_id)
+    full_name = student['full_name'] if student else f"ID:{student_id}"
+
+    await callback.message.edit_text(
+        callback.message.text + f"\n\n❌ <b>Rad etildi</b>",
+        reply_markup=None
+    )
+    await callback.answer("❌ Rad etildi")
+
+    try:
+        await bot.send_message(
+            student_id,
+            f"😔 Afsuski, arizangiz rad etildi.\n\n"
+            f"Qo'shimcha ma'lumot uchun ustozga murojaat qiling."
+        )
+    except Exception as e:
+        print(f"O'quvchiga xabar xatosi: {e}")
 
 @router.message(Command("help"))
 async def cmd_help(message: types.Message):
