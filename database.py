@@ -287,3 +287,12 @@ async def add_warning(student_id):
             warnings, student_id
         )
         return warnings
+
+async def update_student_name(telegram_id, full_name):
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE students SET full_name = $1 WHERE telegram_id = $2",
+            full_name, telegram_id
+        )
+    return True
