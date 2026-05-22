@@ -11,7 +11,7 @@ from database import (
     unlock_next_lesson,
     update_calf,
     add_som
-)h
+)
 
 from config import TEACHER_ID
 
