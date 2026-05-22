@@ -316,7 +316,7 @@ async function loadHome(){
       lb.className='hbtn lesson-open';
     }
     await reloadAccess();
-    const hasActive=lessonAccess.some(a=>!a.test_passed);
+    const hasActive=lessonAccess.some(a=>a.test_passed);
     if(hasActive&&d.is_active){
       document.getElementById('feed-btn').disabled=false;
       document.getElementById('feed-hint').textContent="Testni o'ting va g'alaba qozonin!";
