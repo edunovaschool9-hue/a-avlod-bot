@@ -88,27 +88,27 @@ async def init_db():
                 UNIQUE(student_id, lesson_id)
             )
         """)
-                await conn.execute("""
-                            CREATE TABLE IF NOT EXISTS tez_aytish_access (
-                                            id SERIAL PRIMARY KEY,
-                                                            student_id BIGINT NOT NULL,
-                                                                            lesson_id INTEGER NOT NULL,
-                                                                                            unlocked_at TIMESTAMP DEFAULT NOW(),
-                                                                                                            status TEXT DEFAULT 'locked',
-                                                                                                                            UNIQUE(student_id, lesson_id)
-                                                                                                                                        )
-                                                                                                                                                """)
-                await conn.execute("""
-                            CREATE TABLE IF NOT EXISTS tez_aytish_submissions (
-                                            id SERIAL PRIMARY KEY,
-                                                            student_id BIGINT NOT NULL,
-                                                                            lesson_id INTEGER NOT NULL,
-                                                                                            voice_file_id TEXT NOT NULL,
-                                                                                                            status TEXT DEFAULT 'pending',
-                                                                                                                            submitted_at TIMESTAMP DEFAULT NOW(),
-                                                                                                                                            reviewed_at TIMESTAMP
-                                                                                                                                                        )
-                                                                                                                                                                """)
+        await conn.execute("""
+                    CREATE TABLE IF NOT EXISTS tez_aytish_access (
+                                    id SERIAL PRIMARY KEY,
+                                                    student_id BIGINT NOT NULL,
+                                                                    lesson_id INTEGER NOT NULL,
+                                                                                    unlocked_at TIMESTAMP DEFAULT NOW(),
+                                                                                                    status TEXT DEFAULT 'locked',
+                                                                                                                    UNIQUE(student_id, lesson_id)
+                                                                                                                                )
+                                                                                                                                        """)
+        await conn.execute("""
+                    CREATE TABLE IF NOT EXISTS tez_aytish_submissions (
+                                    id SERIAL PRIMARY KEY,
+                                                    student_id BIGINT NOT NULL,
+                                                                    lesson_id INTEGER NOT NULL,
+                                                                                    voice_file_id TEXT NOT NULL,
+                                                                                                    status TEXT DEFAULT 'pending',
+                                                                                                                    submitted_at TIMESTAMP DEFAULT NOW(),
+                                                                                                                                    reviewed_at TIMESTAMP
+                                                                                                                                                )
+                                                                                                                                                        """)
 
 async def register_student(telegram_id, username, full_name):
     pool = await get_pool()
