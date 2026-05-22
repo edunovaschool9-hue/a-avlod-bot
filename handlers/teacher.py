@@ -39,7 +39,7 @@ async def cmd_students(message: types.Message):
 
     if not students:
                 text = "📭 Hozircha o'quvchilar yo'q."
-else:
+        else:
             text = f"👥 <b>O'quvchilar ro'yxati ({len(students)} ta):</b>\n\n"
             for i, s in enumerate(students, 1):
                             status = "✅" if s.get('is_active') else "⏳"
