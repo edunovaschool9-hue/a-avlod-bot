@@ -419,3 +419,93 @@ MONTHLY_LESSONS = [
         ]
     }
 ]
+
+
+# Tez aytish (skorogovorka) darslari - 1 oylik, haftada 3 ta dars = 12 ta dars
+TEZ_AYTISH_LESSONS = [
+        {
+                    "id": 1,
+                    "week": 1,
+                    "title": "Birinchi tez aytish",
+                    "text": "Sariq sarig'ich, sarig'ich sariq.",
+                    "hint": "Har bir so'zni sekin ayt, keyin tezlashtir!"
+        },
+        {
+                    "id": 2,
+                    "week": 1,
+                    "title": "Ikkinchi tez aytish",
+                    "text": "Bola bolali, bolali bola.",
+                    "hint": "Nafas ol, so'ng tekis gapirib bor."
+        },
+        {
+                    "id": 3,
+                    "week": 1,
+                    "title": "Uchinchi tez aytish",
+                    "text": "Qora qarg'a, qora qarg'a, qarg'a qora.",
+                    "hint": "Q harfiga e'tibor ber, aniq ayt!"
+        },
+        {
+                    "id": 4,
+                    "week": 2,
+                    "title": "To'rtinchi tez aytish",
+                    "text": "Yashil yaproq, yaproq yashil, yashil-yashil.",
+                    "hint": "Y tovushini to'g'ri talaffuz qil."
+        },
+        {
+                    "id": 5,
+                    "week": 2,
+                    "title": "Beshinchi tez aytish",
+                    "text": "Olma oldi, oldi olma, olmani ol.",
+                    "hint": "So'zlarni aralashtirib yubormay ayt."
+        },
+        {
+                    "id": 6,
+                    "week": 2,
+                    "title": "Oltinchi tez aytish",
+                    "text": "Shovqinli shahar, shahar shovqinli, shovqin-shovqin.",
+                    "hint": "SH harfini aniq ayt!"
+        },
+        {
+                    "id": 7,
+                    "week": 3,
+                    "title": "Yettinchi tez aytish",
+                    "text": "Kichik ko'chada kichkina ko'chuk chopdi.",
+                    "hint": "K va CH tovushlarini aniq ayt."
+        },
+        {
+                    "id": 8,
+                    "week": 3,
+                    "title": "Sakkizinchi tez aytish",
+                    "text": "Uch qiz qizg'aldoq uzdi, uzdi uch qiz.",
+                    "hint": "Uch harfli so'zlarga e'tibor ber!"
+        },
+        {
+                    "id": 9,
+                    "week": 3,
+                    "title": "To'qqizinchi tez aytish",
+                    "text": "Bahor boqchada gul ochdi, gul ochdi bahor.",
+                    "hint": "B tovushini labingni to'g'ri qo'yib ayt."
+        },
+        {
+                    "id": 10,
+                    "week": 4,
+                    "title": "O'ninchi tez aytish",
+                    "text": "Temir temirchi temirni tindi, tindi temir.",
+                    "hint": "T harfli so'zlar ketma-ket — aniq ayt!"
+        },
+        {
+                    "id": 11,
+                    "week": 4,
+                    "title": "O'n birinchi tez aytish",
+                    "text": "Suv suvchi suvga suvladi, suv-suv.",
+                    "hint": "S va V tovushlarini almashtirmay ayt."
+        },
+        {
+                    "id": 12,
+                    "week": 4,
+                    "title": "O'n ikkinchi tez aytish",
+                    "text": "Zangori zamin, zamin zangori, zangorimas.",
+                    "hint": "Z tovushini og'zing ochiq holda ayt. Zo'r bajarib bo'lding!"
+        },
+]
+
