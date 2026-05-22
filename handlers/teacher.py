@@ -556,13 +556,13 @@ async def cmd_warn(message: types.Message, bot: Bot):
                                 f"🐮 Buzoqcha -{kg_penalty} kg yo'qotdi"
                 )
 
-        if som_penalty:
+                if som_penalty:
                         msg += f"\n💰 -{som_penalty:,} so'm jarima"
 
-        await bot.send_message(
+                await bot.send_message(
                         student['telegram_id'],
                         msg
-        )
+                )
 
         except Exception:
-        pass
+                pass
