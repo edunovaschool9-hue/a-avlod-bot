@@ -1,10 +1,16 @@
-from aiogram import Router, types, Bot
+from aiogram import Router, types, Bot, F
 from aiogram.filters import CommandStart, Command
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
-from database import register_student, get_student, activate_student
+from database import register_student, get_student, activate_student, update_student_name
 from config import TEACHER_ID, MINI_APP_URL
 
 router = Router()
+
+# FSM states
+class Registration(StatesGroup):
+    waiting_for_name = State()
 
 def get_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[[
@@ -14,11 +20,11 @@ def get_keyboard():
         )
     ]])
 
-def get_approval_keyboard(user_id: int, som_amount: int = 500000):
+def get_approval_keyboard(user_id: int):
     return InlineKeyboardMarkup(inline_keyboard=[
         [
             InlineKeyboardButton(
-                text="✅ Qabul qilish (500k)",
+                text="✅ Qabul (500k)",
                 callback_data=f"approve_student_{user_id}_500000"
             ),
             InlineKeyboardButton(
@@ -35,19 +41,12 @@ def get_approval_keyboard(user_id: int, som_amount: int = 500000):
     ])
 
 @router.message(CommandStart())
-async def cmd_start(message: types.Message, bot: Bot):
+async def cmd_start(message: types.Message, bot: Bot, state: FSMContext):
     user = message.from_user
     is_teacher = user.id == TEACHER_ID
 
     args = message.text.split(maxsplit=1)
     deep_link = args[1].strip() if len(args) > 1 else ""
-
-    full_name = f"{user.first_name} {user.last_name or ''}".strip()
-    is_new = await register_student(
-        telegram_id=user.id,
-        username=user.username or "",
-        full_name=full_name
-    )
 
     if is_teacher:
         await message.answer(
@@ -71,7 +70,7 @@ async def cmd_start(message: types.Message, bot: Bot):
             som_amount = int(deep_link.replace("activate_", ""))
             await activate_student(user.id, som_amount)
             await message.answer(
-                f"🎉 <b>Tabriklaymiz, {user.first_name}!</b>\n\n"
+                f"🎉 <b>Tabriklaymiz!</b>\n\n"
                 f"A Avlod Academy ga xush kelibsiz!\n\n"
                 f"💰 Asosiy hisob: <b>{som_amount:,} so'm</b>\n"
                 f"🐮 Buzoqchangiz: <b>40 kg</b>\n"
@@ -86,34 +85,72 @@ async def cmd_start(message: types.Message, bot: Bot):
     student = await get_student(user.id)
     if student and student.get('is_active'):
         await message.answer(
-            f"Qaytib keldingiz, {user.first_name}! 👋\n\n"
+            f"Qaytib keldingiz, {student['full_name']}! 👋\n\n"
             f"💾 Balans: <b>{student['bytes_balance']} bayt</b>\n"
             f"💰 Hisob: <b>{student.get('som_balance', 0):,} so'm</b>\n\n"
             f"Akademiyaga kirish uchun bosing! 👇",
             reply_markup=get_keyboard()
         )
-    else:
-        await message.answer(
-            f"🎉 <b>A Avlod Academy</b> ga xush kelibsiz, {user.first_name}!\n\n"
-            f"Arizangiz ustozga yuborildi.\n"
-            f"Ustoz qabul qilgandan so'ng darslar ochiladi! ⏳",
-            reply_markup=get_keyboard()
-        )
+        return
 
-        # Ustozga xabarnoma yuborish
-        username_text = f"@{user.username}" if user.username else f"ID: {user.id}"
-        try:
-            await bot.send_message(
-                TEACHER_ID,
-                f"🔔 <b>Yangi o'quvchi!</b>\n\n"
-                f"👤 <b>{full_name}</b>\n"
-                f"🔗 {username_text}\n"
-                f"🆔 ID: <code>{user.id}</code>\n\n"
-                f"Qabul qilasizmi?",
-                reply_markup=get_approval_keyboard(user.id)
-            )
-        except Exception as e:
-            print(f"Ustoz xabarnomasi xatosi: {e}")
+    # New or pending student — ask for real name
+    await state.set_state(Registration.waiting_for_name)
+    await state.update_data(telegram_id=user.id, username=user.username or "")
+    await message.answer(
+        f"🎉 <b>A Avlod Academy</b> ga xush kelibsiz!\n\n"
+        f"📝 Iltimos, <b>to'liq ismingizni</b> yozing:\n"
+        f"<i>(Masalan: Aziz Karimov)</i>\n\n"
+        f"⚠️ Agar bola o'qiyotgan bo'lsa — bolaning ismini yozing!"
+    )
+
+@router.message(Registration.waiting_for_name)
+async def process_name(message: types.Message, state: FSMContext, bot: Bot):
+    data = await state.get_data()
+    telegram_id = data.get('telegram_id', message.from_user.id)
+    username = data.get('username', message.from_user.username or "")
+    entered_name = message.text.strip()
+
+    if len(entered_name) < 3 or len(entered_name) > 60:
+        await message.answer(
+            "❌ Iltimos, to'g'ri ism kiriting (3-60 belgi).\n"
+            "Masalan: <b>Aziz Karimov</b>"
+        )
+        return
+
+    # Register or update student with entered name
+    existing = await get_student(telegram_id)
+    if not existing:
+        await register_student(
+            telegram_id=telegram_id,
+            username=username,
+            full_name=entered_name
+        )
+    else:
+        await update_student_name(telegram_id, entered_name)
+
+    await state.clear()
+
+    username_text = f"@{username}" if username else f"ID: {telegram_id}"
+
+    await message.answer(
+        f"✅ Rahmat, <b>{entered_name}</b>!\n\n"
+        f"Arizangiz ustozga yuborildi.\n"
+        f"Ustoz qabul qilgandan so'ng darslar ochiladi! ⏳"
+    )
+
+    # Send notification to teacher
+    try:
+        await bot.send_message(
+            TEACHER_ID,
+            f"🔔 <b>Yangi o'quvchi arizasi!</b>\n\n"
+            f"👤 <b>{entered_name}</b>\n"
+            f"🔗 {username_text}\n"
+            f"🆔 Telegram ID: <code>{telegram_id}</code>\n\n"
+            f"Qabul qilasizmi?",
+            reply_markup=get_approval_keyboard(telegram_id)
+        )
+    except Exception as e:
+        print(f"Ustoz xabarnomasi xatosi: {e}")
 
 @router.callback_query(lambda c: c.data and c.data.startswith("approve_student_"))
 async def approve_student_callback(callback: types.CallbackQuery, bot: Bot):
@@ -122,7 +159,6 @@ async def approve_student_callback(callback: types.CallbackQuery, bot: Bot):
         return
 
     parts = callback.data.split("_")
-    # approve_student_{user_id}_{som_amount}
     student_id = int(parts[2])
     som_amount = int(parts[3])
 
@@ -140,7 +176,7 @@ async def approve_student_callback(callback: types.CallbackQuery, bot: Bot):
     try:
         await bot.send_message(
             student_id,
-            f"🎉 <b>Tabriklaymiz!</b>\n\n"
+            f"🎉 <b>Tabriklaymiz, {full_name}!</b>\n\n"
             f"Siz A Avlod Academy ga qabul qilindingiz!\n\n"
             f"💰 Asosiy hisob: <b>{som_amount:,} so'm</b>\n"
             f"🐮 Buzoqchangiz: <b>40 kg</b>\n"
@@ -177,7 +213,7 @@ async def reject_student_callback(callback: types.CallbackQuery, bot: Bot):
     try:
         await bot.send_message(
             student_id,
-            f"😔 Afsuski, arizangiz rad etildi.\n\n"
+            f"😔 Afsuski, {full_name}, arizangiz rad etildi.\n\n"
             f"Qo'shimcha ma'lumot uchun ustozga murojaat qiling."
         )
     except Exception as e:
