@@ -1,8 +1,8 @@
 from aiohttp import web
 from aiogram import Bot
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from database import get_student, get_transactions, get_student_homeworks, get_lesson_access, add_bytes, unlock_next_lesson, update_calf
-from lessons_data import MONTHLY_LESSONS
+from database import get_student, get_transactions, get_student_homeworks, get_lesson_access, add_bytes, unlock_next_lesson, update_calf, get_tez_aytish_access, submit_tez_aytish_voice, approve_tez_aytish, reject_tez_aytish
+from lessons_data import MONTHLY_LESSONS, TEZ_AYTISH_LESSONS
 from config import BOT_TOKEN, TEACHER_ID
 
 routes = web.RouteTableDef()
@@ -183,6 +183,77 @@ async def get_trans(request):
         return web.json_response({"error": "No user_id"}, status=400)
     transactions = await get_transactions(int(uid), limit=20)
     return web.json_response({"transactions": transactions})
+
+
+
+# ===== TEZ AYTISH API =====
+
+@routes.get("/api/tez_aytish/lessons")
+async def get_tez_aytish_lessons(request):
+        uid = get_uid(request)
+        if not uid:
+                    return web.json_response({"error": "No user_id"}, status=400)
+                try:
+                            access = await get_tez_aytish_access(int(uid))
+                            access_map = {a["lesson_id"]: a for a in access}
+                            lessons = []
+                            for l in TEZ_AYTISH_LESSONS:
+                                            a = access_map.get(l["id"])
+                                            lessons.append({
+                                                                "id": l["id"],
+                                                                "week": l["week"],
+                                                                "title": l["title"],
+                                                                "text": l["text"],
+                                                                "hint": l["hint"],
+                                                                "status": a["status"] if a else "locked",
+                                            })
+                                        return web.json_response({"lessons": lessons})
+except Exception as e:
+        print(f"tez_aytish lessons error: {e}")
+        return web.json_response({"lessons": []})
+
+@routes.post("/api/tez_aytish/{lesson_id}/submit_voice")
+async def submit_tez_aytish(request):
+        lid = int(request.match_info["lesson_id"])
+    data = await request.json()
+    uid = data.get("user_id")
+    voice_file_id = data.get("voice_file_id")
+    if not uid or not voice_file_id:
+                return web.json_response({"error": "Missing data"}, status=400)
+    try:
+                lesson = next((l for l in TEZ_AYTISH_LESSONS if l["id"] == lid), None)
+        if not lesson:
+                        return web.json_response({"error": "Lesson not found"}, status=404)
+        student = await get_student(int(uid))
+        student_name = student["full_name"] if student else f"ID:{uid}"
+        username = f"@{student['username']}" if student and student.get('username') else f"ID:{uid}"
+        submission_id = await submit_tez_aytish_voice(int(uid), lid, voice_file_id)
+        # Notify teacher
+        bot = Bot(token=BOT_TOKEN)
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[[
+                        InlineKeyboardButton(
+                                            text="✅ Tasdiqlash",
+                                            callback_data=f"taz_ok_{submission_id}_{uid}_{lid}"
+                        ),
+                        InlineKeyboardButton(
+                                            text="❌ Rad etish",
+                                            callback_data=f"taz_no_{submission_id}_{uid}_{lid}"
+                        )
+        ]])
+        await bot.send_voice(
+                        TEACHER_ID,
+                        voice=voice_file_id,
+                        caption=f"🎤 <b>Tez aytish yuborildi!</b>\n\n"
+                                f"👤 {student_name} ({username})\n"
+                                f"📚 {lid}-dars: {lesson['title']}\n"
+                                f"📝 <i>{lesson['text']}</i>",
+                        reply_markup=keyboard
+        )
+        await bot.session.close()
+        return web.json_response({"success": True, "submission_id": submission_id})
+except Exception as e:
+        print(f"tez_aytish submit error: {e}")
+        return web.json_response({"error": str(e)}, status=500)
 
 
 @routes.get("/")
