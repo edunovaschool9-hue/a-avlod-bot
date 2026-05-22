@@ -67,7 +67,7 @@ async def refresh_students(callback: CallbackQuery):
 
         if not students:
                 text = "📭 Hozircha o'quvchilar yo'q."
-else:
+        else:
                 text = f"👥 <b>O'quvchilar ro'yxati ({len(students)} ta):</b>\n\n"
                 for i, s in enumerate(students, 1):
                             status = "✅" if s.get('is_active') else "⏳"
@@ -218,7 +218,7 @@ async def del_yes(callback: CallbackQuery, bot: Bot):
                                 "❌ Sizning hisobingiz o'chirildi.\n"
                                 "Batafsil ma'lumot uchun ustoz bilan bog'laning."
                 )
-except Exception:
+        except Exception:
                 pass
 
         await callback.answer("✅ O'chirildi!")
@@ -251,7 +251,7 @@ async def cmd_add_student(message: types.Message, bot: Bot):
 
         try:
                 som_amount = int(parts[2])
-except ValueError:
+        except ValueError:
                 await message.answer("Summa son bolishi kerak.")
                 return
 
@@ -285,7 +285,7 @@ except ValueError:
                                 f"📚 1-dars testi ochiq!\n\n"
                                 f"Akademiyani oching va boshlang! 🚀"
                 )
-except Exception:
+        except Exception:
                 pass
 
 
@@ -309,7 +309,7 @@ async def cmd_approve_test(message: types.Message, bot: Bot):
 
         try:
                 lesson_id = int(parts[2])
-except ValueError:
+        except ValueError:
                 await message.answer("Dars raqami son bolishi kerak.")
                 return
 
@@ -348,7 +348,7 @@ except ValueError:
                                 f"📖 {lesson_id + 1}-dars testi endi ochiq!\n"
                                 f"Akademiyani oching! 🚀"
                 )
-except Exception:
+        except Exception:
                 pass
 
 
@@ -385,7 +385,7 @@ async def cmd_warn(message: types.Message, bot: Bot):
         if warnings == 1:
                 kg_penalty = 5
                 som_penalty = 0
-else:
+        else:
                 kg_penalty = 10
                 som_penalty = 10000
 
@@ -433,5 +433,5 @@ else:
                         msg
         )
 
-except Exception:
+        except Exception:
         pass
