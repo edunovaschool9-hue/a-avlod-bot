@@ -3,6 +3,7 @@ import logging
 import os
 from aiohttp import web
 from aiogram import Bot, Dispatcher
+from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 from aiogram.types import (
@@ -33,7 +34,7 @@ bot = Bot(
         parse_mode=ParseMode.HTML
     )
 )
-dp = Dispatcher()
+dp = Dispatcher(storage=MemoryStorage())
 
 dp.include_router(lessons_router)
 dp.include_router(homework_router)
