@@ -14,6 +14,9 @@ from database import (
     update_calf,
     add_som,
     update_student_name,
+    approve_tez_aytish,
+    reject_tez_aytish,
+    activate_tez_aytish_for_student,
 )
 
 from config import TEACHER_ID
@@ -566,3 +569,87 @@ async def cmd_warn(message: types.Message, bot: Bot):
 
         except Exception:
                 pass
+
+
+
+# ─────────────────────────────────────────────
+# TEZ AYTISH: Approve / Reject voice
+# ─────────────────────────────────────────────
+
+@router.callback_query(F.data.startswith("taz_ok_"))
+async def taz_approve(callback: CallbackQuery, bot: Bot):
+        if not is_teacher(callback.from_user.id):
+                    await callback.answer("Ruxsat yo'q!", show_alert=True)
+                    return
+                parts = callback.data.split("_")
+    # taz_ok_{submission_id}_{uid}_{lid}
+    submission_id = int(parts[2])
+    student_id = int(parts[3])
+    lesson_id = int(parts[4])
+
+    await approve_tez_aytish(submission_id, student_id, lesson_id)
+
+    from lessons_data import TEZ_AYTISH_LESSONS
+    lesson = next((l for l in TEZ_AYTISH_LESSONS if l["id"] == lesson_id), None)
+    next_lesson = next((l for l in TEZ_AYTISH_LESSONS if l["id"] == lesson_id + 1), None)
+
+    await callback.message.edit_caption(
+                callback.message.caption + "\n\n✅ <b>TASDIQLANDI!</b>"
+    )
+    await callback.answer("✅ Tasdiqlandi!")
+
+    try:
+                if next_lesson:
+                                await bot.send_message(
+                                                    student_id,
+                                                    f"🎉 <b>Tez aytish tasdiqlandi!</b>\n\n"
+                                                    f"✅ {lesson_id}-dars: <b>{lesson['title'] if lesson else ''}</b>\n\n"
+                                                    f"🔓 Keyingi dars ochildi!\n"
+                                                    f"📝 <b>{next_lesson['title']}</b>\n"
+                                                    f"<i>{next_lesson['text']}</i>\n\n"
+                                                    f"Akademiyani oching va davom eting! 🚀"
+                                )
+    else:
+            await bot.send_message(
+                                student_id,
+                                f"🏆 <b>Zo'r! Barcha tez aytishlarni tugatdingiz!</b>\n\n"
+                                f"✅ {lesson_id}-dars tasdiqlandi!\n"
+                                f"Siz 1 oylik tez aytish kursini muvaffaqiyatli tugatdingiz! 🎊"
+            )
+    except Exception:
+        pass
+
+
+@router.callback_query(F.data.startswith("taz_no_"))
+async def taz_reject(callback: CallbackQuery, bot: Bot):
+        if not is_teacher(callback.from_user.id):
+                    await callback.answer("Ruxsat yo'q!", show_alert=True)
+                    return
+                parts = callback.data.split("_")
+    # taz_no_{submission_id}_{uid}_{lid}
+    submission_id = int(parts[2])
+    student_id = int(parts[3])
+    lesson_id = int(parts[4])
+
+    await reject_tez_aytish(submission_id, student_id, lesson_id)
+
+    from lessons_data import TEZ_AYTISH_LESSONS
+    lesson = next((l for l in TEZ_AYTISH_LESSONS if l["id"] == lesson_id), None)
+
+    await callback.message.edit_caption(
+                callback.message.caption + "\n\n❌ <b>RAD ETILDI — qayta yozadi</b>"
+    )
+    await callback.answer("❌ Rad etildi!")
+
+    try:
+                await bot.send_message(
+                                student_id,
+                                f"🔄 <b>Tez aytishni qayta yozing!</b>\n\n"
+                                f"❌ {lesson_id}-dars ustoz tomonidan rad etildi.\n\n"
+                                f"📝 <b>{lesson['title'] if lesson else f'{lesson_id}-dars'}</b>\n"
+                                f"<code>{lesson['text'] if lesson else ''}</code>\n\n"
+                                f"💡 <i>{lesson['hint'] if lesson else ''}</i>\n\n"
+                                f"Akademiyani oching va qayta yuboraring! 🎤"
+                )
+except Exception:
+        pass
