@@ -215,11 +215,11 @@ async def del_yes(callback: CallbackQuery, bot: Bot):
                 name = student['full_name']
                 username = student.get('username', '') or ''
 
-        await conn.execute("DELETE FROM lesson_access WHERE student_id = $1", telegram_id)
-        await conn.execute("DELETE FROM bytes_transactions WHERE student_id = $1", telegram_id)
-        await conn.execute("DELETE FROM som_transactions WHERE student_id = $1", telegram_id)
-        await conn.execute("DELETE FROM homeworks WHERE student_id = $1", telegram_id)
-        await conn.execute("DELETE FROM students WHERE telegram_id = $1", telegram_id)
+                await conn.execute("DELETE FROM lesson_access WHERE student_id = $1", telegram_id)
+                await conn.execute("DELETE FROM bytes_transactions WHERE student_id = $1", telegram_id)
+                await conn.execute("DELETE FROM som_transactions WHERE student_id = $1", telegram_id)
+                await conn.execute("DELETE FROM homeworks WHERE student_id = $1", telegram_id)
+                await conn.execute("DELETE FROM students WHERE telegram_id = $1", telegram_id)
 
         await callback.message.edit_text(
                 f"✅ <b>O'quvchi o'chirildi!</b>\n\n"
