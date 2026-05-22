@@ -256,6 +256,34 @@ except Exception as e:
         return web.json_response({"error": str(e)}, status=500)
 
 
+
+@routes.post("/api/upload_voice")
+async def upload_voice(request):
+        try:
+                    reader = await request.multipart()
+                    uid = None
+                    voice_data = None
+                    async for field in reader:
+                                    if field.name == 'user_id':
+                                                        uid = await field.read(decode=True)
+                                                        uid = uid.decode() if uid else None
+                                    elif field.name == 'voice':
+                                                        voice_data = await field.read()
+                                                if not voice_data:
+                                                                return web.json_response({"error": "No voice data"}, status=400)
+                                                            bot = Bot(token=BOT_TOKEN)
+                                from aiogram.types import BufferedInputFile
+                    voice_file = BufferedInputFile(voice_data, filename="voice.ogg")
+                    msg = await bot.send_voice(TEACHER_ID, voice=voice_file)
+                    file_id = msg.voice.file_id
+                    await bot.delete_message(TEACHER_ID, msg.message_id)
+                    await bot.session.close()
+                    return web.json_response({"file_id": file_id})
+except Exception as e:
+            print(f"upload_voice error: {e}")
+            return web.json_response({"error": str(e)}, status=500)
+
+    
 @routes.get("/")
 async def index(request):
     return web.FileResponse("static/index.html")
