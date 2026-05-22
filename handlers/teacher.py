@@ -399,6 +399,7 @@ async def cmd_add_student(message: types.Message, bot: Bot):
                 return
 
         await activate_student(student['telegram_id'], som_amount)
+            await activate_tez_aytish_for_student(student['telegram_id'])
 
         await message.answer(
                 f"✅ <b>O'quvchi faollashtirildi!</b>\n\n"
