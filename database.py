@@ -88,6 +88,27 @@ async def init_db():
                 UNIQUE(student_id, lesson_id)
             )
         """)
+                await conn.execute("""
+                            CREATE TABLE IF NOT EXISTS tez_aytish_access (
+                                            id SERIAL PRIMARY KEY,
+                                                            student_id BIGINT NOT NULL,
+                                                                            lesson_id INTEGER NOT NULL,
+                                                                                            unlocked_at TIMESTAMP DEFAULT NOW(),
+                                                                                                            status TEXT DEFAULT 'locked',
+                                                                                                                            UNIQUE(student_id, lesson_id)
+                                                                                                                                        )
+                                                                                                                                                """)
+                await conn.execute("""
+                            CREATE TABLE IF NOT EXISTS tez_aytish_submissions (
+                                            id SERIAL PRIMARY KEY,
+                                                            student_id BIGINT NOT NULL,
+                                                                            lesson_id INTEGER NOT NULL,
+                                                                                            voice_file_id TEXT NOT NULL,
+                                                                                                            status TEXT DEFAULT 'pending',
+                                                                                                                            submitted_at TIMESTAMP DEFAULT NOW(),
+                                                                                                                                            reviewed_at TIMESTAMP
+                                                                                                                                                        )
+                                                                                                                                                                """)
 
 async def register_student(telegram_id, username, full_name):
     pool = await get_pool()
@@ -296,3 +317,100 @@ async def update_student_name(telegram_id, full_name):
             full_name, telegram_id
         )
     return True
+
+
+# ===== TEZ AYTISH (TONGUE TWISTERS) =====
+
+async def get_tez_aytish_access(student_id):
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+                    rows = await conn.fetch(
+                                    "SELECT * FROM tez_aytish_access WHERE student_id = $1 ORDER BY lesson_id", student_id
+                    )
+                    return [serialize_row(row) for row in rows]
+
+async def unlock_tez_aytish_lesson(student_id, lesson_id):
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+                    await conn.execute("""
+                                INSERT INTO tez_aytish_access (student_id, lesson_id, status)
+                                            VALUES ($1, $2, 'open')
+                                                        ON CONFLICT (student_id, lesson_id) DO UPDATE SET status = 'open'
+                                                                """, student_id, lesson_id)
+                    return True
+
+async def submit_tez_aytish_voice(student_id, lesson_id, voice_file_id):
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+                    # Mark current submission as pending (replace if exists)
+                    await conn.execute("""
+                                DELETE FROM tez_aytish_submissions
+                                            WHERE student_id = $1 AND lesson_id = $2 AND status = 'pending'
+                                                    """, student_id, lesson_id)
+                    row = await conn.fetchrow("""
+                                INSERT INTO tez_aytish_submissions (student_id, lesson_id, voice_file_id, status)
+                                            VALUES ($1, $2, $3, 'pending') RETURNING id
+                                                    """, student_id, lesson_id, voice_file_id)
+                    await conn.execute("""
+                                UPDATE tez_aytish_access SET status = 'pending'
+                                            WHERE student_id = $1 AND lesson_id = $2
+                                                    """, student_id, lesson_id)
+                    return row['id']
+
+async def approve_tez_aytish(submission_id, student_id, lesson_id):
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+                    await conn.execute("""
+                                UPDATE tez_aytish_submissions SET status = 'approved', reviewed_at = NOW()
+                                            WHERE id = $1
+                                                    """, submission_id)
+                    await conn.execute("""
+                                UPDATE tez_aytish_access SET status = 'done'
+                                            WHERE student_id = $1 AND lesson_id = $2
+                                                    """, student_id, lesson_id)
+                    # Unlock next lesson
+        next_id = lesson_id + 1
+        await conn.execute("""
+                    INSERT INTO tez_aytish_access (student_id, lesson_id, status)
+                                VALUES ($1, $2, 'open')
+                                            ON CONFLICT (student_id, lesson_id) DO NOTHING
+                                                    """, student_id, next_id)
+        return True
+
+async def reject_tez_aytish(submission_id, student_id, lesson_id):
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+                    await conn.execute("""
+                                UPDATE tez_aytish_submissions SET status = 'rejected', reviewed_at = NOW()
+                                            WHERE id = $1
+                                                    """, submission_id)
+                    # Allow student to re-record
+        await conn.execute("""
+                    UPDATE tez_aytish_access SET status = 'open'
+                                WHERE student_id = $1 AND lesson_id = $2
+                                        """, student_id, lesson_id)
+        return True
+
+async def get_pending_tez_aytish():
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+                    rows = await conn.fetch("""
+                                SELECT ts.*, s.full_name, s.username
+                                            FROM tez_aytish_submissions ts
+                                                        JOIN students s ON s.telegram_id = ts.student_id
+                                                                    WHERE ts.status = 'pending'
+                                                                                ORDER BY ts.submitted_at
+                                                                                        """)
+                    return [serialize_row(row) for row in rows]
+
+async def activate_tez_aytish_for_student(student_id):
+        """Give student access to first tez aytish lesson"""
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+                    await conn.execute("""
+                                INSERT INTO tez_aytish_access (student_id, lesson_id, status)
+                                            VALUES ($1, 1, 'open')
+                                                        ON CONFLICT (student_id, lesson_id) DO NOTHING
+                                                                """, student_id)
+                    return True
+            
