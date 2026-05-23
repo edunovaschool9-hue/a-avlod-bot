@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+from datetime import datetime, timedelta
 from aiohttp import web
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -14,7 +15,7 @@ from aiogram.types import (
     WebAppInfo,
 )
 from config import BOT_TOKEN, MINI_APP_URL, TEACHER_ID
-from database import init_db
+from database import init_db, get_pool
 from handlers.start import router as start_router
 from handlers.student import router as student_router
 from handlers.teacher import router as teacher_router
@@ -108,13 +109,95 @@ async def run_api():
     await site.start()
     logger.info(f"🌐 API server ishladi: {port}")
 
+async def _ensure_reminder_columns():
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+                    try:
+                                    await conn.execute("ALTER TABLE students ADD COLUMN IF NOT EXISTS reminder_count INTEGER DEFAULT 0")
+                                    await conn.execute("ALTER TABLE students ADD COLUMN IF NOT EXISTS last_reminded TIMESTAMP")
+                    except Exception as e:
+                                    logger.warning(f"Column migration: {e}")
+
+
+async def check_inactive_students():
+        while True:
+                    try:
+                                    await asyncio.sleep(3600)
+                                    pool = await get_pool()
+                                    async with pool.acquire() as conn:
+                                                        rows = await conn.fetch("""
+                                                                            SELECT telegram_id, full_name, reminder_count FROM students
+                                                                                                WHERE is_active=1
+                                                                                                                    AND last_active < NOW() - INTERVAL '4 hours'
+                                                                                                                                        AND (last_reminded IS NULL OR last_reminded < NOW() - INTERVAL '4 hours')
+                                                                                                                                                        """)
+                                                        for s in rows:
+                                                                                sid = s['telegram_id']
+                                                                                name = s['full_name']
+                                                                                rc = s.get('reminder_count') or 0
+                                                                                try:
+                                                                                                            if rc == 0:
+                                                                                                                                            await bot.send_message(sid,
+                                                                                                                                                                                                   f"Siz darsni unutdingiz, {name}!\n"
+                                                                                                                                                                                                   f"4 soat ichida javob bermasa -5 kg jarima!")
+                                                                                                                                            await conn.execute(
+                                                                                                                                                                                "UPDATE students SET reminder_count=1,last_reminded=NOW() WHERE telegram_id=$1", sid)
+                                                                                    elif rc == 1:
+                                                                                        calf = await conn.fetchval("SELECT calf_kg FROM students WHERE telegram_id=$1", sid)
+                                                                                        if calf is not None:
+                                                                                                                            await conn.execute(
+                                                                                                                                                                    "UPDATE students SET calf_kg=$1,reminder_count=2,last_reminded=NOW() WHERE telegram_id=$2",
+                                                                                                                                                                    max(20.0, calf - 5), sid)
+                                                                                                                        await bot.send_message(sid,
+                                                                                                                                                                               f"OXIRGI OGOHLANTIRISH! {name}\n"
+                                                                                                                                                                               f"Buzoqcha -5 kg!\nYana javob bermasangiz -10 kg va 10000 som jarima!")
+                    else:
+                                                    calf = await conn.fetchval("SELECT calf_kg FROM students WHERE telegram_id=$1", sid)
+                                                    som = await conn.fetchval("SELECT som_balance FROM students WHERE telegram_id=$1", sid)
+                                                    if calf is not None:
+                                                                                        await conn.execute(
+                                                                                                                                "UPDATE students SET calf_kg=$1,som_balance=$2,reminder_count=0,last_reminded=NOW() WHERE telegram_id=$3",
+                                                                                                                                max(20.0, calf-10), max(0,(som or 0)-10000), sid)
+                                                                                        await conn.execute(
+                                                                                                                                "INSERT INTO som_transactions (student_id,amount,reason) VALUES ($1,-10000,'Dars otkazib yuborish')",
+                                                                                                                                sid)
+                                                                                    await bot.send_message(sid,
+                                                                                                                                           f"JARIMA! {name}\n-10 kg\n-10000 som\nDarslarni bajaring!")
+                                                    try:
+                                                                                        await bot.send_message(TEACHER_ID, f"Jarima: {name} -10kg -10000som")
+                                                    except Exception:
+                                                                                        pass
+                                                    except Exception as e:
+                                                                                logger.error(f"Reminder {sid}: {e}")
+                                                    except Exception as e:
+                                                                    logger.error(f"Reminder loop: {e}")
+                                                                    await asyncio.sleep(300)
+
+
+async def reset_daily_reminders():
+        while True:
+                    try:
+                                    now = datetime.now()
+                                    nxt = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+                                    await asyncio.sleep((nxt - now).total_seconds())
+                                    pool = await get_pool()
+                                    async with pool.acquire() as conn:
+                                                        await conn.execute("UPDATE students SET reminder_count=0 WHERE is_active=1")
+                    except Exception as e:
+                                    logger.error(f"Reset: {e}")
+                                    await asyncio.sleep(3600)
+
+
 
 async def main():
     logger.info("🚀 A Avlod Academy ishga tushmoqda...")
     await init_db()
+        await _ensure_reminder_columns()
     logger.info("✅ Database tayyor")
     await asyncio.gather(
         run_bot(),
+        check_inactive_students(),
+        reset_daily_reminders(),
         run_api()
     )
 
