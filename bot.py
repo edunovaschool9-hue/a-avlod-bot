@@ -59,10 +59,10 @@ async def check_inactive_students():
                 students = await conn.fetch(
                     """
                     SELECT telegram_id, full_name, reminder_count,
-                           last_activity, calf_kg, som_balance
+                           last_active, calf_kg, som_balance
                     FROM students
                     WHERE is_active = TRUE
-                    AND (last_activity IS NULL OR last_activity < $1)
+                    AND (last_active IS NULL OR last_active < $1)
                     """,
                     four_hours_ago
                 )
