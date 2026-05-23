@@ -28,6 +28,12 @@ def serialize_row(row):
 async def init_db():
     pool = await get_pool()
     async with pool.acquire() as conn:
+        # Add missing columns for existing databases
+        try:
+            await conn.execute("ALTER TABLE students ADD COLUMN IF NOT EXISTS reminder_count INTEGER DEFAULT 0")
+        except Exception:
+            pass
+
         await conn.execute("""
             CREATE TABLE IF NOT EXISTS students (
                 telegram_id BIGINT PRIMARY KEY,
