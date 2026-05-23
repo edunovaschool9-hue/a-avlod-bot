@@ -97,13 +97,13 @@ def get_payment_confirm_keyboard(user_id: int, amount: int):
 
 @router.message(CommandStart())
 async def cmd_start(message: types.Message, bot: Bot, state: FSMContext):
-        user = message.from_user
+            user = message.from_user
         is_teacher = user.id == TEACHER_ID
 
         args = message.text.split(maxsplit=1)
         deep_link = args[1].strip() if len(args) > 1 else ""
 
-    if is_teacher:
+        if is_teacher:
                 await message.answer(
                                 f"👋 Salom, ustoz {user.first_name}!\n\n"
                                 f"<b>Buyruqlar:</b>\n"
