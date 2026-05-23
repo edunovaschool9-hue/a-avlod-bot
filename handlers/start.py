@@ -100,8 +100,8 @@ async def cmd_start(message: types.Message, bot: Bot, state: FSMContext):
         user = message.from_user
         is_teacher = user.id == TEACHER_ID
 
-    args = message.text.split(maxsplit=1)
-    deep_link = args[1].strip() if len(args) > 1 else ""
+        args = message.text.split(maxsplit=1)
+        deep_link = args[1].strip() if len(args) > 1 else ""
 
     if is_teacher:
                 await message.answer(
