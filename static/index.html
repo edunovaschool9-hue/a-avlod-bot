@@ -1,20 +1,26 @@
 <!DOCTYPE html>
 <html lang="uz">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-    <title>A Avlod Academy</title>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>A Avlod Academy</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     :root{--bg:#0a0a12;--s:#13131f;--s2:#1a1a2a;--brd:rgba(255,255,255,.07);--ac:#7c3aed;--al:#a78bfa;--gn:#10b981;--rd:#ef4444;--go:#f59e0b;--tx:#f1f5f9;--mu:#64748b;--mu2:#94a3b8}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding-bottom:72px;overflow-x:hidden}
+
+    /* NAV */
     .nav{position:fixed;bottom:0;left:0;right:0;background:var(--s);border-top:1px solid var(--brd);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:100}
     .nb{flex:1;border:none;background:transparent;color:var(--mu);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;font-size:10px;transition:color .2s}
     .nb.active{color:var(--al)}
     .nb svg{width:22px;height:22px;stroke-width:1.8}
+
+    /* SCREENS */
     .sc{display:none;padding:0}
     .sc.active{display:block}
+
+    /* HOME */
     .home-inner{padding:14px}
     .balances{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
     .bal-card{border-radius:14px;padding:12px}
@@ -25,6 +31,8 @@
     .bal-label.bayt{color:#c4b5fd}
     .bal-val{font-size:20px;font-weight:700;color:#fff;line-height:1}
     .bal-unit{font-size:10px;font-weight:400;opacity:.7;margin-left:2px}
+
+    /* CALF */
     .calf-card{background:var(--s);border:1px solid var(--brd);border-radius:20px;padding:18px;margin-bottom:14px;text-align:center}
     .calf-week{display:inline-block;background:rgba(16,185,129,.15);color:#34d399;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;margin-bottom:10px}
     .calf-emoji{font-size:80px;line-height:1;margin:4px 0;display:block}
@@ -37,11 +45,15 @@
     .feed-btn{background:linear-gradient(135deg,var(--ac),var(--al));border:none;color:#fff;font-size:15px;font-weight:600;padding:13px 28px;border-radius:14px;cursor:pointer;margin-top:12px}
     .feed-btn:disabled{background:var(--s2);color:var(--mu);cursor:default}
     .feed-hint{font-size:11px;color:var(--mu);margin-top:6px}
+
+    /* HOME BUTTONS */
     .home-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
     .hbtn{padding:14px 10px;border-radius:14px;border:1px solid var(--brd);background:var(--s);color:var(--tx);font-size:14px;font-weight:600;cursor:pointer;text-align:center}
     .hbtn.test{border-color:rgba(124,58,237,.4);background:rgba(124,58,237,.1);color:var(--al)}
     .hbtn.lesson-locked{color:var(--mu);cursor:default}
     .hbtn.lesson-open{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.1);color:#34d399}
+
+    /* LESSONS */
     .lessons-inner{padding:14px}
     .lesson-label{font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
     .collage{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
@@ -62,6 +74,8 @@
     .coming-icon{font-size:22px;display:block;margin-bottom:4px}
     .coming-name{font-size:11px;font-weight:600;color:var(--mu2);margin-bottom:2px}
     .coming-soon{font-size:10px;color:var(--mu)}
+
+    /* TEST */
     .test-screen{padding:14px}
     .test-top{background:var(--s);border:1px solid var(--brd);border-radius:16px;padding:14px;margin-bottom:14px}
     .test-top-title{font-size:15px;font-weight:600;margin-bottom:8px}
@@ -70,12 +84,14 @@
     .prog-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--al));border-radius:3px;transition:width .4s}
     .prog-txt{font-size:12px;color:var(--mu2);white-space:nowrap}
     .q-card{background:var(--s);border:1px solid var(--brd);border-radius:16px;padding:16px;margin-bottom:12px}
-                 .q-text{font-size:15px;font-weight:600;line-height:1.5}
+    .q-text{font-size:15px;font-weight:600;line-height:1.5}
     .opt{width:100%;padding:13px 14px;margin-bottom:8px;background:var(--s2);border:1px solid var(--brd);border-radius:12px;color:var(--tx);font-size:14px;text-align:left;cursor:pointer}
     .opt.correct{background:rgba(16,185,129,.15);border-color:var(--gn);color:#34d399}
     .opt.wrong{background:rgba(239,68,68,.15);border-color:var(--rd);color:#f87171}
     .opt:disabled{cursor:default}
     .next-btn{width:100%;padding:14px;background:var(--ac);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;display:none;margin-top:4px}
+
+    /* RESULT */
     .result-screen{padding:14px}
     .res-card{background:var(--s);border:1px solid var(--brd);border-radius:20px;padding:24px;text-align:center;margin-bottom:14px}
     .res-emoji{font-size:60px;display:block;margin-bottom:10px}
@@ -85,11 +101,15 @@
     .res-bytes{background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);border-radius:12px;padding:12px;font-size:15px;font-weight:600;color:var(--al);margin-bottom:8px}
     .res-pending{font-size:13px;color:var(--mu2);line-height:1.6}
     .back-btn{width:100%;padding:13px;background:var(--s2);border:1px solid var(--brd);border-radius:12px;color:var(--tx);font-size:14px;font-weight:600;cursor:pointer;margin-top:10px}
+
+    /* MARKET */
     .market-inner{padding:14px}
     .coming-big{background:var(--s);border:1px solid var(--brd);border-radius:20px;padding:40px 20px;text-align:center}
     .coming-big-icon{font-size:60px;display:block;margin-bottom:12px}
     .coming-big-title{font-size:18px;font-weight:600;margin-bottom:6px}
     .coming-big-sub{font-size:14px;color:var(--mu)}
+
+    /* PROFILE */
     .profile-inner{padding:14px}
     .prof-head{text-align:center;margin-bottom:18px}
     .pav{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--al));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#fff;margin:0 auto 10px;border:3px solid rgba(124,58,237,.3)}
@@ -111,10 +131,8 @@
     .txa{font-size:13px;font-weight:700;margin-left:auto}
     .txa.plus{color:var(--gn)}
     .txa.minus{color:var(--rd)}
-    .spin{width:24px;height:24px;border:2px solid var(--brd);border-top-color:var(--al);border-radius:50%;animation:sp .7s linear infinite;margin:0 auto 8px}
-    @keyframes sp{to{transform:rotate(360deg)}}
-    .loading{text-align:center;padding:30px;color:var(--mu);font-size:13px}
-    /* TEZ AYTISH STYLES */
+
+    /* TEZ AYTISH */
     .tez-inner{padding:14px}
     .tez-header{font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
     .tez-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
@@ -131,7 +149,8 @@
     .tez-badge.done{background:rgba(16,185,129,.2);color:#34d399}
     .tez-badge.lock{background:rgba(100,116,139,.15);color:var(--mu)}
     .tez-badge.pending{background:rgba(59,130,246,.2);color:#60a5fa}
-    /* TEZ AYTISH LESSON SCREEN */
+
+    /* TEZ AYTISH LESSON */
     .tez-lesson-screen{padding:14px}
     .tez-lesson-card{background:var(--s);border:1px solid rgba(245,158,11,.3);border-radius:20px;padding:20px;margin-bottom:14px;text-align:center}
     .tez-lesson-icon{font-size:50px;display:block;margin-bottom:10px}
@@ -139,7 +158,6 @@
     .tez-lesson-text{font-size:18px;font-weight:700;color:var(--tx);background:var(--s2);border-radius:14px;padding:16px;margin-bottom:10px;line-height:1.6;letter-spacing:.5px}
     .tez-lesson-hint{font-size:13px;color:var(--mu2);font-style:italic;margin-bottom:16px;line-height:1.5}
     .tez-week-badge{display:inline-block;background:rgba(245,158,11,.15);color:var(--go);font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;margin-bottom:12px}
-    /* VOICE RECORDING */
     .voice-section{background:var(--s2);border:1px solid var(--brd);border-radius:16px;padding:16px;margin-bottom:12px}
     .voice-title{font-size:13px;font-weight:600;margin-bottom:10px;color:var(--mu2)}
     .record-btn{width:100%;padding:16px;background:linear-gradient(135deg,#dc2626,#ef4444);border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px}
@@ -156,350 +174,548 @@
     .tez-pending-icon{font-size:36px;display:block;margin-bottom:8px}
     .tez-pending-text{font-size:13px;color:#60a5fa;line-height:1.6}
     .tez-done-card{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:16px;padding:16px;text-align:center;margin-bottom:12px}
-    </style>
-  </head>
+
+    /* UTILS */
+    .spin{width:24px;height:24px;border:2px solid var(--brd);border-top-color:var(--al);border-radius:50%;animation:sp .7s linear infinite;margin:0 auto 8px}
+    @keyframes sp{to{transform:rotate(360deg)}}
+    .loading{text-align:center;padding:30px;color:var(--mu);font-size:13px}
+  </style>
+</head>
 <body>
-  <div class="sc active" id="s-home"><div class="home-inner">
-    <div class="balances"><div class="bal-card som"><div class="bal-label som">💰 Asosiy hisob</div></div><div class="bal-val"><span id="h-som">0</span></span><span class="bal-unit">so'm</span></span></div></div></div></div>
-      <div class="bal-card bayt"><div class="bal-label bayt">💾 Bayt hisob</div></div><div class="bal-val"><span id="h-bayt">0</span></span><span class="bal-unit">bayt</span></span></div></div></div></div></div></div>
-    <div class="calf-card"><div class="calf-week" id="calf-week">1-hafta</div></div><span class="calf-emoji" id="calf-emoji">🐄</span></span>
-      <div class="calf-kg"><span id="calf-kg">40</span></span><span> kg</span></div></div>
-    <div class="calf-prog-wrap"><div class="calf-prog-label"><span id="calf-from">40 kg</span><span id="calf-to">50 kg</span></div></div>
-    <div class="calf-prog"><div class="calf-prog-fill" id="calf-fill" style="width:0%"></div></div></div></div></div></div>
-    <button class="feed-btn" id="feed-btn" disabled onclick="feedCalf()">🌿 Ovqat berish</button></button>
-    <div class="feed-hint" id="feed-hint">Vazifa bajarsangiz faollashadi</div></div></div></div>
-  <div class="home-btns"><button class="hbtn test" onclick="goTest()">🧪 Test</button></button>
-  <button class="hbtn lesson-locked" id="lesson-btn" onclick="goLesson()">📚 Dars 🔒</button></button></div></div>
-  </div></div></div></div>
-<div class="sc" id="s-lessons"><div class="lessons-inner">
-<div class="lesson-label">📚 Testlar va darslar</div></div>
-<div class="collage" id="collage"><div class="loading"><div class="spin"></div></div></div></div></div></div>
-<div class="coming-label">Tez kunda ochiladi</div></div>
-<div class="coming-grid">
-<div class="coming-item"><span class="coming-icon">📖</span><div class="coming-name">Kitob</div></div><div class="coming-soon">Tez kunda</div></div></div></div>
-<div class="coming-item"><span class="coming-icon">🤖</span><div class="coming-name">AI ga buyruq</div></div><div class="coming-soon">Tez kunda</div></div></div></div>
-<div class="coming-item"><span class="coming-icon">🎬</span><div class="coming-name">Video darslik</div></div><div class="coming-soon">Tez kunda</div></div></div></div>
-</div></div></div></div></div></div>
-<div class="sc" id="s-test"><div class="test-screen">
-<div class="test-top"><div class="test-top-title" id="test-title">Test</div></div>
-<div class="prog-row"><div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div></div></div>
-<div class="prog-txt" id="prog-txt">1/5</div></div></div></div></div></div>
-<div class="q-card"><div class="q-text" id="q-text">Savol...</div></div></div></div>
-<div id="opts"></div></div>
-<button class="next-btn" id="next-btn" onclick="nextQ()">Keyingisi →</button></button>
-</div></div></div></div>
-<div class="sc" id="s-result"><div class="result-screen">
-<div class="res-card"><span class="res-emoji" id="res-emoji">🏆</span>
-<div class="res-title" id="res-title">Mukammal!</div></div>
-<div class="res-score" id="res-score">5/5</div></div>
-<div class="res-score-sub">to'g'ri javoblar</div></div>
-<div class="res-bytes" id="res-bytes">+25 bayt kutilmoqda</div></div>
-<div class="res-pending">⏳ O'qituvchi natijangizni tekshirmoqda...<br>Tasdiqlangandan so'ng baytlar va navbatdagi dars ochiladi!</div></div></div></div>
-<button class="back-btn" onclick="backToLessons()">⬅️ Darslarga qaytish</button></button>
-</div></div></div></div>
-<!-- TEZ AYTISH SCREEN -->
-<div class="sc" id="s-tez"><div class="tez-inner">
-<div class="tez-header">🎤 Tez aytish darslari</div></div>
-<div class="tez-grid" id="tez-grid"><div class="loading"><div class="spin"></div></div>Yuklanmoqda...</div></div></div></div>
-</div></div></div></div>
-<!-- TEZ AYTISH LESSON VIEW -->
-<div class="sc" id="s-tez-lesson"><div class="tez-lesson-screen">
-<div class="tez-lesson-card">
-<span class="tez-lesson-icon">🎤</span>
-<div class="tez-week-badge" id="tez-lesson-week">1-hafta</div></div>
-<div class="tez-lesson-title" id="tez-lesson-title">Tez aytish</div></div>
-<div class="tez-lesson-text" id="tez-lesson-text">...</div></div>
-<div class="tez-lesson-hint" id="tez-lesson-hint">...</div></div>
-</div></div>
-<div class="voice-section" id="voice-section">
-<div class="voice-title">🎙️ Ovozingizni yuboring:</div></div>
-<button class="record-btn" id="record-btn" onclick="startRecording()">🎤 Yozishni boshlash</button></button>
-<div class="voice-status" id="voice-status"></div></div>
-<audio id="audio-preview" class="audio-preview" controls style="display:none"></audio></audio>
-<div class="voice-controls" id="voice-controls" style="display:none">
-<button class="voice-ctrl-btn cancel-voice" onclick="cancelRecording()">🗑️ Bekor qilish</button></button>
-<button class="voice-ctrl-btn send-voice" id="send-voice-btn" onclick="sendVoice()">📤 Yuborish</button></button>
-</div></div>
-</div></div>
-<div class="tez-pending-card" id="tez-pending-msg" style="display:none">
-<span class="tez-pending-icon">⏳</span>
-<div class="tez-pending-text">Ovozingiz ustoz ko'rib chiqmoqda...<br>Tasdiqlangandan so'ng keyingi dars ochiladi!</div></div>
-</div></div>
-<button class="back-btn" onclick="go('tez',null)">⬅️ Orqaga</button></button>
-</div></div></div></div></span>
-</body>  
-  <div class="sc" id="s-market"><div class="market-inner"><div class="coming-big">
-    <span class="coming-big-icon">🛍️</span></span>
-    <div class="coming-big-title">Market tez kunda ochiladi!</div></div>
-    <div class="coming-big-sub">Baytlaringizni to'plang — sovg'alar kutmoqda 🎁</div></div>
-  </div></div></div></div></div></div>
-  <div class="sc" id="s-profile"><div class="profile-inner">
-    <div class="prof-head"><div class="pav" id="p-av">?</div></div>
-      <div class="pname" id="p-name">...</div></div><div class="puser" id="p-user"></div></div>
-      <span class="prank" id="p-rank">Junior · Lv1</span></span></div></div>
-    <div class="g2"><div class="card"><div class="ci">💰</div></div><div class="cv" id="p-som">0</div></div><div class="ck">so'm</div></div></div></div>
-      <div class="card"><div class="ci">💾</div></div><div class="cv" id="p-bayt">0</div></div><div class="ck">bayt</div></div></div></div>
-      <div class="card"><div class="ci">🐮</div></div><div class="cv" id="p-kg">40</div></div><div class="ck">kg</div></div></div></div>
-      <div class="card"><div class="ci">🔥</div></div><div class="cv" id="p-str">0</div></div><div class="ck">streak</div></div></div></div></div></div>
-    <div class="sec">Oxirgi operatsiyalar</div></div>
-    <div id="p-tx"><div class="loading"><div class="spin"></div></div>Yuklanmoqda...</div></div></div></div>
-  </div></div></div></div>
+
+  <!-- HOME -->
+  <div class="sc active" id="s-home">
+    <div class="home-inner">
+      <div class="balances">
+        <div class="bal-card som">
+          <div class="bal-label som">💰 Asosiy hisob</div>
+          <div class="bal-val"><span id="h-som">0</span><span class="bal-unit">so'm</span></div>
+        </div>
+        <div class="bal-card bayt">
+          <div class="bal-label bayt">💾 Bayt hisob</div>
+          <div class="bal-val"><span id="h-bayt">0</span><span class="bal-unit">bayt</span></div>
+        </div>
+      </div>
+      <div class="calf-card">
+        <div class="calf-week" id="calf-week">1-hafta</div>
+        <span class="calf-emoji" id="calf-emoji">🐄</span>
+        <div class="calf-kg"><span id="calf-kg">40</span><span> kg</span></div>
+        <div class="calf-prog-wrap">
+          <div class="calf-prog-label">
+            <span id="calf-from">40 kg</span>
+            <span id="calf-to">50 kg</span>
+          </div>
+          <div class="calf-prog">
+            <div class="calf-prog-fill" id="calf-fill" style="width:0%"></div>
+          </div>
+        </div>
+        <button class="feed-btn" id="feed-btn" disabled onclick="feedCalf()">🌿 Ovqat berish</button>
+        <div class="feed-hint" id="feed-hint">Vazifa bajarsangiz faollashadi</div>
+      </div>
+      <div class="home-btns">
+        <button class="hbtn test" onclick="goTest()">🧪 Test</button>
+        <button class="hbtn lesson-locked" id="lesson-btn" onclick="goLesson()">📚 Dars 🔒</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LESSONS -->
+  <div class="sc" id="s-lessons">
+    <div class="lessons-inner">
+      <div class="lesson-label">📚 Testlar va darslar</div>
+      <div class="collage" id="collage">
+        <div class="loading"><div class="spin"></div></div>
+      </div>
+      <div class="coming-label">Tez kunda ochiladi</div>
+      <div class="coming-grid">
+        <div class="coming-item">
+          <span class="coming-icon">📖</span>
+          <div class="coming-name">Kitob</div>
+          <div class="coming-soon">Tez kunda</div>
+        </div>
+        <div class="coming-item">
+          <span class="coming-icon">🤖</span>
+          <div class="coming-name">AI ga buyruq</div>
+          <div class="coming-soon">Tez kunda</div>
+        </div>
+        <div class="coming-item">
+          <span class="coming-icon">🎬</span>
+          <div class="coming-name">Video darslik</div>
+          <div class="coming-soon">Tez kunda</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEST -->
+  <div class="sc" id="s-test">
+    <div class="test-screen">
+      <div class="test-top">
+        <div class="test-top-title" id="test-title">Test</div>
+        <div class="prog-row">
+          <div class="prog-bar">
+            <div class="prog-fill" id="prog-fill" style="width:0%"></div>
+          </div>
+          <div class="prog-txt" id="prog-txt">1/5</div>
+        </div>
+      </div>
+      <div class="q-card">
+        <div class="q-text" id="q-text">Savol...</div>
+      </div>
+      <div id="opts"></div>
+      <button class="next-btn" id="next-btn" onclick="nextQ()">Keyingisi →</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="sc" id="s-result">
+    <div class="result-screen">
+      <div class="res-card">
+        <span class="res-emoji" id="res-emoji">🏆</span>
+        <div class="res-title" id="res-title">Mukammal!</div>
+        <div class="res-score" id="res-score">5/5</div>
+        <div class="res-score-sub">to'g'ri javoblar</div>
+        <div class="res-bytes" id="res-bytes">+25 bayt kutilmoqda</div>
+        <div class="res-pending">⏳ O'qituvchi natijangizni tekshirmoqda...<br>Tasdiqlangandan so'ng baytlar va navbatdagi dars ochiladi!</div>
+      </div>
+      <button class="back-btn" onclick="backToLessons()">⬅️ Darslarga qaytish</button>
+    </div>
+  </div>
+
+  <!-- TEZ AYTISH LIST -->
+  <div class="sc" id="s-tez">
+    <div class="tez-inner">
+      <div class="tez-header">🎤 Tez aytish darslari</div>
+      <div class="tez-grid" id="tez-grid">
+        <div class="loading"><div class="spin"></div>Yuklanmoqda...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEZ AYTISH LESSON -->
+  <div class="sc" id="s-tez-lesson">
+    <div class="tez-lesson-screen">
+      <div class="tez-lesson-card">
+        <span class="tez-lesson-icon">🎤</span>
+        <div class="tez-week-badge" id="tez-lesson-week">1-hafta</div>
+        <div class="tez-lesson-title" id="tez-lesson-title">Tez aytish</div>
+        <div class="tez-lesson-text" id="tez-lesson-text">...</div>
+        <div class="tez-lesson-hint" id="tez-lesson-hint">...</div>
+      </div>
+      <div class="voice-section" id="voice-section">
+        <div class="voice-title">🎙️ Ovozingizni yuboring:</div>
+        <button class="record-btn" id="record-btn" onclick="startRecording()">🎤 Yozishni boshlash</button>
+        <div class="voice-status" id="voice-status"></div>
+        <audio id="audio-preview" class="audio-preview" controls style="display:none"></audio>
+        <div class="voice-controls" id="voice-controls" style="display:none">
+          <button class="voice-ctrl-btn cancel-voice" onclick="cancelRecording()">🗑️ Bekor qilish</button>
+          <button class="voice-ctrl-btn send-voice" id="send-voice-btn" onclick="sendVoice()">📤 Yuborish</button>
+        </div>
+      </div>
+      <div class="tez-pending-card" id="tez-pending-msg" style="display:none">
+        <span class="tez-pending-icon">⏳</span>
+        <div class="tez-pending-text">Ovozingiz ustoz ko'rib chiqmoqda...<br>Tasdiqlangandan so'ng keyingi dars ochiladi!</div>
+      </div>
+      <button class="back-btn" onclick="go('tez',null)">⬅️ Orqaga</button>
+    </div>
+  </div>
+
+  <!-- MARKET -->
+  <div class="sc" id="s-market">
+    <div class="market-inner">
+      <div class="coming-big">
+        <span class="coming-big-icon">🛍️</span>
+        <div class="coming-big-title">Market tez kunda ochiladi!</div>
+        <div class="coming-big-sub">Baytlaringizni to'plang — sovg'alar kutmoqda 🎁</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="sc" id="s-profile">
+    <div class="profile-inner">
+      <div class="prof-head">
+        <div class="pav" id="p-av">?</div>
+        <div class="pname" id="p-name">...</div>
+        <div class="puser" id="p-user"></div>
+        <span class="prank" id="p-rank">Junior · Lv1</span>
+      </div>
+      <div class="g2">
+        <div class="card"><div class="ci">💰</div><div class="cv" id="p-som">0</div><div class="ck">so'm</div></div>
+        <div class="card"><div class="ci">💾</div><div class="cv" id="p-bayt">0</div><div class="ck">bayt</div></div>
+        <div class="card"><div class="ci">🐮</div><div class="cv" id="p-kg">40</div><div class="ck">kg</div></div>
+        <div class="card"><div class="ci">🔥</div><div class="cv" id="p-str">0</div><div class="ck">streak</div></div>
+      </div>
+      <div class="sec">Oxirgi operatsiyalar</div>
+      <div id="p-tx"><div class="loading"><div class="spin"></div>Yuklanmoqda...</div></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
   <nav class="nav">
-    <button class="nb active" onclick="go('home',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></svg>Bosh</button></button>
-    <button class="nb" onclick="go('lessons',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></svg>Darslar</button></button>
-    <button class="nb" id="nb-tez" onclick="go('tez',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></svg>Tez aytish</button></button>
-    <button class="nb" onclick="go('market',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></svg>Market</button></button>
-    <button class="nb" onclick="go('profile',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></svg>Profil</button></button>
-  </nav></nav>
+    <button class="nb active" onclick="go('home',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      Bosh
+    </button>
+    <button class="nb" onclick="go('lessons',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+      Darslar
+    </button>
+    <button class="nb" id="nb-tez" onclick="go('tez',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      Tez aytish
+    </button>
+    <button class="nb" onclick="go('market',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      Market
+    </button>
+    <button class="nb" onclick="go('profile',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Profil
+    </button>
+  </nav>
+
   <script>
-    const tg=window.Telegram?.WebApp;
-    if(tg){tg.ready();tg.expand();}
-    const BASE=window.location.origin;
-    let uid=tg?.initDataUnsafe?.user?.id||new URLSearchParams(location.search).get('user_id')||'0';
-    let profile=null,lessonAccess=[],lessons=[],currentLesson=null,curQ=0,testAnswers=[];
-    let navBtns=document.querySelectorAll('.nb');
-    let tezLessons=[],currentTezLesson=null;
-    let mediaRecorder=null,audioChunks=[],audioBlob=null,audioStream=null;
+    const tg = window.Telegram?.WebApp;
+    if (tg) { tg.ready(); tg.expand(); }
+    const BASE = window.location.origin;
+    let uid = tg?.initDataUnsafe?.user?.id || new URLSearchParams(location.search).get('user_id') || '0';
+    let profile = null, lessonAccess = [], lessons = [], currentLesson = null, curQ = 0, testAnswers = [];
+    let navBtns = document.querySelectorAll('.nb');
+    let tezLessons = [], currentTezLesson = null;
+    let mediaRecorder = null, audioChunks = [], audioBlob = null, audioStream = null;
 
-    const calfStages=[
-      {min:0,max:45,emoji:'🐄',label:"Yangi tug'ilgan"},
-      {min:45,max:55,emoji:'🐄',label:'1-hafta'},
-      {min:55,max:70,emoji:'🐄',label:'2-hafta'},
-      {min:70,max:90,emoji:'🐂',label:'3-hafta'},
-      {min:90,max:120,emoji:'🐂',label:'4-hafta'},
-      {min:120,max:999,emoji:'🐃',label:'Katta buzoq'},
-      ];
-    function getStage(kg){return calfStages.find(s=>kg>=s.min&&kg<s.max)||calfStages[calfStages.length-1];}
-    function fmt(n){return Number(n||0).toLocaleString('ru');}
-    function ini(name){return(name||'?').split(' ').map(n=>n[0]||'').join('').slice(0,2).toUpperCase()||'?';}
+    const calfStages = [
+      {min:0,  max:45,  emoji:'🐄', label:"Yangi tug'ilgan"},
+      {min:45, max:55,  emoji:'🐄', label:'1-hafta'},
+      {min:55, max:70,  emoji:'🐄', label:'2-hafta'},
+      {min:70, max:90,  emoji:'🐂', label:'3-hafta'},
+      {min:90, max:120, emoji:'🐂', label:'4-hafta'},
+      {min:120,max:999, emoji:'🐃', label:'Katta buzoq'},
+    ];
+    function getStage(kg) { return calfStages.find(s => kg >= s.min && kg < s.max) || calfStages[calfStages.length-1]; }
+    function fmt(n) { return Number(n||0).toLocaleString('ru'); }
+    function ini(name) { return (name||'?').split(' ').map(n=>n[0]||'').join('').slice(0,2).toUpperCase()||'?'; }
 
-    async function reloadAccess(){
-      try{const la=await fetch(`${BASE}/api/lesson_access?user_id=${uid}`);const ld=await la.json();lessonAccess=ld.access||[];}
-      catch(e){lessonAccess=[];}
+    async function reloadAccess() {
+      try {
+        const la = await fetch(`${BASE}/api/lesson_access?user_id=${uid}`);
+        const ld = await la.json();
+        lessonAccess = ld.access || [];
+      } catch(e) { lessonAccess = []; }
     }
 
-    function go(n,b){
-      if(n==='test'||n==='result'||n==='tez-lesson')return;
-      document.querySelectorAll('.sc').forEach(s=>s.classList.remove('active'));
-      navBtns.forEach(x=>x.classList.remove('active'));
-      document.getElementById('s-'+n).classList.add('active');
-      if(b)b.classList.add('active');
-      if(n==='lessons'){reloadAccess().then(()=>renderLessons());}
-      if(n==='profile')loadProfile();
-      if(n==='tez')loadTezAytish();
+    function go(n, b) {
+      if (n === 'test' || n === 'result' || n === 'tez-lesson') return;
+      document.querySelectorAll('.sc').forEach(s => s.classList.remove('active'));
+      navBtns.forEach(x => x.classList.remove('active'));
+      document.getElementById('s-' + n).classList.add('active');
+      if (b) b.classList.add('active');
+      if (n === 'lessons') { reloadAccess().then(() => renderLessons()); }
+      if (n === 'profile') loadProfile();
+      if (n === 'tez') loadTezAytish();
     }
 
-    function showScreen(id){document.querySelectorAll('.sc').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+    function showScreen(id) {
+      document.querySelectorAll('.sc').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
 
-    function goTest(){
-      if(!lessons.length){alert('Yuklanmoqda, kuting...');return;}
-      const accessible=lessonAccess.filter(a=>!a.test_passed);
-      if(!accessible.length){
-        if(!profile?.is_active){alert("Avval faollashtirilishingiz kerak.\nUstozga murojaat qiling.");}
-        else{alert("Barcha testlar o'tilgan! Ustoz yangi dars ochadi.");}
+    function goTest() {
+      if (!lessons.length) { alert('Yuklanmoqda, kuting...'); return; }
+      const accessible = lessonAccess.filter(a => !a.test_passed);
+      if (!accessible.length) {
+        if (!profile?.is_active) alert("Avval faollashtirilishingiz kerak.\nUstozga murojaat qiling.");
+        else alert("Barcha testlar o'tilgan! Ustoz yangi dars ochadi.");
         return;
       }
-      const first=accessible.sort((a,b)=>a.lesson_id-b.lesson_id)[0];
+      const first = accessible.sort((a,b) => a.lesson_id - b.lesson_id)[0];
       openTest(first.lesson_id);
     }
-    function goLesson(){
-      if(!profile?.is_active){alert("Darslar faqat faollashtirilgan o'quvchilar uchun.\nUstozga murojaat qiling.");return;}
-      go('lessons',navBtns[1]);
+
+    function goLesson() {
+      if (!profile?.is_active) { alert("Darslar faqat faollashtirilgan o'quvchilar uchun.\nUstozga murojaat qiling."); return; }
+      go('lessons', navBtns[1]);
     }
 
-    async function loadHome(){
-      try{
-        const r=await fetch(`${BASE}/api/profile?user_id=${uid}`);
-        if(!r.ok)return;
-        const d=await r.json();profile=d;
-        document.getElementById('h-som').textContent=fmt(d.som_balance||0);
-        document.getElementById('h-bayt').textContent=fmt(d.bytes_balance||0);
-        const kg=d.calf_kg||40;const stage=getStage(kg);
-        document.getElementById('calf-emoji').textContent=stage.emoji;
-        document.getElementById('calf-week').textContent=stage.label;
-        document.getElementById('calf-kg').textContent=Math.round(kg);
-        const ns=calfStages.find(s=>kg<s.max)||calfStages[calfStages.length-1];
-        const pct=Math.min(((kg-ns.min)/(ns.max-ns.min))*100,100);
-        document.getElementById('calf-fill').style.width=pct+'%';
-        document.getElementById('calf-from').textContent=ns.min+' kg';
-        document.getElementById('calf-to').textContent=ns.max+' kg';
-        if(d.is_active){const lb=document.getElementById('lesson-btn');lb.textContent='📚 Dars';lb.className='hbtn lesson-open';}
+    async function loadHome() {
+      try {
+        const r = await fetch(`${BASE}/api/profile?user_id=${uid}`);
+        if (!r.ok) return;
+        const d = await r.json();
+        profile = d;
+        document.getElementById('h-som').textContent  = fmt(d.som_balance || 0);
+        document.getElementById('h-bayt').textContent = fmt(d.bytes_balance || 0);
+        const kg = d.calf_kg || 40;
+        const stage = getStage(kg);
+        document.getElementById('calf-emoji').textContent = stage.emoji;
+        document.getElementById('calf-week').textContent  = stage.label;
+        document.getElementById('calf-kg').textContent    = Math.round(kg);
+        const ns = calfStages.find(s => kg < s.max) || calfStages[calfStages.length-1];
+        const pct = Math.min(((kg - ns.min) / (ns.max - ns.min)) * 100, 100);
+        document.getElementById('calf-fill').style.width = pct + '%';
+        document.getElementById('calf-from').textContent  = ns.min + ' kg';
+        document.getElementById('calf-to').textContent    = ns.max + ' kg';
+        if (d.is_active) {
+          const lb = document.getElementById('lesson-btn');
+          lb.textContent = '📚 Dars';
+          lb.className = 'hbtn lesson-open';
+        }
         await reloadAccess();
-      }catch(e){console.error(e);}
-    }
-    async function loadLessons(){
-      try{const r=await fetch(`${BASE}/api/lessons`);const d=await r.json();lessons=d.lessons||[];}catch(e){}
-    }
-    const lessonIcons=['🤖','📱','🧠','🎤','🚀','😊','🌍','🎬'];
-    const lessonColors=['rgba(124,58,237,.15)','rgba(16,185,129,.15)','rgba(59,130,246,.15)','rgba(245,158,11,.15)','rgba(239,68,68,.15)','rgba(236,72,153,.15)','rgba(16,185,129,.15)','rgba(124,58,237,.15)'];
-    function renderLessons(){
-      const c=document.getElementById('collage');
-      if(!lessons.length){c.innerHTML='<div class="loading"><div class="spin"></div></div>';loadLessons().then(()=>renderLessons());return;}
-      c.innerHTML=lessons.map((l,i)=>{
-        const access=lessonAccess.find(a=>Number(a.lesson_id)===Number(l.id));
-        const isDone=access&&Number(access.test_passed)===1;
-        const isOpen=access&&!isDone;
-        const isLocked=!access;
-        let cls=isLocked?'locked':isDone?'done':'active';
-        let badge=isLocked?'<span class="coll-badge lock">🔒 Yopiq</span>':isDone?'<span class="coll-badge done">✅ Otildi</span>':'<span class="coll-badge open">📖 Ochiq</span>';
-        let click=isOpen?`onclick="openTest(${l.id})"`:isDone?`onclick="alert('Bu test allaqachon otilgan!')"`:  `onclick="alert('Bu dars hali yopiq. Avvalgi darsni oting!')"`;
-        let bg=isDone?'rgba(16,185,129,.08)':isOpen?lessonColors[i%lessonColors.length]:'';
-        return `<div class="coll-item ${cls}" ${click} style="background:${bg}">${badge}<div class="coll-num">${l.id}-dars</div><span class="coll-icon">${lessonIcons[i%lessonIcons.length]}</span><div class="coll-title">${l.title}</div></div>`;
-      }).join('');
-    }
-    async function openTest(lessonId){
-      try{const r=await fetch(`${BASE}/api/lessons/${lessonId}`);currentLesson=await r.json();curQ=0;testAnswers=new Array(currentLesson.tests.length).fill(null);showScreen('s-test');showQ(0);}
-      catch(e){alert('Xatolik yuz berdi');}
-    }
-    function showQ(idx){
-      const q=currentLesson.tests[idx];const total=currentLesson.tests.length;
-      document.getElementById('test-title').textContent=currentLesson.title;
-      document.getElementById('prog-fill').style.width=((idx/total)*100)+'%';
-      document.getElementById('prog-txt').textContent=`${idx+1}/${total}`;
-      document.getElementById('q-text').textContent=q.question;
-      document.getElementById('next-btn').style.display='none';
-      document.getElementById('opts').innerHTML=q.options.map((opt,i)=>`<button class="opt" onclick="selectAns(${i})" id="opt${i}">${opt}</button>`).join('');
-    }
-    function selectAns(sel){if(testAnswers[curQ]!==null)return;testAnswers[curQ]=sel;document.querySelectorAll('.opt').forEach(b=>b.disabled=true);document.getElementById(`opt${sel}`).classList.add('correct');document.getElementById('next-btn').style.display='block';}
-    function nextQ(){curQ++;if(curQ<currentLesson.tests.length)showQ(curQ);else submitTest();}
-    async function submitTest(){
-      showScreen('s-result');
-      document.getElementById('res-emoji').textContent='⏳';
-      document.getElementById('res-title').textContent='Yuklanmoqda...';
-      try{
-        const r=await fetch(`${BASE}/api/lessons/${currentLesson.id}/submit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:uid,answers:testAnswers})});
-        const d=await r.json();
-        const emojis=['💪','👍','⭐','🏆'];const pct=d.score/d.total;const ei=pct<0.4?0:pct<0.6?1:pct<1?2:3;
-        document.getElementById('res-emoji').textContent=emojis[ei];
-        document.getElementById('res-title').textContent=d.result_emoji||'Natija';
-        document.getElementById('res-score').textContent=`${d.score}/${d.total}`;
-        document.getElementById('res-bytes').textContent=`+${d.bytes_earned} bayt kutilmoqda`;
-      }catch(e){document.getElementById('res-emoji').textContent='❌';document.getElementById('res-title').textContent='Xatolik';}
-    }
-    function backToLessons(){go('lessons',navBtns[1]);}
-    function feedCalf(){alert("Ovqat berish funksiyasi tez kunda!\nHozircha testlarni bajaring va bayt toplang 🐮");}
-    async function loadProfile(){
-      try{
-        const r=await fetch(`${BASE}/api/profile?user_id=${uid}`);const d=await r.json();profile=d;
-        document.getElementById('p-av').textContent=ini(d.full_name);
-        document.getElementById('p-name').textContent=d.full_name||'—';
-        document.getElementById('p-user').textContent=d.username?'@'+d.username:'';
-        document.getElementById('p-rank').textContent='🎖 '+d.rank+' · Lv'+d.level;
-        document.getElementById('p-som').textContent=fmt(d.som_balance||0);
-        document.getElementById('p-bayt').textContent=fmt(d.bytes_balance||0);
-        document.getElementById('p-kg').textContent=Math.round(d.calf_kg||40);
-        document.getElementById('p-str').textContent=d.streak_days||0;
-        const tr=await fetch(`${BASE}/api/transactions?user_id=${uid}`);const td=await tr.json();const txs=td.transactions||[];
-        const tc=document.getElementById('p-tx');
-        if(!txs.length){tc.innerHTML='<div class="loading">Operatsiyalar yoq</div>';return;}
-        tc.innerHTML=txs.map(t=>`<div class="tx"><div class="txi ${t.amount>0?'plus':'minus'}">${t.amount>0?'➕':'➖'}</div><div><div class="txr">${t.reason||'—'}</div><div class="txd">${(t.created_at||'').slice(0,16)}</div></div><div class="txa ${t.amount>0?'plus':'minus'}">${t.amount>0?'+':''}${t.amount} bayt</div></div>`).join('');
-      }catch(e){console.error(e);}
+      } catch(e) { console.error(e); }
     }
 
-    // ===== TEZ AYTISH FUNCTIONS =====
-    async function loadTezAytish(){
-      try{
-        const r=await fetch(`${BASE}/api/tez_aytish/lessons?user_id=${uid}`);
-        const d=await r.json();
-        tezLessons=d.lessons||[];
-        renderTezGrid();
-      }catch(e){document.getElementById('tez-grid').innerHTML='<div class="loading">Yuklab bo\'lmadi</div>';}
+    async function loadLessons() {
+      try {
+        const r = await fetch(`${BASE}/api/lessons`);
+        const d = await r.json();
+        lessons = d.lessons || [];
+      } catch(e) {}
     }
-    const tezIcons=['🦊','🐸','🦁','🐧','🦉','🐬','🦋','🐝','🌸','🍎','🌈','⭐'];
-    function renderTezGrid(){
-      const c=document.getElementById('tez-grid');
-      if(!tezLessons.length){c.innerHTML='<div class="loading">Darslar yo\'q. Ustoz tomonidan ochiladi.</div>';return;}
-      c.innerHTML=tezLessons.map((l,i)=>{
-        const s=l.status;
-        let cls=s==='locked'?'locked':s==='done'?'done':s==='pending'?'pending':'open';
-        let badge=s==='locked'?'<span class="tez-badge lock">🔒</span>':s==='done'?'<span class="tez-badge done">✅</span>':s==='pending'?'<span class="tez-badge pending">⏳</span>':'<span class="tez-badge open">🎤</span>';
-        let click=s==='open'?`onclick="openTezLesson(${l.id})"`:s==='done'?`onclick="alert('Bu dars allaqachon bajarilgan!')"`:s==='pending'?`onclick="alert('Ovozingiz ustoz ko\\'rib chiqmoqda...')"`:  `onclick="alert('Bu dars hali yopiq!')"`;
-        return `<div class="tez-item ${cls}" ${click}>${badge}<div class="tez-num">${l.id}-dars · ${l.week}-hafta</div><span class="tez-icon">${tezIcons[i%tezIcons.length]}</span><div class="tez-title">${l.title}</div></div>`;
+
+    const lessonIcons  = ['🤖','📱','🧠','🎤','🚀','😊','🌍','🎬'];
+    const lessonColors = ['rgba(124,58,237,.15)','rgba(16,185,129,.15)','rgba(59,130,246,.15)','rgba(245,158,11,.15)','rgba(239,68,68,.15)','rgba(236,72,153,.15)','rgba(16,185,129,.15)','rgba(124,58,237,.15)'];
+
+    function renderLessons() {
+      const c = document.getElementById('collage');
+      if (!lessons.length) {
+        c.innerHTML = '<div class="loading"><div class="spin"></div></div>';
+        loadLessons().then(() => renderLessons());
+        return;
+      }
+      c.innerHTML = lessons.map((l, i) => {
+        const access = lessonAccess.find(a => Number(a.lesson_id) === Number(l.id));
+        const isDone   = access && Number(access.test_passed) === 1;
+        const isOpen   = access && !isDone;
+        const isLocked = !access;
+        let cls   = isLocked ? 'locked' : isDone ? 'done' : 'active';
+        let badge = isLocked ? '<span class="coll-badge lock">🔒 Yopiq</span>'
+                  : isDone   ? '<span class="coll-badge done">✅ Otildi</span>'
+                  :             '<span class="coll-badge open">📖 Ochiq</span>';
+        let click = isOpen   ? `onclick="openTest(${l.id})"`
+                  : isDone   ? `onclick="alert('Bu test allaqachon otilgan!')"`
+                  :             `onclick="alert('Bu dars hali yopiq. Avvalgi darsni oting!')"`;
+        let bg = isDone ? 'rgba(16,185,129,.08)' : isOpen ? lessonColors[i % lessonColors.length] : '';
+        return `<div class="coll-item ${cls}" ${click} style="background:${bg}">${badge}<div class="coll-num">${l.id}-dars</div><span class="coll-icon">${lessonIcons[i % lessonIcons.length]}</span><div class="coll-title">${l.title}</div></div>`;
       }).join('');
     }
-    function openTezLesson(lid){
-      currentTezLesson=tezLessons.find(l=>l.id===lid);
-      if(!currentTezLesson)return;
-      document.getElementById('tez-lesson-week').textContent=currentTezLesson.week+'-hafta';
-      document.getElementById('tez-lesson-title').textContent=currentTezLesson.title;
-      document.getElementById('tez-lesson-text').textContent=currentTezLesson.text;
-      document.getElementById('tez-lesson-hint').textContent='💡 '+currentTezLesson.hint;
+
+    async function openTest(lessonId) {
+      try {
+        const r = await fetch(`${BASE}/api/lessons/${lessonId}`);
+        currentLesson = await r.json();
+        curQ = 0;
+        testAnswers = new Array(currentLesson.tests.length).fill(null);
+        showScreen('s-test');
+        showQ(0);
+      } catch(e) { alert('Xatolik yuz berdi'); }
+    }
+
+    function showQ(idx) {
+      const q = currentLesson.tests[idx];
+      const total = currentLesson.tests.length;
+      document.getElementById('test-title').textContent    = currentLesson.title;
+      document.getElementById('prog-fill').style.width     = ((idx / total) * 100) + '%';
+      document.getElementById('prog-txt').textContent      = `${idx+1}/${total}`;
+      document.getElementById('q-text').textContent        = q.question;
+      document.getElementById('next-btn').style.display    = 'none';
+      document.getElementById('opts').innerHTML = q.options.map((opt, i) =>
+        `<button class="opt" onclick="selectAns(${i})" id="opt${i}">${opt}</button>`
+      ).join('');
+    }
+
+    function selectAns(sel) {
+      if (testAnswers[curQ] !== null) return;
+      testAnswers[curQ] = sel;
+      document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+      document.getElementById(`opt${sel}`).classList.add('correct');
+      document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function nextQ() {
+      curQ++;
+      if (curQ < currentLesson.tests.length) showQ(curQ);
+      else submitTest();
+    }
+
+    async function submitTest() {
+      showScreen('s-result');
+      document.getElementById('res-emoji').textContent = '⏳';
+      document.getElementById('res-title').textContent = 'Yuklanmoqda...';
+      try {
+        const r = await fetch(`${BASE}/api/lessons/${currentLesson.id}/submit`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({user_id: uid, answers: testAnswers})
+        });
+        const d = await r.json();
+        const emojis = ['💪','👍','⭐','🏆'];
+        const pct = d.score / d.total;
+        const ei  = pct < 0.4 ? 0 : pct < 0.6 ? 1 : pct < 1 ? 2 : 3;
+        document.getElementById('res-emoji').textContent = emojis[ei];
+        document.getElementById('res-title').textContent = d.result_emoji || 'Natija';
+        document.getElementById('res-score').textContent = `${d.score}/${d.total}`;
+        document.getElementById('res-bytes').textContent = `+${d.bytes_earned} bayt kutilmoqda`;
+      } catch(e) {
+        document.getElementById('res-emoji').textContent = '❌';
+        document.getElementById('res-title').textContent = 'Xatolik';
+      }
+    }
+
+    function backToLessons() { go('lessons', navBtns[1]); }
+    function feedCalf() { alert("Ovqat berish funksiyasi tez kunda!\nHozircha testlarni bajaring va bayt toplang 🐮"); }
+
+    async function loadProfile() {
+      try {
+        const r = await fetch(`${BASE}/api/profile?user_id=${uid}`);
+        const d = await r.json();
+        profile = d;
+        document.getElementById('p-av').textContent   = ini(d.full_name);
+        document.getElementById('p-name').textContent = d.full_name || '—';
+        document.getElementById('p-user').textContent = d.username ? '@' + d.username : '';
+        document.getElementById('p-rank').textContent = '🎖 ' + d.rank + ' · Lv' + d.level;
+        document.getElementById('p-som').textContent  = fmt(d.som_balance || 0);
+        document.getElementById('p-bayt').textContent = fmt(d.bytes_balance || 0);
+        document.getElementById('p-kg').textContent   = Math.round(d.calf_kg || 40);
+        document.getElementById('p-str').textContent  = d.streak_days || 0;
+        const tr = await fetch(`${BASE}/api/transactions?user_id=${uid}`);
+        const td = await tr.json();
+        const txs = td.transactions || [];
+        const tc = document.getElementById('p-tx');
+        if (!txs.length) { tc.innerHTML = '<div class="loading">Operatsiyalar yoq</div>'; return; }
+        tc.innerHTML = txs.map(t =>
+          `<div class="tx"><div class="txi ${t.amount>0?'plus':'minus'}">${t.amount>0?'➕':'➖'}</div><div><div class="txr">${t.reason||'—'}</div><div class="txd">${(t.created_at||'').slice(0,16)}</div></div><div class="txa ${t.amount>0?'plus':'minus'}">${t.amount>0?'+':''}${t.amount} bayt</div></div>`
+        ).join('');
+      } catch(e) { console.error(e); }
+    }
+
+    // ===== TEZ AYTISH =====
+    async function loadTezAytish() {
+      try {
+        const r = await fetch(`${BASE}/api/tez_aytish/lessons?user_id=${uid}`);
+        const d = await r.json();
+        tezLessons = d.lessons || [];
+        renderTezGrid();
+      } catch(e) {
+        document.getElementById('tez-grid').innerHTML = '<div class="loading">Yuklab bo\'lmadi</div>';
+      }
+    }
+
+    const tezIcons = ['🦊','🐸','🦁','🐧','🦉','🐬','🦋','🐝','🌸','🍎','🌈','⭐'];
+
+    function renderTezGrid() {
+      const c = document.getElementById('tez-grid');
+      if (!tezLessons.length) {
+        c.innerHTML = '<div class="loading">Darslar yo\'q. Ustoz tomonidan ochiladi.</div>';
+        return;
+      }
+      c.innerHTML = tezLessons.map((l, i) => {
+        const s = l.status;
+        let cls   = s === 'locked' ? 'locked' : s === 'done' ? 'done' : s === 'pending' ? 'pending' : 'open';
+        let badge = s === 'locked'  ? '<span class="tez-badge lock">🔒</span>'
+                  : s === 'done'    ? '<span class="tez-badge done">✅</span>'
+                  : s === 'pending' ? '<span class="tez-badge pending">⏳</span>'
+                  :                   '<span class="tez-badge open">🎤</span>';
+        let click = s === 'open'    ? `onclick="openTezLesson(${l.id})"`
+                  : s === 'done'    ? `onclick="alert('Bu dars allaqachon bajarilgan!')"`
+                  : s === 'pending' ? `onclick="alert('Ovozingiz ustoz ko\\'rib chiqmoqda...')"`
+                  :                   `onclick="alert('Bu dars hali yopiq!')"`;
+        return `<div class="tez-item ${cls}" ${click}>${badge}<div class="tez-num">${l.id}-dars · ${l.week}-hafta</div><span class="tez-icon">${tezIcons[i % tezIcons.length]}</span><div class="tez-title">${l.title}</div></div>`;
+      }).join('');
+    }
+
+    function openTezLesson(lid) {
+      currentTezLesson = tezLessons.find(l => l.id === lid);
+      if (!currentTezLesson) return;
+      document.getElementById('tez-lesson-week').textContent  = currentTezLesson.week + '-hafta';
+      document.getElementById('tez-lesson-title').textContent = currentTezLesson.title;
+      document.getElementById('tez-lesson-text').textContent  = currentTezLesson.text;
+      document.getElementById('tez-lesson-hint').textContent  = '💡 ' + currentTezLesson.hint;
       resetVoiceUI();
       showScreen('s-tez-lesson');
     }
-    function resetVoiceUI(){
-      audioBlob=null;audioChunks=[];
-      document.getElementById('voice-section').style.display='block';
-      document.getElementById('tez-pending-msg').style.display='none';
-      document.getElementById('record-btn').textContent='🎤 Yozishni boshlash';
+
+    function resetVoiceUI() {
+      audioBlob = null; audioChunks = [];
+      document.getElementById('voice-section').style.display    = 'block';
+      document.getElementById('tez-pending-msg').style.display  = 'none';
+      document.getElementById('record-btn').textContent         = '🎤 Yozishni boshlash';
       document.getElementById('record-btn').classList.remove('recording');
-      document.getElementById('voice-status').textContent='';
-      document.getElementById('audio-preview').style.display='none';
-      document.getElementById('audio-preview').src='';
-      document.getElementById('voice-controls').style.display='none';
+      document.getElementById('voice-status').textContent       = '';
+      document.getElementById('audio-preview').style.display    = 'none';
+      document.getElementById('audio-preview').src              = '';
+      document.getElementById('voice-controls').style.display   = 'none';
     }
-    async function startRecording(){
-      if(mediaRecorder&&mediaRecorder.state==='recording'){
+
+    async function startRecording() {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
         mediaRecorder.stop();
         return;
       }
-      try{
-        audioStream=await navigator.mediaDevices.getUserMedia({audio:true});
-        audioChunks=[];
-        mediaRecorder=new MediaRecorder(audioStream);
-        mediaRecorder.ondataavailable=e=>{if(e.data.size>0)audioChunks.push(e.data);};
-        mediaRecorder.onstop=()=>{
-          audioBlob=new Blob(audioChunks,{type:'audio/ogg; codecs=opus'});
-          const url=URL.createObjectURL(audioBlob);
-          const ap=document.getElementById('audio-preview');
-          ap.src=url;ap.style.display='block';
-          document.getElementById('voice-controls').style.display='grid';
-          document.getElementById('record-btn').textContent='🔄 Qayta yozish';
+      try {
+        audioStream = await navigator.mediaDevices.getUserMedia({audio: true});
+        audioChunks = [];
+        mediaRecorder = new MediaRecorder(audioStream);
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+          audioBlob = new Blob(audioChunks, {type: 'audio/ogg; codecs=opus'});
+          const url = URL.createObjectURL(audioBlob);
+          const ap  = document.getElementById('audio-preview');
+          ap.src = url; ap.style.display = 'block';
+          document.getElementById('voice-controls').style.display = 'grid';
+          document.getElementById('record-btn').textContent = '🔄 Qayta yozish';
           document.getElementById('record-btn').classList.remove('recording');
-          document.getElementById('voice-status').textContent='✅ Yozildi! Eshitib ko\'ring va yuboring.';
-          audioStream.getTracks().forEach(t=>t.stop());
+          document.getElementById('voice-status').textContent = "✅ Yozildi! Eshitib ko'ring va yuboring.";
+          audioStream.getTracks().forEach(t => t.stop());
         };
         mediaRecorder.start();
-        document.getElementById('record-btn').textContent='⏹️ To\'xtatish';
+        document.getElementById('record-btn').textContent = "⏹️ To'xtatish";
         document.getElementById('record-btn').classList.add('recording');
-        document.getElementById('voice-status').textContent='🔴 Yozilmoqda...';
-        document.getElementById('voice-controls').style.display='none';
-        document.getElementById('audio-preview').style.display='none';
-      }catch(e){alert('Mikrofonga ruxsat bering!');}
+        document.getElementById('voice-status').textContent = '🔴 Yozilmoqda...';
+        document.getElementById('voice-controls').style.display = 'none';
+        document.getElementById('audio-preview').style.display  = 'none';
+      } catch(e) { alert('Mikrofonga ruxsat bering!'); }
     }
-    function cancelRecording(){
+
+    function cancelRecording() {
       resetVoiceUI();
-      document.getElementById('record-btn').textContent='🎤 Yozishni boshlash';
     }
-    async function sendVoice(){
-      if(!audioBlob||!currentTezLesson)return;
-      const btn=document.getElementById('send-voice-btn');
-      btn.disabled=true;btn.textContent='📤 Yuborilmoqda...';
-      try{
-        const tgUser=tg?.initDataUnsafe?.user;
-        const formData=new FormData();
-        formData.append('voice',audioBlob,'voice.ogg');
-        formData.append('user_id',uid);
-        if(tgUser){
-          formData.append('first_name',tgUser.first_name||'');
-          formData.append('username',tgUser.username||'');
+
+    async function sendVoice() {
+      if (!audioBlob || !currentTezLesson) return;
+      const btn = document.getElementById('send-voice-btn');
+      btn.disabled = true; btn.textContent = '📤 Yuborilmoqda...';
+      try {
+        const tgUser = tg?.initDataUnsafe?.user;
+        const formData = new FormData();
+        formData.append('voice', audioBlob, 'voice.ogg');
+        formData.append('user_id', uid);
+        if (tgUser) {
+          formData.append('first_name', tgUser.first_name || '');
+          formData.append('username',   tgUser.username   || '');
         }
-        const uploadR=await fetch(`${BASE}/api/upload_voice`,{method:'POST',body:formData});
-        const uploadD=await uploadR.json();
-        if(!uploadD.file_id)throw new Error('Upload failed');
-        const r=await fetch(`${BASE}/api/tez_aytish/${currentTezLesson.id}/submit_voice`,{
-          method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({user_id:uid,voice_file_id:uploadD.file_id})
+        const uploadR = await fetch(`${BASE}/api/upload_voice`, {method:'POST', body:formData});
+        const uploadD = await uploadR.json();
+        if (!uploadD.file_id) throw new Error('Upload failed');
+        const r = await fetch(`${BASE}/api/tez_aytish/${currentTezLesson.id}/submit_voice`, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({user_id: uid, voice_file_id: uploadD.file_id})
         });
-        const d=await r.json();
-        if(d.success){
-          document.getElementById('voice-section').style.display='none';
-          document.getElementById('tez-pending-msg').style.display='block';
+        const d = await r.json();
+        if (d.success) {
+          document.getElementById('voice-section').style.display   = 'none';
+          document.getElementById('tez-pending-msg').style.display = 'block';
           await loadTezAytish();
-        }else{throw new Error(d.error||'Error');}
-      }catch(e){btn.disabled=false;btn.textContent='📤 Yuborish';alert('Xatolik: '+e.message);}
+        } else { throw new Error(d.error || 'Error'); }
+      } catch(e) {
+        btn.disabled = false; btn.textContent = '📤 Yuborish';
+        alert('Xatolik: ' + e.message);
+      }
     }
-    loadHome();loadLessons();
-    
-          </script>
-</body></html>
+
+    loadHome();
+    loadLessons();
+  </script>
+</body>
+</html>
