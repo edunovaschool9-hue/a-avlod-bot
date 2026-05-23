@@ -8,10 +8,8 @@ from config import BOT_TOKEN, TEACHER_ID
 routes = web.RouteTableDef()
 pending_tests = {}
 
-
 def get_uid(request):
     return request.rel_url.query.get("user_id")
-
 
 @routes.get("/api/profile")
 async def get_profile(request):
@@ -41,7 +39,6 @@ async def get_profile(request):
         "homeworks_active": len([h for h in homeworks if h["status"] == "new"]),
     })
 
-
 @routes.get("/api/lesson_access")
 async def get_access(request):
     uid = get_uid(request)
@@ -53,7 +50,6 @@ async def get_access(request):
     except Exception as e:
         print(f"lesson_access error: {e}")
         return web.json_response({"access": []})
-
 
 @routes.get("/api/lessons")
 async def get_lessons(request):
@@ -68,7 +64,6 @@ async def get_lessons(request):
             "bytes_reward": len(l["tests"]) * 5,
         })
     return web.json_response({"lessons": lessons})
-
 
 @routes.get("/api/lessons/{lesson_id}")
 async def get_lesson(request):
@@ -85,7 +80,6 @@ async def get_lesson(request):
         "description": lesson["description"],
         "tests": tests
     })
-
 
 @routes.post("/api/lessons/{lesson_id}/submit")
 async def submit_test(request):
@@ -122,36 +116,35 @@ async def submit_test(request):
     }
 
     if score == total:
-        emoji = "🏆 Mukammal!"
+        emoji = "\U0001f3c6 Mukammal!"
     elif score >= total * 0.8:
-        emoji = "⭐ A'lo!"
+        emoji = "\u2b50 A'lo!"
     elif score >= total * 0.6:
-        emoji = "👍 Yaxshi!"
+        emoji = "\U0001f44d Yaxshi!"
     else:
-        emoji = "💪 Davom eting!"
+        emoji = "\U0001f4aa Davom eting!"
 
-    # Ustozga kнопки yuborish
     try:
         bot = Bot(token=BOT_TOKEN)
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="✅ Tasdiqlash",
+                    text="\u2705 Tasdiqlash",
                     callback_data=f"tapprove_{uid}_{lid}_{bytes_earned}_{score}_{total}"
                 ),
                 InlineKeyboardButton(
-                    text="❌ Rad etish",
+                    text="\u274c Rad etish",
                     callback_data=f"treject_{uid}_{lid}"
                 )
             ]
         ])
         await bot.send_message(
             TEACHER_ID,
-            f"📋 <b>Yangi test natijasi!</b>\n\n"
-            f"👤 {student_name} ({username})\n"
-            f"📚 {lid}-dars: {lesson['title']}\n"
-            f"📊 Natija: <b>{score}/{total}</b> — {emoji}\n"
-            f"💾 Mukofot: <b>+{bytes_earned} bayt</b>",
+            f"\U0001f4cb <b>Yangi test natijasi!</b>\n\n"
+            f"\U0001f464 {student_name} ({username})\n"
+            f"\U0001f4da {lid}-dars: {lesson['title']}\n"
+            f"\U0001f4ca Natija: <b>{score}/{total}</b> — {emoji}\n"
+            f"\U0001f4be Mukofot: <b>+{bytes_earned} bayt</b>",
             reply_markup=keyboard
         )
         await bot.session.close()
@@ -166,7 +159,6 @@ async def submit_test(request):
         "result_emoji": emoji,
     })
 
-
 @routes.get("/api/homeworks")
 async def get_homeworks(request):
     uid = get_uid(request)
@@ -174,7 +166,6 @@ async def get_homeworks(request):
         return web.json_response({"error": "No user_id"}, status=400)
     homeworks = await get_student_homeworks(int(uid))
     return web.json_response({"homeworks": homeworks})
-
 
 @routes.get("/api/transactions")
 async def get_trans(request):
@@ -184,115 +175,107 @@ async def get_trans(request):
     transactions = await get_transactions(int(uid), limit=20)
     return web.json_response({"transactions": transactions})
 
-
-
-# ===== TEZ AYTISH API =====
-
 @routes.get("/api/tez_aytish/lessons")
 async def get_tez_aytish_lessons(request):
-        uid = get_uid(request)
-        if not uid:
-                    return web.json_response({"error": "No user_id"}, status=400)
-                try:
-                            access = await get_tez_aytish_access(int(uid))
-                            access_map = {a["lesson_id"]: a for a in access}
-                            lessons = []
-                            for l in TEZ_AYTISH_LESSONS:
-                                            a = access_map.get(l["id"])
-                                            lessons.append({
-                                                                "id": l["id"],
-                                                                "week": l["week"],
-                                                                "title": l["title"],
-                                                                "text": l["text"],
-                                                                "hint": l["hint"],
-                                                                "status": a["status"] if a else "locked",
-                                            })
-                                        return web.json_response({"lessons": lessons})
-except Exception as e:
+    uid = get_uid(request)
+    if not uid:
+        return web.json_response({"error": "No user_id"}, status=400)
+    try:
+        access = await get_tez_aytish_access(int(uid))
+        access_map = {a["lesson_id"]: a for a in access}
+        lessons = []
+        for l in TEZ_AYTISH_LESSONS:
+            a = access_map.get(l["id"])
+            lessons.append({
+                "id": l["id"],
+                "week": l["week"],
+                "title": l["title"],
+                "text": l["text"],
+                "hint": l["hint"],
+                "status": a["status"] if a else "locked",
+            })
+        return web.json_response({"lessons": lessons})
+    except Exception as e:
         print(f"tez_aytish lessons error: {e}")
         return web.json_response({"lessons": []})
 
 @routes.post("/api/tez_aytish/{lesson_id}/submit_voice")
 async def submit_tez_aytish(request):
-        lid = int(request.match_info["lesson_id"])
+    lid = int(request.match_info["lesson_id"])
     data = await request.json()
     uid = data.get("user_id")
     voice_file_id = data.get("voice_file_id")
     if not uid or not voice_file_id:
-                return web.json_response({"error": "Missing data"}, status=400)
+        return web.json_response({"error": "Missing data"}, status=400)
     try:
-                lesson = next((l for l in TEZ_AYTISH_LESSONS if l["id"] == lid), None)
+        lesson = next((l for l in TEZ_AYTISH_LESSONS if l["id"] == lid), None)
         if not lesson:
-                        return web.json_response({"error": "Lesson not found"}, status=404)
+            return web.json_response({"error": "Lesson not found"}, status=404)
         student = await get_student(int(uid))
         student_name = student["full_name"] if student else f"ID:{uid}"
         username = f"@{student['username']}" if student and student.get('username') else f"ID:{uid}"
         submission_id = await submit_tez_aytish_voice(int(uid), lid, voice_file_id)
-        # Notify teacher
         bot = Bot(token=BOT_TOKEN)
         keyboard = InlineKeyboardMarkup(inline_keyboard=[[
-                        InlineKeyboardButton(
-                                            text="✅ Tasdiqlash",
-                                            callback_data=f"taz_ok_{submission_id}_{uid}_{lid}"
-                        ),
-                        InlineKeyboardButton(
-                                            text="❌ Rad etish",
-                                            callback_data=f"taz_no_{submission_id}_{uid}_{lid}"
-                        )
+            InlineKeyboardButton(
+                text="\u2705 Tasdiqlash",
+                callback_data=f"taz_ok_{submission_id}_{uid}_{lid}"
+            ),
+            InlineKeyboardButton(
+                text="\u274c Rad etish",
+                callback_data=f"taz_no_{submission_id}_{uid}_{lid}"
+            )
         ]])
         await bot.send_voice(
-                        TEACHER_ID,
-                        voice=voice_file_id,
-                        caption=f"🎤 <b>Tez aytish yuborildi!</b>\n\n"
-                                f"👤 {student_name} ({username})\n"
-                                f"📚 {lid}-dars: {lesson['title']}\n"
-                                f"📝 <i>{lesson['text']}</i>",
-                        reply_markup=keyboard
+            TEACHER_ID,
+            voice=voice_file_id,
+            caption=(
+                f"\U0001f3a4 <b>Tez aytish yuborildi!</b>\n\n"
+                f"\U0001f464 {student_name} ({username})\n"
+                f"\U0001f4da {lid}-dars: {lesson['title']}\n"
+                f"\U0001f4dd <i>{lesson['text']}</i>"
+            ),
+            reply_markup=keyboard
         )
         await bot.session.close()
         return web.json_response({"success": True, "submission_id": submission_id})
-except Exception as e:
+    except Exception as e:
         print(f"tez_aytish submit error: {e}")
         return web.json_response({"error": str(e)}, status=500)
 
-
-
 @routes.post("/api/upload_voice")
 async def upload_voice(request):
-        try:
-                    reader = await request.multipart()
-                    uid = None
-                    voice_data = None
-                    async for field in reader:
-                                    if field.name == 'user_id':
-                                                        uid = await field.read(decode=True)
-                                                        uid = uid.decode() if uid else None
-                                    elif field.name == 'voice':
-                                                        voice_data = await field.read()
-                                                if not voice_data:
-                                                                return web.json_response({"error": "No voice data"}, status=400)
-                                                            bot = Bot(token=BOT_TOKEN)
-                                from aiogram.types import BufferedInputFile
-                    voice_file = BufferedInputFile(voice_data, filename="voice.ogg")
-                    msg = await bot.send_voice(TEACHER_ID, voice=voice_file)
-                    file_id = msg.voice.file_id
-                    await bot.delete_message(TEACHER_ID, msg.message_id)
-                    await bot.session.close()
-                    return web.json_response({"file_id": file_id})
-except Exception as e:
-            print(f"upload_voice error: {e}")
-            return web.json_response({"error": str(e)}, status=500)
+    try:
+        reader = await request.multipart()
+        uid = None
+        voice_data = None
+        async for field in reader:
+            if field.name == 'user_id':
+                uid = await field.read(decode=True)
+                uid = uid.decode() if uid else None
+            elif field.name == 'voice':
+                voice_data = await field.read()
+        if not voice_data:
+            return web.json_response({"error": "No voice data"}, status=400)
+        bot = Bot(token=BOT_TOKEN)
+        from aiogram.types import BufferedInputFile
+        voice_file = BufferedInputFile(voice_data, filename="voice.ogg")
+        msg = await bot.send_voice(TEACHER_ID, voice=voice_file)
+        file_id = msg.voice.file_id
+        await bot.delete_message(TEACHER_ID, msg.message_id)
+        await bot.session.close()
+        return web.json_response({"file_id": file_id})
+    except Exception as e:
+        print(f"upload_voice error: {e}")
+        return web.json_response({"error": str(e)}, status=500)
 
-    
 @routes.get("/")
 async def index(request):
     return web.FileResponse("static/index.html")
 
-
 @routes.get("/health")
 async def health(request):
     return web.json_response({"status": "ok"})
-
 
 def create_app():
     app = web.Application()
