@@ -31,17 +31,15 @@ logger = logging.getLogger(__name__)
 
 bot = Bot(
     token=BOT_TOKEN,
-    default=DefaultBotProperties(
-        parse_mode=ParseMode.HTML
-    )
+    default=DefaultBotProperties(parse_mode=ParseMode.HTML)
 )
 dp = Dispatcher(storage=MemoryStorage())
-
-dp.include_router(lessons_router)
-dp.include_router(homework_router)
-dp.include_router(teacher_router)
-dp.include_router(student_router)
 dp.include_router(start_router)
+dp.include_router(student_router)
+dp.include_router(teacher_router)
+dp.include_router(homework_router)
+dp.include_router(lessons_router)
+
 
 # ─────────────────────────────────────────────
 # REMINDER SYSTEM (4-hour inactivity)
@@ -76,7 +74,6 @@ async def check_inactive_students():
 
                     try:
                         if reminder_count == 0:
-                            # First reminder - just warning
                             await bot.send_message(
                                 telegram_id,
                                 f"\u23f0 <b>Eslatma!</b>\n\n"
@@ -91,7 +88,6 @@ async def check_inactive_students():
                             )
 
                         elif reminder_count == 1:
-                            # Second reminder - -5 kg penalty
                             new_calf = max(0, calf_kg - 5)
                             await conn.execute(
                                 "UPDATE students SET calf_kg = $1, reminder_count = 2 WHERE telegram_id = $2",
@@ -109,13 +105,11 @@ async def check_inactive_students():
                             )
 
                         elif reminder_count >= 2:
-                            # Third reminder - -10 kg + fine
                             new_calf = max(0, calf_kg - 10)
                             new_balance = max(0, som_balance - 10000)
                             await conn.execute(
-                                """UPDATE students
-                                SET calf_kg = $1, som_balance = $2, reminder_count = 3
-                                WHERE telegram_id = $3""",
+                                """UPDATE students SET calf_kg = $1, som_balance = $2,
+                                   reminder_count = 3 WHERE telegram_id = $3""",
                                 new_calf, new_balance, telegram_id
                             )
                             await bot.send_message(
@@ -135,7 +129,6 @@ async def check_inactive_students():
         except Exception as e:
             logger.error(f"check_inactive_students error: {e}")
 
-        # Run every 4 hours
         await asyncio.sleep(4 * 60 * 60)
 
 
@@ -144,7 +137,6 @@ async def reset_daily_reminders():
     while True:
         try:
             now = datetime.utcnow()
-            # Calculate seconds until next midnight UTC
             tomorrow = (now + timedelta(days=1)).replace(
                 hour=0, minute=0, second=0, microsecond=0
             )
@@ -163,10 +155,154 @@ async def reset_daily_reminders():
             await asyncio.sleep(3600)
 
 
+# ─────────────────────────────────────────────
+# SCHEDULE REMINDERS
+# ─────────────────────────────────────────────
+
+async def send_lesson_day_reminders():
+    """Send reminder 1 day before scheduled lesson. Runs daily at 18:00 UTC+5 (13:00 UTC)."""
+    while True:
+        try:
+            now_utc = datetime.utcnow()
+            # Target: 13:00 UTC daily (18:00 Tashkent time)
+            target = now_utc.replace(hour=13, minute=0, second=0, microsecond=0)
+            if now_utc >= target:
+                target += timedelta(days=1)
+            wait_seconds = (target - now_utc).total_seconds()
+            await asyncio.sleep(wait_seconds)
+
+            # Tomorrow's day of week (UTC+5)
+            tomorrow_local = datetime.utcnow() + timedelta(hours=5, days=1)
+            tomorrow_dow = tomorrow_local.weekday()  # 0=Mon..6=Sun
+
+            pool = await get_pool()
+            async with pool.acquire() as conn:
+                rows = await conn.fetch("""
+                    SELECT sc.student_id, sc.lesson_time, s.full_name, s.username, s.calf_kg
+                    FROM schedules sc
+                    JOIN students s ON s.telegram_id = sc.student_id
+                    WHERE sc.day_of_week = $1 AND s.is_active = 1
+                """, tomorrow_dow)
+
+            days_uz = {0:"Dushanba",1:"Seshanba",2:"Chorshanba",3:"Payshanba",
+                      4:"Juma",5:"Shanba",6:"Yakshanba"}
+
+            for row in rows:
+                try:
+                    day_name = days_uz.get(tomorrow_dow, "Ertaga")
+                    await bot.send_message(
+                        row['student_id'],
+                        f"\U0001f4c5 <b>Dars eslatmasi!</b>\n\n"
+                        f"Salom {row['full_name']}! \U0001f44b\n\n"
+                        f"Ertaga ({day_name}) <b>{row['lesson_time']}</b>da dars!\n\n"
+                        f"\u23f0 Kechikmaslik uchun:\n"
+                        f"• O'z vaqtida keling!\n"
+                        f"• Kechikish yoki kelmagan holda: <b>-10 kg buzoqchadan</b>!\n\n"
+                        f"\U0001f4aa Muvaffaqiyatlar!"
+                    )
+                except Exception as e:
+                    logger.warning(f"Schedule reminder error for {row['student_id']}: {e}")
+
+            logger.info(f"\u2705 Sent schedule reminders for {len(rows)} students (tomorrow DOW={tomorrow_dow})")
+
+        except Exception as e:
+            logger.error(f"send_lesson_day_reminders error: {e}")
+            await asyncio.sleep(3600)
+
+
+async def check_homework_deadline():
+    """Check if students completed test+tez aytish by 20:00.
+    Lesson day is X, deadline is X+1 (next day) at 20:00.
+    Check runs every 2 hours after 20:00."""
+    while True:
+        try:
+            now_local = datetime.utcnow() + timedelta(hours=5)  # Tashkent time
+            current_dow = now_local.weekday()
+            current_hour = now_local.hour
+
+            # Only check after 20:00
+            if current_hour >= 20:
+                pool = await get_pool()
+                async with pool.acquire() as conn:
+                    # Get students who had lesson TODAY (before deadline 20:00)
+                    rows = await conn.fetch("""
+                        SELECT sc.student_id, sc.lesson_time, sc.day_of_week,
+                               s.full_name, s.calf_kg, s.telegram_id
+                        FROM schedules sc
+                        JOIN students s ON s.telegram_id = sc.student_id
+                        WHERE sc.day_of_week = $1 AND s.is_active = 1
+                    """, current_dow)
+
+                for row in rows:
+                    try:
+                        student_id = row['student_id']
+
+                        # Get current lesson
+                        access_row = await (await get_pool()).acquire().__aenter__()
+                        try:
+                            lesson_row = await access_row.fetchrow("""
+                                SELECT MAX(lesson_id) as lid FROM lesson_access
+                                WHERE student_id = $1
+                            """, student_id)
+                            lesson_id = lesson_row['lid'] if lesson_row and lesson_row['lid'] else 1
+
+                            # Check test done
+                            test_row = await access_row.fetchrow("""
+                                SELECT test_passed FROM lesson_access
+                                WHERE student_id = $1 AND lesson_id = $2
+                            """, student_id, lesson_id)
+
+                            # Check tez aytish done
+                            tez_row = await access_row.fetchrow("""
+                                SELECT status FROM tez_aytish_access
+                                WHERE student_id = $1 AND lesson_id = $2
+                            """, student_id, lesson_id)
+                        finally:
+                            await access_row.__aexit__(None, None, None)
+
+                        test_done = test_row and test_row['test_passed'] == 1
+                        tez_done = tez_row and tez_row['status'] in ('done', 'pending')
+
+                        if not test_done or not tez_done:
+                            missing = []
+                            if not test_done:
+                                missing.append("\U0001f9ea Test")
+                            if not tez_done:
+                                missing.append("\U0001f3a4 Tez aytish")
+                            missing_text = " va ".join(missing)
+
+                            # Apply penalty
+                            new_calf = max(0, row['calf_kg'] - 5)
+                            pool2 = await get_pool()
+                            async with pool2.acquire() as conn2:
+                                await conn2.execute(
+                                    "UPDATE students SET calf_kg = $1 WHERE telegram_id = $2",
+                                    new_calf, student_id
+                                )
+
+                            await bot.send_message(
+                                student_id,
+                                f"\u274c <b>Dars topshiriqlarini bajarmadingiz!</b>\n\n"
+                                f"Bugun dars bo'ldi, lekin 20:00gacha bajarmadingiiz:\n"
+                                f"{missing_text}\n\n"
+                                f"\U0001f42e Buzoqchadan <b>-5 kg</b> ayirildi!\n"
+                                f"Qolgan: <b>{new_calf} kg</b>\n\n"
+                                f"\U0001f4da Tezroq bajaring!"
+                            )
+                    except Exception as e:
+                        logger.warning(f"Homework deadline check error for {row.get('student_id','?')}: {e}")
+
+        except Exception as e:
+            logger.error(f"check_homework_deadline error: {e}")
+
+        await asyncio.sleep(2 * 60 * 60)  # every 2 hours
+
+
 async def set_bot_commands():
     student_commands = [
         BotCommand(command="start", description="\U0001f680 Boshlash"),
         BotCommand(command="darslar", description="\U0001f4da Darslar va testlar"),
+        BotCommand(command="tez_aytish", description="\U0001f3a4 Tez aytish kursi"),
         BotCommand(command="profile", description="\U0001f464 Profil"),
         BotCommand(command="balance", description="\U0001f4b0 Baytlar"),
         BotCommand(command="homework", description="\U0001f4dd Uy vazifalar"),
@@ -174,7 +310,6 @@ async def set_bot_commands():
     ]
 
     teacher_commands = [
-        BotCommand(command="add_student", description="\u2795 O'quvchi qo'shish"),
         BotCommand(command="students", description="\U0001f465 O'quvchilar ro'yxati"),
         BotCommand(command="approve_test", description="\u2705 Testni tasdiqlash"),
         BotCommand(command="add_bytes", description="\U0001f4be Bayt qo'shish"),
@@ -218,11 +353,7 @@ async def run_api():
     port = int(os.getenv("PORT", 8080))
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(
-        runner,
-        host="0.0.0.0",
-        port=port
-    )
+    site = web.TCPSite(runner, host="0.0.0.0", port=port)
     await site.start()
     logger.info(f"\U0001f310 API server ishladi: {port}")
 
@@ -235,10 +366,9 @@ async def main():
         run_api(),
         check_inactive_students(),
         reset_daily_reminders(),
+        send_lesson_day_reminders(),
+        check_homework_deadline(),
     )
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except (KeyboardInterrupt, SystemExit):
-        logger.info("\U0001f6d1 Bot to'xtatildi")
+    asyncio.run(main())
