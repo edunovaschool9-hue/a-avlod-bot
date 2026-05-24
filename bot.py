@@ -15,7 +15,7 @@ from aiogram.types import (
     WebAppInfo,
 )
 from config import BOT_TOKEN, MINI_APP_URL, TEACHER_ID
-from database import init_db, get_pool
+from database import init_db, get_pool, activate_tez_aytish_for_all_active_students
 from handlers.start import router as start_router
 from handlers.student import router as student_router
 from handlers.teacher import router as teacher_router
@@ -360,6 +360,10 @@ async def main():
     logger.info("\U0001f680 A Avlod Academy ishga tushmoqda...")
     await init_db()
     logger.info("\u2705 Database tayyor")
+
+    # Auto-activate tez aytish for all existing active students
+    fixed_count = await activate_tez_aytish_for_all_active_students()
+    logger.info(f"\u2705 Tez aytish activated for {fixed_count} existing students")
     await asyncio.gather(
         run_bot(),
         run_api(),
