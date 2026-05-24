@@ -140,6 +140,8 @@ async def cmd_start(message: types.Message, bot: Bot, state: FSMContext):
 
     student = await get_student(user.id)
     if student and student.get('is_active'):
+        # ✅ Ensure tez aytish access is available for existing students
+        await activate_tez_aytish_for_student(user.id)
         await message.answer(
             f"Qaytib keldingiz, {student['full_name']}! \U0001f44b\n\n"
             f"\U0001f4be Balans: <b>{student['bytes_balance']} bayt</b>\n"
@@ -457,7 +459,7 @@ async def reject_student_callback(callback: types.CallbackQuery, bot: Bot):
         reply_markup=None
     )
     await callback.answer("\u274c Rad etildi")
-
+h
     try:
         await bot.send_message(
             student_id,
