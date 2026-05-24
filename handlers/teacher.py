@@ -864,3 +864,47 @@ async def taz_reject(callback: CallbackQuery, bot: Bot):
         )
     except Exception:
         pass
+
+
+# ─────────────────────────────────────────────
+# ANNOUNCE — broadcast message to all active students
+# ─────────────────────────────────────────────
+
+@router.message(Command("announce"))
+async def cmd_announce(message: types.Message, bot: Bot):
+    if not is_teacher(message.from_user.id):
+        return
+
+    parts = message.text.split(maxsplit=1)
+    if len(parts) < 2:
+        await message.answer(
+            "\u26a0\ufe0f Format:\n<code>/announce Xabar matni</code>\n\n"
+            "Barcha faol o'quvchilarga xabar yuboriladi."
+        )
+        return
+
+    msg_text = parts[1]
+    students = await get_all_students()
+    active = [s for s in students if s.get('is_active')]
+
+    if not active:
+        await message.answer("\u26a0\ufe0f Faol o'quvchilar topilmadi.")
+        return
+
+    sent = 0
+    failed = 0
+    for student in active:
+        try:
+            await bot.send_message(
+                student['telegram_id'],
+                msg_text
+            )
+            sent += 1
+        except Exception:
+            failed += 1
+
+    await message.answer(
+        f"\u2705 <b>Xabar yuborildi!</b>\n\n"
+        f"\U0001f4e4 Yuborildi: <b>{sent}</b>\n"
+        f"\u274c Xato: <b>{failed}</b>"
+    )
