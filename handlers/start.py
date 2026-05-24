@@ -3,7 +3,7 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
-from database import register_student, get_student, activate_student, update_student_name, activate_tez_aytish_for_student
+from database import register_student, get_student, activate_student, update_student_name, activate_tez_aytish_for_student, get_all_students
 from config import TEACHER_ID, MINI_APP_URL
 
 router = Router()
@@ -14,6 +14,9 @@ class Registration(StatesGroup):
 
 class ContractStates(StatesGroup):
     waiting_payment_screenshot = State()
+
+class BroadcastStates(StatesGroup):
+    waiting_message = State()
 
 def get_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[[
@@ -104,21 +107,23 @@ async def cmd_start(message: types.Message, bot: Bot, state: FSMContext):
     deep_link = args[1].strip() if len(args) > 1 else ""
 
     if is_teacher:
+        teacher_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(
+                text="\U0001f4cb  O'quvchilar ro'yxati",
+                callback_data="teacher_students"
+            )],
+            [InlineKeyboardButton(
+                text="\U0001f4e2  Barcha o'quvchilarga xabar",
+                callback_data="teacher_broadcast"
+            )],
+        ])
         await message.answer(
-            f"\U0001f44b Salom, ustoz {user.first_name}!\n\n"
-            f"<b>Buyruqlar:</b>\n"
-            f"/add_student @username 500000\n"
-            f"/approve_test @username 1\n"
-            f"/students\n"
-            f"/warn @username sabab\n"
-            f"/add_bytes @username 50\n"
-            f"/stats\n\n"
-            f"<b>Aktivatsiya havolalari:</b>\n"
-            f"500k: <code>https://t.me/a_avlod_bot?start=activate_500000</code>\n"
-            f"800k: <code>https://t.me/a_avlod_bot?start=activate_800000</code>\n\n"
-            f"<i>ID: {user.id}</i>"
+            f"\U0001f44b Salom, <b>ustoz {user.first_name}</b>!\n\n"
+            f"\U0001f3eb <b>A Avlod Academy</b> boshqaruv paneli\n\n"
+            f"Kerakli bo'limni tanlang \U0001f447",
+            reply_markup=teacher_keyboard
         )
-        return
+        returnreturn
 
     if deep_link.startswith("activate_"):
         try:
@@ -478,4 +483,129 @@ async def cmd_help(message: types.Message):
         "\U0001f4dd /homework — uy vazifalarim\n\n"
         "Yoki pastdagi tugmani bosing \U0001f447",
         reply_markup=get_main_menu_keyboard()
+    )
+
+
+# ─────────────────────────────────────────────
+# TEACHER PANEL — inline buttons handlers
+# ─────────────────────────────────────────────
+
+@router.callback_query(F.data == "teacher_students")
+async def teacher_students_callback(callback: types.CallbackQuery, bot: Bot):
+    if callback.from_user.id != TEACHER_ID:
+        await callback.answer("Bu faqat ustoz uchun!", show_alert=True)
+        return
+
+    students = await get_all_students()
+    active = [s for s in students if s.get('is_active')]
+    pending = [s for s in students if not s.get('is_active')]
+
+    text = f"\U0001f465 <b>O'quvchilar ro'yxati</b>\n\n"
+    text += f"\u2705 Faol: <b>{len(active)}</b> | \u23f3 Kutayotgan: <b>{len(pending)}</b>\n"
+    text += "\u2500" * 20 + "\n\n"
+
+    for i, s in enumerate(active[:20], 1):
+        username = f"@{s['username']}" if s.get('username') else f"ID:{s['telegram_id']}"
+        calf = s.get('calf_kg', 40) or 40
+        text += f"<b>{i}.</b> {s['full_name']} | {username}\n"
+        text += f"   \U0001f42e {calf} kg | \U0001f4be {s.get('bytes_balance', 0)} bayt\n"
+
+    if len(active) > 20:
+        text += f"\n... va yana {len(active) - 20} ta o'quvchi"
+
+    back_kb = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="\u2b05\ufe0f Orqaga", callback_data="teacher_back")
+    ]])
+    await callback.message.edit_text(text, reply_markup=back_kb)
+    await callback.answer()
+
+
+@router.callback_query(F.data == "teacher_broadcast")
+async def teacher_broadcast_callback(callback: types.CallbackQuery, state: FSMContext):
+    if callback.from_user.id != TEACHER_ID:
+        await callback.answer("Bu faqat ustoz uchun!", show_alert=True)
+        return
+
+    await state.set_state(BroadcastStates.waiting_message)
+    cancel_kb = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(
+        text="\u274c Bekor qilish", callback_data="teacher_broadcast_cancel"
+    )]])
+    await callback.message.edit_text(
+        "\U0001f4e2 <b>Barcha o'quvchilarga xabar</b>\n\n"
+        "Yuboriladigan xabar matnini yozing:\n\n"
+        "<i>Xabar emoji, bold yoki oddiy matn bo'lishi mumkin</i>",
+        reply_markup=cancel_kb
+    )
+    await callback.answer()
+
+
+@router.callback_query(F.data == "teacher_broadcast_cancel")
+async def teacher_broadcast_cancel(callback: types.CallbackQuery, state: FSMContext):
+    await state.clear()
+    teacher_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="\U0001f4cb  O'quvchilar ro'yxati", callback_data="teacher_students")],
+        [InlineKeyboardButton(text="\U0001f4e2  Barcha o'quvchilarga xabar", callback_data="teacher_broadcast")],
+    ])
+    await callback.message.edit_text(
+        "\U0001f44b Salom, <b>ustoz</b>!\n\n"
+        "\U0001f3eb <b>A Avlod Academy</b> boshqaruv paneli\n\n"
+        "Kerakli bo'limni tanlang \U0001f447",
+        reply_markup=teacher_keyboard
+    )
+    await callback.answer()
+
+
+@router.callback_query(F.data == "teacher_back")
+async def teacher_back_callback(callback: types.CallbackQuery):
+    if callback.from_user.id != TEACHER_ID:
+        await callback.answer()
+        return
+    teacher_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="\U0001f4cb  O'quvchilar ro'yxati", callback_data="teacher_students")],
+        [InlineKeyboardButton(text="\U0001f4e2  Barcha o'quvchilarga xabar", callback_data="teacher_broadcast")],
+    ])
+    await callback.message.edit_text(
+        "\U0001f44b Salom, <b>ustoz</b>!\n\n"
+        "\U0001f3eb <b>A Avlod Academy</b> boshqaruv paneli\n\n"
+        "Kerakli bo'limni tanlang \U0001f447",
+        reply_markup=teacher_keyboard
+    )
+    await callback.answer()
+
+
+@router.message(BroadcastStates.waiting_message)
+async def process_broadcast_message(message: types.Message, bot: Bot, state: FSMContext):
+    if message.from_user.id != TEACHER_ID:
+        return
+
+    msg_text = message.text or message.caption or ""
+    if not msg_text:
+        await message.answer("\u26a0\ufe0f Xabar matni bo'sh. Qayta yozing.")
+        return
+
+    students = await get_all_students()
+    active = [s for s in students if s.get('is_active')]
+
+    await message.answer(f"\u23f3 Yuborilmoqda... ({len(active)} ta o'quvchi)")
+
+    sent = 0
+    failed = 0
+    for student in active:
+        try:
+            await bot.send_message(student['telegram_id'], msg_text)
+            sent += 1
+        except Exception:
+            failed += 1
+
+    await state.clear()
+
+    teacher_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="\U0001f4cb  O'quvchilar ro'yxati", callback_data="teacher_students")],
+        [InlineKeyboardButton(text="\U0001f4e2  Barcha o'quvchilarga xabar", callback_data="teacher_broadcast")],
+    ])
+    await message.answer(
+        f"\u2705 <b>Xabar yuborildi!</b>\n\n"
+        f"\U0001f4e4 Yuborildi: <b>{sent}</b> ta\n"
+        f"\u274c Xato: <b>{failed}</b> ta",
+        reply_markup=teacher_keyboard
     )
