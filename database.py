@@ -28,27 +28,29 @@ def serialize_row(row):
 async def init_db():
     pool = await get_pool()
     async with pool.acquire() as conn:
-        # Add missing columns for existing databases
         try:
             await conn.execute("ALTER TABLE students ADD COLUMN IF NOT EXISTS reminder_count INTEGER DEFAULT 0")
+        except Exception:
+            pass
+        try:
+            await conn.execute("ALTER TABLE students ADD COLUMN IF NOT EXISTS last_active TIMESTAMP")
         except Exception:
             pass
 
         await conn.execute("""
             CREATE TABLE IF NOT EXISTS students (
-                telegram_id BIGINT PRIMARY KEY,
+                id SERIAL PRIMARY KEY,
+                telegram_id BIGINT UNIQUE NOT NULL,
                 username TEXT,
-                full_name TEXT NOT NULL,
+                full_name TEXT,
                 bytes_balance INTEGER DEFAULT 0,
                 som_balance INTEGER DEFAULT 0,
-                calf_kg REAL DEFAULT 40.0,
-                level INTEGER DEFAULT 1,
-                rank TEXT DEFAULT 'Junior',
-                streak_days INTEGER DEFAULT 0,
-                warnings INTEGER DEFAULT 0,
+                calf_kg FLOAT DEFAULT 40.0,
                 is_active INTEGER DEFAULT 0,
-                registered_at TIMESTAMP DEFAULT NOW(),
-                last_active TIMESTAMP DEFAULT NOW()
+                warnings INTEGER DEFAULT 0,
+                reminder_count INTEGER DEFAULT 0,
+                last_active TIMESTAMP DEFAULT NOW(),
+                created_at TIMESTAMP DEFAULT NOW()
             )
         """)
         await conn.execute("""
@@ -90,31 +92,40 @@ async def init_db():
                 lesson_id INTEGER NOT NULL,
                 unlocked_at TIMESTAMP DEFAULT NOW(),
                 test_passed INTEGER DEFAULT 0,
-                test_score INTEGER DEFAULT 0,
                 UNIQUE(student_id, lesson_id)
             )
         """)
         await conn.execute("""
-                    CREATE TABLE IF NOT EXISTS tez_aytish_access (
-                                    id SERIAL PRIMARY KEY,
-                                                    student_id BIGINT NOT NULL,
-                                                                    lesson_id INTEGER NOT NULL,
-                                                                                    unlocked_at TIMESTAMP DEFAULT NOW(),
-                                                                                                    status TEXT DEFAULT 'locked',
-                                                                                                                    UNIQUE(student_id, lesson_id)
-                                                                                                                                )
-                                                                                                                                        """)
+            CREATE TABLE IF NOT EXISTS tez_aytish_access (
+                id SERIAL PRIMARY KEY,
+                student_id BIGINT NOT NULL,
+                lesson_id INTEGER NOT NULL,
+                unlocked_at TIMESTAMP DEFAULT NOW(),
+                status TEXT DEFAULT 'locked',
+                UNIQUE(student_id, lesson_id)
+            )
+        """)
         await conn.execute("""
-                    CREATE TABLE IF NOT EXISTS tez_aytish_submissions (
-                                    id SERIAL PRIMARY KEY,
-                                                    student_id BIGINT NOT NULL,
-                                                                    lesson_id INTEGER NOT NULL,
-                                                                                    voice_file_id TEXT NOT NULL,
-                                                                                                    status TEXT DEFAULT 'pending',
-                                                                                                                    submitted_at TIMESTAMP DEFAULT NOW(),
-                                                                                                                                    reviewed_at TIMESTAMP
-                                                                                                                                                )
-                                                                                                                                                        """)
+            CREATE TABLE IF NOT EXISTS tez_aytish_submissions (
+                id SERIAL PRIMARY KEY,
+                student_id BIGINT NOT NULL,
+                lesson_id INTEGER NOT NULL,
+                voice_file_id TEXT NOT NULL,
+                status TEXT DEFAULT 'pending',
+                submitted_at TIMESTAMP DEFAULT NOW(),
+                reviewed_at TIMESTAMP
+            )
+        """)
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS schedules (
+                id SERIAL PRIMARY KEY,
+                student_id BIGINT NOT NULL,
+                day_of_week INTEGER NOT NULL,
+                lesson_time TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT NOW(),
+                UNIQUE(student_id, day_of_week)
+            )
+        """)
 
 async def register_student(telegram_id, username, full_name):
     pool = await get_pool()
@@ -244,19 +255,13 @@ async def get_transactions(student_id, limit=10):
         """, student_id, limit)
         return [serialize_row(row) for row in rows]
 
-async def get_student_homeworks(student_id, status=None):
+async def get_student_homeworks(student_id):
     pool = await get_pool()
     async with pool.acquire() as conn:
-        if status:
-            rows = await conn.fetch(
-                "SELECT * FROM homeworks WHERE student_id = $1 AND status = $2 ORDER BY created_at DESC",
-                student_id, status
-            )
-        else:
-            rows = await conn.fetch(
-                "SELECT * FROM homeworks WHERE student_id = $1 ORDER BY created_at DESC",
-                student_id
-            )
+        rows = await conn.fetch(
+            "SELECT * FROM homeworks WHERE student_id = $1 ORDER BY created_at DESC",
+            student_id
+        )
         return [serialize_row(row) for row in rows]
 
 async def submit_homework(homework_id, photo_file_id):
@@ -324,99 +329,187 @@ async def update_student_name(telegram_id, full_name):
         )
     return True
 
-
-# ===== TEZ AYTISH (TONGUE TWISTERS) =====
-
 async def get_tez_aytish_access(student_id):
-        pool = await get_pool()
-        async with pool.acquire() as conn:
-                    rows = await conn.fetch(
-                                    "SELECT * FROM tez_aytish_access WHERE student_id = $1 ORDER BY lesson_id", student_id
-                    )
-                    return [serialize_row(row) for row in rows]
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT * FROM tez_aytish_access WHERE student_id = $1 ORDER BY lesson_id",
+            student_id
+        )
+        return [serialize_row(row) for row in rows]
 
 async def unlock_tez_aytish_lesson(student_id, lesson_id):
-        pool = await get_pool()
-        async with pool.acquire() as conn:
-                    await conn.execute("""
-                                INSERT INTO tez_aytish_access (student_id, lesson_id, status)
-                                            VALUES ($1, $2, 'open')
-                                                        ON CONFLICT (student_id, lesson_id) DO UPDATE SET status = 'open'
-                                                                """, student_id, lesson_id)
-                    return True
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute("""
+            INSERT INTO tez_aytish_access (student_id, lesson_id, status)
+            VALUES ($1, $2, 'open')
+            ON CONFLICT (student_id, lesson_id) DO UPDATE SET status = 'open'
+        """, student_id, lesson_id)
+    return True
 
 async def submit_tez_aytish_voice(student_id, lesson_id, voice_file_id):
-        pool = await get_pool()
-        async with pool.acquire() as conn:
-                    # Mark current submission as pending (replace if exists)
-                    await conn.execute("""
-                                DELETE FROM tez_aytish_submissions
-                                            WHERE student_id = $1 AND lesson_id = $2 AND status = 'pending'
-                                                    """, student_id, lesson_id)
-                    row = await conn.fetchrow("""
-                                INSERT INTO tez_aytish_submissions (student_id, lesson_id, voice_file_id, status)
-                                            VALUES ($1, $2, $3, 'pending') RETURNING id
-                                                    """, student_id, lesson_id, voice_file_id)
-                    await conn.execute("""
-                                UPDATE tez_aytish_access SET status = 'pending'
-                                            WHERE student_id = $1 AND lesson_id = $2
-                                                    """, student_id, lesson_id)
-                    return row['id']
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute("""
+            DELETE FROM tez_aytish_submissions
+            WHERE student_id = $1 AND lesson_id = $2 AND status = 'pending'
+        """, student_id, lesson_id)
+        row = await conn.fetchrow("""
+            INSERT INTO tez_aytish_submissions (student_id, lesson_id, voice_file_id, status)
+            VALUES ($1, $2, $3, 'pending') RETURNING id
+        """, student_id, lesson_id, voice_file_id)
+        await conn.execute("""
+            UPDATE tez_aytish_access SET status = 'pending'
+            WHERE student_id = $1 AND lesson_id = $2
+        """, student_id, lesson_id)
+    return row['id']
 
 async def approve_tez_aytish(submission_id, student_id, lesson_id):
-        pool = await get_pool()
-        async with pool.acquire() as conn:
-                    await conn.execute("""
-                                UPDATE tez_aytish_submissions SET status = 'approved', reviewed_at = NOW()
-                                            WHERE id = $1
-                                                    """, submission_id)
-                    await conn.execute("""
-                                UPDATE tez_aytish_access SET status = 'done'
-                                            WHERE student_id = $1 AND lesson_id = $2
-                                                    """, student_id, lesson_id)
-                    # Unlock next lesson
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute("""
+            UPDATE tez_aytish_submissions SET status = 'approved', reviewed_at = NOW()
+            WHERE id = $1
+        """, submission_id)
+        await conn.execute("""
+            UPDATE tez_aytish_access SET status = 'done'
+            WHERE student_id = $1 AND lesson_id = $2
+        """, student_id, lesson_id)
         next_id = lesson_id + 1
         await conn.execute("""
-                    INSERT INTO tez_aytish_access (student_id, lesson_id, status)
-                                VALUES ($1, $2, 'open')
-                                            ON CONFLICT (student_id, lesson_id) DO NOTHING
-                                                    """, student_id, next_id)
-        return True
+            INSERT INTO tez_aytish_access (student_id, lesson_id, status)
+            VALUES ($1, $2, 'open')
+            ON CONFLICT (student_id, lesson_id) DO NOTHING
+        """, student_id, next_id)
+    return True
 
 async def reject_tez_aytish(submission_id, student_id, lesson_id):
-        pool = await get_pool()
-        async with pool.acquire() as conn:
-                    await conn.execute("""
-                                UPDATE tez_aytish_submissions SET status = 'rejected', reviewed_at = NOW()
-                                            WHERE id = $1
-                                                    """, submission_id)
-                    # Allow student to re-record
+    pool = await get_pool()
+    async with pool.acquire() as conn:
         await conn.execute("""
-                    UPDATE tez_aytish_access SET status = 'open'
-                                WHERE student_id = $1 AND lesson_id = $2
-                                        """, student_id, lesson_id)
-        return True
+            UPDATE tez_aytish_submissions SET status = 'rejected', reviewed_at = NOW()
+            WHERE id = $1
+        """, submission_id)
+        await conn.execute("""
+            UPDATE tez_aytish_access SET status = 'open'
+            WHERE student_id = $1 AND lesson_id = $2
+        """, student_id, lesson_id)
+    return True
 
 async def get_pending_tez_aytish():
-        pool = await get_pool()
-        async with pool.acquire() as conn:
-                    rows = await conn.fetch("""
-                                SELECT ts.*, s.full_name, s.username
-                                            FROM tez_aytish_submissions ts
-                                                        JOIN students s ON s.telegram_id = ts.student_id
-                                                                    WHERE ts.status = 'pending'
-                                                                                ORDER BY ts.submitted_at
-                                                                                        """)
-                    return [serialize_row(row) for row in rows]
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch("""
+            SELECT ts.*, s.full_name, s.username
+            FROM tez_aytish_submissions ts
+            JOIN students s ON s.telegram_id = ts.student_id
+            WHERE ts.status = 'pending'
+            ORDER BY ts.submitted_at
+        """)
+        return [serialize_row(row) for row in rows]
 
 async def activate_tez_aytish_for_student(student_id):
-        """Give student access to first tez aytish lesson"""
-        pool = await get_pool()
-        async with pool.acquire() as conn:
-                    await conn.execute("""
-                                INSERT INTO tez_aytish_access (student_id, lesson_id, status)
-                                            VALUES ($1, 1, 'open')
-                                                        ON CONFLICT (student_id, lesson_id) DO NOTHING
-                                                                """, student_id)
-                    return True
-            
+    """Give student access to first tez aytish lesson"""
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute("""
+            INSERT INTO tez_aytish_access (student_id, lesson_id, status)
+            VALUES ($1, 1, 'open')
+            ON CONFLICT (student_id, lesson_id) DO NOTHING
+        """, student_id)
+    return True
+
+async def set_student_schedule(student_id, day_of_week, lesson_time):
+    """Set schedule for student. day_of_week: 0=Mon..6=Sun"""
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute("""
+            INSERT INTO schedules (student_id, day_of_week, lesson_time)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (student_id, day_of_week) DO UPDATE SET lesson_time = $3
+        """, student_id, day_of_week, lesson_time)
+    return True
+
+async def delete_student_schedule_day(student_id, day_of_week):
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "DELETE FROM schedules WHERE student_id = $1 AND day_of_week = $2",
+            student_id, day_of_week
+        )
+    return True
+
+async def delete_student_schedule(student_id):
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute("DELETE FROM schedules WHERE student_id = $1", student_id)
+    return True
+
+async def get_student_schedule(student_id):
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT * FROM schedules WHERE student_id = $1 ORDER BY day_of_week",
+            student_id
+        )
+        return [serialize_row(row) for row in rows]
+
+async def get_all_schedules():
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch("""
+            SELECT sc.*, s.full_name, s.username, s.telegram_id, s.calf_kg
+            FROM schedules sc
+            JOIN students s ON s.telegram_id = sc.student_id
+            WHERE s.is_active = 1
+            ORDER BY sc.day_of_week, sc.lesson_time
+        """)
+        return [serialize_row(row) for row in rows]
+
+async def get_students_with_lesson_tomorrow(tomorrow_dow):
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch("""
+            SELECT sc.student_id, sc.lesson_time, s.full_name, s.username, s.calf_kg
+            FROM schedules sc
+            JOIN students s ON s.telegram_id = sc.student_id
+            WHERE sc.day_of_week = $1 AND s.is_active = 1
+        """, tomorrow_dow)
+        return [serialize_row(row) for row in rows]
+
+async def get_students_with_lesson_today(today_dow):
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch("""
+            SELECT sc.student_id, sc.lesson_time, sc.day_of_week,
+                   s.full_name, s.username, s.calf_kg, s.telegram_id
+            FROM schedules sc
+            JOIN students s ON s.telegram_id = sc.student_id
+            WHERE sc.day_of_week = $1 AND s.is_active = 1
+        """, today_dow)
+        return [serialize_row(row) for row in rows]
+
+async def check_student_completed_tasks(student_id, lesson_id):
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        test_row = await conn.fetchrow("""
+            SELECT test_passed FROM lesson_access
+            WHERE student_id = $1 AND lesson_id = $2
+        """, student_id, lesson_id)
+        tez_row = await conn.fetchrow("""
+            SELECT status FROM tez_aytish_access
+            WHERE student_id = $1 AND lesson_id = $2
+        """, student_id, lesson_id)
+        test_done = test_row and test_row['test_passed'] == 1
+        tez_done = tez_row and tez_row['status'] in ('done', 'pending')
+        return test_done, tez_done
+
+async def get_current_lesson_for_student(student_id):
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow("""
+            SELECT MAX(lesson_id) as max_lesson FROM lesson_access
+            WHERE student_id = $1
+        """, student_id)
+        return row['max_lesson'] if row else 1
