@@ -315,6 +315,7 @@ async def set_bot_commands():
         BotCommand(command="warn", description="\u26a0\ufe0f Ogohlantirish"),
         BotCommand(command="new_hw", description="\U0001f4dd Yangi vazifa"),
         BotCommand(command="stats", description="\U0001f4ca Statistika"),
+        BotCommand(command="announce", description="\U0001f4e2 Barcha o'quvchilarga xabar"),
     ]
 
     await bot.set_my_commands(
