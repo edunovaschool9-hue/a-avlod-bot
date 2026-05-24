@@ -464,8 +464,7 @@ async def reject_student_callback(callback: types.CallbackQuery, bot: Bot):
         reply_markup=None
     )
     await callback.answer("\u274c Rad etildi")
-h
-    try:
+            try:
         await bot.send_message(
             student_id,
             f"\U0001f614 Afsuski, {full_name}, arizangiz rad etildi.\n\n"
