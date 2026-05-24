@@ -420,6 +420,27 @@ async def activate_tez_aytish_for_student(student_id):
         """, student_id)
     return True
 
+async def activate_tez_aytish_for_all_active_students():
+    """Activate tez aytish lesson 1 for ALL active students who don't have access yet.
+    Called on bot startup to fix existing students automatically.
+    """
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        students = await conn.fetch(
+            "SELECT telegram_id FROM students WHERE is_active = 1"
+        )
+        count = 0
+        for student in students:
+            sid = student['telegram_id']
+            result = await conn.execute("""
+                INSERT INTO tez_aytish_access (student_id, lesson_id, status)
+                VALUES ($1, 1, 'open')
+                ON CONFLICT (student_id, lesson_id) DO NOTHING
+            """, sid)
+            if result == "INSERT 0 1":
+                count += 1
+    return count
+
 async def set_student_schedule(student_id, day_of_week, lesson_time):
     """Set schedule for student. day_of_week: 0=Mon..6=Sun"""
     pool = await get_pool()
