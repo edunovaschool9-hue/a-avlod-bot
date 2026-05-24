@@ -238,27 +238,25 @@ async def check_homework_deadline():
                         student_id = row['student_id']
 
                         # Get current lesson
-                        access_row = await (await get_pool()).acquire().__aenter__()
-                        try:
-                            lesson_row = await access_row.fetchrow("""
+                        pool3 = await get_pool()
+                        async with pool3.acquire() as conn3:
+                            lesson_row = await conn3.fetchrow("""
                                 SELECT MAX(lesson_id) as lid FROM lesson_access
                                 WHERE student_id = $1
                             """, student_id)
                             lesson_id = lesson_row['lid'] if lesson_row and lesson_row['lid'] else 1
 
                             # Check test done
-                            test_row = await access_row.fetchrow("""
+                            test_row = await conn3.fetchrow("""
                                 SELECT test_passed FROM lesson_access
                                 WHERE student_id = $1 AND lesson_id = $2
                             """, student_id, lesson_id)
 
                             # Check tez aytish done
-                            tez_row = await access_row.fetchrow("""
+                            tez_row = await conn3.fetchrow("""
                                 SELECT status FROM tez_aytish_access
                                 WHERE student_id = $1 AND lesson_id = $2
                             """, student_id, lesson_id)
-                        finally:
-                            await access_row.__aexit__(None, None, None)
 
                         test_done = test_row and test_row['test_passed'] == 1
                         tez_done = tez_row and tez_row['status'] in ('done', 'pending')
