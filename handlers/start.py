@@ -123,7 +123,7 @@ async def cmd_start(message: types.Message, bot: Bot, state: FSMContext):
             f"Kerakli bo'limni tanlang \U0001f447",
             reply_markup=teacher_keyboard
         )
-        returnreturn
+        return
 
     if deep_link.startswith("activate_"):
         try:
