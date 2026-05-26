@@ -810,9 +810,13 @@ async def taz_approve(callback: CallbackQuery, bot: Bot):
     lesson = next((l for l in TEZ_AYTISH_LESSONS if l["id"] == lesson_id), None)
     next_lesson = next((l for l in TEZ_AYTISH_LESSONS if l["id"] == lesson_id + 1), None)
 
-    await callback.message.edit_caption(
-        callback.message.caption + "\n\n\u2705 <b>TASDIQLANDI!</b>"
-    )
+    try:
+        await callback.message.edit_caption(
+            callback.message.caption + "\n\n\u2705 <b>TASDIQLANDI!</b>",
+            parse_mode="HTML"
+        )
+    except Exception:
+        pass
     await callback.answer("\u2705 Tasdiqlandi!")
 
     try:
@@ -850,9 +854,13 @@ async def taz_reject(callback: CallbackQuery, bot: Bot):
     from lessons_data import TEZ_AYTISH_LESSONS
     lesson = next((l for l in TEZ_AYTISH_LESSONS if l["id"] == lesson_id), None)
 
-    await callback.message.edit_caption(
-        callback.message.caption + "\n\n\u274c <b>RAD ETILDI — qayta yozadi</b>"
-    )
+    try:
+        await callback.message.edit_caption(
+            callback.message.caption + "\n\n\u274c <b>RAD ETILDI — qayta yozadi</b>",
+            parse_mode="HTML"
+        )
+    except Exception:
+        pass
     await callback.answer("\u274c Rad etildi!")
 
     try:
