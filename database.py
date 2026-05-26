@@ -170,6 +170,15 @@ async def get_student(telegram_id):
         )
         return serialize_row(row)
 
+async def update_last_active(student_id):
+    """Update last_active timestamp when student does any activity."""
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE students SET last_active = NOW() WHERE telegram_id = $1",
+            student_id
+        )
+
 async def get_student_by_username(username):
     username = username.lstrip('@')
     pool = await get_pool()
