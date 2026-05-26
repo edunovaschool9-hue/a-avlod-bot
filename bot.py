@@ -237,13 +237,21 @@ async def check_homework_deadline():
                     try:
                         student_id = row['student_id']
 
-                        # Get current lesson
+                        # Get current lesson (the one not yet completed)
                         pool3 = await get_pool()
                         async with pool3.acquire() as conn3:
+                            # Use lesson with test_passed=0 (current, not yet done)
+                            # If all passed, fall back to max lesson
                             lesson_row = await conn3.fetchrow("""
-                                SELECT MAX(lesson_id) as lid FROM lesson_access
-                                WHERE student_id = $1
+                                SELECT lesson_id as lid FROM lesson_access
+                                WHERE student_id = $1 AND test_passed = 0
+                                ORDER BY lesson_id ASC LIMIT 1
                             """, student_id)
+                            if not lesson_row:
+                                lesson_row = await conn3.fetchrow("""
+                                    SELECT MAX(lesson_id) as lid FROM lesson_access
+                                    WHERE student_id = $1
+                                """, student_id)
                             lesson_id = lesson_row['lid'] if lesson_row and lesson_row['lid'] else 1
 
                             # Check test done
