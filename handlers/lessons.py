@@ -5,7 +5,8 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from database import (
     get_student, add_bytes, get_lesson_access, unlock_next_lesson, update_calf,
-    get_tez_aytish_access, submit_tez_aytish_voice, get_pending_tez_aytish
+    get_tez_aytish_access, submit_tez_aytish_voice, get_pending_tez_aytish,
+    update_last_active
 )
 from config import TEACHER_ID
 from lessons_data import MONTHLY_LESSONS, TEZ_AYTISH_LESSONS
@@ -201,6 +202,7 @@ async def start_test(callback: types.CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data.startswith("answer_"))
 async def process_answer(callback: types.CallbackQuery, state: FSMContext, bot: Bot):
+    await update_last_active(callback.from_user.id)
     parts = callback.data.split("_")
     lesson_id = int(parts[1])
     question_idx = int(parts[2])
@@ -446,6 +448,7 @@ async def show_tez_status(callback: types.CallbackQuery):
 
 @router.message(TezAytishStates.waiting_voice, F.voice)
 async def receive_tez_voice(message: types.Message, state: FSMContext, bot: Bot):
+    await update_last_active(message.from_user.id)
     data = await state.get_data()
     lesson_id = data.get('tez_lesson_id')
 
