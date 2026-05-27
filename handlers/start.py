@@ -46,10 +46,6 @@ def get_approval_keyboard(user_id: int):
     return InlineKeyboardMarkup(inline_keyboard=[
         [
             InlineKeyboardButton(
-                text="\u2705 Qabul (500k)",
-                callback_data=f"approve_student_{user_id}_500000"
-            ),
-            InlineKeyboardButton(
                 text="\u2705 Qabul (800k)",
                 callback_data=f"approve_student_{user_id}_800000"
             ),
@@ -65,7 +61,6 @@ def get_approval_keyboard(user_id: int):
 def get_contract_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="\U0001f4b3 500 000 so'm", callback_data="contract_500000"),
             InlineKeyboardButton(text="\U0001f4b3 800 000 so'm", callback_data="contract_800000"),
         ],
         [
@@ -228,7 +223,6 @@ async def show_contract(callback: types.CallbackQuery):
         "• Bayt va so'm tizimi\n"
         "• Ustoz nazorati\n\n"
         "\U0001f4cc <b>Kurs narxi (3 oy):</b>\n"
-        "• \U0001f4b0 500 000 so'm — asosiy paket\n"
         "• \U0001f48e 800 000 so'm — premium paket\n\n"
         "\U0001f4cc <b>Shartlar:</b>\n"
         "• To'lov to'liq amalga oshiriladi\n"
@@ -258,7 +252,7 @@ async def contract_amount_selected(callback: types.CallbackQuery, state: FSMCont
     await callback.answer()
 
 @router.callback_query(F.data.startswith("pay_cash_"))
-async def pay_cash(callback: types.CallbackQuery):
+async def pay_cash(callback: types.CallbackQuery, bot: Bot):
     amount = int(callback.data.replace("pay_cash_", ""))
     await callback.message.edit_text(
         f"\U0001f4b5 <b>Naqd pul to'lovi</b>\n\n"
@@ -269,20 +263,28 @@ async def pay_cash(callback: types.CallbackQuery):
     )
     await callback.answer()
     try:
-        from aiogram import Bot as AioBot
-        from config import BOT_TOKEN
-        bot_tmp = AioBot(token=BOT_TOKEN)
         student = await get_student(callback.from_user.id)
         name = student['full_name'] if student else callback.from_user.full_name
         username = f"@{callback.from_user.username}" if callback.from_user.username else f"ID:{callback.from_user.id}"
-        await bot_tmp.send_message(
+        cash_approve_kb = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(
+                text="\u2705 Qabul (naqd to'lov)",
+                callback_data=f"approve_student_{callback.from_user.id}_{amount}"
+            )],
+            [InlineKeyboardButton(
+                text="\u274c Rad etish",
+                callback_data=f"reject_student_{callback.from_user.id}"
+            )]
+        ])
+        await bot.send_message(
             TEACHER_ID,
             f"\U0001f4b5 <b>Naqd to'lov so'rovi!</b>\n\n"
             f"\U0001f464 {name} ({username})\n"
+            f"\U0001f194 Telegram ID: <code>{callback.from_user.id}</code>\n"
             f"\U0001f4b0 Summa: <b>{amount:,} so'm</b>\n\n"
-            f"O'quvchi naqd pul orqali to'lashni xohlaydi."
+            f"O'quvchi naqd pul to'lamoqchi. Tasdiqlaysizmi?",
+            reply_markup=cash_approve_kb
         )
-        await bot_tmp.session.close()
     except Exception as e:
         print(f"Notify error: {e}")
 
