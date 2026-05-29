@@ -2166,8 +2166,12 @@ selectedStudentId=id;const s=allStudents.find(x=>x.id===id);
 const{data:la}=await sb.from('lesson_access').select('*').eq('student_id',id);
 const{data:ta}=await sb.from('tez_aytish_access').select('*').eq('student_id',id);
 document.getElementById('sdm-name').textContent=s.full_name;
-const testScores=LESSONS.map(l=>{const a=(la||[]).find(x=>x.lesson_id===l.id&&x.test_passed===1);return a?'<div class="info-row"><span class="info-key">'+l.id+'-dars: '+l.title+'</span><span class="info-val" style="color:var(--gn)">'+(a.test_score!==null&&a.test_score!==undefined?a.test_score+'/'+a.test_total:'✅')+'</span></div>':null;}).filter(Boolean).join('');
-document.getElementById('sdm-body').innerHTML=[['Kod',s.access_code||'—'],['Telegram',s.telegram_username?'@'+s.telegram_username:'—'],['Bayt',fmt(s.bytes_balance)],["So'm",fmt(s.som_balance)],["To'lov",s.paid===1?"To'langan":'Qarzdor'],['Hafta',(s.current_week||1)],['Testlar',(la||[]).filter(a=>a.test_passed===1).length+'/8'],['Tez aytish',(ta||[]).filter(a=>a.status==='done').length+'/8'],['Ogohlantirish',s.warnings||0]].map(([k,v])=>`<div class="info-row"><span class="info-key">${k}</span><span class="info-val">${v}</span></div>`).join('')+(testScores?`<div style="margin-top:10px;font-size:11px;font-weight:600;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px">TEST NATIJALARI</div>${testScores}'':'');
+let infoHTML='';
+const rows=[['Kod',s.access_code||'--'],['Telegram',s.telegram_username?'@'+s.telegram_username:'--'],['Bayt',fmt(s.bytes_balance)],['Som',fmt(s.som_balance)],['Tolов',s.paid===1?'Tolangan':'Qarzdor'],['Hafta',(s.current_week||1)],['Testlar',(la||[]).filter(a=>a.test_passed===1).length+'/8'],['Tez aytish',(ta||[]).filter(a=>a.status==='done').length+'/8'],['Ogohlantirish',s.warnings||0]];
+rows.forEach(function(row){infoHTML+='<div class="info-row"><span class="info-key">'+row[0]+'</span><span class="info-val">'+row[1]+'</span></div>';});
+infoHTML+='<div style="margin-top:10px;font-size:11px;font-weight:600;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px">TEST NATIJALARI</div>';
+LESSONS.forEach(function(l){var a=(la||[]).find(function(x){return x.lesson_id===l.id&&x.test_passed===1;});if(a){infoHTML+='<div class="info-row"><span class="info-key">'+l.id+'-dars: '+l.title+'</span><span class="info-val" style="color:var(--gn)">'+(a.test_score!=null?a.test_score+'/'+a.test_total:'OK')+'</span></div>';}});
+document.getElementById('sdm-body').innerHTML=infoHTML;
 showModal('stu-detail-modal');
 }
 async function adminUnlockWeek(){if(!selectedStudentId)return;const s=allStudents.find(x=>x.id===selectedStudentId);const nw=(s.current_week||1)+1;
