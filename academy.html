@@ -2190,23 +2190,21 @@ async function adminWarn(){if(!selectedStudentId)return;const s=allStudents.find
 
 async function adminEditStudent(id){
 const s=allStudents.find(x=>x.id===id);if(!s)return;
-const newName=prompt("Yangi ism:",s.full_name);if(!newName)return;
-const newCode=prompt("Yangi kod:",s.access_code);if(!newCode)return;
-const newTg=prompt("Telegram username:",s.telegram_username||'');
-const newSom=prompt("So'm balansi:",s.som_balance||0);
-const paid=confirm("To'langan?")? 1:0;
-await sb.from('students').update({full_name:newName,access_code:newCode,telegram_username:newTg||null,som_balance:+newSom,paid}).eq('id',id);
-hideModal('stu-detail-modal');toast('✅ Tahrirlandi');loadStudentsTable();}
-
+const newName=prompt("Yangi ism:",s.full_name||"");if(!newName)return;
+const newCode=prompt("Yangi kod:",s.access_code||"");if(!newCode)return;
+const newTg=prompt("Telegram:",s.telegram_username||"");
+const newSom=prompt("Balansi:",s.som_balance||0);
+const paid=confirm("Tolangan?")? 1:0;
+await sb.from("students").update({full_name:newName,access_code:newCode,telegram_username:newTg||null,som_balance:+newSom,paid:paid}).eq("id",id);
+hideModal("stu-detail-modal");toast("OK Tahrirlandi");loadStudentsTable();}
 async function adminDeleteStudent(id){
 const s=allStudents.find(x=>x.id===id);if(!s)return;
-if(!confirm(s.full_name+" o'chirilsinmi? Bu amal qaytarib bo'lmaydi!"))return;
-await sb.from('lesson_access').delete().eq('student_id',id);
-await sb.from('tez_aytish_access').delete().eq('student_id',id);
-await sb.from('tez_aytish_submissions').delete().eq('student_id',id);
-await sb.from('students').delete().eq('id',id);
-hideModal('stu-detail-modal');toast('🗑 O'quvchi o'chirildi');loadStudentsTable();}
-
+if(!confirm(s.full_name+" ochirilsinmi?"))return;
+await sb.from("lesson_access").delete().eq("student_id",id);
+await sb.from("tez_aytish_access").delete().eq("student_id",id);
+await sb.from("tez_aytish_submissions").delete().eq("student_id",id);
+await sb.from("students").delete().eq("id",id);
+hideModal("stu-detail-modal");toast("Oquvchi ochirildi");loadStudentsTable();}
 async function quickActivate(id){await sb.from('students').update({is_active:1}).eq('id',id);
 
   for(const lid of WEEK_LESSONS[1])await sb.from('lesson_access').upsert({student_id:id,lesson_id:lid,test_passed:0},{onConflict:'student_id,lesson_id'});
