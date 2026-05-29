@@ -993,6 +993,8 @@ audio{height:36px;border-radius:7px;max-width:240px}
     <button class="btn-sm green" style="flex:1;padding:10px" onclick="adminUnlockWeek()">🔓 Keyingi hafta</button>
 
     <button class="btn-sm red" style="flex:1;padding:10px" onclick="adminWarn()">⚠️ Ogohlantirish</button>
+<button class="btn-sm blue" style="flex:1;padding:10px" onclick="adminEditStudent(selectedStudentId)">✏️ Tahrirlash</button>
+<button class="btn-sm red" style="flex:1;padding:10px" onclick="adminDeleteStudent(selectedStudentId)">🗑 O'chirish</button>
 
   </div>
 
@@ -1837,7 +1839,7 @@ async function nextQ(){curQ++;if(curQ<currentLesson.tests.length){showQ(curQ);re
 
   const score=testAnswers.reduce((s,a,i)=>s+(a===currentLesson.tests[i].c?1:0),0);const total=currentLesson.tests.length;const bytes=score*5;
 
-  await sb.from('lesson_access').upsert({student_id:currentUser.id,lesson_id:currentLesson.id,test_passed:1},{onConflict:'student_id,lesson_id'});
+  await sb.from('lesson_access').upsert({student_id:currentUser.id,lesson_id:currentLesson.id,test_passed:1,test_score:score,test_total:total},{onConflict:'student_id,lesson_id'});
 
   await sb.from('bytes_transactions').insert({student_id:currentUser.id,amount:bytes,reason:`${currentLesson.id}-dars testi`});
 
@@ -2160,21 +2162,14 @@ function filterStudents(){const q=document.getElementById('stu-search').value.to
   let l=allStudents.filter(s=>s.full_name.toLowerCase().includes(q));if(f!=='')l=l.filter(s=>String(s.is_active)===f);renderStudentsTable(l);}
 
 async function showStudentDetail(id){
-
-  selectedStudentId=id;const s=allStudents.find(x=>x.id===id);
-
-  const{data:la}=await sb.from('lesson_access').select('*').eq('student_id',id);
-
-  const{data:ta}=await sb.from('tez_aytish_access').select('*').eq('student_id',id);
-
-  document.getElementById('sdm-name').textContent=s.full_name;
-
-  document.getElementById('sdm-body').innerHTML=[['Kod',s.access_code||'—'],['Telegram',s.telegram_username?'@'+s.telegram_username:'—'],['Bayt',fmt(s.bytes_balance)],["So'm",fmt(s.som_balance)],['To\'lov',s.paid===1?'To\'langan':'Qarzdor'],['Hafta',(s.current_week||1)],['Testlar',(la||[]).filter(a=>a.test_passed===1).length+'/8'],['Tez aytish',(ta||[]).filter(a=>a.status==='done').length+'/8'],['Ogohlantirish',s.warnings||0]].map(([k,v])=>`<div class="info-row"><span class="info-key">${k}</span><span class="info-val">${v}</span></div>`).join('');
-
-  showModal('stu-detail-modal');
-
+selectedStudentId=id;const s=allStudents.find(x=>x.id===id);
+const{data:la}=await sb.from('lesson_access').select('*').eq('student_id',id);
+const{data:ta}=await sb.from('tez_aytish_access').select('*').eq('student_id',id);
+document.getElementById('sdm-name').textContent=s.full_name;
+const testScores=LESSONS.map(l=>{const a=(la||[]).find(x=>x.lesson_id===l.id&&x.test_passed===1);return a?'<div class="info-row"><span class="info-key">'+l.id+'-dars: '+l.title+'</span><span class="info-val" style="color:var(--gn)">'+(a.test_score!==null&&a.test_score!==undefined?a.test_score+'/'+a.test_total:'✅')+'</span></div>':null;}).filter(Boolean).join('');
+document.getElementById('sdm-body').innerHTML=[['Kod',s.access_code||'—'],['Telegram',s.telegram_username?'@'+s.telegram_username:'—'],['Bayt',fmt(s.bytes_balance)],["So'm",fmt(s.som_balance)],["To'lov",s.paid===1?"To'langan":'Qarzdor'],['Hafta',(s.current_week||1)],['Testlar',(la||[]).filter(a=>a.test_passed===1).length+'/8'],['Tez aytish',(ta||[]).filter(a=>a.status==='done').length+'/8'],['Ogohlantirish',s.warnings||0]].map(([k,v])=>`<div class="info-row"><span class="info-key">${k}</span><span class="info-val">${v}</span></div>`).join('')+(testScores?`<div style="margin-top:10px;font-size:11px;font-weight:600;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px">TEST NATIJALARI</div>${testScores}'':'');
+showModal('stu-detail-modal');
 }
-
 async function adminUnlockWeek(){if(!selectedStudentId)return;const s=allStudents.find(x=>x.id===selectedStudentId);const nw=(s.current_week||1)+1;
 
   if(nw>4){toast('4-hafta oxirgi!','err');return;}
@@ -2188,6 +2183,25 @@ async function adminUnlockWeek(){if(!selectedStudentId)return;const s=allStudent
 async function adminWarn(){if(!selectedStudentId)return;const s=allStudents.find(x=>x.id===selectedStudentId);const w=(s.warnings||0)+1;
 
   await sb.from('students').update({warnings:w}).eq('id',selectedStudentId);s.warnings=w;toast('⚠️ Ogohlantirish berildi');hideModal('stu-detail-modal');}
+
+async function adminEditStudent(id){
+const s=allStudents.find(x=>x.id===id);if(!s)return;
+const newName=prompt("Yangi ism:",s.full_name);if(!newName)return;
+const newCode=prompt("Yangi kod:",s.access_code);if(!newCode)return;
+const newTg=prompt("Telegram username:",s.telegram_username||'');
+const newSom=prompt("So'm balansi:",s.som_balance||0);
+const paid=confirm("To'langan?")? 1:0;
+await sb.from('students').update({full_name:newName,access_code:newCode,telegram_username:newTg||null,som_balance:+newSom,paid}).eq('id',id);
+hideModal('stu-detail-modal');toast('✅ Tahrirlandi');loadStudentsTable();}
+
+async function adminDeleteStudent(id){
+const s=allStudents.find(x=>x.id===id);if(!s)return;
+if(!confirm(s.full_name+" o'chirilsinmi? Bu amal qaytarib bo'lmaydi!"))return;
+await sb.from('lesson_access').delete().eq('student_id',id);
+await sb.from('tez_aytish_access').delete().eq('student_id',id);
+await sb.from('tez_aytish_submissions').delete().eq('student_id',id);
+await sb.from('students').delete().eq('id',id);
+hideModal('stu-detail-modal');toast('🗑 O'quvchi o'chirildi');loadStudentsTable();}
 
 async function quickActivate(id){await sb.from('students').update({is_active:1}).eq('id',id);
 
@@ -2396,43 +2410,38 @@ function setReminder(id,date,name,phone){if(!('Notification'in window))return;
 function scheduleReminders(leads){leads.filter(l=>l.reminder_at&&l.status!=='enrolled'&&l.status!=='refused').forEach(l=>setReminder(l.id,new Date(l.reminder_at),l.name,l.phone));}
 
 async function loadPlannedCalls(){
+const{data}=await sb.from('leads').select('*').not('reminder_at','is',null).order('reminder_at');
+const c=document.getElementById('calls-container');
+const calls=(data||[]).filter(l=>l.status!=='enrolled'&&l.status!=='refused');
+// Week navigation
+if(!window._callsWeekOffset)window._callsWeekOffset=0;
+renderCallsWeek(calls,window._callsWeekOffset);}
 
-  const{data}=await sb.from('leads').select('*').not('reminder_at','is',null).order('reminder_at');
-
-  const c=document.getElementById('calls-container');const calls=(data||[]).filter(l=>l.status!=='enrolled'&&l.status!=='refused');
-
-  if(!calls.length){c.innerHTML='<div class="empty"><div class="empty-icon">📞</div>Rejalashtirilgan qo\'ng\'iroq yo\'q</div>';return;}
-
-  const today=new Date();today.setHours(0,0,0,0);
-
-  const groups={bugun:[],ertaga:[],indin:[],keyin:[]};
-
-  calls.forEach(l=>{const d=new Date(l.reminder_at);const dd=new Date(d);dd.setHours(0,0,0,0);
-
-    const diff=Math.round((dd-today)/86400000);
-
-    if(diff<=0)groups.bugun.push(l);else if(diff===1)groups.ertaga.push(l);else if(diff===2)groups.indin.push(l);else groups.keyin.push(l);});
-
-  const labels={bugun:'📅 Bugun',ertaga:'📅 Ertaga',indin:'📅 Indin',keyin:'📅 Keyinroq'};
-
-  let html='';
-
-  for(const[k,v]of Object.entries(groups)){if(!v.length)continue;
-
-    html+=`<div class="call-day"><div class="call-day-title">${labels[k]} <span class="badge blue">${v.length}</span></div>`;
-
-    html+=v.map(l=>{const t=new Date(l.reminder_at).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
-
-      return `<div class="call-item"><div class="call-time">${t}</div><div class="call-info"><div class="call-name">${l.name} <span class="badge ${l.status==='hot'?'warn':'blue'}">${LSTAT[l.status]||''}</span></div>
-
-        <div class="call-note">${l.last_comment||l.note||''}</div></div><a href="tel:${l.phone}" class="btn-sm green" style="text-decoration:none">📞 ${l.phone}</a></div>`;}).join('');
-
-    html+='</div>';}
-
-  c.innerHTML=html;
-
-}
-
+function renderCallsWeek(calls,offset){
+const c=document.getElementById('calls-container');
+const today=new Date();const dow=today.getDay();const mondayOffset=(dow===0?-6:1-dow);
+const weekStart=new Date(today);weekStart.setDate(today.getDate()+mondayOffset+offset*7);weekStart.setHours(0,0,0,0);
+const weekEnd=new Date(weekStart);weekEnd.setDate(weekStart.getDate()+7);
+const DAYS=['Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba','Yakshanba'];
+const fmt2=d=>d.toLocaleDateString('ru',{day:'2-digit',month:'2-digit'});
+let html=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px">
+<button class="btn-sm purple" style="padding:9px 16px" onclick="window._callsWeekOffset--;loadPlannedCalls()">← Oldingi</button>
+<div style="font-size:14px;font-weight:600;font-family:var(--fd)">${fmt2(weekStart)} — ${fmt2(new Date(weekEnd.getTime()-1))}</div>
+<button class="btn-sm purple" style="padding:9px 16px" onclick="window._callsWeekOffset++;loadPlannedCalls()">Keyingi →</button>
+</div>`;
+let hasAny=false;
+for(let d=0;d<7;d++){
+const day=new Date(weekStart);day.setDate(weekStart.getDate()+d);
+const dayEnd=new Date(day);dayEnd.setDate(day.getDate()+1);
+const dayLeads=calls.filter(l=>{const ld=new Date(l.reminder_at);return ld>=day&&ld<dayEnd;});
+const isToday=day.toDateString()===new Date().toDateString();
+html+=`<div class="call-day"><div class="call-day-title" style="${isToday?'color:var(--cy)':''}">${DAYS[d]} ${fmt2(day)}${isToday?' 📍':''} <span class="badge ${dayLeads.length?'blue':'inactive'}">${dayLeads.length}</span></div>`;
+if(dayLeads.length){hasAny=true;dayLeads.forEach(l=>{const t=new Date(l.reminder_at).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+html+=`<div class="call-item"><div class="call-time">${t}</div><div class="call-info"><div class="call-name">${l.name} <span class="badge ${l.status==='hot'?'warn':'blue'}">${LSTAT[l.status]||''}</span></div><div class="call-note">${l.last_comment||l.note||''}</div></div><a href="tel:${l.phone}" class="btn-sm green" style="text-decoration:none">📞 ${l.phone}</a></div>`;});}
+else html+=`<div style="padding:10px 0;font-size:12px;color:var(--mu);text-align:center">—</div>`;
+html+='</div>';}
+if(!hasAny&&!calls.length){html+='<div class="empty"><div class="empty-icon">📞</div>Rejalashtirilgan qo\'ng\'iroq yo\'q</div>';}
+c.innerHTML=html;}
 (async function(){await restoreSession();})();
 
 </script>
