@@ -1,1731 +1,2442 @@
 <!DOCTYPE html>
+
 <html lang="uz">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>A Avlod Academy</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-// ══════════════════════════════════════
-// LEADS
-// ══════════════════════════════════════
-let allLeads = [];
-let leadsFilter = 'all';
-let reminderTimers = {};
 
-function toggleLeadForm(){
-  const f = document.getElementById('lead-form');
-  f.style.display = f.style.display === 'none' ? 'block' : 'none';
-}
+<title>EDU BLOG PLATFORM</title>
 
-async function saveLead(){
-  const name  = document.getElementById('ld-name').value.trim();
-  const phone = document.getElementById('ld-phone').value.trim();
-  const note  = document.getElementById('ld-note').value.trim();
-  if(!name || !phone){toast('Ism va telefon kiriting','err'); return;}
-  const {error} = await sb.from('leads').insert({
-    name, phone, note, status:'new',
-    created_at: new Date().toISOString()
-  });
-  if(error){toast(error.message,'err'); return;}
-  document.getElementById('ld-name').value='';
-  document.getElementById('ld-phone').value='';
-  document.getElementById('ld-note').value='';
-  toggleLeadForm();
-  toast('✅ Lid qo\'shildi');
-  loadLeads();
-}
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-async function loadLeads(){
-  const {data} = await sb.from('leads').select('*').order('created_at',{ascending:false});
-  allLeads = data || [];
-  renderLeads(allLeads);
-  scheduleReminders(allLeads);
-}
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-function filterLeads(status, btn){
-  leadsFilter = status;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  const filtered = status==='all' ? allLeads : allLeads.filter(l=>l.status===status);
-  renderLeads(filtered);
-}
-
-const STATUS_LABELS = {
-  new:'🆕 Yangi', called:'📞 Qo\'ng\'irildi',
-  callback:'⏰ Qayta qo\'ng\'iroq', enrolled:'✅ Yozildi', refused:'❌ Rad etdi'
-};
-
-function renderLeads(list){
-  const c = document.getElementById('lead-cards');
-  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">📞</div>Lidlar yo\'q</div>';return;}
-  c.innerHTML = list.map(l => {
-    const statusBadge = `<span class="status-badge ${l.status||'new'}">${STATUS_LABELS[l.status]||'Yangi'}</span>`;
-    const reminder = l.reminder_time ? `<div class="lead-reminder">⏰ Eslatma: ${l.reminder_time}</div>` : '';
-    const comment  = l.last_comment  ? `<div class="lead-comment">"${l.last_comment}"</div>` : '';
-    const date = new Date(l.created_at).toLocaleDateString('ru',{day:'2-digit',month:'2-digit',year:'2-digit'});
-    return `<div class="lead-card status-${l.status||'new'}">
-      <div class="lead-top">
-        <div>
-          <div class="lead-name">${l.name}</div>
-          <div class="lead-phone">📱 ${l.phone}</div>
-        </div>
-        <div style="text-align:right">
-          ${statusBadge}
-          <div class="lead-date">${date}</div>
-        </div>
-      </div>
-      ${l.note?`<div style="font-size:12px;color:var(--mu);margin:4px 0">${l.note}</div>`:''}
-      ${comment}
-      ${reminder}
-      <div class="lead-actions">
-        <a href="tel:${l.phone}" class="btn-sm blue" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:5px 10px">📞 Qo'ng'iroq</a>
-        <button class="btn-sm yellow" onclick="openLeadComment(${l.id},'${(l.status||'new')}')">✏️ Natija</button>
-        <button class="btn-sm red" onclick="deleteLead(${l.id})">🗑</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function openLeadComment(id, status){
-  document.getElementById('lcm-id').value = id;
-  document.getElementById('lcm-status').value = status==='new'?'called':status;
-  document.getElementById('lcm-note').value = allLeads.find(l=>l.id===id)?.last_comment || '';
-  const reminderWrap = document.getElementById('lcm-reminder-wrap');
-  reminderWrap.style.display = 'none';
-  document.getElementById('lcm-status').onchange = function(){
-    reminderWrap.style.display = this.value==='callback' ? 'block' : 'none';
-  };
-  showModal('lead-comment-modal');
-}
-
-async function saveLeadComment(){
-  const id     = +document.getElementById('lcm-id').value;
-  const status = document.getElementById('lcm-status').value;
-  const note   = document.getElementById('lcm-note').value.trim();
-  const time   = document.getElementById('lcm-time').value;
-  const update = {status, last_comment:note, updated_at:new Date().toISOString()};
-  if(status==='callback' && time) update.reminder_time = time;
-  await sb.from('leads').update(update).eq('id',id);
-  hideModal('lead-comment-modal');
-  toast('✅ Saqlandi');
-  loadLeads();
-  if(status==='callback' && time) setReminder(id, time, allLeads.find(l=>l.id===id)?.name);
-}
-
-async function deleteLead(id){
-  if(!confirm('O\'chirishni tasdiqlaysizmi?')) return;
-  await sb.from('leads').delete().eq('id',id);
-  toast('🗑 O\'chirildi');
-  loadLeads();
-}
-
-// Browser notifications for reminders
-function setReminder(leadId, timeStr, name){
-  if(!('Notification' in window)) return;
-  Notification.requestPermission().then(perm=>{
-    if(perm!=='granted') return;
-    const [h,m] = timeStr.split(':').map(Number);
-    const now = new Date();
-    const target = new Date();
-    target.setHours(h, m, 0, 0);
-    let delay = target - now;
-    if(delay < 0) delay += 86400000; // next day
-    if(reminderTimers[leadId]) clearTimeout(reminderTimers[leadId]);
-    reminderTimers[leadId] = setTimeout(()=>{
-      new Notification('📞 A Avlod Academy', {
-        body: `${name} ga qo'ng'iroq qilish vaqti! (${timeStr})`,
-        icon: '/favicon.ico'
-      });
-    }, delay);
-    toast(`⏰ Eslatma ${timeStr} ga o'rnatildi`);
-  });
-}
-
-function scheduleReminders(leads){
-  leads.filter(l=>l.status==='callback'&&l.reminder_time).forEach(l=>{
-    setReminder(l.id, l.reminder_time, l.name);
-  });
-}
-
-</script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
 :root{
-  --bg:#0d0d0d;--s:#161616;--s2:#1f1f1f;--brd:#2a2a2a;
-  --tx:#f0f0f0;--mu:#666;--mu2:#999;
-  --ac:#e8ff47;--ac2:#c8e000;
-  --gn:#4ade80;--rd:#f87171;--bl:#60a5fa;--go:#fbbf24;
-  --r:10px;--ff:'DM Sans',sans-serif;--fm:'DM Mono',monospace;
+
+  --bg:#0a0b0f;--s:#13151c;--s2:#1c1f29;--s3:#252934;--brd:#2a2e3a;--brd2:#363b4a;
+
+  --tx:#eef0f5;--mu:#5f6675;--mu2:#9aa1b3;
+
+  --ac:#7c5cff;--ac2:#9d7bff;--acd:#5b3fd6;
+
+  --cy:#22d3ee;--gn:#34d399;--rd:#fb7185;--go:#fbbf24;--bl:#60a5fa;--pk:#f472b6;
+
+  --r:14px;--rs:10px;
+
+  --ff:'DM Sans',-apple-system,sans-serif;--fd:'Space Grotesk',sans-serif;--fm:'DM Mono',monospace;
+
+  --glow:0 0 30px rgba(124,92,255,.4);
+
 }
-body{font-family:var(--ff);background:var(--bg);color:var(--tx);min-height:100vh}
+
+body{font-family:var(--ff);background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+
 button{cursor:pointer;font-family:var(--ff)}
+
 input,select,textarea{font-family:var(--ff)}
 
-/* ── SCREENS ── */
+::-webkit-scrollbar{width:8px;height:8px}
+
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:4px}
+
 .page{display:none;min-height:100vh}
+
 .page.on{display:flex}
 
-/* ══ LANDING ══ */
-#p-land{flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:40px;
-  background:radial-gradient(ellipse 80% 60% at 50% 0%,#1a1f00,transparent),var(--bg)}
-.land-logo{font-size:13px;font-weight:600;letter-spacing:3px;color:var(--mu);text-transform:uppercase}
-.land-title{font-size:clamp(32px,8vw,64px);font-weight:700;text-align:center;line-height:1.1;letter-spacing:-2px}
-.land-title span{color:var(--ac)}
-.land-sub{font-size:15px;color:var(--mu2);text-align:center;max-width:340px;line-height:1.6}
-.land-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-.btn-primary{background:var(--ac);color:#000;border:none;padding:14px 28px;border-radius:var(--r);font-size:15px;font-weight:700;transition:.15s}
-.btn-primary:hover{background:var(--ac2)}
-.btn-ghost{background:transparent;color:var(--tx);border:1px solid var(--brd);padding:14px 28px;border-radius:var(--r);font-size:15px;font-weight:600;transition:.15s}
-.btn-ghost:hover{border-color:var(--mu);background:var(--s)}
+.hidden{display:none!important}
 
-/* ══ LOGIN ══ */
+body::before{content:"";position:fixed;inset:0;z-index:-2;
+
+  background:radial-gradient(60% 50% at 20% 0%,rgba(124,92,255,.13),transparent 60%),
+
+  radial-gradient(50% 40% at 100% 10%,rgba(34,211,238,.08),transparent 55%),
+
+  radial-gradient(50% 50% at 50% 100%,rgba(124,92,255,.1),transparent 60%),var(--bg)}
+
+#p-land{flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:30px}
+
+.brand-logo{font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:4px;color:var(--mu);text-transform:uppercase}
+
+.brand-title{font-family:var(--fd);font-size:clamp(34px,9vw,68px);font-weight:700;text-align:center;line-height:1;letter-spacing:-2px}
+
+.brand-title span{background:linear-gradient(92deg,var(--ac2),var(--cy));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+.brand-sub{font-size:15px;color:var(--mu2);text-align:center;max-width:360px;line-height:1.6}
+
+.course-cards{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;width:100%;max-width:600px}
+
+.course-card{flex:1;min-width:240px;background:var(--s);border:1px solid var(--brd);border-radius:20px;
+
+  padding:28px;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+
+.course-card:hover{border-color:var(--ac);transform:translateY(-3px)}
+
+.course-card.soon{opacity:.6;cursor:default}
+
+.course-card.soon:hover{transform:none;border-color:var(--brd)}
+
+.cc-icon{font-size:44px;margin-bottom:14px}
+
+.cc-title{font-family:var(--fd);font-size:22px;font-weight:700;margin-bottom:6px}
+
+.cc-desc{font-size:13px;color:var(--mu2);line-height:1.5}
+
+.cc-badge{position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;font-family:var(--fm)}
+
+.cc-badge.active{background:rgba(52,211,153,.15);color:var(--gn)}
+
+.cc-badge.soon{background:rgba(107,107,107,.15);color:var(--mu)}
+
+.land-staff-link{font-size:13px;color:var(--mu);cursor:pointer;border:1px solid var(--brd);padding:10px 20px;border-radius:10px;transition:.15s}
+
+.land-staff-link:hover{color:var(--tx);border-color:var(--mu)}
+
 #p-login{flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
-.login-box{width:100%;max-width:360px;background:var(--s);border:1px solid var(--brd);border-radius:16px;padding:32px}
-.login-back{font-size:13px;color:var(--mu);cursor:pointer;margin-bottom:24px;display:inline-flex;align-items:center;gap:6px}
+
+.login-box{width:100%;max-width:380px;background:var(--s);border:1px solid var(--brd);border-radius:18px;padding:32px}
+
+.login-back{font-size:13px;color:var(--mu);cursor:pointer;margin-bottom:22px;display:inline-block}
+
 .login-back:hover{color:var(--tx)}
-.login-title{font-size:22px;font-weight:700;margin-bottom:6px}
+
+.login-icon{font-size:40px;margin-bottom:14px}
+
+.login-title{font-family:var(--fd);font-size:24px;font-weight:700;margin-bottom:4px}
+
 .login-sub{font-size:13px;color:var(--mu);margin-bottom:24px}
+
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
-.field label{font-size:12px;font-weight:600;color:var(--mu2);letter-spacing:.5px;text-transform:uppercase}
-.field input,.field select{background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:12px 14px;color:var(--tx);font-size:15px;outline:none;transition:.15s;width:100%}
-.field input:focus,.field select:focus{border-color:var(--ac)}
+
+.field label{font-size:11px;font-weight:600;color:var(--mu2);letter-spacing:.5px;text-transform:uppercase}
+
+.field input,.field select,.field textarea{background:var(--s2);border:1px solid var(--brd);border-radius:9px;
+
+  padding:13px 14px;color:var(--tx);font-size:15px;outline:none;transition:.15s;width:100%}
+
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--ac)}
+
 .field select option{background:var(--s2)}
-.btn-full{width:100%;padding:14px;border-radius:8px;font-size:15px;font-weight:700;border:none;background:var(--ac);color:#000;transition:.15s}
-.btn-full:hover{background:var(--ac2)}
-.btn-full:disabled{background:var(--s2);color:var(--mu);cursor:default}
+
+.btn-full{width:100%;padding:14px;border-radius:9px;font-size:15px;font-weight:700;border:none;
+
+  background:linear-gradient(135deg,var(--ac),var(--acd));color:#fff;transition:.15s;box-shadow:var(--glow)}
+
+.btn-full:hover{filter:brightness(1.1)}
+
+.btn-full:disabled{background:var(--s2);color:var(--mu);box-shadow:none;cursor:default}
+
 .err{font-size:13px;color:var(--rd);margin-top:12px;display:none}
 
-/* ══ ADMIN LAYOUT ══ */
+.btn-primary{background:linear-gradient(135deg,var(--ac),var(--acd));color:#fff;border:none;padding:14px 28px;border-radius:11px;font-size:15px;font-weight:700;box-shadow:var(--glow)}
+
+.btn-ghost{background:transparent;color:var(--tx);border:1px solid var(--brd);padding:14px 28px;border-radius:11px;font-size:15px;font-weight:600}
+
+.btn-ghost:hover{border-color:var(--mu);background:var(--s)}
+
+.btn-sm{padding:6px 11px;border-radius:7px;font-size:12px;font-weight:600;border:none;transition:.15s}
+
+.btn-sm.green{background:rgba(52,211,153,.15);color:var(--gn)}.btn-sm.green:hover{background:rgba(52,211,153,.25)}
+
+.btn-sm.red{background:rgba(251,113,133,.13);color:var(--rd)}.btn-sm.red:hover{background:rgba(251,113,133,.23)}
+
+.btn-sm.blue{background:rgba(96,165,250,.13);color:var(--bl)}.btn-sm.blue:hover{background:rgba(96,165,250,.23)}
+
+.btn-sm.yellow{background:rgba(251,191,36,.13);color:var(--go)}.btn-sm.yellow:hover{background:rgba(251,191,36,.23)}
+
+.btn-sm.purple{background:rgba(124,92,255,.15);color:var(--ac2)}.btn-sm.purple:hover{background:rgba(124,92,255,.25)}
+
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:600;font-family:var(--fm)}
+
+.badge.active{background:rgba(52,211,153,.13);color:var(--gn)}
+
+.badge.pending{background:rgba(251,191,36,.13);color:var(--go)}
+
+.badge.inactive{background:rgba(107,107,107,.15);color:var(--mu)}
+
+.badge.warn{background:rgba(251,113,133,.13);color:var(--rd)}
+
+.badge.blue{background:rgba(96,165,250,.13);color:var(--bl)}
+
 #p-admin{flex-direction:row}
-.sidebar{width:220px;min-height:100vh;background:var(--s);border-right:1px solid var(--brd);
-  display:flex;flex-direction:column;padding:24px 0;flex-shrink:0}
-.sb-logo{font-size:11px;font-weight:700;letter-spacing:3px;color:var(--mu);padding:0 20px 24px;border-bottom:1px solid var(--brd)}
-.sb-logo span{color:var(--ac)}
-.sb-nav{flex:1;padding:16px 0}
-.sb-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:14px;font-weight:500;
+
+.sidebar{width:230px;min-height:100vh;background:var(--s);border-right:1px solid var(--brd);
+
+  display:flex;flex-direction:column;padding:22px 0;flex-shrink:0;position:sticky;top:0;height:100vh}
+
+.sb-logo{font-family:var(--fd);font-size:15px;font-weight:700;letter-spacing:1px;padding:0 20px 20px;border-bottom:1px solid var(--brd)}
+
+.sb-logo span{color:var(--ac2)}
+
+.sb-role{font-size:10px;color:var(--mu);font-family:var(--fm);margin-top:3px;letter-spacing:1px;text-transform:uppercase}
+
+.sb-nav{flex:1;padding:14px 0;overflow-y:auto}
+
+.sb-item{display:flex;align-items:center;gap:11px;padding:11px 20px;font-size:14px;font-weight:500;
+
   color:var(--mu);cursor:pointer;transition:.15s;border-left:2px solid transparent}
+
 .sb-item:hover{color:var(--tx);background:var(--s2)}
+
 .sb-item.active{color:var(--tx);border-left-color:var(--ac);background:var(--s2)}
-.sb-item svg{width:16px;height:16px;flex-shrink:0}
-.sb-bottom{padding:16px 20px;border-top:1px solid var(--brd)}
-.sb-user{font-size:12px;color:var(--mu)}
-.sb-user b{color:var(--tx);display:block;font-size:13px}
-.btn-logout{margin-top:10px;width:100%;padding:8px;border-radius:6px;border:1px solid var(--brd);
-  background:transparent;color:var(--mu);font-size:12px}
+
+.sb-item svg{width:17px;height:17px;flex-shrink:0}
+
+.sb-bottom{padding:14px 20px;border-top:1px solid var(--brd)}
+
+.sb-user{font-size:12px;color:var(--mu)}.sb-user b{color:var(--tx);display:block;font-size:13px}
+
+.btn-logout{margin-top:10px;width:100%;padding:9px;border-radius:7px;border:1px solid var(--brd);background:transparent;color:var(--mu);font-size:12px}
+
 .btn-logout:hover{color:var(--rd);border-color:var(--rd)}
+
 .main-area{flex:1;overflow-y:auto;padding:28px;min-height:100vh}
 
-/* ══ ADMIN PANELS ══ */
-.admin-panel{display:none}
-.admin-panel.on{display:block}
-.ap-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
-.ap-title{font-size:20px;font-weight:700}
+.admin-panel{display:none}.admin-panel.on{display:block}
+
+.ap-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+
+.ap-title{font-family:var(--fd);font-size:22px;font-weight:700}
+
 .ap-sub{font-size:13px;color:var(--mu);margin-top:2px}
 
-/* Stats row */
-.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:28px}
-.stat-card{background:var(--s);border:1px solid var(--brd);border-radius:var(--r);padding:16px}
-.stat-val{font-family:var(--fm);font-size:28px;font-weight:500;color:var(--tx)}
-.stat-val.yellow{color:var(--ac)}
-.stat-val.green{color:var(--gn)}
-.stat-val.red{color:var(--rd)}
-.stat-key{font-size:11px;color:var(--mu);margin-top:4px;letter-spacing:.3px}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
 
-/* Table */
-.tbl-wrap{background:var(--s);border:1px solid var(--brd);border-radius:var(--r);overflow:hidden}
-.tbl-toolbar{padding:14px 16px;border-bottom:1px solid var(--brd);display:flex;gap:10px;align-items:center}
-.tbl-search{flex:1;background:var(--s2);border:1px solid var(--brd);border-radius:6px;
-  padding:8px 12px;color:var(--tx);font-size:13px;outline:none}
+.stat-card{background:var(--s);border:1px solid var(--brd);border-radius:var(--r);padding:18px;position:relative;overflow:hidden}
+
+.stat-card::after{content:"";position:absolute;top:0;right:0;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle,rgba(124,92,255,.15),transparent 70%)}
+
+.stat-val{font-family:var(--fd);font-size:30px;font-weight:700}
+
+.stat-val.purple{color:var(--ac2)}.stat-val.green{color:var(--gn)}.stat-val.red{color:var(--rd)}.stat-val.yellow{color:var(--go)}.stat-val.blue{color:var(--bl)}
+
+.stat-key{font-size:12px;color:var(--mu);margin-top:5px}
+
+.tbl-wrap{background:var(--s);border:1px solid var(--brd);border-radius:var(--r);overflow:hidden;margin-bottom:20px}
+
+.tbl-toolbar{padding:14px 16px;border-bottom:1px solid var(--brd);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+.tbl-search{flex:1;min-width:140px;background:var(--s2);border:1px solid var(--brd);border-radius:7px;padding:9px 12px;color:var(--tx);font-size:13px;outline:none}
+
 .tbl-search:focus{border-color:var(--ac)}
-.tbl-filter{background:var(--s2);border:1px solid var(--brd);border-radius:6px;
-  padding:8px 10px;color:var(--tx);font-size:13px;outline:none}
-table{width:100%;border-collapse:collapse}
-th{padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--mu);
-  letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--brd)}
-td{padding:12px 16px;font-size:13px;border-bottom:1px solid #1a1a1a;vertical-align:middle}
+
+.tbl-filter{background:var(--s2);border:1px solid var(--brd);border-radius:7px;padding:9px 11px;color:var(--tx);font-size:13px;outline:none}
+
+.tbl-scroll{overflow-x:auto}
+
+table{width:100%;border-collapse:collapse;min-width:520px}
+
+th{padding:11px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--brd);white-space:nowrap}
+
+td{padding:13px 16px;font-size:13px;border-bottom:1px solid #16181f;vertical-align:middle}
+
 tr:last-child td{border-bottom:none}
-tr:hover td{background:#111}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;
-  font-size:11px;font-weight:600;font-family:var(--fm)}
-.badge.active{background:rgba(74,222,128,.12);color:var(--gn)}
-.badge.pending{background:rgba(251,191,36,.12);color:var(--go)}
-.badge.inactive{background:rgba(107,107,107,.15);color:var(--mu)}
-.badge.warn{background:rgba(248,113,113,.12);color:var(--rd)}
-.progress-bar{width:100%;height:4px;background:var(--s2);border-radius:2px;overflow:hidden;margin-top:4px}
-.progress-fill{height:100%;background:var(--ac);border-radius:2px;transition:.3s}
-.week-tag{font-family:var(--fm);font-size:11px;color:var(--mu)}
-.action-btns{display:flex;gap:6px}
-.btn-sm{padding:5px 10px;border-radius:5px;font-size:11px;font-weight:600;border:none;transition:.15s;cursor:pointer}
-.btn-sm.green{background:rgba(74,222,128,.15);color:var(--gn)}
-.btn-sm.green:hover{background:rgba(74,222,128,.25)}
-.btn-sm.red{background:rgba(248,113,113,.12);color:var(--rd)}
-.btn-sm.red:hover{background:rgba(248,113,133,.22)}
-.btn-sm.blue{background:rgba(96,165,250,.12);color:var(--bl)}
-.btn-sm.blue:hover{background:rgba(96,165,250,.22)}
-.btn-sm.yellow{background:rgba(232,255,71,.1);color:var(--ac)}
-.btn-sm.yellow:hover{background:rgba(232,255,71,.2)}
 
-/* Submissions */
-.sub-list{display:flex;flex-direction:column;gap:10px}
-.sub-card{background:var(--s);border:1px solid var(--brd);border-radius:var(--r);padding:16px;
-  display:flex;align-items:center;gap:14px}
-.sub-info{flex:1}
-.sub-name{font-size:14px;font-weight:600}
-.sub-meta{font-size:12px;color:var(--mu);margin-top:2px}
-.sub-text{font-size:13px;color:var(--mu2);margin-top:6px;font-style:italic}
-audio{height:32px;border-radius:6px;flex-shrink:0}
+tr:hover td{background:#0f1116}
 
-/* Notifications panel */
-.notif-form{background:var(--s);border:1px solid var(--brd);border-radius:var(--r);padding:20px;margin-bottom:20px}
-.notif-form textarea{width:100%;background:var(--s2);border:1px solid var(--brd);border-radius:8px;
-  padding:12px;color:var(--tx);font-size:14px;outline:none;resize:vertical;min-height:80px}
-.notif-form textarea:focus{border-color:var(--ac)}
-.notif-row{display:flex;gap:10px;margin-top:12px;align-items:center;flex-wrap:wrap}
-.btn-send{padding:10px 20px;border-radius:8px;border:none;background:var(--ac);color:#000;font-size:13px;font-weight:700}
-.btn-send:hover{background:var(--ac2)}
-.notif-select{background:var(--s2);border:1px solid var(--brd);border-radius:8px;
-  padding:10px 12px;color:var(--tx);font-size:13px;outline:none;flex:1}
-.notif-log{display:flex;flex-direction:column;gap:8px}
-.notif-item{background:var(--s);border:1px solid var(--brd);border-radius:8px;padding:12px 14px;
-  display:flex;justify-content:space-between;align-items:center}
-.notif-item-left{font-size:13px}
-.notif-item-meta{font-size:11px;color:var(--mu);margin-top:2px;font-family:var(--fm)}
-.notif-status{font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px}
-.notif-status.sent{background:rgba(74,222,128,.1);color:var(--gn)}
-.notif-status.call{background:rgba(248,113,113,.1);color:var(--rd)}
+.progress-bar{width:100%;height:4px;background:var(--s2);border-radius:2px;overflow:hidden;margin-top:5px}
 
-/* Modal */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;
-  align-items:center;justify-content:center;padding:20px}
-.modal-bg.on{display:flex}
-.modal{background:var(--s);border:1px solid var(--brd);border-radius:16px;padding:28px;
-  width:100%;max-width:460px;max-height:85vh;overflow-y:auto}
-.modal-title{font-size:18px;font-weight:700;margin-bottom:16px}
-.modal-close{float:right;background:none;border:none;color:var(--mu);font-size:20px;cursor:pointer;line-height:1}
-.modal-close:hover{color:var(--tx)}
-.info-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--brd);font-size:13px}
-.info-row:last-child{border-bottom:none}
-.info-key{color:var(--mu)}
-.info-val{font-weight:600;font-family:var(--fm)}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--cy));border-radius:2px}
 
-/* ══ STUDENT LAYOUT ══ */
-#p-student{flex-direction:column}
-.stu-header{background:var(--s);border-bottom:1px solid var(--brd);padding:14px 20px;
-  display:flex;align-items:center;justify-content:space-between}
-.stu-logo{font-size:13px;font-weight:700;letter-spacing:2px;color:var(--mu)}
-.stu-logo span{color:var(--ac)}
-.stu-user{font-size:13px;color:var(--mu2)}
-.stu-user b{color:var(--tx)}
-.stu-main{flex:1;padding:20px;max-width:680px;margin:0 auto;width:100%}
+.tg-link{color:var(--bl);text-decoration:none;font-family:var(--fm);font-size:12px}
 
-/* Student nav */
-.stu-nav{display:flex;gap:4px;background:var(--s);border:1px solid var(--brd);border-radius:var(--r);
-  padding:4px;margin-bottom:20px}
-.stu-tab{flex:1;padding:9px;border:none;background:transparent;color:var(--mu);
-  font-size:13px;font-weight:600;border-radius:7px;transition:.15s}
-.stu-tab.active{background:var(--s2);color:var(--tx)}
-.stu-panel{display:none}
-.stu-panel.on{display:block}
+.tg-link:hover{text-decoration:underline}
 
-/* Calf card */
-.calf-card{background:var(--s);border:1px solid var(--brd);border-radius:var(--r);
-  padding:20px;margin-bottom:16px;display:flex;align-items:center;gap:16px}
-.calf-svg-wrap{flex-shrink:0}
-.calf-info{flex:1}
-.calf-name{font-size:18px;font-weight:700}
-.calf-kg{font-family:var(--fm);font-size:28px;font-weight:500;color:var(--ac)}
-.calf-bar-wrap{margin-top:8px}
-.calf-bar-label{font-size:11px;color:var(--mu);display:flex;justify-content:space-between;margin-bottom:4px}
-.calf-bar{height:5px;background:var(--s2);border-radius:3px;overflow:hidden}
-.calf-bar-fill{height:100%;background:var(--ac);border-radius:3px;transition:1s}
-.bal-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.bal-box{background:var(--s);border:1px solid var(--brd);border-radius:8px;padding:14px}
-.bal-label{font-size:11px;color:var(--mu);letter-spacing:.3px}
-.bal-val{font-family:var(--fm);font-size:20px;font-weight:500;margin-top:4px}
+.action-btns{display:flex;gap:6px;flex-wrap:wrap}
 
-/* Week folders */
-.week-folder{margin-bottom:16px}
-.week-head{display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px;background:var(--s);border:1px solid var(--brd);
-  border-radius:8px 8px 0 0;cursor:pointer}
-.week-head-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
-.week-head-badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px;font-family:var(--fm)}
-.week-items-grid{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--brd);
-  border-top:none;border-radius:0 0 8px 8px;overflow:hidden}
-.lesson-cell{padding:14px;background:var(--s2);border-right:1px solid var(--brd);
-  cursor:pointer;transition:.15s;position:relative}
-.lesson-cell:nth-child(even){border-right:none}
-.lesson-cell:hover:not(.locked){background:#1a1a1a}
-.lesson-cell.locked{opacity:.45;cursor:default}
-.lesson-cell.done{background:rgba(74,222,128,.04)}
-.lesson-num{font-size:10px;color:var(--mu);font-family:var(--fm);margin-bottom:6px}
-.lesson-icon{font-size:24px;margin-bottom:6px;display:block}
-.lesson-title{font-size:12px;font-weight:600;line-height:1.3}
-.lesson-badge{position:absolute;top:8px;right:8px;font-size:10px;font-weight:700;
-  padding:2px 6px;border-radius:3px;font-family:var(--fm)}
-.lesson-badge.done{background:rgba(74,222,128,.2);color:var(--gn)}
-.lesson-badge.open{background:rgba(232,255,71,.15);color:var(--ac)}
-.lesson-badge.lock{background:rgba(107,107,107,.2);color:var(--mu)}
-
-/* Test screen */
-.test-wrap{background:var(--s);border:1px solid var(--brd);border-radius:var(--r);padding:20px}
-.test-prog{display:flex;align-items:center;gap:12px;margin-bottom:16px}
-.test-bar{flex:1;height:3px;background:var(--s2);border-radius:2px;overflow:hidden}
-.test-bar-fill{height:100%;background:var(--ac);border-radius:2px;transition:.3s}
-.test-num{font-family:var(--fm);font-size:12px;color:var(--mu)}
-.test-q{font-size:16px;font-weight:600;line-height:1.5;margin-bottom:16px}
-.opt{width:100%;padding:12px 14px;margin-bottom:8px;background:var(--s2);
-  border:1px solid var(--brd);border-radius:8px;color:var(--tx);
-  font-size:14px;text-align:left;transition:.15s;cursor:pointer}
-.opt:hover:not(:disabled){border-color:var(--mu)}
-.opt.correct{background:rgba(74,222,128,.1);border-color:var(--gn);color:var(--gn)}
-.opt.wrong{background:rgba(248,113,113,.1);border-color:var(--rd);color:var(--rd)}
-.opt:disabled{cursor:default}
-.btn-next{width:100%;padding:12px;border:none;border-radius:8px;background:var(--ac);
-  color:#000;font-size:14px;font-weight:700;display:none;margin-top:4px}
-
-/* Tez aytish */
-.tez-cell{padding:14px;background:var(--s2);border-right:1px solid var(--brd);
-  cursor:pointer;transition:.15s;position:relative}
-.tez-cell:nth-child(even){border-right:none}
-.tez-cell:hover:not(.locked){background:#1a1a1a}
-.tez-cell.locked{opacity:.45;cursor:default}
-.tez-cell.done{background:rgba(74,222,128,.04)}
-.tez-cell.pending{background:rgba(251,191,36,.03)}
-.tez-num{font-size:10px;color:var(--mu);font-family:var(--fm);margin-bottom:6px}
-.tez-icon{font-size:24px;margin-bottom:6px;display:block}
-.tez-title-small{font-size:12px;font-weight:600;line-height:1.3}
-.tez-badge{position:absolute;top:8px;right:8px;font-size:10px;font-weight:700;
-  padding:2px 6px;border-radius:3px;font-family:var(--fm)}
-.tez-badge.done{background:rgba(74,222,128,.2);color:var(--gn)}
-.tez-badge.open{background:rgba(232,255,71,.15);color:var(--ac)}
-.tez-badge.pending{background:rgba(251,191,36,.15);color:var(--go)}
-.tez-badge.lock{background:rgba(107,107,107,.2);color:var(--mu)}
-
-/* Voice recorder */
-.voice-card{background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:16px;margin-top:12px}
-.voice-text-box{font-size:18px;font-weight:700;letter-spacing:.5px;
-  background:var(--s);border:1px solid var(--brd);border-radius:8px;
-  padding:14px;margin-bottom:12px;line-height:1.6;font-family:var(--fm)}
-.voice-hint{font-size:12px;color:var(--mu2);font-style:italic;margin-bottom:14px}
-.btn-record{width:100%;padding:14px;border:none;border-radius:8px;
-  background:#7f1d1d;color:#fca5a5;font-size:14px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s}
-.btn-record.idle{background:rgba(248,113,113,.15);color:var(--rd)}
-.btn-record.recording{animation:rpulse 1s infinite}
-@keyframes rpulse{0%,100%{opacity:1}50%{opacity:.6}}
-.voice-ctrl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-audio{width:100%;margin:8px 0;height:32px;border-radius:6px}
-
-/* Loading */
-.spin{width:20px;height:20px;border:2px solid var(--brd);border-top-color:var(--ac);
-  border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
-@keyframes sp{to{transform:rotate(360deg)}}
-.loading-center{display:flex;align-items:center;justify-content:center;gap:10px;
-  padding:40px;color:var(--mu);font-size:13px}
-
-/* Empty */
 .empty{text-align:center;padding:40px;color:var(--mu);font-size:13px}
-.empty-icon{font-size:32px;margin-bottom:8px}
 
-/* Toast */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--s);border:1px solid var(--brd);
-  border-radius:8px;padding:12px 16px;font-size:13px;z-index:999;
-  transform:translateY(80px);opacity:0;transition:.25s;pointer-events:none}
+.empty-icon{font-size:34px;margin-bottom:8px}
+
+.loading-center{display:flex;align-items:center;justify-content:center;gap:10px;padding:40px;color:var(--mu);font-size:13px}
+
+.spin{width:20px;height:20px;border:2px solid var(--brd);border-top-color:var(--ac);border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
+
+@keyframes sp{to{transform:rotate(360deg)}}
+
+.sub-list{display:flex;flex-direction:column;gap:10px}
+
+.sub-card{background:var(--s);border:1px solid var(--brd);border-radius:var(--r);padding:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+
+.sub-info{flex:1;min-width:160px}
+
+.sub-name{font-size:14px;font-weight:600}
+
+.sub-meta{font-size:12px;color:var(--mu);margin-top:2px}
+
+.sub-text{font-size:13px;color:var(--mu2);margin-top:6px;font-style:italic}
+
+audio{height:36px;border-radius:7px;max-width:240px}
+
+.lead-cards{display:flex;flex-direction:column;gap:10px}
+
+.lead-card{background:var(--s);border:1px solid var(--brd);border-radius:var(--r);padding:16px;border-left:3px solid var(--mu)}
+
+.lead-card.cold{border-left-color:var(--bl)}
+
+.lead-card.thinking{border-left-color:var(--go)}
+
+.lead-card.hot{border-left-color:var(--rd)}
+
+.lead-card.enrolled{border-left-color:var(--gn)}
+
+.lead-card.refused{border-left-color:var(--mu)}
+
+.lead-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:10px}
+
+.lead-name{font-size:15px;font-weight:700}
+
+.lead-phone{font-family:var(--fm);font-size:13px;color:var(--bl);margin-top:2px}
+
+.lead-comment{font-size:13px;color:var(--mu2);margin:8px 0;line-height:1.5;font-style:italic;background:var(--s2);padding:10px;border-radius:8px}
+
+.lead-reminder{font-size:12px;color:var(--go);margin-top:6px;display:flex;align-items:center;gap:5px}
+
+.lead-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+
+.lead-date{font-size:11px;color:var(--mu);font-family:var(--fm)}
+
+.leads-filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+
+.filter-btn{padding:7px 14px;border-radius:7px;border:1px solid var(--brd);background:transparent;color:var(--mu);font-size:12px;font-weight:600;transition:.15s}
+
+.filter-btn.active{background:var(--ac);color:#fff;border-color:var(--ac)}
+
+.call-day{margin-bottom:20px}
+
+.call-day-title{font-family:var(--fd);font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+
+.call-item{background:var(--s);border:1px solid var(--brd);border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+
+.call-time{font-family:var(--fm);font-size:18px;font-weight:500;color:var(--go)}
+
+.call-info{flex:1}
+
+.call-name{font-size:14px;font-weight:600}
+
+.call-note{font-size:12px;color:var(--mu);margin-top:2px}
+
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:center;justify-content:center;padding:20px}
+
+.modal-bg.on{display:flex}
+
+.modal{background:var(--s);border:1px solid var(--brd);border-radius:16px;padding:26px;width:100%;max-width:440px;max-height:88vh;overflow-y:auto}
+
+.modal-title{font-family:var(--fd);font-size:18px;font-weight:700;margin-bottom:16px}
+
+.modal-close{float:right;background:none;border:none;color:var(--mu);font-size:22px;cursor:pointer;line-height:1}
+
+.modal-close:hover{color:var(--tx)}
+
+.info-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--brd);font-size:13px;gap:10px}
+
+.info-row:last-child{border-bottom:none}
+
+.info-key{color:var(--mu)}.info-val{font-weight:600;font-family:var(--fm);text-align:right}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s);border:1px solid var(--brd);border-radius:9px;padding:13px 17px;font-size:13px;z-index:999;transform:translateY(80px);opacity:0;transition:.25s;pointer-events:none;max-width:300px}
+
 .toast.on{transform:none;opacity:1}
-.toast.ok{border-color:var(--gn);color:var(--gn)}
-.toast.err{border-color:var(--rd);color:var(--rd)}
+
+.toast.ok{border-color:var(--gn);color:var(--gn)}.toast.err{border-color:var(--rd);color:var(--rd)}
 
 @media(max-width:600px){
-  .sidebar{display:none}
-  .stats-row{grid-template-columns:1fr 1fr}
+
+  .sidebar{width:100%;height:auto;min-height:0;position:relative;flex-direction:row;overflow-x:auto;padding:10px}
+
+  .sb-logo,.sb-bottom{display:none}
+
+  .sb-nav{display:flex;padding:0}
+
+  .sb-item{border-left:none;border-bottom:2px solid transparent;white-space:nowrap;padding:10px 14px}
+
+  .sb-item.active{border-left:none;border-bottom-color:var(--ac)}
+
   #p-admin{flex-direction:column}
+
   .main-area{padding:16px}
+
+  .stats-row{grid-template-columns:1fr 1fr}
+
 }
 
-/* LEADS */
-.lead-form{background:var(--s);border:1px solid var(--brd);border-radius:var(--r);padding:20px;margin-bottom:20px}
-.lead-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.lead-cards{display:flex;flex-direction:column;gap:10px}
-.lead-card{background:var(--s);border:1px solid var(--brd);border-radius:var(--r);padding:16px;position:relative}
-.lead-card.status-new{border-left:3px solid var(--bl)}
-.lead-card.status-callback{border-left:3px solid var(--go)}
-.lead-card.status-enrolled{border-left:3px solid var(--gn)}
-.lead-card.status-refused{border-left:3px solid var(--rd)}
-.lead-card.status-called{border-left:3px solid var(--mu)}
-.lead-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
-.lead-name{font-size:15px;font-weight:700}
-.lead-phone{font-family:var(--fm);font-size:13px;color:var(--bl);margin-top:2px}
-.lead-comment{font-size:13px;color:var(--mu2);margin:8px 0;line-height:1.5;font-style:italic}
-.lead-reminder{font-size:12px;color:var(--go);margin-top:6px;display:flex;align-items:center;gap:4px}
-.lead-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-.lead-date{font-size:11px;color:var(--mu);font-family:var(--fm)}
-.status-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;font-family:var(--fm)}
-.status-badge.new{background:rgba(96,165,250,.15);color:var(--bl)}
-.status-badge.callback{background:rgba(251,191,36,.15);color:var(--go)}
-.status-badge.enrolled{background:rgba(74,222,128,.15);color:var(--gn)}
-.status-badge.refused{background:rgba(248,113,113,.15);color:var(--rd)}
-.status-badge.called{background:rgba(107,107,107,.15);color:var(--mu)}
-.leads-filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.filter-btn{padding:6px 14px;border-radius:6px;border:1px solid var(--brd);background:transparent;
-  color:var(--mu);font-size:12px;font-weight:600;cursor:pointer;transition:.15s}
-.filter-btn.active{background:var(--ac);color:#000;border-color:var(--ac)}
-.reminder-modal-content .field input[type=time]{background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:12px;color:var(--tx);font-size:15px;outline:none;width:100%}
 </style>
+
 </head>
+
 <body>
 
-<!-- ══ LANDING ══ -->
+<style>
+
+/* ══ STUDENT LAYOUT ══ */
+
+#p-student{flex-direction:column}
+
+.stu-header{background:rgba(19,21,28,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--brd);
+
+  padding:13px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+
+.stu-logo{font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:1px}
+
+.stu-logo span{color:var(--ac2)}
+
+.stu-user{font-size:13px;color:var(--mu2)}.stu-user b{color:var(--tx)}
+
+.stu-main{flex:1;padding:18px;max-width:680px;margin:0 auto;width:100%}
+
+.stu-nav{display:flex;gap:3px;background:var(--s);border:1px solid var(--brd);border-radius:12px;padding:4px;margin-bottom:18px;position:sticky;top:60px;z-index:40}
+
+.stu-tab{flex:1;padding:10px 4px;border:none;background:transparent;color:var(--mu);font-size:12px;font-weight:600;border-radius:8px;transition:.15s}
+
+.stu-tab.active{background:var(--s2);color:var(--tx)}
+
+.stu-panel{display:none}.stu-panel.on{display:block}
+
+.brain-hero{background:radial-gradient(ellipse 90% 70% at 50% 30%,rgba(124,92,255,.18),transparent 70%);
+
+  border:1px solid var(--brd);border-radius:20px;padding:24px;margin-bottom:16px;text-align:center;position:relative;overflow:hidden}
+
+.brain-hello{font-size:13px;color:var(--mu2);margin-bottom:2px}
+
+.brain-hello b{color:var(--tx)}
+
+.brain-title{font-family:var(--fd);font-size:19px;font-weight:700;margin-bottom:18px}
+
+.brain-svg-wrap{position:relative;width:220px;height:220px;margin:0 auto}
+
+#brain-svg{width:100%;height:100%;filter:drop-shadow(0 0 18px rgba(124,92,255,.5))}
+
+.brain-core{animation:brainpulse 3s ease-in-out infinite}
+
+@keyframes brainpulse{0%,100%{opacity:.85}50%{opacity:1}}
+
+.skill-node{animation:nodefloat 4s ease-in-out infinite}
+
+@keyframes nodefloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+.brain-level{font-family:var(--fd);font-size:14px;color:var(--ac2);margin-top:14px;font-weight:600}
+
+.brain-xp-bar{height:6px;background:var(--s2);border-radius:3px;overflow:hidden;margin:10px auto 0;max-width:240px}
+
+.brain-xp-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--cy));border-radius:3px;transition:1s}
+
+.skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+
+.skill-card{background:var(--s);border:1px solid var(--brd);border-radius:12px;padding:14px;position:relative;overflow:hidden}
+
+.skill-card-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+
+.skill-emoji{font-size:20px}
+
+.skill-name{font-size:13px;font-weight:600}
+
+.skill-ring{position:relative;width:100%;display:flex;align-items:center;gap:10px}
+
+.skill-pct{font-family:var(--fm);font-size:18px;font-weight:500;color:var(--ac2)}
+
+.skill-prog{flex:1;height:5px;background:var(--s2);border-radius:3px;overflow:hidden}
+
+.skill-prog-fill{height:100%;border-radius:3px;transition:1s}
+
+.brain-calf{background:var(--s);border:1px solid var(--brd);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:16px}
+
+.bal-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+
+.bal-box{background:var(--s);border:1px solid var(--brd);border-radius:11px;padding:14px}
+
+.bal-label{font-size:11px;color:var(--mu)}
+
+.bal-val{font-family:var(--fd);font-size:20px;font-weight:700;margin-top:4px}
+
+.calf-info{flex:1}
+
+.calf-name{font-size:15px;font-weight:700}
+
+.calf-kg{font-family:var(--fd);font-size:24px;font-weight:700;color:var(--ac2)}
+
+.calf-bar{height:5px;background:var(--s2);border-radius:3px;overflow:hidden;margin-top:6px}
+
+.calf-bar-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--cy));border-radius:3px;transition:1s}
+
+.week-folder{margin-bottom:14px}
+
+.week-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--s);border:1px solid var(--brd);border-radius:10px 10px 0 0}
+
+.week-head-title{font-family:var(--fd);font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+
+.week-items-grid{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--brd);border-top:none;border-radius:0 0 10px 10px;overflow:hidden}
+
+.lesson-cell,.tez-cell{padding:14px;background:var(--s2);border-right:1px solid var(--brd);cursor:pointer;transition:.15s;position:relative}
+
+.lesson-cell:nth-child(even),.tez-cell:nth-child(even){border-right:none}
+
+.lesson-cell:hover:not(.locked),.tez-cell:hover:not(.locked){background:#1a1d26}
+
+.lesson-cell.locked,.tez-cell.locked{opacity:.4;cursor:default}
+
+.lesson-cell.done,.tez-cell.done{background:rgba(52,211,153,.05)}
+
+.lesson-num,.tez-num{font-size:10px;color:var(--mu);font-family:var(--fm);margin-bottom:6px}
+
+.lesson-icon,.tez-icon{font-size:24px;margin-bottom:6px;display:block}
+
+.lesson-title,.tez-title-small{font-size:12px;font-weight:600;line-height:1.3}
+
+.lesson-badge,.tez-badge{position:absolute;top:8px;right:8px;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;font-family:var(--fm)}
+
+.lesson-badge.done,.tez-badge.done{background:rgba(52,211,153,.2);color:var(--gn)}
+
+.lesson-badge.open,.tez-badge.open{background:rgba(124,92,255,.18);color:var(--ac2)}
+
+.tez-badge.pending{background:rgba(251,191,36,.15);color:var(--go)}
+
+.lesson-badge.lock,.tez-badge.lock{background:rgba(107,107,107,.2);color:var(--mu)}
+
+.test-wrap{background:var(--s);border:1px solid var(--brd);border-radius:var(--r);padding:20px}
+
+.test-prog{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+
+.test-bar{flex:1;height:4px;background:var(--s2);border-radius:2px;overflow:hidden}
+
+.test-bar-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--cy));border-radius:2px;transition:.3s}
+
+.test-num{font-family:var(--fm);font-size:12px;color:var(--mu)}
+
+.test-q{font-size:16px;font-weight:600;line-height:1.5;margin-bottom:16px}
+
+.opt{width:100%;padding:13px 14px;margin-bottom:8px;background:var(--s2);border:1px solid var(--brd);border-radius:9px;color:var(--tx);font-size:14px;text-align:left;transition:.15s}
+
+.opt:hover:not(:disabled){border-color:var(--mu)}
+
+.opt.correct{background:rgba(52,211,153,.1);border-color:var(--gn);color:var(--gn)}
+
+.opt.wrong{background:rgba(251,113,133,.1);border-color:var(--rd);color:var(--rd)}
+
+.opt:disabled{cursor:default}
+
+.btn-next{width:100%;padding:13px;border:none;border-radius:9px;background:linear-gradient(135deg,var(--ac),var(--acd));color:#fff;font-size:14px;font-weight:700;display:none;margin-top:4px}
+
+.voice-card{background:var(--s);border:1px solid var(--brd);border-radius:var(--r);padding:18px}
+
+.voice-text-box{font-family:var(--fd);font-size:18px;font-weight:700;letter-spacing:.5px;background:var(--s2);border:1px solid var(--brd);border-radius:10px;padding:16px;margin-bottom:12px;line-height:1.6}
+
+.voice-hint{font-size:13px;color:var(--mu2);font-style:italic;margin-bottom:14px}
+
+.btn-record{width:100%;padding:15px;border:none;border-radius:10px;background:rgba(251,113,133,.15);color:var(--rd);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s}
+
+.btn-record.recording{background:linear-gradient(135deg,#9f1239,#e11d48);color:#fff;animation:rpulse 1s infinite}
+
+@keyframes rpulse{0%,100%{opacity:1}50%{opacity:.65}}
+
+.voice-ctrl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+
+.book-reels{height:calc(100vh - 180px);min-height:440px;overflow-y:scroll;scroll-snap-type:y mandatory;border-radius:16px;scrollbar-width:none}
+
+.book-reels::-webkit-scrollbar{display:none}
+
+.reel{height:calc(100vh - 180px);min-height:440px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;position:relative;border-radius:16px;margin-bottom:0}
+
+.reel-quote{font-family:var(--fd);font-size:clamp(20px,5vw,28px);font-weight:700;line-height:1.4;margin-bottom:20px;max-width:90%}
+
+.reel-author{font-size:14px;color:var(--mu2);font-style:italic}
+
+.reel-book{font-size:12px;color:var(--mu);margin-top:6px;font-family:var(--fm)}
+
+.reel-emoji{font-size:40px;margin-bottom:20px}
+
+.reel-hint{position:absolute;bottom:20px;font-size:11px;color:var(--mu);animation:bounce 2s infinite}
+
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+.pr-av{font-family:var(--fd);font-size:30px;font-weight:700;width:64px;height:64px;background:linear-gradient(135deg,var(--ac),var(--acd));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;color:#fff}
+
+</style>
+
+<!-- ══ LANDING / COURSE SELECT ══ -->
+
 <div class="page on" id="p-land">
-  <div class="land-logo">A Avlod Academy</div>
-  <div>
-    <div class="land-title">O'rgan.<br><span>O'ynab.</span><br>O'sib bor.</div>
+
+  <div class="brand-logo">EDU BLOG PLATFORM</div>
+
+  <div class="brand-title">O'rgan.<br><span>Bloging qil.</span></div>
+
+  <div class="brand-sub">Bolalar va ayollar uchun zamonaviy blogerlik va AI kursi.</div>
+
+  <div class="course-cards">
+
+    <div class="course-card" onclick="selectCourse('bolalar')">
+
+      <span class="cc-badge active">FAOL</span>
+
+      <div class="cc-icon">🐄</div>
+
+      <div class="cc-title">Child Blog</div>
+
+      <div class="cc-desc">8-15 yosh bolalar uchun bloging, AI va nutq mahorati. Buzoqcha o'sadi!</div>
+
+    </div>
+
+    <div class="course-card soon" onclick="toast('Women Blog tez kunda ochiladi!','err')">
+
+      <span class="cc-badge soon">TEZ KUNDA</span>
+
+      <div class="cc-icon">🌸</div>
+
+      <div class="cc-title">Women Blog</div>
+
+      <div class="cc-desc">Ayollar uchun blogerlik va shaxsiy brend kursi. Tez kunda...</div>
+
+    </div>
+
   </div>
-  <div class="land-sub">Bolalar uchun AI va bloging kursi. Haftada 2 ta test va tez aytish.</div>
-  <div class="land-btns">
-    <button class="btn-primary" onclick="showLogin('student')">🎓 O'quvchi kirish</button>
-    <button class="btn-ghost" onclick="showLogin('admin')">🛡 Ustoz / Admin</button>
-  </div>
+
+  <div class="land-staff-link" onclick="showStaffLogin()">🛡 Xodimlar uchun kirish</div>
+
 </div>
 
-<!-- ══ LOGIN ══ -->
+<!-- ══ STUDENT LOGIN ══ -->
+
 <div class="page" id="p-login">
+
   <div class="login-box">
+
     <div class="login-back" onclick="showPage('p-land')">← Orqaga</div>
-    <div class="login-title" id="login-title">Kirish</div>
-    <div class="login-sub" id="login-sub">Ma'lumotlaringizni kiriting</div>
-    <div class="field">
+
+    <div class="login-icon" id="li-icon">🎓</div>
+
+    <div class="login-title" id="login-title">O'quvchi kirish</div>
+
+    <div class="login-sub" id="login-sub">Ustoz bergan kodni kiriting</div>
+
+    <div class="field" id="li-name-wrap">
+
       <label>To'liq ism</label>
+
       <input id="li-name" type="text" placeholder="Aziz Karimov" autocomplete="off">
+
     </div>
-    <div class="field" id="li-pass-wrap">
-      <label id="li-pass-label">Kod (ustoz beradi)</label>
-      <input id="li-pass" type="text" placeholder="••••••" autocomplete="off"
-             onkeydown="if(event.key==='Enter')doLogin()">
+
+    <div class="field">
+
+      <label id="li-pass-label">Kirish kodi</label>
+
+      <input id="li-pass" type="text" placeholder="kod" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+
     </div>
+
     <button class="btn-full" id="li-btn" onclick="doLogin()">Kirish</button>
+
     <div class="err" id="li-err">Noto'g'ri ma'lumot</div>
+
   </div>
+
 </div>
 
-<!-- ══ ADMIN ══ -->
-<div class="page" id="p-admin">
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sb-logo">A<span>A</span>A</div>
-    <div class="sb-nav">
-      <div class="sb-item active" onclick="showAdminPanel('dash')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        Dashboard
-      </div>
-      <div class="sb-item" onclick="showAdminPanel('students')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-        O'quvchilar
-      </div>
-      <div class="sb-item" onclick="showAdminPanel('tez')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-        Tez aytish
-      </div>
-      <div class="sb-item" onclick="showAdminPanel('notif')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-        Bildirishnomalar
-      </div>
-      <div class="sb-item" onclick="showAdminPanel('activate')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-        Aktivatsiya
-      </div>
-      <div class="sb-item" onclick="showAdminPanel('leads')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.22 1.18 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.28-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-        Lidlar 🔥
-      </div>
+<!-- ══ STAFF LOGIN ══ -->
+
+<div class="page" id="p-staff-login">
+
+  <div class="login-box">
+
+    <div class="login-back" onclick="showPage('p-land')">← Orqaga</div>
+
+    <div class="login-icon">🛡</div>
+
+    <div class="login-title">Xodimlar kirish</div>
+
+    <div class="login-sub">Rol va parolni tanlang</div>
+
+    <div class="field">
+
+      <label>Rol</label>
+
+      <select id="staff-role">
+
+        <option value="admin">👨‍💼 Administrator</option>
+
+        <option value="marketing">📊 Marketolog</option>
+
+        <option value="director">🎩 Direktor</option>
+
+      </select>
+
     </div>
-    <div class="sb-bottom">
-      <div class="sb-user"><b id="admin-name-sb">Admin</b>Ustoz paneli</div>
-      <button class="btn-logout" onclick="doLogout()">Chiqish</button>
+
+    <div class="field">
+
+      <label>Parol</label>
+
+      <input id="staff-pass" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter')doStaffLogin()">
+
     </div>
+
+    <button class="btn-full" onclick="doStaffLogin()">Kirish</button>
+
+    <div class="err" id="staff-err">Noto'g'ri parol</div>
+
   </div>
 
-  <!-- Main -->
+</div>
+
+<!-- ══ ADMIN / STAFF PANEL ══ -->
+
+<div class="page" id="p-admin">
+
+  <div class="sidebar">
+
+    <div>
+
+      <div class="sb-logo">EDU<span>BLOG</span><div class="sb-role" id="sb-role">ADMIN</div></div>
+
+    </div>
+
+    <div class="sb-nav" id="sb-nav"><!-- filled by JS based on role --></div>
+
+    <div class="sb-bottom">
+
+      <div class="sb-user"><b id="staff-name-sb">—</b><span id="staff-role-sb">Panel</span></div>
+
+      <button class="btn-logout" onclick="doLogout()">Chiqish</button>
+
+    </div>
+
+  </div>
+
   <div class="main-area">
 
-    <!-- DASHBOARD -->
-    <div class="admin-panel on" id="ap-dash">
-      <div class="ap-head">
-        <div><div class="ap-title">Dashboard</div><div class="ap-sub">Child Blogging kursi holati</div></div>
-        <button class="btn-sm green" onclick="loadAdminDash()">↻ Yangilash</button>
+    <!-- SVODKA -->
+
+    <div class="admin-panel" id="ap-svodka">
+
+      <div class="ap-head"><div><div class="ap-title">📊 Svodka</div><div class="ap-sub">Bugungi holat va to'lovlar</div></div>
+
+        <button class="btn-sm purple" onclick="loadSvodka()">↻ Yangilash</button></div>
+
+      <div class="stats-row">
+
+        <div class="stat-card"><div class="stat-val purple" id="sv-total">—</div><div class="stat-key">Jami o'quvchi</div></div>
+
+        <div class="stat-card"><div class="stat-val green" id="sv-paid">—</div><div class="stat-key">To'lagan</div></div>
+
+        <div class="stat-card"><div class="stat-val red" id="sv-debt">—</div><div class="stat-key">Qarzdor</div></div>
+
+        <div class="stat-card"><div class="stat-val yellow" id="sv-income">—</div><div class="stat-key">Jami daromad (so'm)</div></div>
+
       </div>
-      <div class="stats-row" id="dash-stats">
-        <div class="stat-card"><div class="stat-val yellow" id="ds-total">—</div><div class="stat-key">Jami o'quvchi</div></div>
-        <div class="stat-card"><div class="stat-val green" id="ds-active">—</div><div class="stat-key">Faol</div></div>
-        <div class="stat-card"><div class="stat-val red" id="ds-inactive">—</div><div class="stat-key">Faolsiz</div></div>
-        <div class="stat-card"><div class="stat-val" id="ds-tez">—</div><div class="stat-key">Tez aytish kutmoqda</div></div>
+
+      <div class="stats-row">
+
+        <div class="stat-card"><div class="stat-val blue" id="sv-leads">—</div><div class="stat-key">Jami lidlar</div></div>
+
+        <div class="stat-card"><div class="stat-val green" id="sv-hot">—</div><div class="stat-key">Issiq lid</div></div>
+
+        <div class="stat-card"><div class="stat-val yellow" id="sv-calls">—</div><div class="stat-key">Bugun qo'ng'iroq</div></div>
+
+        <div class="stat-card"><div class="stat-val red" id="sv-late">—</div><div class="stat-key">DZ kechiktirgan</div></div>
+
       </div>
-      <!-- Progress overview -->
+
       <div class="tbl-wrap">
-        <div class="tbl-toolbar"><span style="font-size:13px;font-weight:600">O'quvchilar holati</span></div>
-        <table id="dash-table">
-          <thead><tr><th>Ism</th><th>Hafta</th><%>Testlar</th><th>Tez aytish</th><th>Bayt</th><th>Status</th></tr></thead>
-          <tbody id="dash-tbody"><tr><td colspan="6" class="loading-center"><div class="spin"></div></td></tr></tbody>
-        </table>
+
+        <div class="tbl-toolbar"><span style="font-size:13px;font-weight:600">💰 To'lov holati</span></div>
+
+        <div class="tbl-scroll"><table><thead><tr><th>Ism</th><th>Telegram</th><th>To'langan</th><th>Holat</th></tr></thead>
+
+          <tbody id="sv-pay-tbody"><tr><td colspan="4" class="loading-center"><div class="spin"></div></td></tr></tbody></table></div>
+
       </div>
+
+    </div>
+
+    <!-- DASHBOARD -->
+
+    <div class="admin-panel" id="ap-dash">
+
+      <div class="ap-head"><div><div class="ap-title">📈 Dashboard</div><div class="ap-sub">Child Blog o'quvchilari</div></div>
+
+        <button class="btn-sm purple" onclick="loadAdminDash()">↻ Yangilash</button></div>
+
+      <div class="stats-row">
+
+        <div class="stat-card"><div class="stat-val purple" id="ds-total">—</div><div class="stat-key">Jami</div></div>
+
+        <div class="stat-card"><div class="stat-val green" id="ds-active">—</div><div class="stat-key">Faol</div></div>
+
+        <div class="stat-card"><div class="stat-val red" id="ds-inactive">—</div><div class="stat-key">Faolsiz</div></div>
+
+        <div class="stat-card"><div class="stat-val yellow" id="ds-tez">—</div><div class="stat-key">Tez aytish kutmoqda</div></div>
+
+      </div>
+
+      <div class="tbl-wrap"><div class="tbl-toolbar"><span style="font-size:13px;font-weight:600">O'quvchilar holati</span></div>
+
+        <div class="tbl-scroll"><table><thead><tr><th>Ism</th><th>Hafta</th><th>Testlar</th><th>Tez aytish</th><th>Bayt</th></tr></thead>
+
+          <tbody id="dash-tbody"><tr><td colspan="5" class="loading-center"><div class="spin"></div></td></tr></tbody></table></div>
+
+      </div>
+
+    </div>
+
+    <!-- CONTROL -->
+
+    <div class="admin-panel" id="ap-control">
+
+      <div class="ap-head"><div><div class="ap-title">🎯 Nazorat</div><div class="ap-sub">Kim DZ qilmadi va kimga qo'ng'iroq kerak</div></div>
+
+        <button class="btn-sm purple" onclick="loadControl()">↻ Yangilash</button></div>
+
+      <div class="tbl-wrap"><div class="tbl-toolbar"><span style="font-size:13px;font-weight:600;color:var(--rd)">⚠️ DZ qilmaganlar / kechiktirganlar</span></div>
+
+        <div class="tbl-scroll"><table><thead><tr><th>Ism</th><th>Hafta</th><th>Holat</th><th>Telegram</th><th>Amal</th></tr></thead>
+
+          <tbody id="control-tbody"><tr><td colspan="5" class="loading-center"><div class="spin"></div></td></tr></tbody></table></div>
+
+      </div>
+
     </div>
 
     <!-- STUDENTS -->
+
     <div class="admin-panel" id="ap-students">
-      <div class="ap-head">
-        <div><div class="ap-title">O'quvchilar</div><div class="ap-sub">Ro'yxat va boshqaruv</div></div>
-        <button class="btn-sm yellow" onclick="showModal('add-student-modal')">+ Yangi o'quvchi</button>
-      </div>
+
+      <div class="ap-head"><div><div class="ap-title">👥 O'quvchilar</div><div class="ap-sub">Ro'yxat va boshqaruv</div></div>
+
+        <button class="btn-sm yellow" onclick="showModal('add-student-modal')">+ Yangi</button></div>
+
       <div class="tbl-wrap">
+
         <div class="tbl-toolbar">
-          <input class="tbl-search" id="stu-search" placeholder="Ism bo'yicha qidirish..." oninput="filterStudents()">
+
+          <input class="tbl-search" id="stu-search" placeholder="Qidirish..." oninput="filterStudents()">
+
           <select class="tbl-filter" id="stu-filter" onchange="filterStudents()">
-            <option value="">Barchasi</option>
-            <option value="1">Faol</option>
-            <option value="0">Faolsiz</option>
+
+            <option value="">Barchasi</option><option value="1">Faol</option><option value="0">Faolsiz</option>
+
           </select>
+
         </div>
-        <table>
-          <thead><tr><th>Ism</th><th>Kod</th><th>Hafta</th><th>Bayt</th><th>Status</th><th>Amallar</th></tr></thead>
-          <tbody id="stu-tbody"><tr><td colspan="6" class="loading-center"><div class="spin"></div></td></tr></tbody>
-        </table>
+
+        <div class="tbl-scroll"><table><thead><tr><th>Ism</th><th>Kod</th><th>Telegram</th><th>To'lov</th><th>Status</th><th>Amal</th></tr></thead>
+
+          <tbody id="stu-tbody"><tr><td colspan="6" class="loading-center"><div class="spin"></div></td></tr></tbody></table></div>
+
       </div>
+
     </div>
 
     <!-- TEZ AYTISH -->
+
     <div class="admin-panel" id="ap-tez">
-      <div class="ap-head">
-        <div><div class="ap-title">Tez aytish</div><div class="ap-sub">Kutayotgan ovozlar</div></div>
-        <button class="btn-sm green" onclick="loadTezSubmissions()">↻ Yangilash</button>
-      </div>
-      <div class="sub-list" id="tez-sub-list">
-        <div class="loading-center"><div class="spin"></div> Yuklanmoqda...</div>
-      </div>
+
+      <div class="ap-head"><div><div class="ap-title">🎤 Tez aytish</div><div class="ap-sub">Kutayotgan ovozlar</div></div>
+
+        <button class="btn-sm green" onclick="loadTezSubmissions()">↻ Yangilash</button></div>
+
+      <div class="sub-list" id="tez-sub-list"><div class="loading-center"><div class="spin"></div></div></div>
+
     </div>
 
     <!-- NOTIFICATIONS -->
+
     <div class="admin-panel" id="ap-notif">
-      <div class="ap-head">
-        <div><div class="ap-title">Bildirishnomalar</div><div class="ap-sub">Xabar yuborish va qo'ng'iroq</div></div>
-      </div>
-      <div class="notif-form">
-        <div class="field" style="margin-bottom:10px">
-          <label>Xabar matni</label>
-          <textarea id="notif-text" placeholder="DZ qilinmagan, iltimos bajaring..."></textarea>
+
+      <div class="ap-head"><div><div class="ap-title">🔔 Bildirishnomalar</div><div class="ap-sub">Xabar yuborish</div></div></div>
+
+      <div class="tbl-wrap" style="padding:18px">
+
+        <div class="field"><label>Xabar matni</label><textarea id="notif-text" placeholder="DZ qilinmagan, iltimos bajaring..."></textarea></div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px">
+
+          <select class="tbl-filter" id="notif-target" style="flex:1;min-width:160px"><option value="all">Barchaga</option></select>
+
+          <button class="btn-sm purple" style="padding:11px 18px" onclick="sendNotification()">📨 Yuborish</button>
+
         </div>
-        <div class="notif-row">
-          <select class="notif-select" id="notif-target">
-            <option value="all">Barcha o'quvchilarga</option>
-          </select>
-          <button class="btn-send" onclick="sendNotification()">📨 Xabar yuborish</button>
-          <button class="btn-send" style="background:var(--rd);color:#fff" onclick="markCall()">📞 Qo'ng'iroq qilindi</button>
-        </div>
+
       </div>
-      <div class="notif-log" id="notif-log">
-        <div class="loading-center"><div class="spin"></div></div>
-      </div>
+
+      <div class="sub-list" id="notif-log"><div class="loading-center"><div class="spin"></div></div></div>
+
     </div>
 
     <!-- ACTIVATE -->
-    <div class="admin-panel" id="ap-activate">
-      <div class="ap-head">
-        <div><div class="ap-title">Aktivatsiya</div><div class="ap-sub">Yangi o'quvchi qo'shish</div></div>
-      </div>
-      <div style="max-width:400px">
-        <div class="tbl-wrap" style="padding:20px">
-          <div class="field"><label>To'liq ism</label><input id="act-name" type="text" placeholder="Aziz Karimov"></div>
-          <div class="field"><label>Kirish kodi (o'quvchi uchun)</label><input id="act-code" type="text" placeholder="Masalan: aziz2024" autocomplete="off"></div>
-          <div class="field"><label>Kurs</label>
-            <select id="act-course"><option value="bolalar">🐄 Child Blogging</option><option value="women" disabled>👩 Women (tez kunda)</option></select>
-          </div>
-          <div class="field"><label>So'm (kurs narxi)</label><input id="act-som" type="number" placeholder="800000"></div>
-          <button class="btn-full" onclick="activateStudent()">✅ Faollashtirish va qo'shish</button>
-          <div class="err" id="act-err">Xatolik</div>
-        </div>
-        <div style="margin-top:20px">
-          <div style="font-size:12px;font-weight:600;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">Faolsiz o'quvchilar</div>
-          <div id="inactive-list" class="tbl-wrap">
-            <div class="loading-center"><div class="spin"></div></div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-  </div>
-</div>
+    <div class="admin-panel" id="ap-activate">
+
+      <div class="ap-head"><div><div class="ap-title">✅ Aktivatsiya</div><div class="ap-sub">Yangi o'quvchi qo'shish</div></div></div>
+
+      <div style="max-width:420px">
+
+        <div class="tbl-wrap" style="padding:20px">
+
+          <div class="field"><label>To'liq ism</label><input id="act-name" type="text" placeholder="Aziz Karimov"></div>
+
+          <div class="field"><label>Kirish kodi</label><input id="act-code" type="text" placeholder="aziz2024" autocomplete="off"></div>
+
+          <div class="field"><label>Telegram username (ixtiyoriy)</label><input id="act-tg" type="text" placeholder="aziz_blog"></div>
+
+          <div class="field"><label>So'm (kurs narxi)</label><input id="act-som" type="number" placeholder="800000"></div>
+
+          <div class="field"><label>To'lov holati</label><select id="act-paid"><option value="1">To'langan</option><option value="0">Qarzdor</option></select></div>
+
+          <button class="btn-full" onclick="activateStudent()">Faollashtirish</button>
+
+          <div class="err" id="act-err"></div>
+
+        </div>
+
+      </div>
+
+    </div>
 
     <!-- LEADS -->
+
     <div class="admin-panel" id="ap-leads">
-      <div class="ap-head">
-        <div><div class="ap-title">Lidlar 🔥</div><div class="ap-sub">Yangi mijozlar va qo'ng'iroqlar</div></div>
-        <button class="btn-sm yellow" onclick="toggleLeadForm()">+ Yangi lid</button>
+
+      <div class="ap-head"><div><div class="ap-title">🔥 Lidlar</div><div class="ap-sub">Mijozlar va qo'ng'iroqlar</div></div>
+
+        <button class="btn-sm yellow" onclick="toggleLeadForm()">+ Yangi lid</button></div>
+
+      <div class="tbl-wrap" id="lead-form" style="display:none;padding:18px">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+
+          <div class="field"><label>Ism</label><input id="ld-name" type="text" placeholder="Aziza"></div>
+
+          <div class="field"><label>Telefon</label><input id="ld-phone" type="tel" placeholder="+998901234567"></div>
+
+        </div>
+
+        <div class="field"><label>Manba / izoh</label><textarea id="ld-note" placeholder="Instagram reklama..."></textarea></div>
+
+        <div style="display:flex;gap:8px"><button class="btn-sm green" style="padding:10px 18px" onclick="saveLead()">Saqlash</button>
+
+          <button class="btn-sm red" style="padding:10px 18px" onclick="toggleLeadForm()">Bekor</button></div>
+
       </div>
-      <div class="lead-form" id="lead-form" style="display:none">
-        <div class="lead-grid">
-          <div class="field"><label>Ism familiya</label><input id="ld-name" type="text" placeholder="Aziza Karimova"></div>
-          <div class="field"><label>Telefon</label><input id="ld-phone" type="tel" placeholder="+998 90 123 45 67"></div>
-        </div>
-        <div class="field"><label>Izoh</label>
-          <textarea id="ld-note" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:12px;color:var(--tx);font-size:13px;outline:none;resize:vertical;min-height:60px;width:100%" placeholder="Instagram orqali keldi..."></textarea>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn-sm green" style="padding:10px 20px" onclick="saveLead()">Saqlash</button>
-          <button class="btn-sm red" style="padding:10px 20px" onclick="toggleLeadForm()">Bekor</button>
-        </div>
-      </div>
+
       <div class="leads-filter-row">
+
         <button class="filter-btn active" onclick="filterLeads('all',this)">Barchasi</button>
-        <button class="filter-btn" onclick="filterLeads('new',this)">🆕 Yangi</button>
-        <button class="filter-btn" onclick="filterLeads('callback',this)">⏰ Qayta</button>
-        <button class="filter-btn" onclick="filterLeads('called',this)">📞 Qo'ng'irildi</button>
+
+        <button class="filter-btn" onclick="filterLeads('cold',this)">❄️ Sovuq</button>
+
+        <button class="filter-btn" onclick="filterLeads('thinking',this)">🤔 O'ylayotgan</button>
+
+        <button class="filter-btn" onclick="filterLeads('hot',this)">🔥 Issiq</button>
+
         <button class="filter-btn" onclick="filterLeads('enrolled',this)">✅ Yozildi</button>
-        <button class="filter-btn" onclick="filterLeads('refused',this)">❌ Rad etdi</button>
+
+        <button class="filter-btn" onclick="filterLeads('refused',this)">❌ Rad</button>
+
       </div>
-      <div class="lead-cards" id="lead-cards">
-        <div class="loading-center"><div class="spin"></div></div>
-      </div>
+
+      <div class="lead-cards" id="lead-cards"><div class="loading-center"><div class="spin"></div></div></div>
+
     </div>
 
-    <!-- LEAD COMMENT MODAL -->
-    <div class="modal-bg" id="lead-comment-modal">
-      <div class="modal">
-        <button class="modal-close" onclick="hideModal('lead-comment-modal')">×</button>
-        <div class="modal-title">Qo'ng'iroq natijasi</div>
-        <input type="hidden" id="lcm-id">
-        <div class="field"><label>Status</label>
-          <select id="lcm-status">
-            <option value="called">Qo'ng'irildi</option>
-            <option value="callback">Qayta qo'ng'iroq so'radi</option>
-            <option value="enrolled">Yozildi (kursga)</option>
-            <option value="refused">Rad etdi</option>
-          </select>
-        </div>
-        <div class="field"><label>Izoh</label>
-          <textarea id="lcm-note" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:12px;color:var(--tx);font-size:13px;outline:none;resize:vertical;min-height:80px;width:100%"></textarea>
-        </div>
-        <div class="field" id="lcm-reminder-wrap" style="display:none">
-          <label>⏰ Eslatma vaqti</label>
-          <input type="time" id="lcm-time" style="background:var(--s2);border:1px solid var(--brd);border-radius:8px;padding:12px;color:var(--tx);font-size:15px;outline:none;width:100%">
-        </div>
-        <button class="btn-full" onclick="saveLeadComment()">Saqlash</button>
-      </div>
+    <!-- PLANNED CALLS -->
+
+    <div class="admin-panel" id="ap-calls">
+
+      <div class="ap-head"><div><div class="ap-title">📞 Rejalashtirilgan qo'ng'iroqlar</div><div class="ap-sub">Bugun, ertaga, indinga</div></div>
+
+        <button class="btn-sm purple" onclick="loadPlannedCalls()">↻ Yangilash</button></div>
+
+      <div id="calls-container"><div class="loading-center"><div class="spin"></div></div></div>
+
     </div>
 
-<!-- ══ ADD STUDENT MODAL ══ -->
-<div class="modal-bg" id="add-student-modal">
-  <div class="modal">
-    <button class="modal-close" onclick="hideModal('add-student-modal')">×</button>
-    <div class="modal-title">Yangi o'quvchi</div>
-    <div class="field"><label>To'liq ism</label><input id="ms-name" type="text" placeholder="Aziz Karimov"></div>
-    <div class="field"><label>Kirish kodi</label><input id="ms-code" type="text" placeholder="aziz2024"></div>
-    <div class="field"><label>So'm</label><input id="ms-som" type="number" placeholder="800000"></div>
-    <button class="btn-full" onclick="addStudentModal()">Qo'shish</button>
   </div>
+
 </div>
 
-<!-- ══ STUDENT DETAIL MODAL ══ -->
-<div class="modal-bg" id="stu-detail-modal">
-  <div class="modal">
-    <button class="modal-close" onclick="hideModal('stu-detail-modal')">×</button>
-    <div class="modal-title" id="sdm-name">—</div>
-    <div id="sdm-body"></div>
-    <div style="display:flex;gap:8px;margin-top:16px">
-      <button class="btn-sm green" style="flex:1;padding:10px" onclick="adminUnlockWeek()">🔓 Keyingi haftani och</button>
-      <button class="btn-sm red" style="flex:1;padding:10px" onclick="adminWarn()">⚠️ Ogohlantirish</button>
-    </div>
+<!-- ══ MODALS ══ -->
+
+<div class="modal-bg" id="add-student-modal"><div class="modal">
+
+  <button class="modal-close" onclick="hideModal('add-student-modal')">×</button>
+
+  <div class="modal-title">Yangi o'quvchi</div>
+
+  <div class="field"><label>Ism</label><input id="ms-name" type="text"></div>
+
+  <div class="field"><label>Kod</label><input id="ms-code" type="text"></div>
+
+  <div class="field"><label>Telegram username</label><input id="ms-tg" type="text" placeholder="aziz_blog"></div>
+
+  <div class="field"><label>So'm</label><input id="ms-som" type="number"></div>
+
+  <button class="btn-full" onclick="addStudentModal()">Qo'shish</button>
+
+</div></div>
+
+<div class="modal-bg" id="stu-detail-modal"><div class="modal">
+
+  <button class="modal-close" onclick="hideModal('stu-detail-modal')">×</button>
+
+  <div class="modal-title" id="sdm-name">—</div>
+
+  <div id="sdm-body"></div>
+
+  <div style="display:flex;gap:8px;margin-top:16px">
+
+    <button class="btn-sm green" style="flex:1;padding:10px" onclick="adminUnlockWeek()">🔓 Keyingi hafta</button>
+
+    <button class="btn-sm red" style="flex:1;padding:10px" onclick="adminWarn()">⚠️ Ogohlantirish</button>
+
   </div>
-</div>
+
+</div></div>
+
+<div class="modal-bg" id="lead-comment-modal"><div class="modal">
+
+  <button class="modal-close" onclick="hideModal('lead-comment-modal')">×</button>
+
+  <div class="modal-title">📞 Qo'ng'iroq natijasi</div>
+
+  <input type="hidden" id="lcm-id">
+
+  <div class="field"><label>Lid darajasi</label>
+
+    <select id="lcm-status">
+
+      <option value="cold">❄️ Sovuq lid</option>
+
+      <option value="thinking">🤔 O'ylayotgan lid</option>
+
+      <option value="hot">🔥 Issiq lid</option>
+
+      <option value="enrolled">✅ Yozildi</option>
+
+      <option value="refused">❌ Rad etdi</option>
+
+    </select>
+
+  </div>
+
+  <div class="field"><label>Qo'ng'iroq izohi (itog)</label><textarea id="lcm-note" placeholder="Kechqurun qayta qo'ng'iroq so'radi..."></textarea></div>
+
+  <div class="field" id="lcm-reminder-wrap">
+
+    <label>⏰ Qayta qo'ng'iroq (sana va vaqt)</label>
+
+    <input type="datetime-local" id="lcm-datetime">
+
+    <div style="font-size:11px;color:var(--mu);margin-top:4px">10 daqiqa oldin eslatma keladi</div>
+
+  </div>
+
+  <button class="btn-full" onclick="saveLeadComment()">Saqlash</button>
+
+</div></div>
 
 <!-- ══ STUDENT APP ══ -->
+
 <div class="page" id="p-student">
+
   <div class="stu-header">
-    <div class="stu-logo">A<span>A</span>A</div>
+
+    <div class="stu-logo">EDU<span>BLOG</span></div>
+
     <div class="stu-user"><b id="stu-name-h">—</b> · <span id="stu-bal-h">0 bayt</span></div>
+
     <button class="btn-sm red" onclick="doLogout()">Chiqish</button>
+
   </div>
+
   <div class="stu-main">
-    <!-- Calf -->
-    <div class="calf-card">
-      <div class="calf-svg-wrap">
-        <svg id="calf-svg" width="90" height="90" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#fef3e2"/><stop offset="1" stop-color="#e7c9a3"/>
-            </linearGradient>
-          </defs>
-          <g id="cv-tail" style="transform-origin:152px 120px">
-            <path d="M150 118 Q170 124 168 148" fill="none" stroke="#caa478" stroke-width="6" stroke-linecap="round"/>
-            <ellipse cx="167" cy="152" rx="6" ry="9" fill="#8a6a44"/>
-          </g>
-          <rect x="60" y="138" width="13" height="34" rx="6" fill="#d8b88f"/>
-          <rect x="120" y="138" width="13" height="34" rx="6" fill="#d8b88f"/>
-          <ellipse cx="66.5" cy="173" rx="8" ry="5" fill="#8a6a44"/>
-          <ellipse cx="126.5" cy="173" rx="8" ry="5" fill="#8a6a44"/>
-          <g id="cv-body" style="transform-origin:100px 120px">
-            <ellipse cx="100" cy="118" rx="52" ry="40" fill="url(#bg)"/>
-            <ellipse cx="78" cy="108" rx="13" ry="10" fill="#8a6a44" opacity=".5"/>
-            <ellipse cx="120" cy="128" rx="10" ry="8" fill="#8a6a44" opacity=".4"/>
-            <ellipse cx="100" cy="132" rx="34" ry="22" fill="#fffaf2" opacity=".55"/>
-          </g>
-          <rect x="74" y="146" width="13" height="30" rx="6" fill="#e7c9a3"/>
-          <rect x="106" y="146" width="13" height="30" rx="6" fill="#e7c9a3"/>
-          <ellipse cx="80.5" cy="177" rx="8" ry="5" fill="#8a6a44"/>
-          <ellipse cx="112.5" cy="177" rx="8" ry="5" fill="#8a6a44"/>
-          <g id="cv-head" style="transform-origin:100px 78px">
-            <ellipse cx="62" cy="60" rx="13" ry="9" fill="#d8b88f" transform="rotate(-30 62 60)"/>
-            <ellipse cx="138" cy="60" rx="13" ry="9" fill="#d8b88f" transform="rotate(30 138 60)"/>
-            <path d="M78 44 Q74 30 82 26" fill="none" stroke="#b8946a" stroke-width="6" stroke-linecap="round"/>
-            <path d="M122 44 Q126 30 118 26" fill="none" stroke="#b8946a" stroke-width="6" stroke-linecap="round"/>
-            <ellipse cx="100" cy="74" rx="40" ry="36" fill="url(#bg)"/>
-            <radialGradient id="chk"><stop offset="0" stop-color="#fda4af" stop-opacity=".6"/><stop offset="1" stop-color="#fda4af" stop-opacity="0"/></radialGradient>
-            <ellipse cx="70" cy="86" rx="12" ry="8" fill="url(#chk)"/>
-            <ellipse cx="130" cy="86" rx="12" ry="8" fill="url(#chk)"/>
-            <g id="cv-eyes">
-              <ellipse cx="84" cy="72" rx="7" ry="9" fill="#3b2a1a"/>
-              <ellipse cx="116" cy="72" rx="7" ry="9" fill="#3b2a1a"/>
-              <circle cx="86" cy="69" r="2.4" fill="#fff"/>
-              <circle cx="118" cy="69" r="2.4" fill="#fff"/>
-            </g>
-            <g id="cv-lids" style="transform:scaleY(0);transform-origin:center">
-              <rect x="76" y="62" width="16" height="20" rx="8" fill="#e7c9a3"/>
-              <rect x="108" y="62" width="16" height="20" rx="8" fill="#e7c9a3"/>
-            </g>
-            <ellipse cx="100" cy="94" rx="22" ry="16" fill="#f4c9b8"/>
-            <ellipse cx="92" cy="93" rx="3" ry="4" fill="#b5705f"/>
-            <ellipse cx="108" cy="93" rx="3" ry="4" fill="#b5705f"/>
-            <path d="M92 102 Q100 107 108 102" fill="none" stroke="#b5705f" stroke-width="2.5" stroke-linecap="round"/>
-          </g>
-        </svg>
-      </div>
-      <div class="calf-info">
-        <div class="calf-name" id="cv-stage">Buzoqcha</div>
-        <div class="calf-kg"><span id="cv-kg">40</span> kg</div>
-        <div class="calf-bar-wrap">
-          <div class="calf-bar-label"><span id="cv-from">40</span><span id="cv-to">55</span></div>
-          <div class="calf-bar"><div class="calf-bar-fill" id="cv-fill" style="width:0%"></div></div>
-        </div>
-      </div>
-    </div>
-    <div class="bal-row">
-      <div class="bal-box"><div class="bal-label">💰 So'm</div><div class="bal-val" id="stu-som">0</div></div>
-      <div class="bal-box"><div class="bal-label">💾 Bayt</div><div class="bal-val" id="stu-bayt">0</div></div>
-    </div>
 
-    <!-- Tabs -->
     <div class="stu-nav">
-      <button class="stu-tab active" onclick="stuTab('lessons')">📚 Testlar</button>
-      <button class="stu-tab" onclick="stuTab('tez')">🎤 Tez aytish</button>
+
+      <button class="stu-tab active" onclick="stuTab('brain')">🧠 Miya</button>
+
+      <button class="stu-tab" onclick="stuTab('lessons')">📚 Test</button>
+
+      <button class="stu-tab" onclick="stuTab('tez')">🎤 Tez</button>
+
+      <button class="stu-tab" onclick="stuTab('book')">📖 Kitob</button>
+
       <button class="stu-tab" onclick="stuTab('profile')">👤 Profil</button>
+
     </div>
 
-    <!-- Lessons tab -->
-    <div class="stu-panel on" id="st-lessons">
-      <div id="lessons-grid"><div class="loading-center"><div class="spin"></div></div></div>
+    <!-- BRAIN -->
+
+    <div class="stu-panel on" id="st-brain">
+
+      <div class="brain-hero">
+
+        <div class="brain-hello">Salom, <b id="brain-name">do'stim</b> 👋</div>
+
+        <div class="brain-title">Sening miya xaritang</div>
+
+        <div class="brain-svg-wrap">
+
+          <svg id="brain-svg" viewBox="0 0 200 200">
+
+            <defs>
+
+              <radialGradient id="brainGrad"><stop offset="0" stop-color="#9d7bff"/><stop offset="1" stop-color="#5b3fd6"/></radialGradient>
+
+              <filter id="glow2"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+
+            </defs>
+
+            <g id="brain-links" stroke="#7c5cff" stroke-width="1" opacity=".35"></g>
+
+            <g class="brain-core" filter="url(#glow2)">
+
+              <path d="M100 55 C75 55 60 72 62 92 C50 96 48 118 62 126 C64 144 84 150 100 144 C116 150 136 144 138 126 C152 118 150 96 138 92 C140 72 125 55 100 55 Z" fill="url(#brainGrad)" opacity=".9"/>
+
+              <path d="M100 60 L100 144" stroke="#4a2fc0" stroke-width="2" fill="none" opacity=".5"/>
+
+              <path d="M80 75 Q90 85 82 100 Q90 115 82 130" stroke="#c4b5fd" stroke-width="1.5" fill="none" opacity=".6"/>
+
+              <path d="M120 75 Q110 85 118 100 Q110 115 118 130" stroke="#c4b5fd" stroke-width="1.5" fill="none" opacity=".6"/>
+
+            </g>
+
+            <g id="brain-nodes"></g>
+
+          </svg>
+
+        </div>
+
+        <div class="brain-level" id="brain-level">Daraja 1 · Junior Bloger</div>
+
+        <div class="brain-xp-bar"><div class="brain-xp-fill" id="brain-xp" style="width:0%"></div></div>
+
+      </div>
+
+      <div class="skills-grid" id="skills-grid"></div>
+
+      <div class="brain-calf">
+
+        <svg width="70" height="70" viewBox="0 0 200 200" id="calf-mini"></svg>
+
+        <div class="calf-info">
+
+          <div class="calf-name" id="cv-stage">Buzoqcha</div>
+
+          <div class="calf-kg"><span id="cv-kg">40</span> kg</div>
+
+          <div class="calf-bar"><div class="calf-bar-fill" id="cv-fill" style="width:0%"></div></div>
+
+        </div>
+
+      </div>
+
+      <div class="bal-row">
+
+        <div class="bal-box"><div class="bal-label">💰 So'm</div><div class="bal-val" id="stu-som">0</div></div>
+
+        <div class="bal-box"><div class="bal-label">💾 Bayt</div><div class="bal-val" id="stu-bayt">0</div></div>
+
+      </div>
+
     </div>
 
-    <!-- Test screen (inside lessons tab) -->
+    <!-- LESSONS -->
+
+    <div class="stu-panel" id="st-lessons"><div id="lessons-grid"><div class="loading-center"><div class="spin"></div></div></div></div>
+
+    <!-- TEST -->
+
     <div class="stu-panel" id="st-test">
+
       <button class="btn-sm blue" style="margin-bottom:12px" onclick="backToLessons()">← Orqaga</button>
+
       <div class="test-wrap">
-        <div class="test-prog">
-          <div class="test-bar"><div class="test-bar-fill" id="tb-fill" style="width:0%"></div></div>
-          <div class="test-num" id="tb-num">1/5</div>
-        </div>
+
+        <div class="test-prog"><div class="test-bar"><div class="test-bar-fill" id="tb-fill" style="width:0%"></div></div><div class="test-num" id="tb-num">1/5</div></div>
+
         <div class="test-q" id="test-q">Savol...</div>
+
         <div id="test-opts"></div>
+
         <button class="btn-next" id="btn-next" onclick="nextQ()">Keyingisi →</button>
+
       </div>
+
     </div>
 
-    <!-- Tez tab -->
-    <div class="stu-panel" id="st-tez">
-      <div id="tez-grid-stu"><div class="loading-center"><div class="spin"></div></div></div>
-    </div>
+    <!-- TEZ -->
 
-    <!-- Tez lesson screen -->
+    <div class="stu-panel" id="st-tez"><div id="tez-grid-stu"><div class="loading-center"><div class="spin"></div></div></div></div>
+
+    <!-- TEZ LESSON -->
+
     <div class="stu-panel" id="st-tez-lesson">
+
       <button class="btn-sm blue" style="margin-bottom:12px" onclick="backToTez()">← Orqaga</button>
+
       <div class="voice-card">
+
         <div style="font-size:12px;color:var(--mu);font-family:var(--fm);margin-bottom:8px" id="tl-week">1-hafta</div>
+
         <div style="font-size:15px;font-weight:700;margin-bottom:10px" id="tl-title">—</div>
+
         <div class="voice-text-box" id="tl-text">—</div>
+
         <div class="voice-hint" id="tl-hint">—</div>
-        <button class="btn-record idle" id="rec-btn" onclick="toggleRecord()">🎤 Yozishni boshlash</button>
+
+        <button class="btn-record" id="rec-btn" onclick="toggleRecord()">🎤 Yozishni boshlash</button>
+
         <div id="rec-status" style="font-size:12px;color:var(--mu);text-align:center;padding:6px 0"></div>
-        <audio id="rec-preview" controls style="display:none"></audio>
+
+        <audio id="rec-preview" controls style="display:none;width:100%"></audio>
+
         <div class="voice-ctrl" id="rec-ctrl" style="display:none">
+
           <button class="btn-sm red" style="padding:10px" onclick="cancelRec()">🗑 Bekor</button>
+
           <button class="btn-sm green" id="rec-send" style="padding:10px" onclick="sendVoice()">📤 Yuborish</button>
+
         </div>
+
       </div>
-      <div id="tl-pending" style="display:none;margin-top:12px;background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:14px;text-align:center;font-size:13px;color:var(--go)">
-        ⏳ Ovozingiz ustoz tekshirmoqda...
-      </div>
+
+      <div id="tl-pending" style="display:none;margin-top:12px;background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:14px;text-align:center;font-size:13px;color:var(--go)">⏳ Ovozingiz ustoz tekshirmoqda...</div>
+
     </div>
 
-    <!-- Profile tab -->
-    <div class="stu-panel" id="st-profile">
-      <div class="tbl-wrap" style="padding:0">
-        <div style="padding:20px;border-bottom:1px solid var(--brd);text-align:center">
-          <div style="font-size:32px;font-weight:700;width:64px;height:64px;background:var(--s2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-family:var(--fm)" id="pr-av">—</div>
-          <div style="font-size:18px;font-weight:700" id="pr-name">—</div>
-          <div style="font-size:12px;color:var(--mu);margin-top:4px" id="pr-rank">—</div>
-        </div>
-        <div id="pr-rows"></div>
-      </div>
+    <!-- BOOK / REELS -->
+
+    <div class="stu-panel" id="st-book">
+
+      <div class="book-reels" id="book-reels"></div>
+
     </div>
+
+    <!-- PROFILE -->
+
+    <div class="stu-panel" id="st-profile">
+
+      <div class="tbl-wrap" style="padding:0">
+
+        <div style="padding:20px;border-bottom:1px solid var(--brd);text-align:center">
+
+          <div class="pr-av" id="pr-av">—</div>
+
+          <div style="font-size:18px;font-weight:700" id="pr-name">—</div>
+
+          <div style="font-size:12px;color:var(--mu);margin-top:4px" id="pr-rank">—</div>
+
+        </div>
+
+        <div style="padding:6px 18px" id="pr-rows"></div>
+
+      </div>
+
+    </div>
+
   </div>
+
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════
-// SUPABASE INIT
-// ══════════════════════════════════════
+
 const { createClient } = supabase;
-const sb = createClient(
-  'https://unaodltahuevrfnarfha.supabase.co',
-  'sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP'
-);
 
-// ══════════════════════════════════════
-// LESSONS DATA
-// ══════════════════════════════════════
-const LESSONS = [
-  {id:1,title:"Sun'iy intellekt do'stlarim",week:1,icon:'🤖',tests:[
-    {q:"ChatGPT qaysi kompaniya tomonidan yaratilgan?",opts:["Google","OpenAI","Apple","Microsoft"],c:1},
-    {q:"Gemini sun'iy intellektini kim yaratgan?",opts:["Apple","OpenAI","Google","Amazon"],c:2},
-    {q:"Claude sun'iy intellektini qaysi kompaniya yaratgan?",opts:["Meta","Anthropic","OpenAI","Google"],c:1},
-    {q:"Sun'iy intellekt nima qila oladi?",opts:["Faqat rasmlar chizadi","Savollarga javob beradi, she'r yozadi","Faqat o'yin o'ynaydi","Hech narsa qila olmaydi"],c:1},
-    {q:"ChatGPT birinchi marta qachon chiqdi?",opts:["2020","2021","2022","2023"],c:2}
-  ]},
-  {id:2,title:"Kamera bilan tanishuv",week:1,icon:'📱',tests:[
-    {q:"Kamera oldida gapirish uchun eng muhim narsa?",opts:["Ko'p mashq","Qimmat kamera","Ko'p pul","Mashhur bo'lish"],c:0},
-    {q:"AEIOU mashqi nima uchun kerak?",opts:["Rasm chizish","Og'iz mushagini tayyorlash","Uxlash","O'yin"],c:1},
-    {q:"Yaxshi ovoz uchun avval nima?",opts:["Baland qichqirish","Chuqur nafas olish","Suv ichish","Yugurish"],c:1},
-    {q:"Bloger bo'lish uchun eng muhim narsa?",opts:["Qimmat kamera","Ko'p pul","Muntazam mashq","Mashhur do'stlar"],c:2},
-    {q:"Video yaratishda dastlab nima kerak?",opts:["Ko'p obunachilar","Kuchli kompyuter","G'oya va mavzu","Milliy mukofot"],c:2}
-  ]},
-  {id:3,title:"Sun'iy intellekt tarixi",week:2,icon:'🧠',tests:[
-    {q:"AI g'oyasini birinchi o'ylab topgan kim?",opts:["Eynshteyn","Alan Turing","Nyuton","Tesla"],c:1},
+const sb = createClient('https://unaodltahuevrfnarfha.supabase.co','sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP');
+
+const STAFF = {
+
+  admin:     {pass:'admin2024',    name:'Administrator', role:'admin'},
+
+  marketing: {pass:'market2024',   name:'Marketolog',    role:'marketing'},
+
+  director:  {pass:'director2024', name:'Direktor',      role:'director'}
+
+};
+
+const MENUS = {
+
+  admin:     ['svodka','dash','control','students','tez','notif','activate','leads','calls'],
+
+  marketing: ['svodka','leads','calls','students'],
+
+  director:  ['svodka','dash','control','students']
+
+};
+
+const MENU_META = {
+
+  svodka:  {label:'📊 Svodka',        fn:'loadSvodka'},
+
+  dash:    {label:'📈 Dashboard',     fn:'loadAdminDash'},
+
+  control: {label:'🎯 Nazorat',       fn:'loadControl'},
+
+  students:{label:"👥 O'quvchilar",  fn:'loadStudentsTable'},
+
+  tez:     {label:'🎤 Tez aytish',    fn:'loadTezSubmissions'},
+
+  notif:   {label:'🔔 Xabarlar',      fn:'loadNotifLog'},
+
+  activate:{label:'✅ Aktivatsiya',   fn:null},
+
+  leads:   {label:'🔥 Lidlar',        fn:'loadLeads'},
+
+  calls:   {label:"📞 Qo'ng'iroqlar",fn:'loadPlannedCalls'}
+
+};
+
+const LESSONS=[
+
+  {id:1,title:"AI do'stlarim",week:1,icon:'🤖',skill:'ai',tests:[
+
+    {q:"ChatGPT ni kim yaratgan?",opts:["Google","OpenAI","Apple","Microsoft"],c:1},
+
+    {q:"Gemini ni kim yaratgan?",opts:["Apple","OpenAI","Google","Amazon"],c:2},
+
+    {q:"Claude ni kim yaratgan?",opts:["Meta","Anthropic","OpenAI","Google"],c:1},
+
+    {q:"AI nima qila oladi?",opts:["Faqat rasm","Savolga javob, she'r yozadi","Faqat o'yin","Hech narsa"],c:1},
+
+    {q:"ChatGPT qachon chiqdi?",opts:["2020","2021","2022","2023"],c:2}]},
+
+  {id:2,title:"Kamera bilan tanishuv",week:1,icon:'📱',skill:'camera',tests:[
+
+    {q:"Kamera oldida eng muhim narsa?",opts:["Ko'p mashq","Qimmat kamera","Ko'p pul","Mashhurlik"],c:0},
+
+    {q:"AEIOU mashqi nima uchun?",opts:["Rasm","Og'iz mushagi uchun","Uxlash","O'yin"],c:1},
+
+    {q:"Yaxshi ovoz uchun avval?",opts:["Qichqirish","Chuqur nafas","Suv","Yugurish"],c:1},
+
+    {q:"Bloger uchun eng muhim?",opts:["Kamera","Pul","Muntazam mashq","Do'stlar"],c:2},
+
+    {q:"Videoda dastlab nima kerak?",opts:["Obunachi","Kompyuter","G'oya va mavzu","Mukofot"],c:2}]},
+
+  {id:3,title:"AI tarixi",week:2,icon:'🧠',skill:'ai',tests:[
+
+    {q:"AI g'oyasini birinchi kim?",opts:["Eynshteyn","Alan Turing","Nyuton","Tesla"],c:1},
+
     {q:"ChatGPT qachon yaratilgan?",opts:["2010","2015","2022","2000"],c:2},
-    {q:"Sun'iy intellekt qanday o'rganadi?",opts:["Kitob o'qib","Ko'p ma'lumotlardan","Televizor ko'rib","Uxlab"],c:1},
-    {q:"AI insondan qanday farq qiladi?",opts:["Hech qachon charchamaydi","His-tuyg'uga ega","Ovqat yeydi","Uxlaydi"],c:0},
-    {q:"Mashinali o'rganish nima?",opts:["Robot yasash","Ma'lumotdan o'rganish","Mashina boshqarish","Kompyuter o'ynash"],c:1}
-  ]},
-  {id:4,title:"Ovoz va nutq mashqlari",week:2,icon:'🎙',tests:[
-    {q:"Nutq uchun eng muhim organ?",opts:["Ko'z","Quloq","Og'iz va nafas","Qo'l"],c:2},
-    {q:"Sekin va tez gapirish mashqi nima uchun?",opts:["Nutq tezligini his qilish","Uxlamaslik","Ovqat hazm","Yugurish"],c:0},
-    {q:"Yaxshi bloger uchun ovoz qanday?",opts:["Juda baland","Aniq va qulay","Juda past","Qo'rqinchli"],c:1},
-    {q:"AEIOU nima?",opts:["Raqamlar","Unli tovushlar","Undosh tovushlar","O'yin nomi"],c:1},
-    {q:"Nutq mashqini qancha vaqt qilish kerak?",opts:["Hech qachon","Har kuni 5-10 daqiqa","Haftada bir marta","Yiliga bir marta"],c:1}
-  ]},
-  {id:5,title:"OpenAI startapi tarixi",week:3,icon:'🚀',tests:[
+
+    {q:"AI qanday o'rganadi?",opts:["Kitobdan","Ko'p ma'lumotdan","TV dan","Uxlab"],c:1},
+
+    {q:"AI insondan farqi?",opts:["Charchamaydi","His-tuyg'u bor","Ovqat yeydi","Uxlaydi"],c:0},
+
+    {q:"Mashinali o'rganish nima?",opts:["Robot","Ma'lumotdan o'rganish","Mashina","O'yin"],c:1}]},
+
+  {id:4,title:"Nutq mashqlari",week:2,icon:'🎙',skill:'speech',tests:[
+
+    {q:"Nutq uchun muhim organ?",opts:["Ko'z","Quloq","Og'iz va nafas","Qo'l"],c:2},
+
+    {q:"Sekin-tez mashqi nima uchun?",opts:["Tezlikni his qilish","Uxlamaslik","Hazm","Yugurish"],c:0},
+
+    {q:"Bloger ovozi qanday?",opts:["Baland","Aniq va qulay","Past","Qo'rqinchli"],c:1},
+
+    {q:"AEIOU nima?",opts:["Raqam","Unli tovush","Undosh","O'yin"],c:1},
+
+    {q:"Nutq mashqi qancha?",opts:["Hech qachon","Har kuni 5-10 daq","Haftada bir","Yilda bir"],c:1}]},
+
+  {id:5,title:"OpenAI tarixi",week:3,icon:'🚀',skill:'ai',tests:[
+
     {q:"OpenAI qachon tashkil etilgan?",opts:["2010","2015","2020","2022"],c:1},
-    {q:"OpenAI asoschilaridan biri kim?",opts:["Mark Zukerberg","Ilon Mask","Jeff Bezos","Tim Kuk"],c:1},
-    {q:"Katta g'oyalar qanday boshlanadi?",opts:["Ko'p puldan","Mashhurlikdan","Kichik qadamdan","Omaddan"],c:2},
-    {q:"Startup nima?",opts:["Katta davlat korxonasi","Yangi texnologiya kompaniyasi","Maktab","Do'kon"],c:1},
-    {q:"OpenAI maqsadi nima?",opts:["Faqat pul ishlash","Xavfsiz AI yaratish","O'yin ishlab chiqarish","Telefon sotish"],c:1}
-  ]},
-  {id:6,title:"Emotsiyalar va kamera",week:3,icon:'😊',tests:[
-    {q:"Kamera oldida qo'rquvni yengish uchun?",opts:["Kamerani o'chirish","Ko'p mashq","Yig'lash","Qochish"],c:1},
-    {q:"Yaxshi bloger qanday bo'lishi kerak?",opts:["Doim jiddiy","Doim g'amgin","Tabiiy va samimiy","Doim kulgan"],c:2},
-    {q:"Emotsiyalarni ko'rsatish nima beradi?",opts:["Tomoshabin ko'proq tomosha qiladi","Kamera buziladi","Video qisqaradi","Hech narsa"],c:0},
-    {q:"Kamera oldida qanday tursangiz yaxshi?",opts:["Egilgan holda","Tik va erkin","Yotib","Yugurib"],c:1},
-    {q:"Birinchi videoda nima haqida gapirsangiz yaxshi?",opts:["Siyosat","O'zingiz haqida","Boshqa odamlar haqida","Pul haqida"],c:1}
-  ]},
-  {id:7,title:"Google va Anthropic",week:4,icon:'🌍',tests:[
-    {q:"Anthropic qaysi AI ni yaratgan?",opts:["ChatGPT","Gemini","Claude","Siri"],c:2},
-    {q:"Google qaysi AI yaratgan?",opts:["Claude","ChatGPT","Gemini","Alexa"],c:2},
-    {q:"AI o'rganish kelajakda nima beradi?",opts:["Hech narsa","Ko'p imkoniyatlar","Faqat o'yin","Vaqt sarflash"],c:1},
-    {q:"Dunyo miqyosidagi AI kompaniyalar qayerda?",opts:["Faqat Amerika","Faqat Yaponiya","Butun dunyo","Faqat Yevropa"],c:2},
-    {q:"AI bilan ishlash nima uchun kerak?",opts:["Shunchaki qiziq","Kelajak kasblari uchun","Vaqt o'ldirish","Hech narsa uchun"],c:1}
-  ]},
-  {id:8,title:"Birinchi qisqa vlog",week:4,icon:'🎬',tests:[
-    {q:"Yaxshi vlog uchun nima kerak?",opts:["Qimmat kamera","G'oya, ovoz va tabassum","Million dollar","Mashhur do'stlar"],c:1},
-    {q:"Birinchi vlog qancha uzun bo'lishi kerak?",opts:["1 soat","30 daqiqa","1 daqiqa","3 soat"],c:2},
-    {q:"1 oyda nima o'rgandingiz?",opts:["Hech narsa","AI, ovoz, kamera va g'oya","Faqat o'yin","Faqat rasmlar"],c:1},
-    {q:"Bloger bo'lish uchun eng muhim qadam?",opts:["Boshlash","Kutish","Pul topish","Mashhur bo'lish"],c:0},
-    {q:"Muvaffaqiyatli vlog siri nima?",opts:["Qimmat jihozlar","Muntazamlik va izchillik","Omad","Ko'p pul"],c:1}
-  ]}
+
+    {q:"OpenAI asoschisi?",opts:["Zukerberg","Ilon Mask","Bezos","Kuk"],c:1},
+
+    {q:"Katta g'oya qanday boshlanadi?",opts:["Puldan","Mashhurlikdan","Kichik qadamdan","Omaddan"],c:2},
+
+    {q:"Startup nima?",opts:["Davlat korxonasi","Yangi texnologiya kompaniyasi","Maktab","Do'kon"],c:1},
+
+    {q:"OpenAI maqsadi?",opts:["Pul","Xavfsiz AI","O'yin","Telefon"],c:1}]},
+
+  {id:6,title:"Emotsiyalar",week:3,icon:'😊',skill:'camera',tests:[
+
+    {q:"Kamera qo'rquvini yengish?",opts:["O'chirish","Ko'p mashq","Yig'lash","Qochish"],c:1},
+
+    {q:"Yaxshi bloger qanday?",opts:["Jiddiy","G'amgin","Tabiiy va samimiy","Doim kulgan"],c:2},
+
+    {q:"Emotsiya ko'rsatish nima beradi?",opts:["Ko'p tomosha","Kamera buziladi","Qisqaradi","Hech narsa"],c:0},
+
+    {q:"Kamera oldida qanday turish?",opts:["Egilgan","Tik va erkin","Yotib","Yugurib"],c:1},
+
+    {q:"Birinchi video mavzusi?",opts:["Siyosat","O'zing haqida","Boshqalar","Pul"],c:1}]},
+
+  {id:7,title:"Google va Anthropic",week:4,icon:'🌍',skill:'ai',tests:[
+
+    {q:"Anthropic qaysi AI?",opts:["ChatGPT","Gemini","Claude","Siri"],c:2},
+
+    {q:"Google qaysi AI?",opts:["Claude","ChatGPT","Gemini","Alexa"],c:2},
+
+    {q:"AI o'rganish kelajakda?",opts:["Hech narsa","Ko'p imkoniyat","O'yin","Vaqt sarfi"],c:1},
+
+    {q:"AI kompaniyalar qayerda?",opts:["Amerika","Yaponiya","Butun dunyo","Yevropa"],c:2},
+
+    {q:"AI bilan ishlash nega kerak?",opts:["Qiziq","Kelajak kasbi uchun","Vaqt","Hech narsa"],c:1}]},
+
+  {id:8,title:"Birinchi vlog",week:4,icon:'🎬',skill:'camera',tests:[
+
+    {q:"Yaxshi vlog uchun?",opts:["Kamera","G'oya, ovoz, tabassum","Million","Do'stlar"],c:1},
+
+    {q:"Birinchi vlog uzunligi?",opts:["1 soat","30 daq","1 daqiqa","3 soat"],c:2},
+
+    {q:"1 oyda nima o'rgandingiz?",opts:["Hech narsa","AI, ovoz, kamera, g'oya","O'yin","Rasm"],c:1},
+
+    {q:"Eng muhim qadam?",opts:["Boshlash","Kutish","Pul","Mashhurlik"],c:0},
+
+    {q:"Vlog siri?",opts:["Jihoz","Muntazamlik","Omad","Pul"],c:1}]}
+
 ];
 
-const TEZ = [
-  {id:1,week:1,title:"Birinchi tez aytish",text:"Sariq sarig'ich, sarig'ich sariq.",hint:"Har bir so'zni sekin ayt, keyin tezlashtir!"},
-  {id:2,week:1,title:"Ikkinchi tez aytish",text:"Bola bolali, bolali bola.",hint:"Nafas ol, so'ng tekis gapirib bor."},
-  {id:3,week:2,title:"Uchinchi tez aytish",text:"Qora qarg'a, qora qarg'a, qarg'a qora.",hint:"Q harfiga e'tibor ber!"},
-  {id:4,week:2,title:"To'rtinchi tez aytish",text:"Yashil yaproq, yaproq yashil.",hint:"Y tovushini to'g'ri talaffuz qil."},
-  {id:5,week:3,title:"Beshinchi tez aytish",text:"Olma oldi, oldi olma, olmani ol.",hint:"So'zlarni aralashtirib yubormay ayt."},
-  {id:6,week:3,title:"Oltinchi tez aytish",text:"Shovqinli shahar, shahar shovqinli.",hint:"SH harfini aniq ayt!"},
-  {id:7,week:4,title:"Yettinchi tez aytish",text:"Kichik ko'chada kichkina ko'chuk chopdi.",hint:"K va CH tovushlarini aniq ayt."},
-  {id:8,week:4,title:"Sakkizinchi tez aytish",text:"Temir temirchi temirni tindi.",hint:"T harfli so'zlar — aniq ayt! Zo'r!"}
+const TEZ=[
+
+  {id:1,week:1,title:"Birinchi",text:"Sariq sarig'ich, sarig'ich sariq.",hint:"Sekin ayt, keyin tezlashtir!"},
+
+  {id:2,week:1,title:"Ikkinchi",text:"Bola bolali, bolali bola.",hint:"Nafas ol, tekis gapir."},
+
+  {id:3,week:2,title:"Uchinchi",text:"Qora qarg'a, qarg'a qora.",hint:"Q harfiga e'tibor!"},
+
+  {id:4,week:2,title:"To'rtinchi",text:"Yashil yaproq, yaproq yashil.",hint:"Y tovushini to'g'ri ayt."},
+
+  {id:5,week:3,title:"Beshinchi",text:"Olma oldi, oldi olma.",hint:"Aralashtirmay ayt."},
+
+  {id:6,week:3,title:"Oltinchi",text:"Shovqinli shahar, shahar shovqinli.",hint:"SH ni aniq ayt!"},
+
+  {id:7,week:4,title:"Yettinchi",text:"Kichik ko'chada kichkina ko'chuk.",hint:"K va CH ni aniq ayt."},
+
+  {id:8,week:4,title:"Sakkizinchi",text:"Temir temirchi temirni tindi.",hint:"T harfli so'zlar — aniq!"}
+
 ];
 
-const WEEK_LESSONS = {1:[1,2],2:[3,4],3:[5,6],4:[7,8]};
-const WEEK_TEZ     = {1:[1,2],2:[3,4],3:[5,6],4:[7,8]};
-const CALF_STAGES  = [
-  {min:0,max:45,label:"Yangi tug'ilgan"},
-  {min:45,max:55,label:"1-hafta"},
-  {min:55,max:70,label:"2-hafta"},
-  {min:70,max:90,label:"3-hafta"},
-  {min:90,max:120,label:"4-hafta"},
-  {min:120,max:999,label:"Katta buzoq"}
+const BOOK_QUOTES=[
+
+  {emoji:'🦊',q:"Eng muhim narsalar ko'zga ko'rinmaydi, ular faqat yurak bilan ko'riladi.",author:"Antuan de Sent-Ekzyuperi",book:"Kichkina shahzoda"},
+
+  {emoji:'🧙',q:"Boshlash uchun ajoyib bo'lish shart emas, lekin ajoyib bo'lish uchun boshlash shart.",author:"Xalq donoligi",book:"Hikmatlar"},
+
+  {emoji:'🦁',q:"Qo'rquvni yengish — bu jasoratning boshlanishi.",author:"K.S. Lyuis",book:"Narniya yilnomalari"},
+
+  {emoji:'🐉',q:"Kitob o'qigan inson ming hayot yashaydi, o'qimagan esa faqat bittasini.",author:"Jorj Martin",book:"Hikmatli so'zlar"},
+
+  {emoji:'🌟',q:"Sehr — bu o'ziga ishonishdan boshlanadi.",author:"J.K. Rouling",book:"Garri Potter"},
+
+  {emoji:'🐧',q:"Har bir katta sayohat bitta kichik qadamdan boshlanadi.",author:"Lao Tszi",book:"Dao haqida"},
+
+  {emoji:'🦋',q:"O'zgarishdan qo'rqma — kapalak ham avval qurt bo'lgan.",author:"Xalq maqoli",book:"Tabiat hikmatlari"},
+
+  {emoji:'🚀',q:"Orzu qilishni to'xtatma — orzular bizni oldinga yetaklaydi.",author:"Uolt Disney",book:"Hayot saboqlari"},
+
+  {emoji:'📚',q:"Bilim — bu yagona xazina, uni hech kim o'g'irlay olmaydi.",author:"Xalq donoligi",book:"Hikmatlar"},
+
+  {emoji:'🌈',q:"Xato qilishdan qo'rqma — bu o'rganishning bir qismi.",author:"Tomas Edison",book:"Ixtirochi saboqlari"}
+
 ];
 
-// ══════════════════════════════════════
-// STATE
-// ══════════════════════════════════════
-let currentUser = null; // student row
-let currentRole = null; // 'student'|'admin'
-let lessonAccess = [];
-let tezAccess = [];
-let currentLesson = null, curQ = 0, testAnswers = [];
-let currentTez = null;
-let mediaRec = null, audioChunks = [], audioBlob = null, audioStream = null;
-let allStudents = [];
-let selectedStudentId = null;
+const WEEK_LESSONS={1:[1,2],2:[3,4],3:[5,6],4:[7,8]};
 
-// ══════════════════════════════════════
-// UTILS
-// ══════════════════════════════════════
-function showPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  document.getElementById(id).classList.add('on');
-}
-function toast(msg, type='ok'){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='toast on '+(type==='ok'?'ok':'err');
-  setTimeout(()=>t.classList.remove('on'),2800);
-}
+const WEEK_TEZ={1:[1,2],2:[3,4],3:[5,6],4:[7,8]};
+
+const CALF_STAGES=[{min:0,max:45,label:"Yangi tug'ilgan"},{min:45,max:55,label:"1-hafta"},{min:55,max:70,label:"2-hafta"},{min:70,max:90,label:"3-hafta"},{min:90,max:120,label:"4-hafta"},{min:120,max:999,label:"Katta buzoq"}];
+
+const SKILLS={ai:{emoji:'🤖',name:'AI bilimi',color:'#7c5cff'},camera:{emoji:'📹',name:'Kamera',color:'#22d3ee'},speech:{emoji:'🎙',name:'Nutq',color:'#34d399'},blogging:{emoji:'✨',name:'Bloging',color:'#fbbf24'}};
+
+let currentUser=null, currentStaff=null;
+
+let lessonAccess=[], tezAccess=[];
+
+let currentLesson=null, curQ=0, testAnswers=[];
+
+let currentTez=null;
+
+let mediaRec=null, audioChunks=[], audioBlob=null, audioStream=null;
+
+let allStudents=[], allLeads=[], leadsFilter='all', selectedStudentId=null;
+
+let reminderTimers={};
+
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.getElementById(id).classList.add('on');}
+
+function toast(m,t='ok'){const e=document.getElementById('toast');e.textContent=m;e.className='toast on '+(t==='ok'?'ok':'err');setTimeout(()=>e.classList.remove('on'),2800);}
+
 function fmt(n){return Number(n||0).toLocaleString('ru')}
-function ini(name){return(name||'?').split(' ').map(n=>n[0]||'').join('').slice(0,2).toUpperCase()||'?'}
+
+function ini(n){return(n||'?').split(' ').map(x=>x[0]||'').join('').slice(0,2).toUpperCase()||'?'}
+
 function showModal(id){document.getElementById(id).classList.add('on')}
+
 function hideModal(id){document.getElementById(id).classList.remove('on')}
 
-// ══════════════════════════════════════
-// AUTH
-// ══════════════════════════════════════
-const ADMIN_CODE = 'admin2024'; // учитель меняет пароль тут
+function saveSession(type,data){try{localStorage.setItem('edu_session',JSON.stringify({type,data,ts:Date.now()}))}catch(e){}}
 
-function showLogin(role){
-  currentRole = role;
-  document.getElementById('login-title').textContent = role==='admin' ? '🛡 Ustoz kirish' : '🎓 O\'quvchi kirish';
-  document.getElementById('login-sub').textContent   = role==='admin' ? 'Admin parolini kiriting' : 'Ustoz bergan kodni kiriting';
-  document.getElementById('li-pass-label').textContent = role==='admin' ? 'Admin paroli' : 'Kirish kodi';
-  document.getElementById('li-pass-wrap').style.display = 'flex';
-  document.getElementById('li-name').style.display = role==='admin' ? 'none' : 'block';
-  document.getElementById('li-err').style.display='none';
-  document.getElementById('li-name').value='';
-  document.getElementById('li-pass').value='';
-  showPage('p-login');
+function clearSession(){try{localStorage.removeItem('edu_session')}catch(e){}}
+
+async function restoreSession(){
+
+  let s;try{s=JSON.parse(localStorage.getItem('edu_session'))}catch(e){return false}
+
+  if(!s)return false;
+
+  if(s.type==='staff'){currentStaff=s.data;enterStaffPanel();return true;}
+
+  if(s.type==='student'){
+
+    const {data}=await sb.from('students').select('*').eq('id',s.data.id).single();
+
+    if(data&&data.is_active===1){currentUser=data;await loadStudentApp();showPage('p-student');return true;}
+
+  }
+
+  return false;
+
 }
 
+function selectCourse(course){
+
+  if(course==='bolalar'){
+
+    document.getElementById('li-icon').textContent='🐄';
+
+    document.getElementById('login-title').textContent="Child Blog — kirish";
+
+    document.getElementById('login-sub').textContent="Ustoz bergan kodni kiriting";
+
+    showPage('p-login');
+
+  }
+
+}
+
+function showStaffLogin(){showPage('p-staff-login');}
+
 async function doLogin(){
-  const name = document.getElementById('li-name').value.trim();
-  const pass  = document.getElementById('li-pass').value.trim();
-  const err   = document.getElementById('li-err');
-  const btn   = document.getElementById('li-btn');
+
+  const name=document.getElementById('li-name').value.trim();
+
+  const pass=document.getElementById('li-pass').value.trim();
+
+  const err=document.getElementById('li-err'),btn=document.getElementById('li-btn');
+
   err.style.display='none';
-  if(!pass){err.textContent='Kodni kiriting';err.style.display='block';return;}
-  btn.disabled=true; btn.textContent='Tekshirilmoqda...';
 
-  if(currentRole==='admin'){
-    if(pass===ADMIN_CODE){
-      document.getElementById('admin-name-sb').textContent='Ustoz';
-      showPage('p-admin');
-      loadAdminDash();
-      loadTezSubmissions();
-      loadInactiveList();
-      loadNotifLog();
-      loadStudentsTable();
-    } else {
-      err.textContent="Noto'g'ri parol"; err.style.display='block';
-    }
-    btn.disabled=false; btn.textContent='Kirish'; return;
-  }
+  if(!name||!pass){err.textContent='Ism va kodni kiriting';err.style.display='block';return;}
 
-  // Student login: match name + access_code
-  if(!name){err.textContent='Ismingizni kiriting';err.style.display='block';btn.disabled=false;btn.textContent='Kirish';return;}
-  const {data,error} = await sb.from('students')
-    .select('*').ilike('full_name',name).eq('access_code',pass).eq('is_active',1).single();
-  if(error||!data){
-    err.textContent="Ism yoki kod noto'g'ri, yoki hisob faolsiz";
-    err.style.display='block'; btn.disabled=false; btn.textContent='Kirish'; return;
-  }
-  currentUser = data;
+  btn.disabled=true;btn.textContent='Tekshirilmoqda...';
+
+  const {data,error}=await sb.from('students').select('*').ilike('full_name',name).eq('access_code',pass).eq('is_active',1).maybeSingle();
+
+  if(error||!data){err.textContent="Ism yoki kod noto'g'ri yoki faolsiz";err.style.display='block';btn.disabled=false;btn.textContent='Kirish';return;}
+
+  currentUser=data;
+
+  saveSession('student',{id:data.id});
+
   await loadStudentApp();
+
   showPage('p-student');
-  btn.disabled=false; btn.textContent='Kirish';
+
+  btn.disabled=false;btn.textContent='Kirish';
+
+}
+
+function doStaffLogin(){
+
+  const role=document.getElementById('staff-role').value;
+
+  const pass=document.getElementById('staff-pass').value.trim();
+
+  const err=document.getElementById('staff-err');
+
+  err.style.display='none';
+
+  const s=STAFF[role];
+
+  if(!s||pass!==s.pass){err.textContent="Noto'g'ri parol";err.style.display='block';return;}
+
+  currentStaff={role:s.role,name:s.name};
+
+  saveSession('staff',currentStaff);
+
+  enterStaffPanel();
+
+}
+
+function enterStaffPanel(){
+
+  const role=currentStaff.role;
+
+  document.getElementById('sb-role').textContent=role.toUpperCase();
+
+  document.getElementById('staff-name-sb').textContent=currentStaff.name;
+
+  document.getElementById('staff-role-sb').textContent=role==='admin'?'Administrator':role==='marketing'?'Marketolog':'Direktor';
+
+  const nav=document.getElementById('sb-nav');
+
+  const items=MENUS[role]||MENUS.admin;
+
+  nav.innerHTML=items.map((k,i)=>`<div class="sb-item ${i===0?'active':''}" data-panel="${k}" onclick="navTo('${k}',this)">${MENU_META[k].label}</div>`).join('');
+
+  showPage('p-admin');
+
+  navTo(items[0],nav.querySelector('.sb-item'));
+
+}
+
+function navTo(panel,el){
+
+  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('on'));
+
+  document.getElementById('ap-'+panel).classList.add('on');
+
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+
+  if(el)el.classList.add('active');
+
+  const fn=MENU_META[panel].fn;
+
+  if(fn&&window[fn])window[fn]();
+
 }
 
 function doLogout(){
-  currentUser=null; currentRole=null;
-  lessonAccess=[]; tezAccess=[];
+
+  currentUser=null;currentStaff=null;lessonAccess=[];tezAccess=[];
+
+  clearSession();
+
   showPage('p-land');
+
 }
 
-// ══════════════════════════════════════
-// STUDENT APP
-// ══════════════════════════════════════
+function calfSVG(){return `<defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fef3e2"/><stop offset="1" stop-color="#e7c9a3"/></linearGradient></defs>
+<ellipse cx="100" cy="118" rx="52" ry="40" fill="url(#cg)"/><ellipse cx="78" cy="108" rx="13" ry="10" fill="#8a6a44" opacity=".5"/>
+<g style="transform-origin:100px 78px"><ellipse cx="62" cy="60" rx="13" ry="9" fill="#d8b88f" transform="rotate(-30 62 60)"/><ellipse cx="138" cy="60" rx="13" ry="9" fill="#d8b88f" transform="rotate(30 138 60)"/>
+<path d="M78 44 Q74 30 82 26" fill="none" stroke="#b8946a" stroke-width="6" stroke-linecap="round"/><path d="M122 44 Q126 30 118 26" fill="none" stroke="#b8946a" stroke-width="6" stroke-linecap="round"/>
+<ellipse cx="100" cy="74" rx="40" ry="36" fill="url(#cg)"/><ellipse cx="84" cy="72" rx="6" ry="8" fill="#3b2a1a"/><ellipse cx="116" cy="72" rx="6" ry="8" fill="#3b2a1a"/>
+<ellipse cx="100" cy="94" rx="20" ry="14" fill="#f4c9b8"/><ellipse cx="93" cy="93" rx="2.5" ry="3.5" fill="#b5705f"/><ellipse cx="107" cy="93" rx="2.5" ry="3.5" fill="#b5705f"/></g>`;}
+
 async function loadStudentApp(){
-  const s = currentUser;
-  document.getElementById('stu-name-h').textContent = s.full_name;
-  document.getElementById('stu-bal-h').textContent  = fmt(s.bytes_balance)+' bayt';
-  document.getElementById('stu-som').textContent    = fmt(s.som_balance);
-  document.getElementById('stu-bayt').textContent   = fmt(s.bytes_balance);
-  document.getElementById('pr-name').textContent    = s.full_name;
-  document.getElementById('pr-rank').textContent    = (s.rank||'Junior')+' · Lv'+(s.level||1);
-  document.getElementById('pr-av').textContent      = ini(s.full_name);
+
+  const s=currentUser;
+
+  document.getElementById('stu-name-h').textContent=s.full_name;
+
+  document.getElementById('stu-bal-h').textContent=fmt(s.bytes_balance)+' bayt';
+
+  document.getElementById('brain-name').textContent=(s.full_name||'').split(' ')[0]||"do'stim";
+
+  document.getElementById('stu-som').textContent=fmt(s.som_balance);
+
+  document.getElementById('stu-bayt').textContent=fmt(s.bytes_balance);
+
+  document.getElementById('pr-name').textContent=s.full_name;
+
+  document.getElementById('pr-rank').textContent=(s.rank||'Junior')+' · Lv'+(s.level||1);
+
+  document.getElementById('pr-av').textContent=ini(s.full_name);
+
+  document.getElementById('calf-mini').innerHTML=calfSVG();
+
   updateCalf(s.calf_kg||40);
-  startCalfAnim();
 
-  // Load access
-  const {data:la} = await sb.from('lesson_access').select('*').eq('student_id',s.id);
-  lessonAccess = la||[];
-  const {data:ta} = await sb.from('tez_aytish_access').select('*').eq('student_id',s.id);
-  tezAccess = ta||[];
+  const {data:la}=await sb.from('lesson_access').select('*').eq('student_id',s.id);lessonAccess=la||[];
 
-  renderProfile();
-  renderLessonsGrid();
-  renderTezGrid();
+  const {data:ta}=await sb.from('tez_aytish_access').select('*').eq('student_id',s.id);tezAccess=ta||[];
+
+  renderBrain();renderProfile();renderLessonsGrid();renderTezGrid();renderBook();
+
 }
 
 function updateCalf(kg){
-  const stage = CALF_STAGES.find(s=>kg>=s.min&&kg<s.max)||CALF_STAGES[CALF_STAGES.length-1];
-  const next  = CALF_STAGES.find(s=>kg<s.max)||CALF_STAGES[CALF_STAGES.length-1];
-  const pct   = Math.min(((kg-next.min)/(next.max-next.min))*100,100);
-  document.getElementById('cv-stage').textContent = stage.label;
-  document.getElementById('cv-kg').textContent    = Math.round(kg);
-  document.getElementById('cv-fill').style.width  = pct+'%';
-  document.getElementById('cv-from').textContent  = next.min+' kg';
-  document.getElementById('cv-to').textContent    = next.max+' kg';
+
+  const st=CALF_STAGES.find(s=>kg>=s.min&&kg<s.max)||CALF_STAGES[CALF_STAGES.length-1];
+
+  const nx=CALF_STAGES.find(s=>kg<s.max)||CALF_STAGES[CALF_STAGES.length-1];
+
+  document.getElementById('cv-stage').textContent=st.label;
+
+  document.getElementById('cv-kg').textContent=Math.round(kg);
+
+  document.getElementById('cv-fill').style.width=Math.min(((kg-nx.min)/(nx.max-nx.min))*100,100)+'%';
+
 }
 
-// Calf animations
-function startCalfAnim(){
-  const body=document.getElementById('cv-body');
-  const head=document.getElementById('cv-head');
-  const tail=document.getElementById('cv-tail');
-  const lids=document.getElementById('cv-lids');
-  if(body&&body.animate){
-    body.animate([{transform:'scale(1,1)'},{transform:'scale(1.03,1.04)'},{transform:'scale(1,1)'}],{duration:3200,iterations:Infinity,easing:'ease-in-out'});
-  }
-  if(head&&head.animate){
-    head.animate([{transform:'translateY(0) rotate(0deg)'},{transform:'translateY(-2px) rotate(-1.5deg)'},{transform:'translateY(0)'}],{duration:5000,iterations:Infinity,easing:'ease-in-out'});
-  }
-  if(tail&&tail.animate){
-    tail.animate([{transform:'rotate(0deg)'},{transform:'rotate(-16deg)'},{transform:'rotate(8deg)'},{transform:'rotate(0deg)'}],{duration:1400,iterations:Infinity,easing:'ease-in-out'});
-  }
-  function blink(){
-    if(lids&&lids.animate) lids.animate([{transform:'scaleY(0)'},{transform:'scaleY(1)'},{transform:'scaleY(0)'}],{duration:260,easing:'ease-in-out'});
-    setTimeout(blink,2200+Math.random()*3000);
-  }
-  blink();
-}
+function renderBrain(){
 
-// ── LESSONS GRID ──
-function renderLessonsGrid(){
-  const c = document.getElementById('lessons-grid');
-  const weeks = {1:[],2:[],3:[],4:[]};
-  LESSONS.forEach(l=>weeks[l.week].push(l));
-  let html='';
-  [1,2,3,4].forEach(wk=>{
-    const items = weeks[wk];
-    const hasAccess = items.some(l=>lessonAccess.find(a=>a.lesson_id===l.id));
-    const allDone   = items.every(l=>{const a=lessonAccess.find(x=>x.lesson_id===l.id);return a&&a.test_passed===1;});
-    const wkBadge   = !hasAccess?'<span class="badge inactive">🔒 Yopiq</span>':allDone?'<span class="badge active">✅</span>':'<span class="badge pending">📂 Ochiq</span>';
-    html+=`<div class="week-folder"><div class="week-head"><div class="week-head-title">📁 ${wk}-hafta</div>${wkBadge}</div><div class="week-items-grid">`;
-    items.forEach(l=>{
-      const acc = lessonAccess.find(a=>a.lesson_id===l.id);
-      const done = acc&&acc.test_passed===1;
-      const open = acc&&!done;
-      const lock = !acc;
-      const cls  = lock?'locked':done?'done':'';
-      const badge= lock?'<span class="lesson-badge lock">🔒</span>':done?'<span class="lesson-badge done">✅</span>':'<span class="lesson-badge open">📖</span>';
-      const click= open?`openLesson(${l.id})`:done?`alert('Allaqachon o\\'tilgan!')`:``; 
-      html+=`<div class="lesson-cell ${cls}" ${click?`onclick="${click}"`:''}>${badge}<div class="lesson-num">${l.id}-dars</div><span class="lesson-icon">${l.icon}</span><div class="lesson-title">${l.title}</div></div>`;
-    });
-    html+=`</div></div>`;
+  const skillScores={ai:0,camera:0,speech:0,blogging:0};
+
+  const skillMax={ai:0,camera:0,speech:0,blogging:0};
+
+  LESSONS.forEach(l=>{
+
+    const sk=l.skill||'blogging';skillMax[sk]++;
+
+    const acc=lessonAccess.find(a=>a.lesson_id===l.id&&a.test_passed===1);
+
+    if(acc)skillScores[sk]++;
+
   });
-  c.innerHTML=html;
+
+  const totalDone=lessonAccess.filter(a=>a.test_passed===1).length;
+
+  skillScores.blogging=totalDone;skillMax.blogging=LESSONS.length;
+
+  document.getElementById('skills-grid').innerHTML=Object.entries(SKILLS).map(([k,v])=>{
+
+    const pct=skillMax[k]?Math.round((skillScores[k]/skillMax[k])*100):0;
+
+    return `<div class="skill-card"><div class="skill-card-top"><span class="skill-emoji">${v.emoji}</span><span class="skill-name">${v.name}</span></div>
+
+      <div class="skill-ring"><span class="skill-pct">${pct}%</span><div class="skill-prog"><div class="skill-prog-fill" style="width:${pct}%;background:${v.color}"></div></div></div></div>`;
+
+  }).join('');
+
+  const lvl=Math.floor(totalDone/2)+1;
+
+  const xpPct=((totalDone%2)/2)*100;
+
+  document.getElementById('brain-level').textContent=`Daraja ${lvl} · ${totalDone>=6?'Pro':totalDone>=3?'Middle':'Junior'} Bloger`;
+
+  document.getElementById('brain-xp').style.width=(totalDone>=8?100:xpPct)+'%';
+
+  const nodes=Object.entries(SKILLS).map(([k,v],i)=>{
+
+    const ang=(i/4)*Math.PI*2-Math.PI/2;
+
+    const r=58, cx=100+Math.cos(ang)*r, cy=100+Math.sin(ang)*r;
+
+    const active=skillScores[k]>0;
+
+    const sz=active?7:4;
+
+    return `<circle class="skill-node" cx="${cx}" cy="${cy}" r="${sz}" fill="${active?v.color:'#3a3a4a'}" style="animation-delay:${i*0.5}s" opacity="${active?1:.5}"/>
+
+      <text x="${cx}" y="${cy+22}" text-anchor="middle" font-size="9" fill="${active?v.color:'#5f6675'}" font-family="DM Mono">${v.emoji}</text>`;
+
+  }).join('');
+
+  document.getElementById('brain-nodes').innerHTML=nodes;
+
+  const links=Object.keys(SKILLS).map((k,i)=>{
+
+    const ang=(i/4)*Math.PI*2-Math.PI/2;const r=58;
+
+    return `<line x1="100" y1="100" x2="${100+Math.cos(ang)*r}" y2="${100+Math.sin(ang)*r}"/>`;
+
+  }).join('');
+
+  document.getElementById('brain-links').innerHTML=links;
+
 }
 
-// ── TEST ──
-function openLesson(id){
-  currentLesson = LESSONS.find(l=>l.id===id);
-  curQ=0; testAnswers=new Array(currentLesson.tests.length).fill(null);
-  stuTab('test'); showQ(0);
-}
-function showQ(idx){
-  const q=currentLesson.tests[idx], total=currentLesson.tests.length;
-  document.getElementById('tb-fill').style.width=((idx/total)*100)+'%';
-  document.getElementById('tb-num').textContent=`${idx+1}/${total}`;
-  document.getElementById('test-q').textContent=q.q;
-  document.getElementById('btn-next').style.display='none';
-  document.getElementById('test-opts').innerHTML=q.opts.map((o,i)=>
-    `<button class="opt" onclick="pickAns(${i})" id="opt${i}">${o}</button>`
-  ).join('');
-}
-function pickAns(sel){
-  if(testAnswers[curQ]!==null)return;
-  testAnswers[curQ]=sel;
-  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
-  document.getElementById(`opt${sel}`).classList.add('correct');
-  document.getElementById('btn-next').style.display='block';
-}
-async function nextQ(){
-  curQ++;
-  if(curQ<currentLesson.tests.length){showQ(curQ);return;}
-  // Submit
-  const score=testAnswers.reduce((s,a,i)=>s+(a===currentLesson.tests[i].c?1:0),0);
-  const total=currentLesson.tests.length;
-  const bytes=score*5;
-  // Save to DB
-  await sb.from('lesson_access').upsert({student_id:currentUser.id,lesson_id:currentLesson.id,test_passed:1},{onConflict:'student_id,lesson_id'});
-  await sb.from('bytes_transactions').insert({student_id:currentUser.id,amount:bytes,reason:`${currentLesson.id}-dars testi`});
-  await sb.from('students').update({bytes_balance:currentUser.bytes_balance+bytes,calf_kg:(currentUser.calf_kg||40)+2}).eq('id',currentUser.id);
-  currentUser.bytes_balance+=bytes; currentUser.calf_kg=(currentUser.calf_kg||40)+2;
-  // Maybe unlock next week
-  const week = currentLesson.week;
-  const weekLessons = WEEK_LESSONS[week];
-  const weekTez     = WEEK_TEZ[week];
-  lessonAccess = lessonAccess.filter(a=>a.lesson_id!==currentLesson.id);
-  lessonAccess.push({lesson_id:currentLesson.id,test_passed:1});
-  const allTestsDone = weekLessons.every(lid=>lessonAccess.find(a=>a.lesson_id===lid&&a.test_passed===1));
-  const allTezDone   = weekTez.every(tid=>{const a=tezAccess.find(x=>x.lesson_id===tid);return a&&a.status==='done';});
-  if(allTestsDone&&allTezDone&&week<4){
-    const nextW=week+1;
-    for(const lid of WEEK_LESSONS[nextW]){await sb.from('lesson_access').upsert({student_id:currentUser.id,lesson_id:lid,test_passed:0},{onConflict:'student_id,lesson_id'});}
-    for(const tid of WEEK_TEZ[nextW]){await sb.from('tez_aytish_access').upsert({student_id:currentUser.id,lesson_id:tid,status:'open'},{onConflict:'student_id,lesson_id'});}
-    toast(`🎉 ${nextW}-hafta ochildi!`);
-  }
-  // Show result
-  document.getElementById('test-q').textContent=`Natija: ${score}/${total} — +${bytes} bayt!`;
-  document.getElementById('test-opts').innerHTML='';
-  document.getElementById('btn-next').textContent='← Darslarga qaytish';
-  document.getElementById('btn-next').onclick=backToLessons;
-  document.getElementById('btn-next').style.display='block';
-  updateCalf(currentUser.calf_kg);
-  document.getElementById('stu-bayt').textContent=fmt(currentUser.bytes_balance);
-  document.getElementById('stu-bal-h').textContent=fmt(currentUser.bytes_balance)+' bayt';
-}
-function backToLessons(){
-  const {data:la} = sb.from('lesson_access').select('*').eq('student_id',currentUser.id).then(r=>{
-    lessonAccess=r.data||lessonAccess;
-    renderLessonsGrid();
-  });
-  document.getElementById('btn-next').onclick=nextQ;
-  document.getElementById('btn-next').textContent='Keyingisi →';
-  stuTab('lessons');
+function renderBook(){
+
+  const colors=['#1a1330','#0f1e2e','#1e1a0f','#1a0f1e','#0f1e16','#1e0f0f'];
+
+  document.getElementById('book-reels').innerHTML=BOOK_QUOTES.map((q,i)=>`
+
+    <div class="reel" style="background:radial-gradient(ellipse 80% 60% at 50% 40%,${colors[i%colors.length]},var(--bg))">
+
+      <div class="reel-emoji">${q.emoji}</div>
+
+      <div class="reel-quote">"${q.q}"</div>
+
+      <div class="reel-author">— ${q.author}</div>
+
+      <div class="reel-book">📖 ${q.book}</div>
+
+      ${i===0?'<div class="reel-hint">↑ Surib o\'qing</div>':''}
+
+    </div>`).join('');
+
 }
 
-// ── TEZ AYTISH ──
-function renderTezGrid(){
-  const c=document.getElementById('tez-grid-stu');
-  const weeks={1:[],2:[],3:[],4:[]};
-  TEZ.forEach(l=>weeks[l.week].push(l));
-  let html='';
-  [1,2,3,4].forEach(wk=>{
-    const items=weeks[wk];
-    const hasA=items.some(l=>tezAccess.find(a=>a.lesson_id===l.id&&a.status!=='locked'));
-    const allD=items.every(l=>{const a=tezAccess.find(x=>x.lesson_id===l.id);return a&&a.status==='done';});
-    const wkB=!hasA?'<span class="badge inactive">🔒 Yopiq</span>':allD?'<span class="badge active">✅</span>':'<span class="badge pending">📂 Ochiq</span>';
-    html+=`<div class="week-folder"><div class="week-head"><div class="week-head-title">📁 ${wk}-hafta</div>${wkB}</div><div class="week-items-grid">`;
-    items.forEach(l=>{
-      const acc=tezAccess.find(a=>a.lesson_id===l.id);
-      const s=acc?acc.status:'locked';
-      const cls=s==='locked'?'locked':s==='done'?'done':s==='pending'?'pending':'';
-      const badge=s==='locked'?'<span class="tez-badge lock">🔒</span>':s==='done'?'<span class="tez-badge done">✅</span>':s==='pending'?'<span class="tez-badge pending">⏳</span>':'<span class="tez-badge open">🎤</span>';
-      const click=s==='open'?`openTez(${l.id})`:s==='done'?`alert('Bajarilgan!')`:s==='pending'?`alert('Ustoz tekshirmoqda...')`:s==='locked'?`alert('Bu hafta hali yopiq!')` :'';
-      html+=`<div class="tez-cell ${cls}" onclick="${click}">${badge}<div class="tez-num">${l.id}-dars</div><span class="tez-icon">🎙</span><div class="tez-title-small">${l.title}</div></div>`;
-    });
-    html+=`</div></div>`;
-  });
-  c.innerHTML=html;
-}
-function openTez(id){
-  currentTez=TEZ.find(l=>l.id===id);
-  document.getElementById('tl-week').textContent=currentTez.week+'-hafta';
-  document.getElementById('tl-title').textContent=currentTez.title;
-  document.getElementById('tl-text').textContent=currentTez.text;
-  document.getElementById('tl-hint').textContent='💡 '+currentTez.hint;
-  resetRecUI();
-  stuTab('tez-lesson');
-}
-function backToTez(){
-  sb.from('tez_aytish_access').select('*').eq('student_id',currentUser.id).then(r=>{
-    tezAccess=r.data||tezAccess; renderTezGrid();
-  });
-  stuTab('tez');
-}
-function resetRecUI(){
-  audioBlob=null;audioChunks=[];
-  document.getElementById('rec-btn').textContent='🎤 Yozishni boshlash';
-  document.getElementById('rec-btn').className='btn-record idle';
-  document.getElementById('rec-status').textContent='';
-  document.getElementById('rec-preview').style.display='none';
-  document.getElementById('rec-preview').src='';
-  document.getElementById('rec-ctrl').style.display='none';
-  document.getElementById('tl-pending').style.display='none';
-}
-async function toggleRecord(){
-  if(mediaRec&&mediaRec.state==='recording'){mediaRec.stop();return;}
-  try{
-    audioStream=await navigator.mediaDevices.getUserMedia({audio:true});
-    audioChunks=[];
-    mediaRec=new MediaRecorder(audioStream);
-    mediaRec.ondataavailable=e=>{if(e.data.size>0)audioChunks.push(e.data);};
-    mediaRec.onstop=()=>{
-      audioBlob=new Blob(audioChunks,{type:'audio/ogg;codecs=opus'});
-      const url=URL.createObjectURL(audioBlob);
-      const ap=document.getElementById('rec-preview');
-      ap.src=url;ap.style.display='block';
-      document.getElementById('rec-ctrl').style.display='grid';
-      document.getElementById('rec-btn').textContent='🔄 Qayta yozish';
-      document.getElementById('rec-btn').className='btn-record idle';
-      document.getElementById('rec-status').textContent="✅ Yozildi! Eshitib ko'ring.";
-      audioStream.getTracks().forEach(t=>t.stop());
-    };
-    mediaRec.start();
-    document.getElementById('rec-btn').textContent="⏹ To'xtatish";
-    document.getElementById('rec-btn').className='btn-record recording';
-    document.getElementById('rec-status').textContent='🔴 Yozilmoqda...';
-    document.getElementById('rec-ctrl').style.display='none';
-    document.getElementById('rec-preview').style.display='none';
-  }catch(e){alert('Mikrofonga ruxsat bering!');}
-}
-function cancelRec(){resetRecUI();}
-async function sendVoice(){
-  if(!audioBlob||!currentTez)return;
-  const btn=document.getElementById('rec-send');
-  btn.disabled=true;btn.textContent='Yuborilmoqda...';
-  try{
-    // Upload to Supabase Storage
-    const fileName=`tez/${currentUser.id}_${currentTez.id}_${Date.now()}.ogg`;
-    const {data:upData,error:upErr}=await sb.storage.from('voices').upload(fileName,audioBlob,{contentType:'audio/ogg'});
-    if(upErr)throw upErr;
-    const {data:urlData}=sb.storage.from('voices').getPublicUrl(fileName);
-    const voiceUrl=urlData.publicUrl;
-    // Save submission
-    await sb.from('tez_aytish_submissions').insert({student_id:currentUser.id,lesson_id:currentTez.id,voice_url:voiceUrl,status:'pending'});
-    await sb.from('tez_aytish_access').upsert({student_id:currentUser.id,lesson_id:currentTez.id,status:'pending'},{onConflict:'student_id,lesson_id'});
-    tezAccess=tezAccess.filter(a=>a.lesson_id!==currentTez.id);
-    tezAccess.push({lesson_id:currentTez.id,status:'pending'});
-    document.getElementById('rec-btn').style.display='none';
-    document.getElementById('rec-ctrl').style.display='none';
-    document.getElementById('tl-pending').style.display='block';
-    toast('Ovoz yuborildi! Ustoz tekshiradi.');
-  }catch(e){
-    btn.disabled=false;btn.textContent='📤 Yuborish';
-    toast('Xatolik: '+e.message,'err');
-  }
-}
-
-// ── PROFILE ──
-function renderProfile(){
-  const s=currentUser;
-  const rows=[
-    ['Ism',s.full_name],['Daraja',`${s.rank||'Junior'} · Lv${s.level||1}`],
-    ['Bayt',fmt(s.bytes_balance)+' bayt'],["So'm",fmt(s.som_balance)+" so'm"],
-    ['Buzoq',Math.round(s.calf_kg||40)+' kg'],['Streak',`${s.streak_days||0} kun`]
-  ];
-  document.getElementById('pr-rows').innerHTML=rows.map(([k,v])=>`<div class="info-row"><span class="info-key">${k}</span><span class="info-val">${v}</span></div>`).join('');
-}
-
-// ── TABS ──
 function stuTab(name){
-  document.querySelectorAll('.stu-tab').forEach((t,i)=>{
-    const tabs=['lessons','tez','profile'];
-    t.classList.toggle('active',tabs[i]===name);
-  });
-  ['lessons','test','tez','tez-lesson','profile'].forEach(p=>{
-    document.getElementById('st-'+p).classList.toggle('on',p===name);
-  });
+
+  const tabs=['brain','lessons','tez','book','profile'];
+
+  document.querySelectorAll('.stu-tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===name));
+
+  ['brain','lessons','test','tez','tez-lesson','book','profile'].forEach(p=>document.getElementById('st-'+p).classList.toggle('on',p===name));
+
 }
 
-// ══════════════════════════════════════
-// ADMIN
-// ══════════════════════════════════════
-function showAdminPanel(name){
-  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('on'));
-  document.getElementById('ap-'+name).classList.add('on');
-  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
-  event.currentTarget.classList.add('active');
-  if(name==='students')loadStudentsTable();
-  if(name==='tez')loadTezSubmissions();
-  if(name==='notif')loadNotifLog();
-  if(name==='activate')loadInactiveList();
-  if(name==='dash')loadAdminDash();
-  if(name==='leads')loadLeads();
+function renderProfile(){
+
+  const s=currentUser;
+
+  const rows=[['Ism',s.full_name],['Daraja',`${s.rank||'Junior'} Lv${s.level||1}`],['Bayt',fmt(s.bytes_balance)],["So'm",fmt(s.som_balance)],['Buzoq',Math.round(s.calf_kg||40)+' kg'],['Streak',(s.streak_days||0)+' kun']];
+
+  document.getElementById('pr-rows').innerHTML=rows.map(([k,v])=>`<div class="info-row"><span class="info-key">${k}</span><span class="info-val">${v}</span></div>`).join('');
+
 }
 
-// ── DASHBOARD ──
-async function loadAdminDash(){
-  const {data:studs}=await sb.from('students').select('*').eq('course','bolalar');
-  allStudents=studs||[];
+function renderLessonsGrid(){
+
+  const c=document.getElementById('lessons-grid');const weeks={1:[],2:[],3:[],4:[]};
+
+  LESSONS.forEach(l=>weeks[l.week].push(l));let html='';
+
+  [1,2,3,4].forEach(wk=>{
+
+    const items=weeks[wk];
+
+    const hasA=items.some(l=>lessonAccess.find(a=>a.lesson_id===l.id));
+
+    const allD=items.every(l=>{const a=lessonAccess.find(x=>x.lesson_id===l.id);return a&&a.test_passed===1;});
+
+    const wkB=!hasA?'<span class="badge inactive">🔒</span>':allD?'<span class="badge active">✅</span>':'<span class="badge pending">📂 Ochiq</span>';
+
+    html+=`<div class="week-folder"><div class="week-head"><div class="week-head-title">📁 ${wk}-hafta</div>${wkB}</div><div class="week-items-grid">`;
+
+    items.forEach(l=>{
+
+      const acc=lessonAccess.find(a=>a.lesson_id===l.id);const done=acc&&acc.test_passed===1;const open=acc&&!done;const lock=!acc;
+
+      const cls=lock?'locked':done?'done':'';
+
+      const badge=lock?'<span class="lesson-badge lock">🔒</span>':done?'<span class="lesson-badge done">✅</span>':'<span class="lesson-badge open">📖</span>';
+
+      const click=open?`onclick="openLesson(${l.id})"`:done?`onclick="toast('Allaqachon o\'tilgan!')"`:'';
+
+      html+=`<div class="lesson-cell ${cls}" ${click}>${badge}<div class="lesson-num">${l.id}-dars</div><span class="lesson-icon">${l.icon}</span><div class="lesson-title">${l.title}</div></div>`;
+
+    });
+
+    html+='</div></div>';
+
+  });
+
+  c.innerHTML=html;
+
+}
+
+function openLesson(id){currentLesson=LESSONS.find(l=>l.id===id);curQ=0;testAnswers=new Array(currentLesson.tests.length).fill(null);stuTab('test');showQ(0);}
+
+function showQ(idx){const q=currentLesson.tests[idx],t=currentLesson.tests.length;
+
+  document.getElementById('tb-fill').style.width=((idx/t)*100)+'%';document.getElementById('tb-num').textContent=`${idx+1}/${t}`;
+
+  document.getElementById('test-q').textContent=q.q;document.getElementById('btn-next').style.display='none';
+
+  document.getElementById('test-opts').innerHTML=q.opts.map((o,i)=>`<button class="opt" onclick="pickAns(${i})" id="opt${i}">${o}</button>`).join('');}
+
+function pickAns(sel){if(testAnswers[curQ]!==null)return;testAnswers[curQ]=sel;document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+
+  const correct=currentLesson.tests[curQ].c;document.getElementById('opt'+sel).classList.add(sel===correct?'correct':'wrong');
+
+  if(sel!==correct)document.getElementById('opt'+correct).classList.add('correct');document.getElementById('btn-next').style.display='block';}
+
+async function nextQ(){curQ++;if(curQ<currentLesson.tests.length){showQ(curQ);return;}
+
+  const score=testAnswers.reduce((s,a,i)=>s+(a===currentLesson.tests[i].c?1:0),0);const total=currentLesson.tests.length;const bytes=score*5;
+
+  await sb.from('lesson_access').upsert({student_id:currentUser.id,lesson_id:currentLesson.id,test_passed:1},{onConflict:'student_id,lesson_id'});
+
+  await sb.from('bytes_transactions').insert({student_id:currentUser.id,amount:bytes,reason:`${currentLesson.id}-dars testi`});
+
+  const newKg=(currentUser.calf_kg||40)+2;
+
+  await sb.from('students').update({bytes_balance:currentUser.bytes_balance+bytes,calf_kg:newKg}).eq('id',currentUser.id);
+
+  currentUser.bytes_balance+=bytes;currentUser.calf_kg=newKg;
+
+  lessonAccess=lessonAccess.filter(a=>a.lesson_id!==currentLesson.id);lessonAccess.push({lesson_id:currentLesson.id,test_passed:1});
+
+  const week=currentLesson.week;
+
+  const allT=WEEK_LESSONS[week].every(lid=>lessonAccess.find(a=>a.lesson_id===lid&&a.test_passed===1));
+
+  const allTz=WEEK_TEZ[week].every(tid=>{const a=tezAccess.find(x=>x.lesson_id===tid);return a&&a.status==='done';});
+
+  if(allT&&allTz&&week<4){const nw=week+1;
+
+    for(const lid of WEEK_LESSONS[nw])await sb.from('lesson_access').upsert({student_id:currentUser.id,lesson_id:lid,test_passed:0},{onConflict:'student_id,lesson_id'});
+
+    for(const tid of WEEK_TEZ[nw])await sb.from('tez_aytish_access').upsert({student_id:currentUser.id,lesson_id:tid,status:'open'},{onConflict:'student_id,lesson_id'});
+
+    await sb.from('students').update({current_week:nw}).eq('id',currentUser.id);toast(`🎉 ${nw}-hafta ochildi!`);}
+
+  document.getElementById('test-q').textContent=`Natija: ${score}/${total} — +${bytes} bayt! 🎉`;
+
+  document.getElementById('test-opts').innerHTML='';
+
+  const bn=document.getElementById('btn-next');bn.textContent='← Darslarga';bn.onclick=backToLessons;bn.style.display='block';
+
+  updateCalf(currentUser.calf_kg);document.getElementById('stu-bayt').textContent=fmt(currentUser.bytes_balance);
+
+  document.getElementById('stu-bal-h').textContent=fmt(currentUser.bytes_balance)+' bayt';renderBrain();
+
+}
+
+async function backToLessons(){const{data:la}=await sb.from('lesson_access').select('*').eq('student_id',currentUser.id);lessonAccess=la||lessonAccess;
+
+  document.getElementById('btn-next').onclick=nextQ;document.getElementById('btn-next').textContent='Keyingisi →';renderLessonsGrid();renderBrain();stuTab('lessons');}
+
+function renderTezGrid(){const c=document.getElementById('tez-grid-stu');const weeks={1:[],2:[],3:[],4:[]};TEZ.forEach(l=>weeks[l.week].push(l));let html='';
+
+  [1,2,3,4].forEach(wk=>{const items=weeks[wk];
+
+    const hasA=items.some(l=>tezAccess.find(a=>a.lesson_id===l.id&&a.status!=='locked'));
+
+    const allD=items.every(l=>{const a=tezAccess.find(x=>x.lesson_id===l.id);return a&&a.status==='done';});
+
+    const wkB=!hasA?'<span class="badge inactive">🔒</span>':allD?'<span class="badge active">✅</span>':'<span class="badge pending">📂 Ochiq</span>';
+
+    html+=`<div class="week-folder"><div class="week-head"><div class="week-head-title">📁 ${wk}-hafta</div>${wkB}</div><div class="week-items-grid">`;
+
+    items.forEach(l=>{const acc=tezAccess.find(a=>a.lesson_id===l.id);const s=acc?acc.status:'locked';
+
+      const cls=s==='locked'?'locked':s==='done'?'done':'';
+
+      const badge=s==='locked'?'<span class="tez-badge lock">🔒</span>':s==='done'?'<span class="tez-badge done">✅</span>':s==='pending'?'<span class="tez-badge pending">⏳</span>':'<span class="tez-badge open">🎤</span>';
+
+      const click=s==='open'?`onclick="openTez(${l.id})"`:s==='done'?`onclick="toast('Bajarilgan!')"`:s==='pending'?`onclick="toast('Tekshirilmoqda...')"`:'';
+
+      html+=`<div class="tez-cell ${cls}" ${click}>${badge}<div class="tez-num">${l.id}-dars</div><span class="tez-icon">🎙</span><div class="tez-title-small">${l.title}</div></div>`;});
+
+    html+='</div></div>';});
+
+  c.innerHTML=html;}
+
+function openTez(id){currentTez=TEZ.find(l=>l.id===id);document.getElementById('tl-week').textContent=currentTez.week+'-hafta';
+
+  document.getElementById('tl-title').textContent=currentTez.title;
+
+  document.getElementById('tl-text').textContent=currentTez.text;
+
+  document.getElementById('tl-hint').textContent='💡 '+currentTez.hint;resetRecUI();stuTab('tez-lesson');}
+
+async function backToTez(){const{data:ta}=await sb.from('tez_aytish_access').select('*').eq('student_id',currentUser.id);tezAccess=ta||tezAccess;renderTezGrid();stuTab('tez');}
+
+function resetRecUI(){audioBlob=null;audioChunks=[];
+
+  document.getElementById('rec-btn').textContent='🎤 Yozishni boshlash';document.getElementById('rec-btn').className='btn-record';document.getElementById('rec-btn').style.display='flex';
+
+  document.getElementById('rec-status').textContent='';document.getElementById('rec-preview').style.display='none';document.getElementById('rec-preview').src='';
+
+  document.getElementById('rec-ctrl').style.display='none';document.getElementById('tl-pending').style.display='none';}
+
+async function toggleRecord(){
+
+  if(mediaRec&&mediaRec.state==='recording'){mediaRec.stop();return;}
+
+  try{audioStream=await navigator.mediaDevices.getUserMedia({audio:true});audioChunks=[];
+
+    let mime='audio/webm';if(MediaRecorder.isTypeSupported('audio/webm'))mime='audio/webm';else if(MediaRecorder.isTypeSupported('audio/mp4'))mime='audio/mp4';else mime='';
+
+    mediaRec=mime?new MediaRecorder(audioStream,{mimeType:mime}):new MediaRecorder(audioStream);
+
+    mediaRec.ondataavailable=e=>{if(e.data.size>0)audioChunks.push(e.data);};
+
+    mediaRec.onstop=()=>{audioBlob=new Blob(audioChunks,{type:mediaRec.mimeType||'audio/webm'});const url=URL.createObjectURL(audioBlob);
+
+      const ap=document.getElementById('rec-preview');ap.src=url;ap.style.display='block';
+
+      document.getElementById('rec-ctrl').style.display='grid';document.getElementById('rec-btn').textContent='🔄 Qayta';document.getElementById('rec-btn').className='btn-record';
+
+      document.getElementById('rec-status').textContent="✅ Yozildi! Eshitib ko'ring.";audioStream.getTracks().forEach(t=>t.stop());};
+
+    mediaRec.start();document.getElementById('rec-btn').textContent="⏹ To'xtatish";document.getElementById('rec-btn').className='btn-record recording';
+
+    document.getElementById('rec-status').textContent='🔴 Yozilmoqda...';document.getElementById('rec-ctrl').style.display='none';document.getElementById('rec-preview').style.display='none';
+
+  }catch(e){toast('Mikrofonga ruxsat bering!','err');}}
+
+function cancelRec(){if(audioStream)audioStream.getTracks().forEach(t=>t.stop());resetRecUI();}
+
+async function sendVoice(){
+
+  if(!audioBlob||!currentTez){toast('Avval ovoz yozing','err');return;}
+
+  const btn=document.getElementById('rec-send');btn.disabled=true;btn.textContent='Yuborilmoqda...';
+
+  try{
+
+    const ext=(audioBlob.type.includes('mp4'))?'mp4':'webm';
+
+    const fileName=`${currentUser.id}_${currentTez.id}_${Date.now()}.${ext}`;
+
+    const {error:upErr}=await sb.storage.from('voices').upload(fileName,audioBlob,{contentType:audioBlob.type,upsert:true});
+
+    if(upErr)throw upErr;
+
+    const {data:urlData}=sb.storage.from('voices').getPublicUrl(fileName);
+
+    await sb.from('tez_aytish_submissions').insert({student_id:currentUser.id,lesson_id:currentTez.id,voice_url:urlData.publicUrl,status:'pending'});
+
+    await sb.from('tez_aytish_access').upsert({student_id:currentUser.id,lesson_id:currentTez.id,status:'pending'},{onConflict:'student_id,lesson_id'});
+
+    tezAccess=tezAccess.filter(a=>a.lesson_id!==currentTez.id);tezAccess.push({lesson_id:currentTez.id,status:'pending'});
+
+    document.getElementById('rec-btn').style.display='none';document.getElementById('rec-ctrl').style.display='none';
+
+    document.getElementById('rec-preview').style.display='none';document.getElementById('rec-status').textContent='';
+
+    document.getElementById('tl-pending').style.display='block';toast('✅ Ovoz yuborildi!');
+
+  }catch(e){btn.disabled=false;btn.textContent='📤 Yuborish';toast('Xato: '+(e.message||e),'err');}}
+
+async function getAllStudents(){const{data}=await sb.from('students').select('*').eq('course','bolalar').order('created_at',{ascending:false});allStudents=data||[];return allStudents;}
+
+async function loadSvodka(){
+
+  await getAllStudents();
+
   const active=allStudents.filter(s=>s.is_active===1);
-  const inactive=allStudents.filter(s=>s.is_active!==1);
-  const {data:pend}=await sb.from('tez_aytish_submissions').select('id').eq('status','pending');
+
+  const paid=allStudents.filter(s=>s.paid===1);
+
+  const debt=allStudents.filter(s=>s.is_active===1&&s.paid!==1);
+
+  const income=paid.reduce((s,x)=>s+(x.som_balance||0),0);
+
+  document.getElementById('sv-total').textContent=allStudents.length;
+
+  document.getElementById('sv-paid').textContent=paid.length;
+
+  document.getElementById('sv-debt').textContent=debt.length;
+
+  document.getElementById('sv-income').textContent=fmt(income);
+
+  const {data:leads}=await sb.from('leads').select('*');allLeads=leads||[];
+
+  document.getElementById('sv-leads').textContent=allLeads.length;
+
+  document.getElementById('sv-hot').textContent=allLeads.filter(l=>l.status==='hot').length;
+
+  const today=new Date().toISOString().slice(0,10);
+
+  document.getElementById('sv-calls').textContent=allLeads.filter(l=>l.reminder_at&&l.reminder_at.slice(0,10)===today).length;
+
+  let late=0;
+
+  for(const s of active){const{data:la}=await sb.from('lesson_access').select('test_passed').eq('student_id',s.id);if(!(la||[]).some(a=>a.test_passed===1))late++;}
+
+  document.getElementById('sv-late').textContent=late;
+
+  document.getElementById('sv-pay-tbody').innerHTML=allStudents.map(s=>{
+
+    const tg=s.telegram_username?`<a class="tg-link" href="https://t.me/${s.telegram_username}" target="_blank">@${s.telegram_username}</a>`:'—';
+
+    const pay=s.paid===1?'<span class="badge active">To\'langan</span>':'<span class="badge warn">Qarzdor</span>';
+
+    return `<tr><td><b>${s.full_name}</b></td><td>${tg}</td><td style="font-family:var(--fm)">${fmt(s.som_balance)}</td><td>${pay}</td></tr>`;
+
+  }).join('')||'<tr><td colspan="4" class="empty">O\'quvchi yo\'q</td></tr>';
+
+}
+
+async function loadAdminDash(){
+
+  await getAllStudents();
+
+  const active=allStudents.filter(s=>s.is_active===1);
+
   document.getElementById('ds-total').textContent=allStudents.length;
+
   document.getElementById('ds-active').textContent=active.length;
-  document.getElementById('ds-inactive').textContent=inactive.length;
+
+  document.getElementById('ds-inactive').textContent=allStudents.length-active.length;
+
+  const {data:pend}=await sb.from('tez_aytish_submissions').select('id').eq('status','pending');
+
   document.getElementById('ds-tez').textContent=(pend||[]).length;
 
-  // Build rows
   const rows=await Promise.all(active.map(async s=>{
-    const {data:la}=await sb.from('lesson_access').select('*').eq('student_id',s.id);
-    const {data:ta}=await sb.from('tez_aytish_access').select('*').eq('student_id',s.id);
-    const testsDone=(la||[]).filter(a=>a.test_passed===1).length;
-    const tezDone=(ta||[]).filter(a=>a.status==='done').length;
-    const maxWeek=Math.max(0,...(la||[]).map(a=>{for(const[w,ids]of Object.entries(WEEK_LESSONS))if(ids.includes(a.lesson_id))return+w;return 0;}));
-    const warn=s.warnings>0?`<span class="badge warn">⚠ ${s.warnings}</span>`:'';
-    return `<tr>
-      <td><b>${s.full_name}</b>${warn}</td>
-      <td><span class="week-tag">${maxWeek||1}-hafta</span>
-        <div class="progress-bar"><div class="progress-fill" style="width:${(maxWeek/4)*100}%"></div></div>
-      </td>
-      <td><span class="badge ${testsDone>=8?'active':'pending'}">${testsDone}/8</span></td>
-      <td><span class="badge ${tezDone>=8?'active':tezDone>0?'pending':'inactive'}">${tezDone}/8</span></td>
-      <td><span style="font-family:var(--fm)">${fmt(s.bytes_balance)}</span></td>
-      <td><span class="badge active">Faol</span></td>
-    </tr>`;
-  }));
-  document.getElementById('dash-tbody').innerHTML=rows.join('')||'<tr><td colspan="6" class="empty">Faol o\'quvchilar yo\'q</td></tr>';
+
+    const{data:la}=await sb.from('lesson_access').select('*').eq('student_id',s.id);
+
+    const{data:ta}=await sb.from('tez_aytish_access').select('*').eq('student_id',s.id);
+
+    const td=(la||[]).filter(a=>a.test_passed===1).length;const zd=(ta||[]).filter(a=>a.status==='done').length;
+
+    const mw=s.current_week||1;
+
+    return `<tr><td><b>${s.full_name}</b>${s.warnings>0?` <span class="badge warn">⚠${s.warnings}</span>`:''}</td>
+
+      <td><span style="font-family:var(--fm);font-size:12px">${mw}-hafta</span><div class="progress-bar"><div class="progress-fill" style="width:${(mw/4)*100}%"></div></div></td>
+
+      <td><span class="badge ${td>=8?'active':'pending'}">${td}/8</span></td>
+
+      <td><span class="badge ${zd>=8?'active':zd>0?'pending':'inactive'}">${zd}/8</span></td>
+
+      <td style="font-family:var(--fm)">${fmt(s.bytes_balance)}</td></tr>`;}));
+
+  document.getElementById('dash-tbody').innerHTML=rows.join('')||'<tr><td colspan="5" class="empty">Faol o\'quvchi yo\'q</td></tr>';
+
 }
 
-// ── STUDENTS TABLE ──
+async function loadControl(){
+
+  await getAllStudents();
+
+  const active=allStudents.filter(s=>s.is_active===1);
+
+  const rows=[];
+
+  for(const s of active){
+
+    const{data:la}=await sb.from('lesson_access').select('*').eq('student_id',s.id);
+
+    const{data:ta}=await sb.from('tez_aytish_access').select('*').eq('student_id',s.id);
+
+    const td=(la||[]).filter(a=>a.test_passed===1).length;const zd=(ta||[]).filter(a=>a.status==='done').length;
+
+    const openTests=(la||[]).filter(a=>a.test_passed!==1).length;
+
+    const openTez=(ta||[]).filter(a=>a.status==='open').length;
+
+    if(openTests>0||openTez>0||td===0){
+
+      const tg=s.telegram_username?`<a class="tg-link" href="https://t.me/${s.telegram_username}" target="_blank">@${s.telegram_username}</a>`:'—';
+
+      let holat=td===0?'<span class="badge warn">Hech narsa qilmagan</span>':`<span class="badge pending">${openTests} test, ${openTez} tez ochiq</span>`;
+
+      rows.push(`<tr><td><b>${s.full_name}</b></td><td>${s.current_week||1}-hafta</td><td>${holat}</td><td>${tg}</td>
+
+        <td><div class="action-btns"><button class="btn-sm blue" onclick="quickNotify(${s.id},'${s.full_name.replace(/'/g,'')}')">📨</button>
+
+        ${s.telegram_username?`<a class="btn-sm purple" style="text-decoration:none" href="https://t.me/${s.telegram_username}" target="_blank">📞 TG</a>`:''}</div></td></tr>`);
+
+    }
+
+  }
+
+  document.getElementById('control-tbody').innerHTML=rows.join('')||'<tr><td colspan="5" class="empty">✅ Hamma DZ qilgan!</td></tr>';
+
+}
+
+async function quickNotify(id,name){
+
+  await sb.from('notifications').insert({target_id:id,target_name:name,message:'⚠️ DZ ni bajaring! Dars kechikmoqda.',type:'message',sent_at:new Date().toISOString()});
+
+  toast('📨 Eslatma yuborildi: '+name);
+
+}
+
 async function loadStudentsTable(){
-  const {data}=await sb.from('students').select('*').eq('course','bolalar').order('created_at',{ascending:false});
-  allStudents=data||[];
-  renderStudentsTable(allStudents);
-  // Fill notification targets
+
+  await getAllStudents();renderStudentsTable(allStudents);
+
   const sel=document.getElementById('notif-target');
-  sel.innerHTML='<option value="all">Barcha o\'quvchilarga</option>'+
-    allStudents.filter(s=>s.is_active===1).map(s=>`<option value="${s.id}">${s.full_name}</option>`).join('');
+
+  if(sel)sel.innerHTML='<option value="all">Barchaga</option>'+allStudents.filter(s=>s.is_active===1).map(s=>`<option value="${s.id}">${s.full_name}</option>`).join('');
+
 }
 
 function renderStudentsTable(list){
-  const tbody=document.getElementById('stu-tbody');
-  if(!list.length){tbody.innerHTML='<tr><td colspan="6" class="empty">O\'quvchi yo\'q</td></tr>';return;}
-  tbody.innerHTML=list.map(s=>{
-    const badge=s.is_active===1?'<span class="badge active">Faol</span>':'<span class="badge inactive">Faolsiz</span>';
-    return `<tr>
-      <td><b>${s.full_name}</b>${s.warnings>0?` <span class="badge warn">⚠${s.warnings}</span>`:''}</td>
-      <td><code style="font-family:var(--fm);font-size:12px">${s.access_code||'—'}</code></td>
-      <td><span class="week-tag">${s.current_week||1}-hafta</span></td>
-      <td><span style="font-family:var(--fm)">${fmt(s.bytes_balance)}</span></td>
-      <td>${badge}</td>
-      <td><div class="action-btns">
-        <button class="btn-sm blue" onclick="showStudentDetail(${s.id})">Ko'rish</button>
-        ${s.is_active!==1?`<button class="btn-sm green" onclick="quickActivate(${s.id})">Faollashtir</button>`:''}
-        <button class="btn-sm red" onclick="adminWarnById(${s.id})">⚠</button>
-      </div></td>
-    </tr>`;
-  }).join('');
+
+  const tb=document.getElementById('stu-tbody');
+
+  if(!list.length){tb.innerHTML='<tr><td colspan="6" class="empty">O\'quvchi yo\'q</td></tr>';return;}
+
+  tb.innerHTML=list.map(s=>{
+
+    const b=s.is_active===1?'<span class="badge active">Faol</span>':'<span class="badge inactive">Faolsiz</span>';
+
+    const pay=s.paid===1?'<span class="badge active">✓</span>':'<span class="badge warn">Qarz</span>';
+
+    const tg=s.telegram_username?`<a class="tg-link" href="https://t.me/${s.telegram_username}" target="_blank">@${s.telegram_username}</a>`:'—';
+
+    return `<tr><td><b>${s.full_name}</b>${s.warnings>0?` <span class="badge warn">⚠${s.warnings}</span>`:''}</td>
+
+      <td><code style="font-family:var(--fm);font-size:12px">${s.access_code||'—'}</code></td><td>${tg}</td><td>${pay}</td><td>${b}</td>
+
+      <td><div class="action-btns"><button class="btn-sm blue" onclick="showStudentDetail(${s.id})">Ko'rish</button>
+
+      ${s.is_active!==1?`<button class="btn-sm green" onclick="quickActivate(${s.id})">Faol</button>`:''}</div></td></tr>`;}).join('');
+
 }
 
-function filterStudents(){
-  const q=document.getElementById('stu-search').value.toLowerCase();
-  const f=document.getElementById('stu-filter').value;
-  let list=allStudents.filter(s=>s.full_name.toLowerCase().includes(q));
-  if(f!=='')list=list.filter(s=>String(s.is_active)===f);
-  renderStudentsTable(list);
-}
+function filterStudents(){const q=document.getElementById('stu-search').value.toLowerCase();const f=document.getElementById('stu-filter').value;
 
-// ── STUDENT DETAIL ──
+  let l=allStudents.filter(s=>s.full_name.toLowerCase().includes(q));if(f!=='')l=l.filter(s=>String(s.is_active)===f);renderStudentsTable(l);}
+
 async function showStudentDetail(id){
-  selectedStudentId=id;
-  const s=allStudents.find(x=>x.id===id);
-  const {data:la}=await sb.from('lesson_access').select('*').eq('student_id',id);
-  const {data:ta}=await sb.from('tez_aytish_access').select('*').eq('student_id',id);
-  const testsDone=(la||[]).filter(a=>a.test_passed===1).length;
-  const tezDone=(ta||[]).filter(a=>a.status==='done').length;
-  const tezPend=(ta||[]).filter(a=>a.status==='pending').length;
+
+  selectedStudentId=id;const s=allStudents.find(x=>x.id===id);
+
+  const{data:la}=await sb.from('lesson_access').select('*').eq('student_id',id);
+
+  const{data:ta}=await sb.from('tez_aytish_access').select('*').eq('student_id',id);
+
   document.getElementById('sdm-name').textContent=s.full_name;
-  document.getElementById('sdm-body').innerHTML=[
-    ['Kirish kodi',s.access_code||'—'],
-    ['Bayt',fmt(s.bytes_balance)+' bayt'],
-    ["So'm",fmt(s.som_balance)+" so'm"],
-    ['Buzoq',Math.round(s.calf_kg||40)+' kg'],
-    ['Testlar',`${testsDone}/8`],
-    ['Tez aytish (done)',`${tezDone}/8`],
-    ['Tez aytish (kutmoqda)',tezPend],
-    ['Ogohlantirishlar',s.warnings||0],
-    ['Status',s.is_active===1?'Faol':'Faolsiz'],
-  ].map(([k,v])=>`<div class="info-row"><span class="info-key">${k}</span><span class="info-val">${v}</span></div>`).join('');
+
+  document.getElementById('sdm-body').innerHTML=[['Kod',s.access_code||'—'],['Telegram',s.telegram_username?'@'+s.telegram_username:'—'],['Bayt',fmt(s.bytes_balance)],["So'm",fmt(s.som_balance)],['To\'lov',s.paid===1?'To\'langan':'Qarzdor'],['Hafta',(s.current_week||1)],['Testlar',(la||[]).filter(a=>a.test_passed===1).length+'/8'],['Tez aytish',(ta||[]).filter(a=>a.status==='done').length+'/8'],['Ogohlantirish',s.warnings||0]].map(([k,v])=>`<div class="info-row"><span class="info-key">${k}</span><span class="info-val">${v}</span></div>`).join('');
+
   showModal('stu-detail-modal');
+
 }
 
-async function adminUnlockWeek(){
-  if(!selectedStudentId)return;
-  const s=allStudents.find(x=>x.id===selectedStudentId);
-  const curW=(s.current_week||1);
-  const nextW=curW+1;
-  if(nextW>4){toast('4-hafta so\'nggi!','err');return;}
-  for(const lid of WEEK_LESSONS[nextW]){
-    await sb.from('lesson_access').upsert({student_id:selectedStudentId,lesson_id:lid,test_passed:0},{onConflict:'student_id,lesson_id'});
-  }
-  for(const tid of WEEK_TEZ[nextW]){
-    await sb.from('tez_aytish_access').upsert({student_id:selectedStudentId,lesson_id:tid,status:'open'},{onConflict:'student_id,lesson_id'});
-  }
-  await sb.from('students').update({current_week:nextW}).eq('id',selectedStudentId);
-  toast(`✅ ${nextW}-hafta ochildi`);
-  hideModal('stu-detail-modal');
-  loadStudentsTable();
-}
+async function adminUnlockWeek(){if(!selectedStudentId)return;const s=allStudents.find(x=>x.id===selectedStudentId);const nw=(s.current_week||1)+1;
 
-async function adminWarn(){
-  if(!selectedStudentId)return;
-  await adminWarnById(selectedStudentId);
-  hideModal('stu-detail-modal');
-}
+  if(nw>4){toast('4-hafta oxirgi!','err');return;}
 
-async function adminWarnById(id){
-  const s=allStudents.find(x=>x.id===id);
-  const newW=(s.warnings||0)+1;
-  await sb.from('students').update({warnings:newW}).eq('id',id);
-  s.warnings=newW;
-  toast(`⚠️ Ogohlantirish ${s.full_name} ga berildi`);
-  renderStudentsTable(allStudents);
-}
+  for(const lid of WEEK_LESSONS[nw])await sb.from('lesson_access').upsert({student_id:selectedStudentId,lesson_id:lid,test_passed:0},{onConflict:'student_id,lesson_id'});
 
-async function quickActivate(id){
-  await sb.from('students').update({is_active:1}).eq('id',id);
-  for(const lid of WEEK_LESSONS[1]){
-    await sb.from('lesson_access').upsert({student_id:id,lesson_id:lid,test_passed:0},{onConflict:'student_id,lesson_id'});
-  }
-  for(const tid of WEEK_TEZ[1]){
-    await sb.from('tez_aytish_access').upsert({student_id:id,lesson_id:tid,status:'open'},{onConflict:'student_id,lesson_id'});
-  }
-  toast('✅ Faollashtirildi');
-  loadStudentsTable(); loadInactiveList();
-}
+  for(const tid of WEEK_TEZ[nw])await sb.from('tez_aytish_access').upsert({student_id:selectedStudentId,lesson_id:tid,status:'open'},{onConflict:'student_id,lesson_id'});
 
-// ── TEZ SUBMISSIONS ──
+  await sb.from('students').update({current_week:nw}).eq('id',selectedStudentId);toast(`✅ ${nw}-hafta ochildi`);hideModal('stu-detail-modal');loadStudentsTable();}
+
+async function adminWarn(){if(!selectedStudentId)return;const s=allStudents.find(x=>x.id===selectedStudentId);const w=(s.warnings||0)+1;
+
+  await sb.from('students').update({warnings:w}).eq('id',selectedStudentId);s.warnings=w;toast('⚠️ Ogohlantirish berildi');hideModal('stu-detail-modal');}
+
+async function quickActivate(id){await sb.from('students').update({is_active:1}).eq('id',id);
+
+  for(const lid of WEEK_LESSONS[1])await sb.from('lesson_access').upsert({student_id:id,lesson_id:lid,test_passed:0},{onConflict:'student_id,lesson_id'});
+
+  for(const tid of WEEK_TEZ[1])await sb.from('tez_aytish_access').upsert({student_id:id,lesson_id:tid,status:'open'},{onConflict:'student_id,lesson_id'});
+
+  toast('✅ Faollashtirildi');loadStudentsTable();}
+
 async function loadTezSubmissions(){
-  const {data}=await sb.from('tez_aytish_submissions').select('*,students(full_name,id)').eq('status','pending').order('submitted_at',{ascending:true});
+
+  const{data}=await sb.from('tez_aytish_submissions').select('*,students(full_name)').eq('status','pending').order('submitted_at');
+
   const c=document.getElementById('tez-sub-list');
-  if(!data||!data.length){c.innerHTML='<div class="empty"><div class="empty-icon">🎤</div>Kutayotgan ovozlar yo\'q</div>';return;}
-  const tezMap=Object.fromEntries(TEZ.map(t=>[t.id,t]));
-  c.innerHTML=data.map(sub=>{
-    const lesson=tezMap[sub.lesson_id]||{};
-    return `<div class="sub-card">
-      <div class="sub-info">
-        <div class="sub-name">${sub.students?.full_name||'—'}</div>
-        <div class="sub-meta">${sub.lesson_id}-dars · ${lesson.title||''} · ${new Date(sub.submitted_at).toLocaleDateString('ru')}</div>
-        <div class="sub-text">"${lesson.text||''}"</div>
-      </div>
+
+  if(!data||!data.length){c.innerHTML='<div class="empty"><div class="empty-icon">🎤</div>Kutayotgan ovoz yo\'q</div>';return;}
+
+  const tm=Object.fromEntries(TEZ.map(t=>[t.id,t]));
+
+  c.innerHTML=data.map(sub=>{const l=tm[sub.lesson_id]||{};
+
+    return `<div class="sub-card"><div class="sub-info"><div class="sub-name">${sub.students?.full_name||'—'}</div>
+
+      <div class="sub-meta">${sub.lesson_id}-dars · ${l.title||''}</div><div class="sub-text">"${l.text||''}"</div></div>
+
       ${sub.voice_url?`<audio src="${sub.voice_url}" controls></audio>`:''}
-      <div class="action-btns" style="flex-direction:column;gap:6px">
-        <button class="btn-sm green" onclick="approveTez(${sub.id},${sub.student_id||sub.students?.id},${sub.lesson_id})">✅ Qabul</button>
-        <button class="btn-sm red" onclick="rejectTez(${sub.id},${sub.student_id||sub.students?.id},${sub.lesson_id})">❌ Rad</button>
-      </div>
-    </div>`;
-  }).join('');
+
+      <div class="action-btns" style="flex-direction:column"><button class="btn-sm green" onclick="approveTez(${sub.id},${sub.student_id},${sub.lesson_id})">✅ Qabul</button>
+
+      <button class="btn-sm red" onclick="rejectTez(${sub.id},${sub.student_id},${sub.lesson_id})">❌ Rad</button></div></div>`;}).join('');
+
 }
 
 async function approveTez(subId,stuId,lessonId){
+
   await sb.from('tez_aytish_submissions').update({status:'approved',reviewed_at:new Date().toISOString()}).eq('id',subId);
+
   await sb.from('tez_aytish_access').update({status:'done'}).eq('student_id',stuId).eq('lesson_id',lessonId);
-  // Check week completion
-  const week=Object.entries(WEEK_TEZ).find(([w,ids])=>ids.includes(lessonId))?.[0];
-  if(week){
-    const {data:la}=await sb.from('lesson_access').select('*').eq('student_id',stuId);
-    const {data:ta}=await sb.from('tez_aytish_access').select('*').eq('student_id',stuId);
-    const weekLids=WEEK_LESSONS[+week];
-    const weekTids=WEEK_TEZ[+week];
-    const allT=weekLids.every(lid=>(la||[]).find(a=>a.lesson_id===lid&&a.test_passed===1));
-    const updTa=[...(ta||[]).filter(a=>a.lesson_id!==lessonId),{lesson_id:lessonId,status:'done'}];
-    const allTz=weekTids.every(tid=>updTa.find(a=>a.lesson_id===tid&&a.status==='done'));
-    if(allT&&allTz&&+week<4){
-      const nw=+week+1;
-      for(const lid of WEEK_LESSONS[nw]) await sb.from('lesson_access').upsert({student_id:stuId,lesson_id:lid,test_passed:0},{onConflict:'student_id,lesson_id'});
-      for(const tid of WEEK_TEZ[nw]) await sb.from('tez_aytish_access').upsert({student_id:stuId,lesson_id:tid,status:'open'},{onConflict:'student_id,lesson_id'});
-      await sb.from('students').update({current_week:nw,calf_kg:sb.rpc('increment_calf',{sid:stuId,val:5})}).eq('id',stuId);
-      toast(`✅ Qabul! ${nw}-hafta ochildi`);
-    } else { toast('✅ Tez aytish qabul qilindi'); }
-  }
-  await sb.from('students').update({bytes_balance:sb.rpc,calf_kg:0}).eq('id',stuId); // simple update below
-  await sb.from('students').update({calf_kg:50}).eq('id',stuId).is('calf_kg',null); // fallback
+
+  const week=+Object.entries(WEEK_TEZ).find(([w,ids])=>ids.includes(lessonId))[0];
+
+  const{data:la}=await sb.from('lesson_access').select('*').eq('student_id',stuId);
+
+  const{data:ta}=await sb.from('tez_aytish_access').select('*').eq('student_id',stuId);
+
+  const allT=WEEK_LESSONS[week].every(lid=>(la||[]).find(a=>a.lesson_id===lid&&a.test_passed===1));
+
+  const allTz=WEEK_TEZ[week].every(tid=>(ta||[]).find(a=>a.lesson_id===tid&&a.status==='done'));
+
+  if(allT&&allTz&&week<4){const nw=week+1;
+
+    for(const lid of WEEK_LESSONS[nw])await sb.from('lesson_access').upsert({student_id:stuId,lesson_id:lid,test_passed:0},{onConflict:'student_id,lesson_id'});
+
+    for(const tid of WEEK_TEZ[nw])await sb.from('tez_aytish_access').upsert({student_id:stuId,lesson_id:tid,status:'open'},{onConflict:'student_id,lesson_id'});
+
+    await sb.from('students').update({current_week:nw}).eq('id',stuId);toast(`✅ Qabul! ${nw}-hafta ochildi`);}
+
+  else toast('✅ Qabul qilindi');
+
   loadTezSubmissions();
+
 }
 
 async function rejectTez(subId,stuId,lessonId){
+
   await sb.from('tez_aytish_submissions').update({status:'rejected',reviewed_at:new Date().toISOString()}).eq('id',subId);
+
   await sb.from('tez_aytish_access').update({status:'open'}).eq('student_id',stuId).eq('lesson_id',lessonId);
-  toast('❌ Rad etildi — o\'quvchi qayta yubora oladi');
-  loadTezSubmissions();
+
+  toast('❌ Rad etildi');loadTezSubmissions();
+
 }
 
-// ── NOTIFICATIONS ──
-async function sendNotification(){
-  const text=document.getElementById('notif-text').value.trim();
-  const target=document.getElementById('notif-target').value;
-  if(!text){toast('Xabar matni kiriting','err');return;}
-  let targetName='Barchaga';
-  if(target!=='all'){
-    const s=allStudents.find(x=>String(x.id)===target);
-    targetName=s?s.full_name:'—';
-  }
-  await sb.from('notifications').insert({
-    target_id:target==='all'?null:+target,
-    target_name:targetName,
-    message:text,
-    type:'message',
-    sent_at:new Date().toISOString()
-  });
-  document.getElementById('notif-text').value='';
-  toast('📨 Xabar qayd etildi');
-  loadNotifLog();
-}
+async function sendNotification(){const text=document.getElementById('notif-text').value.trim();const target=document.getElementById('notif-target').value;
 
-async function markCall(){
-  const target=document.getElementById('notif-target').value;
-  const s=allStudents.find(x=>String(x.id)===target);
-  await sb.from('notifications').insert({
-    target_id:target==='all'?null:+target,
-    target_name:s?s.full_name:'Barchaga',
-    message:'📞 Qo\'ng\'iroq qilindi',
-    type:'call',
-    sent_at:new Date().toISOString()
-  });
-  toast('📞 Qo\'ng\'iroq qayd etildi');
-  loadNotifLog();
-}
+  if(!text){toast('Matn kiriting','err');return;}let tn='Barchaga';if(target!=='all'){const s=allStudents.find(x=>String(x.id)===target);tn=s?s.full_name:'—';}
 
-async function loadNotifLog(){
-  const {data}=await sb.from('notifications').select('*').order('sent_at',{ascending:false}).limit(20);
-  const c=document.getElementById('notif-log');
-  if(!data||!data.length){c.innerHTML='<div class="empty">Xabarlar yo\'q</div>';return;}
-  c.innerHTML=data.map(n=>`
-    <div class="notif-item">
-      <div class="notif-item-left">
-        <div>${n.target_name||'Barchaga'}: ${n.message}</div>
-        <div class="notif-item-meta">${new Date(n.sent_at).toLocaleString('ru')}</div>
-      </div>
-      <span class="notif-status ${n.type==='call'?'call':'sent'}">${n.type==='call'?'📞 Qo\'ng\'iroq':'📨 Xabar'}</span>
-    </div>`).join('');
-}
+  await sb.from('notifications').insert({target_id:target==='all'?null:+target,target_name:tn,message:text,type:'message',sent_at:new Date().toISOString()});
 
-// ── ACTIVATE ──
+  document.getElementById('notif-text').value='';toast('📨 Yuborildi');loadNotifLog();}
+
+async function loadNotifLog(){const{data}=await sb.from('notifications').select('*').order('sent_at',{ascending:false}).limit(20);
+
+  const c=document.getElementById('notif-log');if(!data||!data.length){c.innerHTML='<div class="empty">Xabar yo\'q</div>';return;}
+
+  c.innerHTML=data.map(n=>`<div class="sub-card"><div class="sub-info"><div class="sub-name">${n.target_name||'Barchaga'}</div>
+
+    <div class="sub-text">${n.message}</div><div class="sub-meta">${new Date(n.sent_at).toLocaleString('ru')}</div></div></div>`).join('');}
+
 async function activateStudent(){
-  const name=document.getElementById('act-name').value.trim();
-  const code=document.getElementById('act-code').value.trim();
-  const course=document.getElementById('act-course').value;
-  const som=+document.getElementById('act-som').value||0;
-  const err=document.getElementById('act-err');
-  err.style.display='none';
-  if(!name||!code){err.textContent='Ism va kodni kiriting';err.style.display='block';return;}
-  const {data:ex}=await sb.from('students').select('id').eq('access_code',code).single();
-  if(ex){err.textContent='Bu kod allaqachon ishlatilgan';err.style.display='block';return;}
-  const {data:stu,error}=await sb.from('students').insert({
-    full_name:name,access_code:code,course,
-    som_balance:som,bytes_balance:0,calf_kg:40,
-    is_active:1,level:1,rank:'Junior',
-    streak_days:0,warnings:0,current_week:1,
-    created_at:new Date().toISOString()
-  }).select().single();
+
+  const name=document.getElementById('act-name').value.trim();const code=document.getElementById('act-code').value.trim();
+
+  const tg=document.getElementById('act-tg').value.trim().replace('@','');const som=+document.getElementById('act-som').value||0;
+
+  const paid=+document.getElementById('act-paid').value;const err=document.getElementById('act-err');err.style.display='none';
+
+  if(!name||!code){err.textContent='Ism va kod kiriting';err.style.display='block';return;}
+
+  const{data:ex}=await sb.from('students').select('id').eq('access_code',code).maybeSingle();
+
+  if(ex){err.textContent='Bu kod band';err.style.display='block';return;}
+
+  const{data:stu,error}=await sb.from('students').insert({full_name:name,access_code:code,telegram_username:tg||null,course:'bolalar',som_balance:som,paid,bytes_balance:0,calf_kg:40,is_active:1,level:1,rank:'Junior',streak_days:0,warnings:0,current_week:1,created_at:new Date().toISOString()}).select().single();
+
   if(error){err.textContent=error.message;err.style.display='block';return;}
-  // Open week 1
-  for(const lid of WEEK_LESSONS[1]) await sb.from('lesson_access').insert({student_id:stu.id,lesson_id:lid,test_passed:0});
-  for(const tid of WEEK_TEZ[1])     await sb.from('tez_aytish_access').insert({student_id:stu.id,lesson_id:tid,status:'open'});
-  document.getElementById('act-name').value='';
-  document.getElementById('act-code').value='';
-  document.getElementById('act-som').value='';
-  toast(`✅ ${name} qo'shildi! Kodi: ${code}`);
-  loadStudentsTable(); loadInactiveList(); loadAdminDash();
+
+  for(const lid of WEEK_LESSONS[1])await sb.from('lesson_access').insert({student_id:stu.id,lesson_id:lid,test_passed:0});
+
+  for(const tid of WEEK_TEZ[1])await sb.from('tez_aytish_access').insert({student_id:stu.id,lesson_id:tid,status:'open'});
+
+  ['act-name','act-code','act-tg','act-som'].forEach(i=>document.getElementById(i).value='');
+
+  toast(`✅ ${name} qo'shildi! Kod: ${code}`);
+
 }
 
-async function addStudentModal(){
-  const name=document.getElementById('ms-name').value.trim();
-  const code=document.getElementById('ms-code').value.trim();
-  const som=+document.getElementById('ms-som').value||0;
-  if(!name||!code){toast('Ism va kodni kiriting','err');return;}
-  const {data:stu,error}=await sb.from('students').insert({
-    full_name:name,access_code:code,course:'bolalar',
-    som_balance:som,bytes_balance:0,calf_kg:40,
-    is_active:1,level:1,rank:'Junior',
-    streak_days:0,warnings:0,current_week:1,
-    created_at:new Date().toISOString()
-  }).select().single();
+async function addStudentModal(){const name=document.getElementById('ms-name').value.trim();const code=document.getElementById('ms-code').value.trim();
+
+  const tg=document.getElementById('ms-tg').value.trim().replace('@','');const som=+document.getElementById('ms-som').value||0;
+
+  if(!name||!code){toast('Ism va kod kiriting','err');return;}
+
+  const{data:stu,error}=await sb.from('students').insert({full_name:name,access_code:code,telegram_username:tg||null,course:'bolalar',som_balance:som,paid:1,bytes_balance:0,calf_kg:40,is_active:1,level:1,rank:'Junior',current_week:1,warnings:0,created_at:new Date().toISOString()}).select().single();
+
   if(error){toast(error.message,'err');return;}
-  for(const lid of WEEK_LESSONS[1]) await sb.from('lesson_access').insert({student_id:stu.id,lesson_id:lid,test_passed:0});
-  for(const tid of WEEK_TEZ[1])     await sb.from('tez_aytish_access').insert({student_id:stu.id,lesson_id:tid,status:'open'});
-  hideModal('add-student-modal');
-  toast(`✅ ${name} qo'shildi`);
-  loadStudentsTable(); loadAdminDash();
+
+  for(const lid of WEEK_LESSONS[1])await sb.from('lesson_access').insert({student_id:stu.id,lesson_id:lid,test_passed:0});
+
+  for(const tid of WEEK_TEZ[1])await sb.from('tez_aytish_access').insert({student_id:stu.id,lesson_id:tid,status:'open'});
+
+  hideModal('add-student-modal');toast(`✅ ${name} qo'shildi`);loadStudentsTable();
+
 }
 
-async function loadInactiveList(){
-  const {data}=await sb.from('students').select('*').eq('is_active',0).eq('course','bolalar');
-  const c=document.getElementById('inactive-list');
-  if(!data||!data.length){c.innerHTML='<div class="empty" style="padding:16px">Faolsiz o\'quvchi yo\'q</div>';return;}
-  c.innerHTML=`<table><thead><tr><th>Ism</th><th>Kod</th><th>Amal</th></tr></thead><tbody>`+
-    data.map(s=>`<tr><td>${s.full_name}</td><td><code style="font-family:var(--fm)">${s.access_code||'—'}</code></td>
-      <td><button class="btn-sm green" onclick="quickActivate(${s.id})">Faollashtir</button></td></tr>`).join('')+
-    `</tbody></table>`;
+function toggleLeadForm(){const f=document.getElementById('lead-form');f.style.display=f.style.display==='none'?'block':'none';}
+
+async function saveLead(){const name=document.getElementById('ld-name').value.trim();const phone=document.getElementById('ld-phone').value.trim();const note=document.getElementById('ld-note').value.trim();
+
+  if(!name||!phone){toast('Ism va telefon kiriting','err');return;}
+
+  const{error}=await sb.from('leads').insert({name,phone,note,status:'cold',created_at:new Date().toISOString()});
+
+  if(error){toast(error.message,'err');return;}
+
+  document.getElementById('ld-name').value='';document.getElementById('ld-phone').value='';document.getElementById('ld-note').value='';
+
+  toggleLeadForm();toast('✅ Lid qo\'shildi');loadLeads();}
+
+async function loadLeads(){const{data}=await sb.from('leads').select('*').order('created_at',{ascending:false});allLeads=data||[];renderLeads(allLeads);scheduleReminders(allLeads);}
+
+function filterLeads(s,btn){leadsFilter=s;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+
+  renderLeads(s==='all'?allLeads:allLeads.filter(l=>l.status===s));}
+
+const LSTAT={cold:'❄️ Sovuq',thinking:"🤔 O'ylayotgan",hot:'🔥 Issiq',enrolled:'✅ Yozildi',refused:'❌ Rad'};
+
+function renderLeads(list){const c=document.getElementById('lead-cards');
+
+  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">📞</div>Lid yo\'q</div>';return;}
+
+  c.innerHTML=list.map(l=>{const rem=l.reminder_at?`<div class="lead-reminder">⏰ Qayta qo'ng'iroq: ${new Date(l.reminder_at).toLocaleString('ru',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</div>`:'';  const com=l.last_comment?`<div class="lead-comment">"${l.last_comment}"</div>`:'';
+
+    return `<div class="lead-card ${l.status||'cold'}"><div class="lead-top"><div><div class="lead-name">${l.name}</div><div class="lead-phone">📱 ${l.phone}</div></div>
+
+      <div style="text-align:right"><span class="badge ${l.status==='hot'?'warn':l.status==='enrolled'?'active':l.status==='thinking'?'pending':'blue'}">${LSTAT[l.status]||'Sovuq'}</span>
+
+      <div class="lead-date">${new Date(l.created_at).toLocaleDateString('ru')}</div></div></div>
+
+      ${l.note?`<div style="font-size:12px;color:var(--mu);margin:4px 0">${l.note}</div>`:''}${com}${rem}
+
+      <div class="lead-actions"><a href="tel:${l.phone}" class="btn-sm blue" style="text-decoration:none">📞 Qo'ng'iroq</a>
+
+      <button class="btn-sm yellow" onclick="openLeadComment(${l.id})">✏️ Natija</button>
+
+      <button class="btn-sm red" onclick="deleteLead(${l.id})">🗑</button></div></div>`;}).join('');}
+
+function openLeadComment(id){const l=allLeads.find(x=>x.id===id);document.getElementById('lcm-id').value=id;
+
+  document.getElementById('lcm-status').value=l.status||'cold';document.getElementById('lcm-note').value=l.last_comment||'';
+
+  document.getElementById('lcm-datetime').value=l.reminder_at?l.reminder_at.slice(0,16):'';showModal('lead-comment-modal');}
+
+async function saveLeadComment(){const id=+document.getElementById('lcm-id').value;const status=document.getElementById('lcm-status').value;
+
+  const note=document.getElementById('lcm-note').value.trim();const dt=document.getElementById('lcm-datetime').value;
+
+  const upd={status,last_comment:note,updated_at:new Date().toISOString()};if(dt)upd.reminder_at=new Date(dt).toISOString();
+
+  await sb.from('leads').update(upd).eq('id',id);hideModal('lead-comment-modal');toast('✅ Saqlandi');loadLeads();
+
+  if(dt){const l=allLeads.find(x=>x.id===id);setReminder(id,new Date(dt),l?l.name:'Lid',l?l.phone:'');}}
+
+async function deleteLead(id){if(!confirm('O\'chirilsinmi?'))return;await sb.from('leads').delete().eq('id',id);toast('🗑 O\'chirildi');loadLeads();}
+
+function setReminder(id,date,name,phone){if(!('Notification'in window))return;
+
+  Notification.requestPermission().then(perm=>{if(perm!=='granted')return;
+
+    const notifyAt=date.getTime()-10*60*1000;const delay=notifyAt-Date.now();
+
+    if(delay<0||delay>2147483647)return;if(reminderTimers[id])clearTimeout(reminderTimers[id]);
+
+    reminderTimers[id]=setTimeout(()=>{new Notification('📞 Qo\'ng\'iroq vaqti yaqin!',{body:`${name} (${phone}) ga 10 daqiqadan keyin qo'ng'iroq qiling!`});},delay);});}
+
+function scheduleReminders(leads){leads.filter(l=>l.reminder_at&&l.status!=='enrolled'&&l.status!=='refused').forEach(l=>setReminder(l.id,new Date(l.reminder_at),l.name,l.phone));}
+
+async function loadPlannedCalls(){
+
+  const{data}=await sb.from('leads').select('*').not('reminder_at','is',null).order('reminder_at');
+
+  const c=document.getElementById('calls-container');const calls=(data||[]).filter(l=>l.status!=='enrolled'&&l.status!=='refused');
+
+  if(!calls.length){c.innerHTML='<div class="empty"><div class="empty-icon">📞</div>Rejalashtirilgan qo\'ng\'iroq yo\'q</div>';return;}
+
+  const today=new Date();today.setHours(0,0,0,0);
+
+  const groups={bugun:[],ertaga:[],indin:[],keyin:[]};
+
+  calls.forEach(l=>{const d=new Date(l.reminder_at);const dd=new Date(d);dd.setHours(0,0,0,0);
+
+    const diff=Math.round((dd-today)/86400000);
+
+    if(diff<=0)groups.bugun.push(l);else if(diff===1)groups.ertaga.push(l);else if(diff===2)groups.indin.push(l);else groups.keyin.push(l);});
+
+  const labels={bugun:'📅 Bugun',ertaga:'📅 Ertaga',indin:'📅 Indin',keyin:'📅 Keyinroq'};
+
+  let html='';
+
+  for(const[k,v]of Object.entries(groups)){if(!v.length)continue;
+
+    html+=`<div class="call-day"><div class="call-day-title">${labels[k]} <span class="badge blue">${v.length}</span></div>`;
+
+    html+=v.map(l=>{const t=new Date(l.reminder_at).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+
+      return `<div class="call-item"><div class="call-time">${t}</div><div class="call-info"><div class="call-name">${l.name} <span class="badge ${l.status==='hot'?'warn':'blue'}">${LSTAT[l.status]||''}</span></div>
+
+        <div class="call-note">${l.last_comment||l.note||''}</div></div><a href="tel:${l.phone}" class="btn-sm green" style="text-decoration:none">📞 ${l.phone}</a></div>`;}).join('');
+
+    html+='</div>';}
+
+  c.innerHTML=html;
+
 }
 
-// ══════════════════════════════════════
-// SQL SETUP HELPER (run once)
-// ══════════════════════════════════════
-// Run this SQL in Supabase SQL Editor:
-/*
-CREATE TABLE IF NOT EXISTS students (
-  id SERIAL PRIMARY KEY, telegram_id BIGINT,
-  full_name TEXT NOT NULL, username TEXT,
-  access_code TEXT UNIQUE, password_hash TEXT,
-  bytes_balance INTEGER DEFAULT 0, som_balance INTEGER DEFAULT 0,
-  calf_kg FLOAT DEFAULT 40, is_active INTEGER DEFAULT 0,
-  course TEXT DEFAULT 'bolalar', warnings INTEGER DEFAULT 0,
-  streak_days INTEGER DEFAULT 0, level INTEGER DEFAULT 1,
-  rank TEXT DEFAULT 'Junior', current_week INTEGER DEFAULT 1,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-CREATE TABLE IF NOT EXISTS lesson_access (
-  id SERIAL PRIMARY KEY, student_id INTEGER NOT NULL,
-  lesson_id INTEGER NOT NULL, test_passed INTEGER DEFAULT 0,
-  unlocked_at TIMESTAMP DEFAULT NOW(), UNIQUE(student_id,lesson_id)
-);
-CREATE TABLE IF NOT EXISTS tez_aytish_access (
-  id SERIAL PRIMARY KEY, student_id INTEGER NOT NULL,
-  lesson_id INTEGER NOT NULL, status TEXT DEFAULT 'locked',
-  UNIQUE(student_id,lesson_id)
-);
-CREATE TABLE IF NOT EXISTS tez_aytish_submissions (
-  id SERIAL PRIMARY KEY, student_id INTEGER NOT NULL,
-  lesson_id INTEGER NOT NULL, voice_url TEXT,
-  status TEXT DEFAULT 'pending',
-  submitted_at TIMESTAMP DEFAULT NOW(), reviewed_at TIMESTAMP
-);
-CREATE TABLE IF NOT EXISTS bytes_transactions (
-  id SERIAL PRIMARY KEY, student_id INTEGER NOT NULL,
-  amount INTEGER, reason TEXT, created_at TIMESTAMP DEFAULT NOW()
-);
-CREATE TABLE IF NOT EXISTS notifications (
-  id SERIAL PRIMARY KEY, target_id INTEGER,
-  target_name TEXT, message TEXT, type TEXT DEFAULT 'message',
-  sent_at TIMESTAMP DEFAULT NOW()
-);
--- Storage bucket for voices (run in Storage section: create bucket "voices", make it public)
--- RLS: disable RLS on all tables for now (or add policies)
-ALTER TABLE students DISABLE ROW LEVEL SECURITY;
-ALTER TABLE lesson_access DISABLE ROW LEVEL SECURITY;
-ALTER TABLE tez_aytish_access DISABLE ROW LEVEL SECURITY;
-ALTER TABLE tez_aytish_submissions DISABLE ROW LEVEL SECURITY;
-ALTER TABLE bytes_transactions DISABLE ROW LEVEL SECURITY;
-ALTER TABLE notifications DISABLE ROW LEVEL SECURITY;
-CREATE TABLE IF NOT EXISTS leads (
-  id SERIAL PRIMARY KEY, name TEXT NOT NULL,
-  phone TEXT NOT NULL, note TEXT, status TEXT DEFAULT 'new',
-  last_comment TEXT, reminder_time TEXT,
-  created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP
-);
-ALTER TABLE leads DISABLE ROW LEVEL SECURITY;
-*/
+(async function(){await restoreSession();})();
+
 </script>
+
 </body>
+
 </html>
