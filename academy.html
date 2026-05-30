@@ -11,7 +11,7 @@
 :root{
   --bg:#0a0b0f;--s:#13151c;--s2:#1c1f29;--s3:#252934;--brd:#2a2e3a;--brd2:#363b4a;
   --tx:#eef0f5;--mu:#5f6675;--mu2:#9aa1b3;
-  --ac:#7c5cff;--ac2:#9d7bff;--acd:#5b3fd6;
+  --ac:#7c5cff;--ac2:#9d7bff;--acd:#5b3fd6;h
   --cy:#22d3ee;--gn:#34d399;--rd:#fb7185;--go:#fbbf24;--bl:#60a5fa;--pk:#f472b6;
   --r:14px;--rs:10px;
   --ff:'DM Sans',-apple-system,sans-serif;--fd:'Space Grotesk',sans-serif;--fm:'DM Mono',monospace;
@@ -1454,7 +1454,7 @@ function setReminder(id,date,name,phone){if(!('Notification'in window))return;
     const notifyAt=date.getTime()-10*60*1000;const delay=notifyAt-Date.now();
     if(delay<0||delay>2147483647)return;if(reminderTimers[id])clearTimeout(reminderTimers[id]);
     reminderTimers[id]=setTimeout(()=>{new Notification('📞 Qo\'ng\'iroq vaqti yaqin!',{body:`${name} (${phone}) ga 10 daqiqadan keyin qo'ng'iroq qiling!`});},delay);});}
-function scheduleReminders(leads){leads.filter(l=>l.reminder_at&&l.status!=='enrolled'&&l.status!=='refused').forEach(l=>setReminder(l.id,new Date(l.reminder_at),l.name,l.phone));}
+function scheduleReminders(leads){leads.filter(l=>l.reminder_at&&l.status!=='refused').forEach(l=>setReminder(l.id,new Date(l.reminder_at),l.name,l.phone));}
 
 // ── PLANNED CALLS (weekly calendar Mon-Sun) ──
 let callWeekOffset=0; // 0=this week
@@ -1464,7 +1464,7 @@ async function loadPlannedCalls(){
   // fetch ALL leads, filter in JS (more reliable than .not())
   const{data,error}=await sb.from('leads').select('*').order('reminder_at',{ascending:true});
   if(error){c.innerHTML='<div class="empty">Xato: '+error.message+'</div>';return;}
-  const calls=(data||[]).filter(l=>l.reminder_at&&l.status!=='enrolled'&&l.status!=='refused');
+  const calls=(data||[]).filter(l=>l.reminder_at&&l.status!=='refused');
 
   // compute week range (Mon-Sun) with offset
   const now=new Date();
