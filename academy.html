@@ -370,21 +370,23 @@ audio{height:36px;border-radius:7px;max-width:240px}
     <div class="login-back" onclick="showPage('p-land')">← Orqaga</div>
     <div class="login-icon">🛡</div>
     <div class="login-title">Xodimlar kirish</div>
-    <div class="login-sub">Rol va parolni tanlang</div>
-    <div class="field">
-      <label>Rol</label>
-      <select id="staff-role">
-        <option value="admin">👨‍💼 Administrator</option>
-        <option value="marketing">📊 Marketolog</option>
-        <option value="director">🎩 Direktor</option>
-      </select>
+    <div class="login-sub" id="staff-login-sub">Login va parolni kiriting</div>
+    <div style="display:flex;gap:6px;background:var(--s2);border-radius:9px;padding:4px;margin-bottom:18px">
+      <button class="stf-tab active" id="stf-tab-emp" onclick="staffTab('emp')" style="flex:1;padding:9px;border:none;background:var(--s);color:var(--tx);font-size:13px;font-weight:600;border-radius:7px">👤 Xodim</button>
+      <button class="stf-tab" id="stf-tab-mkt" onclick="staffTab('mkt')" style="flex:1;padding:9px;border:none;background:transparent;color:var(--mu);font-size:13px;font-weight:600;border-radius:7px">📊 Marketolog</button>
     </div>
-    <div class="field">
-      <label>Parol</label>
-      <input id="staff-pass" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter')doStaffLogin()">
+    <!-- Employee login (login + pass) -->
+    <div id="stf-emp-form">
+      <div class="field"><label>Login</label><input id="staff-login" type="text" placeholder="mohijahon" autocomplete="off"></div>
+      <div class="field"><label>Parol</label><input id="staff-emp-pass" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter')doEmployeeLogin()"></div>
+      <button class="btn-full" onclick="doEmployeeLogin()">Kirish</button>
     </div>
-    <button class="btn-full" onclick="doStaffLogin()">Kirish</button>
-    <div class="err" id="staff-err">Noto'g'ri parol</div>
+    <!-- Marketer login (master pass) -->
+    <div id="stf-mkt-form" style="display:none">
+      <div class="field"><label>Marketolog paroli</label><input id="staff-pass" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter')doStaffLogin()"></div>
+      <button class="btn-full" onclick="doStaffLogin()">Kirish</button>
+    </div>
+    <div class="err" id="staff-err">Noto'g'ri ma'lumot</div>
   </div>
 </div>
 
@@ -555,6 +557,41 @@ audio{height:36px;border-radius:7px;max-width:240px}
       <div id="meet-container"><div class="loading-center"><div class="spin"></div></div></div>
     </div>
 
+    <!-- STAFF MANAGEMENT (marketer only) -->
+    <div class="admin-panel" id="ap-staff">
+      <div class="ap-head"><div><div class="ap-title">🧑‍💼 Xodimlar</div><div class="ap-sub">Xodim qo'shish va ish hisoboti</div></div>
+        <button class="btn-sm yellow" onclick="toggleStaffForm()">+ Yangi xodim</button></div>
+      <div class="tbl-wrap" id="staff-form" style="display:none;padding:18px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field"><label>Ism</label><input id="sf-name" type="text" placeholder="Mohijahon"></div>
+          <div class="field"><label>Lavozim</label><select id="sf-position"><option value="admin">👨‍💼 Administrator</option><option value="director">🎩 Direktor</option><option value="manager">📋 Menejer</option></select></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field"><label>Login</label><input id="sf-login" type="text" placeholder="mohijahon" autocomplete="off"></div>
+          <div class="field"><label>Parol</label><input id="sf-pass" type="text" placeholder="parol123" autocomplete="off"></div>
+        </div>
+        <div style="display:flex;gap:8px"><button class="btn-sm green" style="padding:10px 18px" onclick="saveStaff()">Saqlash</button>
+          <button class="btn-sm red" style="padding:10px 18px" onclick="toggleStaffForm()">Bekor</button></div>
+        <div style="font-size:11px;color:var(--mu);margin-top:8px">⏱ Administrator lavozimida "Ishni boshlash/yakunlash" tugmasi bo'ladi. Direktor va menejer uchun yo'q.</div>
+      </div>
+      <div style="font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin:8px 0 10px">📋 Xodimlar ro'yxati</div>
+      <div id="staff-list"><div class="loading-center"><div class="spin"></div></div></div>
+      <div style="font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin:20px 0 10px">📊 Bugungi ish hisoboti</div>
+      <div id="staff-report"><div class="loading-center"><div class="spin"></div></div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- WORK TIMER BAR (admin only, floating) -->
+<div id="work-timer-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s);border-top:1px solid var(--ac);padding:12px 18px;z-index:60;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+  <div style="display:flex;align-items:center;gap:14px">
+    <span style="font-size:13px;color:var(--mu2)" id="wt-label">Ishni boshlang</span>
+    <span style="font-family:var(--fm);font-size:20px;font-weight:500;color:var(--ac2)" id="wt-clock" style="display:none"></span>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn-sm green" id="wt-start" style="padding:10px 20px" onclick="startWork()">▶️ Ishni boshlash</button>
+    <button class="btn-sm red" id="wt-end" style="padding:10px 20px;display:none" onclick="endWork()">⏹ Yakunlash</button>
   </div>
 </div>
 
@@ -748,16 +785,21 @@ const sb = createClient('https://unaodltahuevrfnarfha.supabase.co','sb_publishab
 
 // ── STAFF PASSWORDS ──
 const STAFF = {
-  admin:     {pass:'admin2024',    name:'Administrator', role:'admin'},
-  marketing: {pass:'market2024',   name:'Marketolog',    role:'marketing'},
-  director:  {pass:'director2024', name:'Direktor',      role:'director'}
+  marketing: {pass:'market2024', name:'Marketolog', role:'marketing'}
+};
+// POSITIONS — what menus & timer each gets. Marketer registers staff with one of these.
+const POSITIONS = {
+  director: {label:'Direktor',  menuRole:'director', timer:false},
+  manager:  {label:'Menejer',   menuRole:'marketing',timer:false},
+  admin:    {label:'Administrator', menuRole:'admin', timer:true}
 };
 
-// ── ROLE MENUS ──
+// ── ROLE MENUS ── (Variant B: everyone sees ALL sections; only timer differs)
+const FULL_MENU=['svodka','dash','control','students','tez','notif','activate','leads','calls','meet'];
 const MENUS = {
-  admin:     ['svodka','dash','control','students','tez','notif','activate','leads','calls','meet'],
-  marketing: ['svodka','leads','calls','meet','students'],
-  director:  ['svodka','dash','control','students','meet']
+  admin:     FULL_MENU,
+  marketing: FULL_MENU,
+  director:  FULL_MENU
 };
 const MENU_META = {
   svodka:  {label:'📊 Svodka',        fn:'loadSvodka'},
@@ -769,7 +811,8 @@ const MENU_META = {
   activate:{label:'✅ Aktivatsiya',   fn:null},
   leads:   {label:'🔥 Lidlar',        fn:'loadLeads'},
   calls:   {label:'📞 Qo\'ng\'iroqlar',fn:'loadPlannedCalls'},
-  meet:    {label:'🤝 Uchrashuvlar',  fn:'loadMeetings'}
+  meet:    {label:'🤝 Uchrashuvlar',  fn:'loadMeetings'},
+  staff:   {label:'🧑‍💼 Xodimlar',     fn:'loadStaffPanel'}
 };
 
 // ── LESSONS ──
@@ -922,28 +965,55 @@ async function doLogin(){
   btn.disabled=false;btn.textContent='Kirish';
 }
 
+function staffTab(t){
+  document.getElementById('stf-tab-emp').classList.toggle('active',t==='emp');
+  document.getElementById('stf-tab-mkt').classList.toggle('active',t==='mkt');
+  document.getElementById('stf-tab-emp').style.background=t==='emp'?'var(--s)':'transparent';
+  document.getElementById('stf-tab-emp').style.color=t==='emp'?'var(--tx)':'var(--mu)';
+  document.getElementById('stf-tab-mkt').style.background=t==='mkt'?'var(--s)':'transparent';
+  document.getElementById('stf-tab-mkt').style.color=t==='mkt'?'var(--tx)':'var(--mu)';
+  document.getElementById('stf-emp-form').style.display=t==='emp'?'block':'none';
+  document.getElementById('stf-mkt-form').style.display=t==='mkt'?'block':'none';
+  document.getElementById('staff-err').style.display='none';
+}
+
 function doStaffLogin(){
-  const role=document.getElementById('staff-role').value;
   const pass=document.getElementById('staff-pass').value.trim();
-  const err=document.getElementById('staff-err');
-  err.style.display='none';
-  const s=STAFF[role];
-  if(!s||pass!==s.pass){err.textContent="Noto'g'ri parol";err.style.display='block';return;}
-  currentStaff={role:s.role,name:s.name};
+  const err=document.getElementById('staff-err');err.style.display='none';
+  const s=STAFF.marketing;
+  if(pass!==s.pass){err.textContent="Noto'g'ri parol";err.style.display='block';return;}
+  currentStaff={role:'marketing',name:'Marketolog',position:'marketing',isMarketer:true};
+  saveSession('staff',currentStaff);
+  enterStaffPanel();
+}
+
+async function doEmployeeLogin(){
+  const login=document.getElementById('staff-login').value.trim();
+  const pass=document.getElementById('staff-emp-pass').value.trim();
+  const err=document.getElementById('staff-err');err.style.display='none';
+  if(!login||!pass){err.textContent='Login va parolni kiriting';err.style.display='block';return;}
+  const{data,error}=await sb.from('staff_accounts').select('*').eq('login',login).eq('password',pass).maybeSingle();
+  if(error||!data){err.textContent="Login yoki parol noto'g'ri";err.style.display='block';return;}
+  const pos=POSITIONS[data.position]||POSITIONS.admin;
+  currentStaff={role:pos.menuRole,name:data.name,position:data.position,staffId:data.id,timer:pos.timer,isMarketer:false};
   saveSession('staff',currentStaff);
   enterStaffPanel();
 }
 
 function enterStaffPanel(){
   const role=currentStaff.role;
-  document.getElementById('sb-role').textContent=role.toUpperCase();
+  const posLabel=currentStaff.isMarketer?'Marketolog (Bosh)':(POSITIONS[currentStaff.position]?POSITIONS[currentStaff.position].label:'Xodim');
+  document.getElementById('sb-role').textContent=posLabel.toUpperCase();
   document.getElementById('staff-name-sb').textContent=currentStaff.name;
-  document.getElementById('staff-role-sb').textContent=role==='admin'?'Administrator':role==='marketing'?'Marketolog':'Direktor';
-  // Build menu
+  document.getElementById('staff-role-sb').textContent=posLabel;
+  // Build menu — marketer gets full + xodimlar management
+  let items=(MENUS[role]||MENUS.admin).slice();
+  if(currentStaff.isMarketer&&!items.includes('staff'))items.push('staff'); // staff management panel
   const nav=document.getElementById('sb-nav');
-  const items=MENUS[role]||MENUS.admin;
   nav.innerHTML=items.map((k,i)=>`<div class="sb-item ${i===0?'active':''}" data-panel="${k}" onclick="navTo('${k}',this)">${MENU_META[k].label}</div>`).join('');
   showPage('p-admin');
+  // Admin work-timer bar
+  setupWorkTimer();
   navTo(items[0],nav.querySelector('.sb-item'));
 }
 
@@ -1517,6 +1587,7 @@ async function saveLeadComment(){const id=+document.getElementById('lcm-id').val
   const newEntry=`[${dtFmt(nowStr)}] ${LSTAT[status]||status}: ${note}`;
   history=history?(history+'\n'+newEntry):newEntry;
   const upd={status,last_comment:note,name,phone,last_checked:nowStr,history,updated_at:new Date().toISOString()};
+  if(currentStaff&&currentStaff.staffId)upd.last_checked_by=currentStaff.staffId;
   if(dt)upd.reminder_at=dt;else upd.reminder_at=null;
   const{error}=await sb.from('leads').update(upd).eq('id',id);
   if(error){toast(error.message,'err');return;}
@@ -1638,6 +1709,135 @@ async function loadMeetings(){
     html+=`</div>`;});
   if(total===0)html+=`<div class="empty" style="margin-top:10px">Bu haftada uchrashuv yo'q</div>`;
   c.innerHTML=html;
+}
+
+// ════ STAFF MANAGEMENT (marketer only) ════
+function toggleStaffForm(){const f=document.getElementById('staff-form');f.style.display=f.style.display==='none'?'block':'none';}
+async function saveStaff(){
+  const name=document.getElementById('sf-name').value.trim();
+  const login=document.getElementById('sf-login').value.trim();
+  const pass=document.getElementById('sf-pass').value.trim();
+  const position=document.getElementById('sf-position').value;
+  if(!name||!login||!pass){toast('Ism, login va parol kerak','err');return;}
+  // check login unique
+  const{data:ex}=await sb.from('staff_accounts').select('id').eq('login',login).maybeSingle();
+  if(ex){toast('Bu login band','err');return;}
+  const{error}=await sb.from('staff_accounts').insert({name,login,password:pass,position,created_at:new Date().toISOString()});
+  if(error){toast(error.message,'err');return;}
+  ['sf-name','sf-login','sf-pass'].forEach(i=>document.getElementById(i).value='');
+  toggleStaffForm();toast('✅ Xodim qo\'shildi: '+name);loadStaffPanel();
+}
+async function deleteStaff(id,name){
+  if(!confirm(name+' o\'chirilsinmi?'))return;
+  await sb.from('staff_accounts').delete().eq('id',id);
+  toast('🗑 O\'chirildi');loadStaffPanel();
+}
+async function loadStaffPanel(){
+  const listC=document.getElementById('staff-list');
+  const repC=document.getElementById('staff-report');
+  listC.innerHTML='<div class="loading-center"><div class="spin"></div></div>';
+  repC.innerHTML='<div class="loading-center"><div class="spin"></div></div>';
+  const{data,error}=await sb.from('staff_accounts').select('*').order('created_at',{ascending:false});
+  if(error){listC.innerHTML='<div class="empty" style="color:var(--rd)">❌ '+error.message+'</div>';repC.innerHTML='';return;}
+  const staff=data||[];
+  // staff list
+  if(!staff.length){listC.innerHTML='<div class="empty">Hali xodim qo\'shilmagan</div>';}
+  else{
+    listC.innerHTML=staff.map(s=>{const pos=POSITIONS[s.position]||{label:s.position};
+      return `<div class="sub-card"><div class="sub-info"><div class="sub-name">${s.name} <span class="badge ${s.position==='admin'?'active':s.position==='director'?'warn':'blue'}">${pos.label}</span></div>
+        <div class="sub-meta">Login: <b style="color:var(--mu2)">${s.login}</b> · Parol: <b style="color:var(--mu2)">${s.password}</b> ${pos.timer?'· ⏱ Taymer bor':''}</div></div>
+        <button class="btn-sm red" onclick="deleteStaff(${s.id},'${s.name.replace(/'/g,'')}')">🗑</button></div>`;}).join('');
+  }
+  // today's work report (only admins have sessions)
+  const today=todayLocalStr();
+  const{data:sessions}=await sb.from('work_sessions').select('*').eq('work_date',today);
+  const admins=staff.filter(s=>s.position==='admin');
+  if(!admins.length){repC.innerHTML='<div class="empty">Administrator lavozimidagi xodim yo\'q</div>';return;}
+  repC.innerHTML=admins.map(a=>{
+    const mySessions=(sessions||[]).filter(x=>x.staff_id===a.id);
+    const totalMin=mySessions.reduce((sum,x)=>sum+(x.minutes||0),0);
+    const totalLeads=mySessions.reduce((sum,x)=>sum+(x.leads_handled||0),0);
+    const isWorking=mySessions.some(x=>!x.ended_at);
+    const h=Math.floor(totalMin/60),m=totalMin%60;
+    return `<div class="sub-card"><div class="sub-info"><div class="sub-name">${a.name} ${isWorking?'<span class="badge active">🟢 Ishlamoqda</span>':''}</div>
+      <div class="sub-meta">⏱ Bugun: <b style="color:var(--ac2)">${h} soat ${m} daqiqa</b> · 📋 Lidlar: <b style="color:var(--gn)">${totalLeads} ta</b></div></div></div>`;
+  }).join('');
+}
+
+// ════ WORK TIMER (admin position only) ════
+let workSessionId=null, workStartTime=null, workClockInterval=null, workLeadsAtStart=0;
+function setupWorkTimer(){
+  const bar=document.getElementById('work-timer-bar');
+  if(currentStaff&&currentStaff.timer){
+    bar.style.display='flex';
+    // check if already has open session today (resume)
+    checkOpenSession();
+  }else{
+    bar.style.display='none';
+  }
+}
+async function checkOpenSession(){
+  if(!currentStaff||!currentStaff.staffId)return;
+  const today=todayLocalStr();
+  const{data}=await sb.from('work_sessions').select('*').eq('staff_id',currentStaff.staffId).eq('work_date',today).is('ended_at',null).maybeSingle();
+  if(data){
+    // resume running session
+    workSessionId=data.id;
+    workStartTime=dtToDateObj(data.started_at)||new Date(data.started_at);
+    workLeadsAtStart=data.leads_at_start||0;
+    showWorkRunning();
+  }
+}
+function showWorkRunning(){
+  document.getElementById('wt-start').style.display='none';
+  document.getElementById('wt-end').style.display='inline-block';
+  document.getElementById('wt-label').textContent='Ish vaqti:';
+  const clock=document.getElementById('wt-clock');clock.style.display='inline-block';
+  if(workClockInterval)clearInterval(workClockInterval);
+  const tick=()=>{const diff=Math.floor((Date.now()-workStartTime.getTime())/1000);
+    const h=Math.floor(diff/3600),m=Math.floor((diff%3600)/60),s=diff%60;
+    clock.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;};
+  tick();workClockInterval=setInterval(tick,1000);
+}
+async function startWork(){
+  if(!currentStaff||!currentStaff.staffId){toast('Xato: xodim aniqlanmadi','err');return;}
+  const now=new Date();
+  const nowStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const today=todayLocalStr();
+  // count leads checked today by this admin already (so we measure delta)
+  const leadsNow=await countMyLeadsToday();
+  const{data,error}=await sb.from('work_sessions').insert({staff_id:currentStaff.staffId,staff_name:currentStaff.name,started_at:nowStr,work_date:today,leads_at_start:leadsNow}).select().single();
+  if(error){toast(error.message,'err');return;}
+  workSessionId=data.id;workStartTime=now;workLeadsAtStart=leadsNow;
+  showWorkRunning();toast('▶️ Ish boshlandi! Omad, '+currentStaff.name);
+}
+async function countMyLeadsToday(){
+  // leads this admin checked today (last_checked is today). We count all leads checked today.
+  const today=todayLocalStr();
+  const{data}=await sb.from('leads').select('last_checked').eq('last_checked_by',currentStaff.staffId);
+  // fallback: if last_checked_by not tracked, count all checked-today
+  if(data&&data.length)return data.filter(l=>dtDateOnly(l.last_checked)===today).length;
+  const{data:all}=await sb.from('leads').select('last_checked');
+  return (all||[]).filter(l=>l.last_checked&&dtDateOnly(l.last_checked)===today).length;
+}
+async function endWork(){
+  if(!workSessionId){toast('Faol sessiya yo\'q','err');return;}
+  const now=new Date();
+  const nowStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const minutes=Math.max(1,Math.round((now.getTime()-workStartTime.getTime())/60000));
+  const leadsNow=await countMyLeadsToday();
+  const leadsHandled=Math.max(0,leadsNow-workLeadsAtStart);
+  await sb.from('work_sessions').update({ended_at:nowStr,minutes,leads_handled:leadsHandled}).eq('id',workSessionId);
+  if(workClockInterval)clearInterval(workClockInterval);
+  const h=Math.floor(minutes/60),m=minutes%60;
+  // nice summary
+  const timeStr=h>0?`${h} soat ${m} daqiqa`:`${m} daqiqa`;
+  alert(`✅ Ajoyib ish, ${currentStaff.name}!\n\n⏱ Bugun siz ${timeStr} ishladingiz\n📋 ${leadsHandled} ta lid bilan ishladingiz\n\nDam oling, ertaga ko'rishguncha! 👋`);
+  workSessionId=null;workStartTime=null;
+  document.getElementById('wt-start').style.display='inline-block';
+  document.getElementById('wt-end').style.display='none';
+  document.getElementById('wt-clock').style.display='none';
+  document.getElementById('wt-label').textContent='Ishni boshlang';
 }
 
 // ── INIT ──
