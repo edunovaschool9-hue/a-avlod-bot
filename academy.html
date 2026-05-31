@@ -11,7 +11,7 @@
 :root{
   --bg:#0a0b0f;--s:#13151c;--s2:#1c1f29;--s3:#252934;--brd:#2a2e3a;--brd2:#363b4a;
   --tx:#eef0f5;--mu:#5f6675;--mu2:#9aa1b3;
-  --ac:#7c5cff;--ac2:#9d7bff;--acd:#5b3fd6;h
+  --ac:#7c5cff;--ac2:#9d7bff;--acd:#5b3fd6;
   --cy:#22d3ee;--gn:#34d399;--rd:#fb7185;--go:#fbbf24;--bl:#60a5fa;--pk:#f472b6;
   --r:14px;--rs:10px;
   --ff:'DM Sans',-apple-system,sans-serif;--fd:'Space Grotesk',sans-serif;--fm:'DM Mono',monospace;
@@ -462,7 +462,7 @@ audio{height:36px;border-radius:7px;max-width:240px}
             <option value="">Barchasi</option><option value="1">Faol</option><option value="0">Faolsiz</option>
           </select>
         </div>
-        <div class="tbl-scroll"><table><thead><tr><th>Ism</th><th>Kod</th><th>Telegram</th><th>To'lov</th><th>Status</th><th>Amal</th></tr></thead>
+        <div class="tbl-scroll"><table><thead><tr><th>Ism</th><th>Kod</th><th>Telegram</th><th>To'lov</th><th>To'lovgacha</th><th>Status</th><th>Amal</th></tr></thead>
           <tbody id="stu-tbody"><tr><td colspan="6" class="loading-center"><div class="spin"></div></td></tr></tbody></table></div>
       </div>
     </div>
@@ -516,6 +516,7 @@ audio{height:36px;border-radius:7px;max-width:240px}
         <div style="display:flex;gap:8px"><button class="btn-sm green" style="padding:10px 18px" onclick="saveLead()">Saqlash</button>
           <button class="btn-sm red" style="padding:10px 18px" onclick="toggleLeadForm()">Bekor</button></div>
       </div>
+      <div id="leads-unread-banner"></div>
       <div class="leads-filter-row">
         <button class="filter-btn active" onclick="filterLeads('all',this)">Barchasi</button>
         <button class="filter-btn" onclick="filterLeads('cold',this)">❄️ Sovuq</button>
@@ -591,6 +592,7 @@ audio{height:36px;border-radius:7px;max-width:240px}
   <div class="field"><label>Kirish kodi</label><input id="es-code" type="text"></div>
   <div class="field"><label>So'm</label><input id="es-som" type="number"></div>
   <div class="field"><label>To'lov holati</label><select id="es-paid"><option value="1">To'langan</option><option value="0">Qarzdor</option></select></div>
+  <div class="field"><label>📅 Birinchi dars sanasi (to'lov hisobi uchun)</label><input id="es-firstlesson" type="date"><div style="font-size:11px;color:var(--mu);margin-top:4px">Shu sanadan 30 kun keyin to'lov muddati</div></div>
   <button class="btn-full" onclick="saveEditStudent()">Saqlash</button>
 </div></div>
 
@@ -611,7 +613,8 @@ audio{height:36px;border-radius:7px;max-width:240px}
       <option value="refused">❌ Rad etdi</option>
     </select>
   </div>
-  <div class="field"><label>Qo'ng'iroq izohi (itog)</label><textarea id="lcm-note" placeholder="Kechqurun qayta qo'ng'iroq so'radi..."></textarea></div>
+  <div id="lcm-history"></div>
+  <div class="field"><label>📋 Hisobot — nima bo'ldi? (majburiy)</label><textarea id="lcm-note" placeholder="Masalan: Telefon ko'tardi, bir soatdan keyin qayta qo'ng'iroq so'radi..."></textarea></div>
   <div class="field" id="lcm-reminder-wrap">
     <label>⏰ Qayta qo'ng'iroq (sana va vaqt)</label>
     <input type="datetime-local" id="lcm-datetime">
@@ -860,6 +863,18 @@ let reminderTimers={};
 function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.getElementById(id).classList.add('on');}
 function toast(m,t='ok'){const e=document.getElementById('toast');e.textContent=m;e.className='toast on '+(t==='ok'?'ok':'err');setTimeout(()=>e.classList.remove('on'),2800);}
 function fmt(n){return Number(n||0).toLocaleString('ru')}
+// Time helpers — store & show EXACTLY what user entered, no timezone shift
+// datetime-local gives "2026-05-30T10:00" — we keep it as-is (local string)
+function dtToStore(localStr){return localStr?localStr:null;} // store the literal string
+function dtFmt(s,withDate=true){if(!s)return '';
+  // s is "2026-05-30T10:00" or ISO; take first 16 chars
+  const m=String(s).match(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+  if(!m)return s;
+  return withDate?`${m[3]}.${m[2]} ${m[4]}:${m[5]}`:`${m[4]}:${m[5]}`;}
+function dtDateOnly(s){if(!s)return '';const m=String(s).match(/(\d{4})-(\d{2})-(\d{2})/);return m?m[0]:'';}
+function dtToDateObj(s){if(!s)return null;const m=String(s).match(/(\d{4})-(\d{2})-(\d{2})T?(\d{2})?:?(\d{2})?/);
+  if(!m)return null;return new Date(+m[1],+m[2]-1,+m[3],+(m[4]||0),+(m[5]||0));}
+function todayLocalStr(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 function ini(n){return(n||'?').split(' ').map(x=>x[0]||'').join('').slice(0,2).toUpperCase()||'?'}
 function showModal(id){document.getElementById(id).classList.add('on')}
 function hideModal(id){document.getElementById(id).classList.remove('on')}
@@ -900,6 +915,8 @@ async function doLogin(){
   if(error||!data){err.textContent="Ism yoki kod noto'g'ri yoki faolsiz";err.style.display='block';btn.disabled=false;btn.textContent='Kirish';return;}
   currentUser=data;
   saveSession('student',{id:data.id});
+  // log visit for monitoring (fire and forget)
+  try{sb.from('student_visits').insert({student_id:data.id,visited_at:new Date().toISOString()}).then(()=>{});}catch(e){}
   await loadStudentApp();
   showPage('p-student');
   btn.disabled=false;btn.textContent='Kirish';
@@ -1169,8 +1186,8 @@ async function loadSvodka(){
   const {data:leads}=await sb.from('leads').select('*');allLeads=leads||[];
   document.getElementById('sv-leads').textContent=allLeads.length;
   document.getElementById('sv-hot').textContent=allLeads.filter(l=>l.status==='hot').length;
-  const today=new Date().toISOString().slice(0,10);
-  document.getElementById('sv-calls').textContent=allLeads.filter(l=>l.reminder_at&&l.reminder_at.slice(0,10)===today).length;
+  const today=todayLocalStr();
+  document.getElementById('sv-calls').textContent=allLeads.filter(l=>l.reminder_at&&dtDateOnly(l.reminder_at)===today).length;
   // late = active but no test passed in 7 days (simplified: 0 tests done)
   let late=0;
   for(const s of active){const{data:la}=await sb.from('lesson_access').select('test_passed').eq('student_id',s.id);if(!(la||[]).some(a=>a.test_passed===1))late++;}
@@ -1238,13 +1255,17 @@ async function loadStudentsTable(){
 }
 function renderStudentsTable(list){
   const tb=document.getElementById('stu-tbody');
-  if(!list.length){tb.innerHTML='<tr><td colspan="6" class="empty">O\'quvchi yo\'q</td></tr>';return;}
+  if(!list.length){tb.innerHTML='<tr><td colspan="7" class="empty">O\'quvchi yo\'q</td></tr>';return;}
   tb.innerHTML=list.map(s=>{
     const b=s.is_active===1?'<span class="badge active">Faol</span>':'<span class="badge inactive">Faolsiz</span>';
     const pay=s.paid===1?'<span class="badge active">✓</span>':'<span class="badge warn">Qarz</span>';
     const tg=s.telegram_username?`<a class="tg-link" href="https://t.me/${s.telegram_username}" target="_blank">@${s.telegram_username}</a>`:'—';
+    const pd=paymentDays(s);
+    let payCell='<span style="color:var(--mu);font-size:12px">—</span>';
+    if(pd.days!=null){const col=pd.days<0?'var(--rd)':pd.days<=5?'var(--go)':'var(--gn)';
+      payCell=`<span style="color:${col};font-family:var(--fm);font-size:12px">${pd.days<0?Math.abs(pd.days)+' kun kechikdi':pd.days+' kun'}</span>`;}
     return `<tr><td><b>${s.full_name}</b>${s.warnings>0?` <span class="badge warn">⚠${s.warnings}</span>`:''}</td>
-      <td><code style="font-family:var(--fm);font-size:12px">${s.access_code||'—'}</code></td><td>${tg}</td><td>${pay}</td><td>${b}</td>
+      <td><code style="font-family:var(--fm);font-size:12px">${s.access_code||'—'}</code></td><td>${tg}</td><td>${pay}</td><td>${payCell}</td><td>${b}</td>
       <td><div class="action-btns"><button class="btn-sm blue" onclick="showStudentDetail(${s.id})">Ko'rish</button>
       ${s.is_active!==1?`<button class="btn-sm green" onclick="quickActivate(${s.id})">Faol</button>`:''}
       <button class="btn-sm red" onclick="selectedStudentId=${s.id};deleteStudent()">🗑</button></div></td></tr>`;}).join('');
@@ -1268,10 +1289,40 @@ async function showStudentDetail(id){
     }
   });
   if(!testRows)testRows='<div class="info-row"><span class="info-key" style="color:var(--mu)">Hali test topshirmagan</span></div>';
+  // VISITS monitoring
+  let visitsToday=0,visitsTotal=0,lastVisit='—';
+  try{
+    const{data:vis}=await sb.from('student_visits').select('visited_at').eq('student_id',id).order('visited_at',{ascending:false});
+    visitsTotal=(vis||[]).length;
+    const today=todayLocalStr();
+    visitsToday=(vis||[]).filter(v=>dtDateOnly(v.visited_at)===today).length;
+    if(vis&&vis.length)lastVisit=new Date(vis[0].visited_at).toLocaleString('ru',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  }catch(e){}
+  const testsDone=(la||[]).filter(a=>a.test_passed===1).length;
+  const tezDone=(ta||[]).filter(a=>a.status==='done').length;
+  // payment countdown
+  const payInfo=paymentDays(s);
   document.getElementById('sdm-body').innerHTML=
-    [['Kod',s.access_code||'—'],['Telegram',s.telegram_username?'@'+s.telegram_username:'—'],['Bayt',fmt(s.bytes_balance)],["So'm",fmt(s.som_balance)],['To\'lov',s.paid===1?'To\'langan':'Qarzdor'],['Hafta',(s.current_week||1)],['Tez aytish',(ta||[]).filter(a=>a.status==='done').length+'/8'],['Ogohlantirish',s.warnings||0]].map(([k,v])=>`<div class="info-row"><span class="info-key">${k}</span><span class="info-val">${v}</span></div>`).join('')
+    [['Kod',s.access_code||'—'],['Telegram',s.telegram_username?'@'+s.telegram_username:'—'],['Bayt',fmt(s.bytes_balance)],["So'm",fmt(s.som_balance)],['To\'lov',s.paid===1?'To\'langan':'Qarzdor'],['Hafta',(s.current_week||1)],['Ogohlantirish',s.warnings||0]].map(([k,v])=>`<div class="info-row"><span class="info-key">${k}</span><span class="info-val">${v}</span></div>`).join('')
+    +`<div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 6px">📊 Monitoring</div>`
+    +`<div class="info-row"><span class="info-key">Bugun kirgan</span><span class="info-val" style="color:${visitsToday>0?'var(--gn)':'var(--rd)'}">${visitsToday} marta</span></div>`
+    +`<div class="info-row"><span class="info-key">Jami kirishlar</span><span class="info-val">${visitsTotal}</span></div>`
+    +`<div class="info-row"><span class="info-key">Oxirgi kirish</span><span class="info-val">${lastVisit}</span></div>`
+    +`<div class="info-row"><span class="info-key">Testlar / Tez aytish</span><span class="info-val">${testsDone}/8 · ${tezDone}/8</span></div>`
+    +(payInfo.html||'')
     +`<div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 6px">📝 Test natijalari</div>`+testRows;
   showModal('stu-detail-modal');
+}
+// payment countdown: first_lesson_date + 30 days
+function paymentDays(s){
+  if(!s.first_lesson_date)return {html:`<div class="info-row"><span class="info-key">To'lov sanasi</span><span class="info-val" style="color:var(--mu)">Birinchi dars sanasi belgilanmagan</span></div>`,days:null};
+  const start=dtToDateObj(s.first_lesson_date)||new Date(s.first_lesson_date);
+  const due=new Date(start);due.setDate(due.getDate()+30);
+  const now=new Date();now.setHours(0,0,0,0);const dueD=new Date(due);dueD.setHours(0,0,0,0);
+  const days=Math.round((dueD-now)/86400000);
+  const col=days<0?'var(--rd)':days<=5?'var(--go)':'var(--gn)';
+  const txt=days<0?`${Math.abs(days)} kun kechikdi!`:days===0?'Bugun to\'lov kuni!':`${days} kun qoldi`;
+  return {html:`<div class="info-row"><span class="info-key">To'lovgacha</span><span class="info-val" style="color:${col}">${txt}</span></div>`,days};
 }
 function openEditStudent(){
   if(!selectedStudentId)return;const s=allStudents.find(x=>x.id===selectedStudentId);
@@ -1281,16 +1332,19 @@ function openEditStudent(){
   document.getElementById('es-code').value=s.access_code||'';
   document.getElementById('es-som').value=s.som_balance||0;
   document.getElementById('es-paid').value=s.paid===1?'1':'0';
+  document.getElementById('es-firstlesson').value=s.first_lesson_date?dtDateOnly(s.first_lesson_date):'';
   hideModal('stu-detail-modal');showModal('edit-student-modal');
 }
 async function saveEditStudent(){
   const id=+document.getElementById('es-id').value;
+  const fl=document.getElementById('es-firstlesson').value;
   const upd={
     full_name:document.getElementById('es-name').value.trim(),
     telegram_username:document.getElementById('es-tg').value.trim().replace('@','')||null,
     access_code:document.getElementById('es-code').value.trim(),
     som_balance:+document.getElementById('es-som').value||0,
-    paid:+document.getElementById('es-paid').value
+    paid:+document.getElementById('es-paid').value,
+    first_lesson_date:fl||null
   };
   if(!upd.full_name||!upd.access_code){toast('Ism va kod kerak','err');return;}
   const{error}=await sb.from('students').update(upd).eq('id',id);
@@ -1414,38 +1468,65 @@ async function loadLeads(){const{data}=await sb.from('leads').select('*').order(
 function filterLeads(s,btn){leadsFilter=s;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   renderLeads(s==='all'?allLeads:allLeads.filter(l=>l.status===s));}
 const LSTAT={cold:'❄️ Sovuq',thinking:'🤔 O\'ylayotgan',hot:'🔥 Issiq',enrolled:'✅ Yozildi',refused:'❌ Rad'};
+function isCheckedToday(l){return l.last_checked&&dtDateOnly(l.last_checked)===todayLocalStr();}
 function renderLeads(list){const c=document.getElementById('lead-cards');
   if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">📞</div>Lid yo\'q</div>';return;}
-  c.innerHTML=list.map(l=>{const rem=l.reminder_at?`<div class="lead-reminder">⏰ Qayta qo'ng'iroq: ${new Date(l.reminder_at).toLocaleString('ru',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</div>`:'';
+  // unread count = leads not yet checked today (skip enrolled/refused — yopilgan)
+  const unread=allLeads.filter(l=>l.status!=='enrolled'&&l.status!=='refused'&&!isCheckedToday(l)).length;
+  const banner=document.getElementById('leads-unread-banner');
+  if(banner){
+    if(unread>0)banner.innerHTML=`<div style="background:rgba(124,92,255,.12);border:1px solid var(--ac);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:22px">📨</span><div><b style="color:var(--ac2)">${unread} ta lid bugun tekshirilmagan</b><div style="font-size:12px;color:var(--mu)">Har bir lidni oching, hisobot yozing va "tekshirildi" deb belgilang</div></div></div>`;
+    else banner.innerHTML=`<div style="background:rgba(52,211,153,.1);border:1px solid var(--gn);border-radius:10px;padding:12px 16px;margin-bottom:14px;color:var(--gn)">✅ Barcha lidlar bugun tekshirildi! Zo'r ish!</div>`;
+  }
+  // sort: unchecked first
+  const sorted=[...list].sort((a,b)=>{const ua=(a.status!=='enrolled'&&a.status!=='refused'&&!isCheckedToday(a))?0:1;const ub=(b.status!=='enrolled'&&b.status!=='refused'&&!isCheckedToday(b))?0:1;return ua-ub;});
+  c.innerHTML=sorted.map(l=>{const rem=l.reminder_at?`<div class="lead-reminder">⏰ Qayta qo'ng'iroq: ${dtFmt(l.reminder_at)}</div>`:'';
     const com=l.last_comment?`<div class="lead-comment">"${l.last_comment}"</div>`:'';
-    return `<div class="lead-card ${l.status||'cold'}"><div class="lead-top"><div><div class="lead-name">${l.name}</div><div class="lead-phone">📱 ${l.phone}</div></div>
+    const closed=l.status==='enrolled'||l.status==='refused';
+    const checked=isCheckedToday(l);
+    // unread indicator (like unread SMS)
+    const unreadDot=(!closed&&!checked)?'<span style="display:inline-block;width:9px;height:9px;background:var(--ac);border-radius:50%;margin-right:6px;vertical-align:middle"></span>':'';
+    const readMark=checked?'<span style="color:var(--gn);font-size:12px">✓✓ bugun tekshirildi</span>':(!closed?'<span style="color:var(--ac2);font-size:12px;font-weight:600">● yangi / tekshirilmagan</span>':'');
+    return `<div class="lead-card ${l.status||'cold'}" style="${(!closed&&!checked)?'border-left-width:4px':''}"><div class="lead-top"><div><div class="lead-name">${unreadDot}${l.name}</div><div class="lead-phone">📱 ${l.phone}</div></div>
       <div style="text-align:right"><span class="badge ${l.status==='hot'?'warn':l.status==='enrolled'?'active':l.status==='thinking'?'pending':'blue'}">${LSTAT[l.status]||'Sovuq'}</span>
       <div class="lead-date">${new Date(l.created_at).toLocaleDateString('ru')}</div></div></div>
       ${l.note?`<div style="font-size:12px;color:var(--mu);margin:4px 0">${l.note}</div>`:''}${com}${rem}
+      <div style="margin:6px 0">${readMark}</div>
       <div class="lead-actions"><a href="tel:${l.phone}" class="btn-sm blue" style="text-decoration:none">📞 Qo'ng'iroq</a>
-      <button class="btn-sm yellow" onclick="openLeadComment(${l.id})">✏️ Natija</button>
+      <button class="btn-sm ${(!closed&&!checked)?'green':'yellow'}" onclick="openLeadComment(${l.id})">${(!closed&&!checked)?'📋 Hisobot yozish':'✏️ Natija'}</button>
       <button class="btn-sm red" onclick="deleteLead(${l.id})">🗑</button></div></div>`;}).join('');}
 function openLeadComment(id){const l=allLeads.find(x=>x.id===id);document.getElementById('lcm-id').value=id;
   document.getElementById('lcm-name').value=l.name||'';document.getElementById('lcm-phone').value=l.phone||'';
-  document.getElementById('lcm-status').value=l.status||'cold';document.getElementById('lcm-note').value=l.last_comment||'';
-  document.getElementById('lcm-datetime').value=l.reminder_at?l.reminder_at.slice(0,16):'';
+  document.getElementById('lcm-status').value=l.status||'cold';document.getElementById('lcm-note').value='';
+  // show history of past reports
+  const hw=document.getElementById('lcm-history');
+  if(l.history){hw.innerHTML=`<div style="background:var(--s2);border-radius:8px;padding:10px;margin-bottom:12px;max-height:140px;overflow-y:auto"><div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">📜 Oldingi hisobotlar</div>${l.history.split('\n').map(h=>`<div style="font-size:12px;color:var(--mu2);padding:3px 0;border-bottom:1px solid var(--brd)">${h}</div>`).join('')}</div>`;}
+  else hw.innerHTML='';
+  document.getElementById('lcm-datetime').value=l.reminder_at?String(l.reminder_at).slice(0,16):'';
   document.getElementById('lcm-meet').value='';showModal('lead-comment-modal');}
 async function saveLeadComment(){const id=+document.getElementById('lcm-id').value;const status=document.getElementById('lcm-status').value;
   const note=document.getElementById('lcm-note').value.trim();const dt=document.getElementById('lcm-datetime').value;
   const meetDt=document.getElementById('lcm-meet').value;
   const name=document.getElementById('lcm-name').value.trim();const phone=document.getElementById('lcm-phone').value.trim();
-  const upd={status,last_comment:note,name,phone,updated_at:new Date().toISOString()};
-  if(dt)upd.reminder_at=new Date(dt).toISOString();else upd.reminder_at=null;
+  // REPORT IS REQUIRED — devushka must write what happened
+  if(!note){toast('❗ Iltimos, hisobot yozing: lid bilan nima bo\'ldi?','err');document.getElementById('lcm-note').focus();return;}
+  const now=new Date();const nowStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  // append to history log
+  const l=allLeads.find(x=>x.id===id);
+  let history='';try{history=l&&l.history?l.history:'';}catch(e){}
+  const newEntry=`[${dtFmt(nowStr)}] ${LSTAT[status]||status}: ${note}`;
+  history=history?(history+'\n'+newEntry):newEntry;
+  const upd={status,last_comment:note,name,phone,last_checked:nowStr,history,updated_at:new Date().toISOString()};
+  if(dt)upd.reminder_at=dt;else upd.reminder_at=null;
   const{error}=await sb.from('leads').update(upd).eq('id',id);
   if(error){toast(error.message,'err');return;}
-  // If a meeting was scheduled — create meeting record (integration lead -> meetings)
   if(meetDt){
-    const{error:mErr}=await sb.from('meetings').insert({name,phone,meet_at:new Date(meetDt).toISOString(),type:'lesson',note:'Lid orqali: '+(note||''),created_at:new Date().toISOString()});
+    const{error:mErr}=await sb.from('meetings').insert({name,phone,meet_at:meetDt,type:'lesson',note:'Lid orqali: '+(note||''),created_at:new Date().toISOString()});
     if(mErr)toast('Lid saqlandi, lekin uchrashuv xato: '+mErr.message,'err');
-    else toast('✅ Saqlandi + uchrashuv belgilandi');
-  } else { toast('✅ Saqlandi'); }
+    else toast('✅ Tekshirildi + uchrashuv belgilandi');
+  } else { toast('✅ Hisobot saqlandi, lid tekshirildi'); }
   hideModal('lead-comment-modal');loadLeads();
-  if(dt)setReminder(id,new Date(dt),name,phone);}
+  if(dt)setReminder(id,dtToDateObj(dt),name,phone);}
 async function deleteLead(id){if(!confirm('O\'chirilsinmi?'))return;await sb.from('leads').delete().eq('id',id);toast('🗑 O\'chirildi');loadLeads();}
 
 // ── REMINDERS (10 min before) ──
@@ -1454,7 +1535,7 @@ function setReminder(id,date,name,phone){if(!('Notification'in window))return;
     const notifyAt=date.getTime()-10*60*1000;const delay=notifyAt-Date.now();
     if(delay<0||delay>2147483647)return;if(reminderTimers[id])clearTimeout(reminderTimers[id]);
     reminderTimers[id]=setTimeout(()=>{new Notification('📞 Qo\'ng\'iroq vaqti yaqin!',{body:`${name} (${phone}) ga 10 daqiqadan keyin qo'ng'iroq qiling!`});},delay);});}
-function scheduleReminders(leads){leads.filter(l=>l.reminder_at&&l.status!=='refused').forEach(l=>setReminder(l.id,new Date(l.reminder_at),l.name,l.phone));}
+function scheduleReminders(leads){leads.filter(l=>l.reminder_at&&l.status!=='enrolled'&&l.status!=='refused').forEach(l=>setReminder(l.id,dtToDateObj(l.reminder_at),l.name,l.phone));}
 
 // ── PLANNED CALLS (weekly calendar Mon-Sun) ──
 let callWeekOffset=0; // 0=this week
@@ -1464,7 +1545,7 @@ async function loadPlannedCalls(){
   // fetch ALL leads, filter in JS (more reliable than .not())
   const{data,error}=await sb.from('leads').select('*').order('reminder_at',{ascending:true});
   if(error){c.innerHTML='<div class="empty">Xato: '+error.message+'</div>';return;}
-  const calls=(data||[]).filter(l=>l.reminder_at&&l.status!=='refused');
+  const calls=(data||[]).filter(l=>l.reminder_at&&l.status!=='enrolled'&&l.status!=='refused');
 
   // compute week range (Mon-Sun) with offset
   const now=new Date();
@@ -1477,7 +1558,7 @@ async function loadPlannedCalls(){
 
   // group calls by day
   const byDay={};
-  calls.forEach(l=>{const ds=new Date(l.reminder_at).toDateString();(byDay[ds]=byDay[ds]||[]).push(l);});
+  calls.forEach(l=>{const ds=dtToDateObj(l.reminder_at).toDateString();(byDay[ds]=byDay[ds]||[]).push(l);});
 
   // header with week navigation
   const wkLabel=callWeekOffset===0?'Shu hafta':callWeekOffset===-1?'O\'tgan hafta':callWeekOffset===1?'Keyingi hafta':`${callWeekOffset>0?'+':''}${callWeekOffset} hafta`;
@@ -1489,14 +1570,14 @@ async function loadPlannedCalls(){
 
   let totalThisWeek=0;
   weekDays.forEach((d,i)=>{
-    const ds=d.toDateString();const dayCalls=(byDay[ds]||[]).sort((a,b)=>new Date(a.reminder_at)-new Date(b.reminder_at));
+    const ds=d.toDateString();const dayCalls=(byDay[ds]||[]).sort((a,b)=>dtToDateObj(a.reminder_at)-dtToDateObj(b.reminder_at));
     totalThisWeek+=dayCalls.length;
     const isToday=ds===todayStr;
     const dateLabel=`${d.getDate()}.${String(d.getMonth()+1).padStart(2,'0')}`;
     html+=`<div class="call-day">
       <div class="call-day-title" style="${isToday?'color:var(--ac2)':''}">${isToday?'🔵 ':''}${dayNames[i]} <span style="color:var(--mu);font-family:var(--fm);font-size:12px">${dateLabel}</span> ${dayCalls.length?`<span class="badge blue">${dayCalls.length}</span>`:''}</div>`;
     if(dayCalls.length){
-      html+=dayCalls.map(l=>{const t=new Date(l.reminder_at).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+      html+=dayCalls.map(l=>{const t=dtFmt(l.reminder_at,false);
         return `<div class="call-item"><div class="call-time">${t}</div>
           <div class="call-info"><div class="call-name">${l.name} <span class="badge ${l.status==='hot'?'warn':l.status==='thinking'?'pending':'blue'}">${LSTAT[l.status]||''}</span></div>
           <div class="call-note">${l.last_comment||l.note||''}</div></div>
@@ -1520,7 +1601,7 @@ async function saveMeeting(){
   const name=document.getElementById('mt-name').value.trim();const phone=document.getElementById('mt-phone').value.trim();
   const dt=document.getElementById('mt-datetime').value;const type=document.getElementById('mt-type').value;const note=document.getElementById('mt-note').value.trim();
   if(!name||!dt){toast('Ism va sana kerak','err');return;}
-  const{error}=await sb.from('meetings').insert({name,phone,meet_at:new Date(dt).toISOString(),type,note,created_at:new Date().toISOString()});
+  const{error}=await sb.from('meetings').insert({name,phone,meet_at:dt,type,note,created_at:new Date().toISOString()});
   if(error){toast(error.message,'err');return;}
   ['mt-name','mt-phone','mt-datetime','mt-note'].forEach(i=>document.getElementById(i).value='');
   toggleMeetForm();toast('✅ Uchrashuv qo\'shildi');loadMeetings();
@@ -1538,17 +1619,17 @@ async function loadMeetings(){
   const weekDays=[];for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(monday.getDate()+i);weekDays.push(d);}
   const dayNames=['Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba','Yakshanba'];
   const todayStr=new Date().toDateString();
-  const byDay={};meets.forEach(m=>{const ds=new Date(m.meet_at).toDateString();(byDay[ds]=byDay[ds]||[]).push(m);});
+  const byDay={};meets.forEach(m=>{const ds=dtToDateObj(m.meet_at).toDateString();(byDay[ds]=byDay[ds]||[]).push(m);});
   const wkLabel=meetWeekOffset===0?'Shu hafta':meetWeekOffset===-1?'O\'tgan hafta':meetWeekOffset===1?'Keyingi hafta':`${meetWeekOffset>0?'+':''}${meetWeekOffset} hafta`;
   let html=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px">
     <button class="btn-sm purple" onclick="meetWeekOffset--;loadMeetings()">← Oldingi</button>
     <span style="font-family:var(--fd);font-weight:700;font-size:14px">${wkLabel}</span>
     <button class="btn-sm purple" onclick="meetWeekOffset++;loadMeetings()">Keyingi →</button></div>`;
   let total=0;
-  weekDays.forEach((d,i)=>{const ds=d.toDateString();const dm=(byDay[ds]||[]).sort((a,b)=>new Date(a.meet_at)-new Date(b.meet_at));total+=dm.length;
+  weekDays.forEach((d,i)=>{const ds=d.toDateString();const dm=(byDay[ds]||[]).sort((a,b)=>dtToDateObj(a.meet_at)-dtToDateObj(b.meet_at));total+=dm.length;
     const isToday=ds===todayStr;const dateLabel=`${d.getDate()}.${String(d.getMonth()+1).padStart(2,'0')}`;
     html+=`<div class="call-day"><div class="call-day-title" style="${isToday?'color:var(--ac2)':''}">${isToday?'🔵 ':''}${dayNames[i]} <span style="color:var(--mu);font-family:var(--fm);font-size:12px">${dateLabel}</span> ${dm.length?`<span class="badge blue">${dm.length}</span>`:''}</div>`;
-    if(dm.length){html+=dm.map(m=>{const t=new Date(m.meet_at).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+    if(dm.length){html+=dm.map(m=>{const t=dtFmt(m.meet_at,false);
       return `<div class="call-item"><div class="call-time">${t}</div><div class="call-info"><div class="call-name">${m.name} <span class="badge ${m.type==='payment'?'active':m.type==='lesson'?'pending':'blue'}">${MEET_TYPE[m.type]||''}</span></div>
         <div class="call-note">${m.note||''}</div></div>
         <div style="display:flex;flex-direction:column;gap:5px">${m.phone?`<a href="tel:${m.phone}" class="btn-sm green" style="text-decoration:none;white-space:nowrap">📞 ${m.phone}</a>`:''}
