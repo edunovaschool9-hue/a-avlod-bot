@@ -173,6 +173,8 @@ audio{height:36px;border-radius:7px;max-width:240px}
 .leads-filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
 .filter-btn{padding:7px 14px;border-radius:7px;border:1px solid var(--brd);background:transparent;color:var(--mu);font-size:12px;font-weight:600;transition:.15s}
 .filter-btn.active{background:var(--ac);color:#fff;border-color:var(--ac)}
+.day-pick{width:42px;height:42px;border-radius:10px;border:1px solid var(--brd);background:var(--s2);color:var(--mu);font-size:13px;font-weight:600;transition:.15s}
+.day-pick.on{background:var(--ac);color:#fff;border-color:var(--ac)}
 
 /* Planned calls */
 .call-day{margin-bottom:20px}
@@ -320,6 +322,43 @@ audio{height:36px;border-radius:7px;max-width:240px}
 
 /* profile */
 .pr-av{font-family:var(--fd);font-size:30px;font-weight:700;width:64px;height:64px;background:linear-gradient(135deg,var(--ac),var(--acd));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;color:#fff}
+
+/* ═══ REELS FORMAT ═══ */
+.reels-stage{min-height:calc(100vh - 150px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 16px;position:relative}
+.reels-fade{animation:reelsFade .5s ease}
+@keyframes reelsFade{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.reels-intro-text{font-family:var(--fd);font-size:clamp(24px,7vw,34px);font-weight:700;line-height:1.3;margin-bottom:14px;max-width:90%}
+.reels-sub{font-size:15px;color:var(--mu2);margin-bottom:36px;max-width:85%;line-height:1.5}
+.reels-big-btn{padding:20px 48px;border:none;border-radius:18px;font-family:var(--fd);font-size:20px;font-weight:700;
+  background:linear-gradient(135deg,var(--ac),var(--acd));color:#fff;box-shadow:0 8px 30px rgba(124,92,255,.45);transition:.2s;animation:btnPulse 2s infinite}
+.reels-big-btn:active{transform:scale(.96)}
+@keyframes btnPulse{0%,100%{box-shadow:0 8px 30px rgba(124,92,255,.45)}50%{box-shadow:0 8px 44px rgba(124,92,255,.7)}}
+.reels-big-btn.green{background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 8px 30px rgba(16,185,129,.45)}
+.reels-big-btn.red{background:linear-gradient(135deg,#f43f5e,#e11d48);box-shadow:0 8px 30px rgba(244,63,94,.4);animation:none}
+.reels-emoji-big{font-size:80px;margin-bottom:24px;animation:floaty 3s ease-in-out infinite}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.reels-progress{position:absolute;top:0;left:0;right:0;display:flex;gap:6px;padding:4px}
+.reels-progress span{flex:1;height:4px;background:var(--s2);border-radius:2px;overflow:hidden}
+.reels-progress span.done{background:linear-gradient(90deg,var(--ac),var(--cy))}
+.reels-progress span.active::after{content:"";display:block;height:100%;width:50%;background:linear-gradient(90deg,var(--ac),var(--cy))}
+/* reels test option */
+.reels-opt{width:100%;max-width:420px;padding:18px 20px;margin-bottom:12px;background:var(--s2);border:2px solid var(--brd);border-radius:14px;color:var(--tx);font-size:16px;font-weight:600;text-align:left;transition:.15s}
+.reels-opt:active{transform:scale(.98)}
+.reels-opt.correct{background:rgba(52,211,153,.12);border-color:var(--gn);color:var(--gn)}
+.reels-opt.wrong{background:rgba(251,113,133,.12);border-color:var(--rd);color:var(--rd)}
+.reels-q{font-family:var(--fd);font-size:clamp(18px,5vw,24px);font-weight:700;line-height:1.4;margin-bottom:26px;max-width:90%}
+.reels-voice-text{font-family:var(--fd);font-size:clamp(22px,6vw,30px);font-weight:700;background:var(--s2);border:2px solid var(--ac);border-radius:16px;padding:24px;margin-bottom:14px;line-height:1.5;max-width:90%}
+.reels-card{background:var(--s);border:1px solid var(--brd);border-radius:18px;padding:24px;max-width:440px;width:100%}
+
+/* ═══ GROWING SNAIL 🐌 ═══ */
+.snail-wrap{position:relative;margin:0 auto 20px;display:flex;align-items:center;justify-content:center}
+#snail-svg{filter:drop-shadow(0 8px 24px rgba(124,92,255,.4));animation:snailBob 3s ease-in-out infinite}
+@keyframes snailBob{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-8px) rotate(1deg)}}
+.snail-trail{position:absolute;bottom:6px;left:0;right:0;height:6px;background:linear-gradient(90deg,transparent,rgba(157,123,255,.3),transparent);border-radius:3px;animation:trailShine 2s infinite}
+@keyframes trailShine{0%,100%{opacity:.3}50%{opacity:.7}}
+.rest-timer{font-family:var(--fm);font-size:34px;font-weight:500;color:var(--ac2);margin:14px 0;letter-spacing:1px}
+.rest-label{font-size:15px;color:var(--mu2);margin-bottom:6px}
+.rest-next{font-family:var(--fd);font-size:18px;font-weight:600;color:var(--tx);margin-bottom:4px}
 </style>
 
 <!-- ══ LANDING / COURSE SELECT ══ -->
@@ -630,6 +669,18 @@ audio{height:36px;border-radius:7px;max-width:240px}
   <div class="field"><label>So'm</label><input id="es-som" type="number"></div>
   <div class="field"><label>To'lov holati</label><select id="es-paid"><option value="1">To'langan</option><option value="0">Qarzdor</option></select></div>
   <div class="field"><label>📅 Birinchi dars sanasi (to'lov hisobi uchun)</label><input id="es-firstlesson" type="date"><div style="font-size:11px;color:var(--mu);margin-top:4px">Shu sanadan 30 kun keyin to'lov muddati</div></div>
+  <div class="field"><label>📚 Online DZ kunlari (2 ta tanlang — soat 15:00 da ochiladi)</label>
+    <div id="es-days" style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px">
+      <button type="button" class="day-pick" data-day="1" onclick="toggleDay(this)">Du</button>
+      <button type="button" class="day-pick" data-day="2" onclick="toggleDay(this)">Se</button>
+      <button type="button" class="day-pick" data-day="3" onclick="toggleDay(this)">Ch</button>
+      <button type="button" class="day-pick" data-day="4" onclick="toggleDay(this)">Pa</button>
+      <button type="button" class="day-pick" data-day="5" onclick="toggleDay(this)">Ju</button>
+      <button type="button" class="day-pick" data-day="6" onclick="toggleDay(this)">Sh</button>
+      <button type="button" class="day-pick" data-day="7" onclick="toggleDay(this)">Ya</button>
+    </div>
+    <div style="font-size:11px;color:var(--mu);margin-top:4px">Masalan: bola dushanba+juma oflayn kelsa, DZ uchun seshanba+payshanba tanlang</div>
+  </div>
   <button class="btn-full" onclick="saveEditStudent()">Saqlash</button>
 </div></div>
 
@@ -674,15 +725,22 @@ audio{height:36px;border-radius:7px;max-width:240px}
   </div>
   <div class="stu-main">
     <div class="stu-nav">
-      <button class="stu-tab active" onclick="stuTab('brain')">🧠 Miya</button>
-      <button class="stu-tab" onclick="stuTab('lessons')">📚 Test</button>
-      <button class="stu-tab" onclick="stuTab('tez')">🎤 Tez</button>
-      <button class="stu-tab" onclick="stuTab('book')">📖 Kitob</button>
-      <button class="stu-tab" onclick="stuTab('profile')">👤 Profil</button>
+      <button class="stu-tab active" onclick="stuTab('today')">📚 Bugungi dars</button>
+      <button class="stu-tab" onclick="stuTab('brain')">🧠 Mening miyam</button>
+    </div>
+
+    <!-- ═══ BUGUNGI DARS (reels) ═══ -->
+    <div class="stu-panel on" id="st-today">
+      <div id="today-content"><div class="loading-center"><div class="spin"></div></div></div>
+    </div>
+
+    <!-- ═══ REELS LESSON FLOW ═══ -->
+    <div class="stu-panel" id="st-reels">
+      <div class="reels-stage" id="reels-stage"><!-- filled by JS step by step --></div>
     </div>
 
     <!-- BRAIN -->
-    <div class="stu-panel on" id="st-brain">
+    <div class="stu-panel" id="st-brain">
       <div class="brain-hero">
         <div class="brain-hello">Salom, <b id="brain-name">do'stim</b> 👋</div>
         <div class="brain-title">Sening miya xaritang</div>
@@ -692,16 +750,13 @@ audio{height:36px;border-radius:7px;max-width:240px}
               <radialGradient id="brainGrad"><stop offset="0" stop-color="#9d7bff"/><stop offset="1" stop-color="#5b3fd6"/></radialGradient>
               <filter id="glow2"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
             </defs>
-            <!-- connections -->
             <g id="brain-links" stroke="#7c5cff" stroke-width="1" opacity=".35"></g>
-            <!-- core brain -->
             <g class="brain-core" filter="url(#glow2)">
               <path d="M100 55 C75 55 60 72 62 92 C50 96 48 118 62 126 C64 144 84 150 100 144 C116 150 136 144 138 126 C152 118 150 96 138 92 C140 72 125 55 100 55 Z" fill="url(#brainGrad)" opacity=".9"/>
               <path d="M100 60 L100 144" stroke="#4a2fc0" stroke-width="2" fill="none" opacity=".5"/>
               <path d="M80 75 Q90 85 82 100 Q90 115 82 130" stroke="#c4b5fd" stroke-width="1.5" fill="none" opacity=".6"/>
               <path d="M120 75 Q110 85 118 100 Q110 115 118 130" stroke="#c4b5fd" stroke-width="1.5" fill="none" opacity=".6"/>
             </g>
-            <!-- skill nodes (filled by JS) -->
             <g id="brain-nodes"></g>
           </svg>
         </div>
@@ -712,67 +767,14 @@ audio{height:36px;border-radius:7px;max-width:240px}
       <div class="brain-calf">
         <svg width="70" height="70" viewBox="0 0 200 200" id="calf-mini"></svg>
         <div class="calf-info">
-          <div class="calf-name" id="cv-stage">Buzoqcha</div>
-          <div class="calf-kg"><span id="cv-kg">40</span> kg</div>
+          <div class="calf-name" id="cv-stage">Salyangoz</div>
+          <div class="calf-kg"><span id="cv-kg">1</span>-daraja</div>
           <div class="calf-bar"><div class="calf-bar-fill" id="cv-fill" style="width:0%"></div></div>
         </div>
       </div>
       <div class="bal-row">
         <div class="bal-box"><div class="bal-label">💰 So'm</div><div class="bal-val" id="stu-som">0</div></div>
         <div class="bal-box"><div class="bal-label">💾 Bayt</div><div class="bal-val" id="stu-bayt">0</div></div>
-      </div>
-    </div>
-
-    <!-- LESSONS -->
-    <div class="stu-panel" id="st-lessons"><div id="lessons-grid"><div class="loading-center"><div class="spin"></div></div></div></div>
-
-    <!-- TEST -->
-    <div class="stu-panel" id="st-test">
-      <button class="btn-sm blue" style="margin-bottom:12px" onclick="backToLessons()">← Orqaga</button>
-      <div class="test-wrap">
-        <div class="test-prog"><div class="test-bar"><div class="test-bar-fill" id="tb-fill" style="width:0%"></div></div><div class="test-num" id="tb-num">1/5</div></div>
-        <div class="test-q" id="test-q">Savol...</div>
-        <div id="test-opts"></div>
-        <button class="btn-next" id="btn-next" onclick="nextQ()">Keyingisi →</button>
-      </div>
-    </div>
-
-    <!-- TEZ -->
-    <div class="stu-panel" id="st-tez"><div id="tez-grid-stu"><div class="loading-center"><div class="spin"></div></div></div></div>
-
-    <!-- TEZ LESSON -->
-    <div class="stu-panel" id="st-tez-lesson">
-      <button class="btn-sm blue" style="margin-bottom:12px" onclick="backToTez()">← Orqaga</button>
-      <div class="voice-card">
-        <div style="font-size:12px;color:var(--mu);font-family:var(--fm);margin-bottom:8px" id="tl-week">1-hafta</div>
-        <div style="font-size:15px;font-weight:700;margin-bottom:10px" id="tl-title">—</div>
-        <div class="voice-text-box" id="tl-text">—</div>
-        <div class="voice-hint" id="tl-hint">—</div>
-        <button class="btn-record" id="rec-btn" onclick="toggleRecord()">🎤 Yozishni boshlash</button>
-        <div id="rec-status" style="font-size:12px;color:var(--mu);text-align:center;padding:6px 0"></div>
-        <audio id="rec-preview" controls style="display:none;width:100%"></audio>
-        <div class="voice-ctrl" id="rec-ctrl" style="display:none">
-          <button class="btn-sm red" style="padding:10px" onclick="cancelRec()">🗑 Bekor</button>
-          <button class="btn-sm green" id="rec-send" style="padding:10px" onclick="sendVoice()">📤 Yuborish</button>
-        </div>
-      </div>
-      <div id="tl-pending" style="display:none;margin-top:12px;background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:14px;text-align:center;font-size:13px;color:var(--go)">⏳ Ovozingiz ustoz tekshirmoqda...</div>
-    </div>
-
-    <!-- BOOK / REELS -->
-    <div class="stu-panel" id="st-book">
-      <div class="book-reels" id="book-reels"></div>
-    </div>
-
-    <!-- PROFILE -->
-    <div class="stu-panel" id="st-profile">
-      <div class="tbl-wrap" style="padding:0">
-        <div style="padding:20px;border-bottom:1px solid var(--brd);text-align:center">
-          <div class="pr-av" id="pr-av">—</div>
-          <div style="font-size:18px;font-weight:700" id="pr-name">—</div>
-          <div style="font-size:12px;color:var(--mu);margin-top:4px" id="pr-rank">—</div>
-        </div>
-        <div style="padding:6px 18px" id="pr-rows"></div>
       </div>
     </div>
   </div>
@@ -1048,23 +1050,55 @@ async function loadStudentApp(){
   document.getElementById('brain-name').textContent=(s.full_name||'').split(' ')[0]||"do'stim";
   document.getElementById('stu-som').textContent=fmt(s.som_balance);
   document.getElementById('stu-bayt').textContent=fmt(s.bytes_balance);
-  document.getElementById('pr-name').textContent=s.full_name;
-  document.getElementById('pr-rank').textContent=(s.rank||'Junior')+' · Lv'+(s.level||1);
-  document.getElementById('pr-av').textContent=ini(s.full_name);
-  document.getElementById('calf-mini').innerHTML=calfSVG();
-  updateCalf(s.calf_kg||40);
   const {data:la}=await sb.from('lesson_access').select('*').eq('student_id',s.id);lessonAccess=la||[];
   const {data:ta}=await sb.from('tez_aytish_access').select('*').eq('student_id',s.id);tezAccess=ta||[];
-  renderBrain();renderProfile();renderLessonsGrid();renderTezGrid();renderBook();
+  renderBrain();
+  renderSnailMini();
+  renderToday();
+  stuTab('today');
 }
 
-function updateCalf(kg){
-  const st=CALF_STAGES.find(s=>kg>=s.min&&kg<s.max)||CALF_STAGES[CALF_STAGES.length-1];
-  const nx=CALF_STAGES.find(s=>kg<s.max)||CALF_STAGES[CALF_STAGES.length-1];
-  document.getElementById('cv-stage').textContent=st.label;
-  document.getElementById('cv-kg').textContent=Math.round(kg);
-  document.getElementById('cv-fill').style.width=Math.min(((kg-nx.min)/(nx.max-nx.min))*100,100)+'%';
+// how many full lessons completed (test passed AND tez done for that lesson id)
+function lessonsCompleted(){
+  let n=0;
+  for(let id=1;id<=8;id++){
+    const t=lessonAccess.find(a=>a.lesson_id===id&&a.test_passed===1);
+    const z=tezAccess.find(a=>a.lesson_id===id&&a.status==='done');
+    if(t&&z)n++; else break; // sequential
+  }
+  return n;
 }
+// which lesson id is "next" to do (1-8), or 0 if all done
+function nextLessonId(){const c=lessonsCompleted();return c>=8?0:c+1;}
+
+// parse lesson_days "1,4" (1=Mon..7=Sun) → array of ints
+function getLessonDays(){
+  const raw=currentUser.lesson_days;
+  if(!raw)return [];
+  return String(raw).split(',').map(x=>parseInt(x.trim())).filter(x=>x>=1&&x<=7);
+}
+// is today a lesson-day? returns true if now is one of the 2 days AND past 15:00
+function isLessonOpenNow(){
+  const days=getLessonDays();
+  if(!days.length)return false;
+  const now=new Date();
+  const dow=now.getDay()===0?7:now.getDay(); // 1=Mon..7=Sun
+  if(!days.includes(dow))return false;
+  return now.getHours()>=15; // opens at 15:00
+}
+// next lesson datetime (for rest timer): nearest future lesson-day at 15:00
+function nextLessonDate(){
+  const days=getLessonDays();
+  if(!days.length)return null;
+  const now=new Date();
+  for(let add=0;add<=14;add++){
+    const d=new Date(now);d.setDate(now.getDate()+add);d.setHours(15,0,0,0);
+    const dow=d.getDay()===0?7:d.getDay();
+    if(days.includes(dow)&&d.getTime()>now.getTime())return d;
+  }
+  return null;
+}
+const DOW_UZ=['','Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba','Yakshanba'];
 
 // ── BRAIN ──
 function renderBrain(){
@@ -1108,105 +1142,235 @@ function renderBrain(){
   document.getElementById('brain-links').innerHTML=links;
 }
 
-// ── BOOK REELS ──
-function renderBook(){
-  const colors=['#1a1330','#0f1e2e','#1e1a0f','#1a0f1e','#0f1e16','#1e0f0f'];
-  document.getElementById('book-reels').innerHTML=BOOK_QUOTES.map((q,i)=>`
-    <div class="reel" style="background:radial-gradient(ellipse 80% 60% at 50% 40%,${colors[i%colors.length]},var(--bg))">
-      <div class="reel-emoji">${q.emoji}</div>
-      <div class="reel-quote">"${q.q}"</div>
-      <div class="reel-author">— ${q.author}</div>
-      <div class="reel-book">📖 ${q.book}</div>
-      ${i===0?'<div class="reel-hint">↑ Surib o\'qing</div>':''}
-    </div>`).join('');
+// ═══ GROWING SNAIL 🐌 ═══
+// stage grows with completed lessons (0-8)
+function snailSVG(scale){
+  const sc=scale||1;
+  return `<svg id="snail-svg" width="${Math.round(150*sc)}" height="${Math.round(130*sc)}" viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="shellG" cx="42%" cy="40%"><stop offset="0" stop-color="#a78bfa"/><stop offset="55%" stop-color="#7c5cff"/><stop offset="100%" stop-color="#5b3fd6"/></radialGradient>
+      <linearGradient id="bodyG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c4b5fd"/><stop offset="1" stop-color="#9d7bff"/></linearGradient>
+    </defs>
+    <!-- body -->
+    <path d="M30 130 Q20 130 22 118 Q26 96 60 98 L150 98 Q150 130 120 130 Z" fill="url(#bodyG)"/>
+    <!-- head -->
+    <ellipse cx="40" cy="108" rx="26" ry="22" fill="url(#bodyG)"/>
+    <!-- eye stalks -->
+    <line x1="32" y1="92" x2="26" y2="66" stroke="#9d7bff" stroke-width="5" stroke-linecap="round"/>
+    <line x1="46" y1="92" x2="52" y2="64" stroke="#9d7bff" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="25" cy="62" r="7" fill="#fff"/><circle cx="26" cy="63" r="3.5" fill="#2a2a3a"/>
+    <circle cx="53" cy="60" r="7" fill="#fff"/><circle cx="54" cy="61" r="3.5" fill="#2a2a3a"/>
+    <!-- smile -->
+    <path d="M30 116 Q40 124 52 116" fill="none" stroke="#5b3fd6" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- shell spiral -->
+    <circle cx="118" cy="80" r="50" fill="url(#shellG)"/>
+    <path d="M118 80 m0 0 a14 14 0 1 1 -0.1 0 a26 26 0 1 0 0.2 0 a38 38 0 1 1 -0.1 0" fill="none" stroke="#5b3fd6" stroke-width="4" opacity=".55" stroke-linecap="round"/>
+    <circle cx="118" cy="80" r="50" fill="none" stroke="#c4b5fd" stroke-width="3" opacity=".6"/>
+  </svg>`;
+}
+function renderSnailMini(){
+  const done=lessonsCompleted();
+  const wrap=document.getElementById('calf-mini');
+  if(wrap)wrap.outerHTML=`<div id="calf-mini" style="width:64px;height:64px;display:flex;align-items:center;justify-content:center">${snailSVG(0.42)}</div>`;
+  const stageEl=document.getElementById('cv-stage');
+  const stages=["Yangi salyangoz","Kichik salyangoz","O'syapti","Tezlashmoqda","Yarim yo'l","Kuchli","Deyarli tayyor","Katta salyangoz","Chempion! 🏆"];
+  if(stageEl)stageEl.textContent=stages[Math.min(done,8)];
+  const kgEl=document.getElementById('cv-kg');if(kgEl)kgEl.textContent=done;
+  const fillEl=document.getElementById('cv-fill');if(fillEl)fillEl.style.width=(done/8*100)+'%';
+  // relabel "daraja" suffix
+  const kgParent=kgEl?kgEl.parentElement:null;
+  if(kgParent)kgParent.innerHTML=`<span id="cv-kg">${done}</span>/8 dars`;
 }
 
-// ── TABS ──
+// ── TABS (2 only: today / brain) ──
 function stuTab(name){
-  const tabs=['brain','lessons','tez','book','profile'];
+  const tabs=['today','brain'];
   document.querySelectorAll('.stu-tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===name));
-  ['brain','lessons','test','tez','tez-lesson','book','profile'].forEach(p=>document.getElementById('st-'+p).classList.toggle('on',p===name));
-}
-function renderProfile(){
-  const s=currentUser;
-  const rows=[['Ism',s.full_name],['Daraja',`${s.rank||'Junior'} Lv${s.level||1}`],['Bayt',fmt(s.bytes_balance)],["So'm",fmt(s.som_balance)],['Buzoq',Math.round(s.calf_kg||40)+' kg'],['Streak',(s.streak_days||0)+' kun']];
-  document.getElementById('pr-rows').innerHTML=rows.map(([k,v])=>`<div class="info-row"><span class="info-key">${k}</span><span class="info-val">${v}</span></div>`).join('');
+  ['today','reels','brain'].forEach(p=>{const el=document.getElementById('st-'+p);if(el)el.classList.toggle('on',p===name);});
+  if(name==='today')renderToday();
+  if(name==='brain'){renderBrain();renderSnailMini();}
 }
 
-// ── LESSONS / TEST ──
-function renderLessonsGrid(){
-  const c=document.getElementById('lessons-grid');const weeks={1:[],2:[],3:[],4:[]};
-  LESSONS.forEach(l=>weeks[l.week].push(l));let html='';
-  [1,2,3,4].forEach(wk=>{
-    const items=weeks[wk];
-    const hasA=items.some(l=>lessonAccess.find(a=>a.lesson_id===l.id));
-    const allD=items.every(l=>{const a=lessonAccess.find(x=>x.lesson_id===l.id);return a&&a.test_passed===1;});
-    const wkB=!hasA?'<span class="badge inactive">🔒</span>':allD?'<span class="badge active">✅</span>':'<span class="badge pending">📂 Ochiq</span>';
-    html+=`<div class="week-folder"><div class="week-head"><div class="week-head-title">📁 ${wk}-hafta</div>${wkB}</div><div class="week-items-grid">`;
-    items.forEach(l=>{
-      const acc=lessonAccess.find(a=>a.lesson_id===l.id);const done=acc&&acc.test_passed===1;const open=acc&&!done;const lock=!acc;
-      const cls=lock?'locked':done?'done':'';const badge=lock?'<span class="lesson-badge lock">🔒</span>':done?'<span class="lesson-badge done">✅</span>':'<span class="lesson-badge open">📖</span>';
-      const click=open?`onclick="openLesson(${l.id})"`:done?`onclick="toast('Allaqachon o\\'tilgan!')"`:'';
-      html+=`<div class="lesson-cell ${cls}" ${click}>${badge}<div class="lesson-num">${l.id}-dars</div><span class="lesson-icon">${l.icon}</span><div class="lesson-title">${l.title}</div></div>`;
-    });
-    html+=`</div></div>`;
-  });
-  c.innerHTML=html;
+// ═══ TODAY: decide rest-screen or lesson-available ═══
+function renderToday(){
+  const c=document.getElementById('today-content');
+  const days=getLessonDays();
+  const nextId=nextLessonId();
+  // program finished
+  if(nextId===0){
+    c.innerHTML=`<div class="reels-stage"><div class="snail-wrap">${snailSVG(1.4)}<div class="snail-trail"></div></div>
+      <div class="reels-intro-text">🏆 Tabriklaymiz!</div>
+      <div class="reels-sub">Sen butun 1 oylik dasturni tugatding! Salyangozing eng katta bo'ldi. Zo'r ish, ${(currentUser.full_name||'').split(' ')[0]}!</div></div>`;
+    return;
+  }
+  // no schedule set yet
+  if(!days.length){
+    c.innerHTML=`<div class="reels-stage"><div class="reels-emoji-big">📅</div>
+      <div class="reels-intro-text">Dars jadvali hali belgilanmagan</div>
+      <div class="reels-sub">Ustozing tez orada sening dars kunlaringni belgilaydi. Keyinroq kel!</div></div>`;
+    return;
+  }
+  // is today open?
+  if(isLessonOpenNow()){
+    // lesson available now
+    const lesson=LESSONS.find(l=>l.id===nextId);
+    c.innerHTML=`<div class="reels-stage reels-fade">
+      <div class="reels-emoji-big">🎯</div>
+      <div class="reels-intro-text">Bugungi dars tayyor!</div>
+      <div class="reels-sub">${nextId}-dars: ${lesson?lesson.title:''}<br>Test va tez aytishni bajaramiz. Tayyormisan?</div>
+      <button class="reels-big-btn" onclick="startReelsLesson(${nextId})">Boshlash 🚀</button></div>`;
+  }else{
+    // rest screen with snail + countdown
+    showRestScreen(c);
+  }
 }
-function openLesson(id){currentLesson=LESSONS.find(l=>l.id===id);curQ=0;testAnswers=new Array(currentLesson.tests.length).fill(null);stuTab('test');showQ(0);}
-function showQ(idx){const q=currentLesson.tests[idx],t=currentLesson.tests.length;
-  document.getElementById('tb-fill').style.width=((idx/t)*100)+'%';document.getElementById('tb-num').textContent=`${idx+1}/${t}`;
-  document.getElementById('test-q').textContent=q.q;document.getElementById('btn-next').style.display='none';
-  document.getElementById('test-opts').innerHTML=q.opts.map((o,i)=>`<button class="opt" onclick="pickAns(${i})" id="opt${i}">${o}</button>`).join('');}
-function pickAns(sel){if(testAnswers[curQ]!==null)return;testAnswers[curQ]=sel;document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
-  const correct=currentLesson.tests[curQ].c;document.getElementById('opt'+sel).classList.add(sel===correct?'correct':'wrong');
-  if(sel!==correct)document.getElementById('opt'+correct).classList.add('correct');document.getElementById('btn-next').style.display='block';}
-async function nextQ(){curQ++;if(curQ<currentLesson.tests.length){showQ(curQ);return;}
-  const score=testAnswers.reduce((s,a,i)=>s+(a===currentLesson.tests[i].c?1:0),0);const total=currentLesson.tests.length;const bytes=score*5;
-  await sb.from('lesson_access').upsert({student_id:currentUser.id,lesson_id:currentLesson.id,test_passed:1,test_score:score,test_total:total},{onConflict:'student_id,lesson_id'});
-  await sb.from('bytes_transactions').insert({student_id:currentUser.id,amount:bytes,reason:`${currentLesson.id}-dars testi`});
-  const newKg=(currentUser.calf_kg||40)+2;
-  await sb.from('students').update({bytes_balance:currentUser.bytes_balance+bytes,calf_kg:newKg}).eq('id',currentUser.id);
-  currentUser.bytes_balance+=bytes;currentUser.calf_kg=newKg;
-  lessonAccess=lessonAccess.filter(a=>a.lesson_id!==currentLesson.id);lessonAccess.push({lesson_id:currentLesson.id,test_passed:1});
-  const week=currentLesson.week;
-  const allT=WEEK_LESSONS[week].every(lid=>lessonAccess.find(a=>a.lesson_id===lid&&a.test_passed===1));
-  const allTz=WEEK_TEZ[week].every(tid=>{const a=tezAccess.find(x=>x.lesson_id===tid);return a&&a.status==='done';});
-  if(allT&&allTz&&week<4){const nw=week+1;
-    for(const lid of WEEK_LESSONS[nw])await sb.from('lesson_access').upsert({student_id:currentUser.id,lesson_id:lid,test_passed:0},{onConflict:'student_id,lesson_id'});
-    for(const tid of WEEK_TEZ[nw])await sb.from('tez_aytish_access').upsert({student_id:currentUser.id,lesson_id:tid,status:'open'},{onConflict:'student_id,lesson_id'});
-    await sb.from('students').update({current_week:nw}).eq('id',currentUser.id);toast(`🎉 ${nw}-hafta ochildi!`);}
-  document.getElementById('test-q').textContent=`Natija: ${score}/${total} — +${bytes} bayt! 🎉`;
-  document.getElementById('test-opts').innerHTML='';
-  const bn=document.getElementById('btn-next');bn.textContent='← Darslarga';bn.onclick=backToLessons;bn.style.display='block';
-  updateCalf(currentUser.calf_kg);document.getElementById('stu-bayt').textContent=fmt(currentUser.bytes_balance);
-  document.getElementById('stu-bal-h').textContent=fmt(currentUser.bytes_balance)+' bayt';renderBrain();
-}
-async function backToLessons(){const{data:la}=await sb.from('lesson_access').select('*').eq('student_id',currentUser.id);lessonAccess=la||lessonAccess;
-  document.getElementById('btn-next').onclick=nextQ;document.getElementById('btn-next').textContent='Keyingisi →';renderLessonsGrid();renderBrain();stuTab('lessons');}
 
-// ── TEZ ──
-function renderTezGrid(){const c=document.getElementById('tez-grid-stu');const weeks={1:[],2:[],3:[],4:[]};TEZ.forEach(l=>weeks[l.week].push(l));let html='';
-  [1,2,3,4].forEach(wk=>{const items=weeks[wk];
-    const hasA=items.some(l=>tezAccess.find(a=>a.lesson_id===l.id&&a.status!=='locked'));
-    const allD=items.every(l=>{const a=tezAccess.find(x=>x.lesson_id===l.id);return a&&a.status==='done';});
-    const wkB=!hasA?'<span class="badge inactive">🔒</span>':allD?'<span class="badge active">✅</span>':'<span class="badge pending">📂 Ochiq</span>';
-    html+=`<div class="week-folder"><div class="week-head"><div class="week-head-title">📁 ${wk}-hafta</div>${wkB}</div><div class="week-items-grid">`;
-    items.forEach(l=>{const acc=tezAccess.find(a=>a.lesson_id===l.id);const s=acc?acc.status:'locked';
-      const cls=s==='locked'?'locked':s==='done'?'done':'';
-      const badge=s==='locked'?'<span class="tez-badge lock">🔒</span>':s==='done'?'<span class="tez-badge done">✅</span>':s==='pending'?'<span class="tez-badge pending">⏳</span>':'<span class="tez-badge open">🎤</span>';
-      const click=s==='open'?`onclick="openTez(${l.id})"`:s==='done'?`onclick="toast('Bajarilgan!')"`:s==='pending'?`onclick="toast('Tekshirilmoqda...')"`:'';
-      html+=`<div class="tez-cell ${cls}" ${click}>${badge}<div class="tez-num">${l.id}-dars</div><span class="tez-icon">🎙</span><div class="tez-title-small">${l.title}</div></div>`;});
-    html+=`</div></div>`;});
-  c.innerHTML=html;}
-function openTez(id){currentTez=TEZ.find(l=>l.id===id);document.getElementById('tl-week').textContent=currentTez.week+'-hafta';
-  document.getElementById('tl-title').textContent=currentTez.title;document.getElementById('tl-text').textContent=currentTez.text;
-  document.getElementById('tl-hint').textContent='💡 '+currentTez.hint;resetRecUI();stuTab('tez-lesson');}
-async function backToTez(){const{data:ta}=await sb.from('tez_aytish_access').select('*').eq('student_id',currentUser.id);tezAccess=ta||tezAccess;renderTezGrid();stuTab('tez');}
-function resetRecUI(){audioBlob=null;audioChunks=[];
-  document.getElementById('rec-btn').textContent='🎤 Yozishni boshlash';document.getElementById('rec-btn').className='btn-record';document.getElementById('rec-btn').style.display='flex';
-  document.getElementById('rec-status').textContent='';document.getElementById('rec-preview').style.display='none';document.getElementById('rec-preview').src='';
-  document.getElementById('rec-ctrl').style.display='none';document.getElementById('tl-pending').style.display='none';}
+function showRestScreen(c){
+  const done=lessonsCompleted();
+  const nd=nextLessonDate();
+  const name=(currentUser.full_name||'').split(' ')[0];
+  let nextLabel='tez orada';
+  if(nd){const dow=nd.getDay()===0?7:nd.getDay();nextLabel=`${DOW_UZ[dow]} 15:00`;}
+  c.innerHTML=`<div class="reels-stage reels-fade">
+    <div class="snail-wrap">${snailSVG(1.3)}<div class="snail-trail"></div></div>
+    <div class="rest-label">Dam ol, ${name}! 😴</div>
+    <div class="rest-next">Keyingi dars: ${nextLabel}</div>
+    <div class="rest-timer" id="rest-timer">--:--:--</div>
+    <div class="reels-sub">Sen ${done} ta darsni tugatding. Salyangozing o'smoqda! 🐌</div></div>`;
+  if(window._restInterval)clearInterval(window._restInterval);
+  const tick=()=>{
+    const t=document.getElementById('rest-timer');if(!t){clearInterval(window._restInterval);return;}
+    if(!nd){t.textContent='';return;}
+    let diff=Math.floor((nd.getTime()-Date.now())/1000);
+    if(diff<=0){t.textContent='Tayyor! 🎉';clearInterval(window._restInterval);renderToday();return;}
+    const h=Math.floor(diff/3600),m=Math.floor((diff%3600)/60),s=diff%60;
+    t.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  };
+  tick();window._restInterval=setInterval(tick,1000);
+}
+
+// ═══ REELS LESSON ENGINE ═══
+// flow: test intro → test Qs → tez intro → record → snail grow
+let reelsLesson=null, reelsQ=0, reelsScore=0, reelsTez=null;
+function rStage(){return document.getElementById('reels-stage');}
+function startReelsLesson(id){
+  reelsLesson=LESSONS.find(l=>l.id===id);
+  reelsTez=TEZ.find(t=>t.id===id); // same id = paired tez
+  reelsQ=0;reelsScore=0;
+  stuTab('reels');
+  reelsTestIntro();
+}
+// step 1: test intro
+function reelsTestIntro(){
+  rStage().innerHTML=`<div class="reels-stage reels-fade">
+    <div class="reels-emoji-big">📝</div>
+    <div class="reels-intro-text">Hozir test yechamiz!</div>
+    <div class="reels-sub">${reelsLesson.id}-dars: ${reelsLesson.title}<br>${reelsLesson.tests.length} ta savol. Tayyormisan?</div>
+    <button class="reels-big-btn" onclick="reelsShowQ()">Boshlash ✏️</button></div>`;
+}
+// step 2: show question
+function reelsShowQ(){
+  const q=reelsLesson.tests[reelsQ];const total=reelsLesson.tests.length;
+  const dots=Array.from({length:total},(_, i)=>`<span class="${i<reelsQ?'done':i===reelsQ?'active':''}"></span>`).join('');
+  rStage().innerHTML=`<div class="reels-stage reels-fade">
+    <div class="reels-progress">${dots}</div>
+    <div style="font-family:var(--fm);font-size:13px;color:var(--mu);margin-bottom:18px">${reelsQ+1} / ${total}</div>
+    <div class="reels-q">${q.q}</div>
+    <div id="reels-opts" style="width:100%;display:flex;flex-direction:column;align-items:center">
+      ${q.opts.map((o,i)=>`<button class="reels-opt" onclick="reelsPick(${i})" id="ropt${i}">${o}</button>`).join('')}
+    </div>
+    <button class="reels-big-btn" id="reels-next" style="display:none;margin-top:14px" onclick="reelsNextQ()">Keyingisi →</button></div>`;
+}
+function reelsPick(sel){
+  const q=reelsLesson.tests[reelsQ];
+  document.querySelectorAll('.reels-opt').forEach(b=>b.disabled=true);
+  if(sel===q.c){reelsScore++;document.getElementById('ropt'+sel).classList.add('correct');}
+  else{document.getElementById('ropt'+sel).classList.add('wrong');document.getElementById('ropt'+q.c).classList.add('correct');}
+  document.getElementById('reels-next').style.display='inline-block';
+}
+function reelsNextQ(){
+  reelsQ++;
+  if(reelsQ<reelsLesson.tests.length){reelsShowQ();return;}
+  reelsSaveTest();
+}
+async function reelsSaveTest(){
+  const total=reelsLesson.tests.length;const bytes=reelsScore*5;
+  await sb.from('lesson_access').upsert({student_id:currentUser.id,lesson_id:reelsLesson.id,test_passed:1,test_score:reelsScore,test_total:total},{onConflict:'student_id,lesson_id'});
+  await sb.from('bytes_transactions').insert({student_id:currentUser.id,amount:bytes,reason:`${reelsLesson.id}-dars testi`});
+  await sb.from('students').update({bytes_balance:(currentUser.bytes_balance||0)+bytes}).eq('id',currentUser.id);
+  currentUser.bytes_balance=(currentUser.bytes_balance||0)+bytes;
+  lessonAccess=lessonAccess.filter(a=>a.lesson_id!==reelsLesson.id);lessonAccess.push({lesson_id:reelsLesson.id,test_passed:1,test_score:reelsScore,test_total:total});
+  document.getElementById('stu-bayt').textContent=fmt(currentUser.bytes_balance);
+  document.getElementById('stu-bal-h').textContent=fmt(currentUser.bytes_balance)+' bayt';
+  // test result screen → continue to tez
+  rStage().innerHTML=`<div class="reels-stage reels-fade">
+    <div class="reels-emoji-big">${reelsScore>=total*0.6?'🎉':'💪'}</div>
+    <div class="reels-intro-text">Natija: ${reelsScore}/${total}</div>
+    <div class="reels-sub">+${bytes} bayt! Endi tez aytishga o'tamiz.</div>
+    <button class="reels-big-btn" onclick="reelsTezIntro()">Davom etish →</button></div>`;
+}
+// step 3: tez intro
+function reelsTezIntro(){
+  if(!reelsTez){reelsFinish();return;}
+  rStage().innerHTML=`<div class="reels-stage reels-fade">
+    <div class="reels-emoji-big">🎤</div>
+    <div class="reels-intro-text">Endi tez aytish aytamiz!</div>
+    <div class="reels-sub">Bu so'zlarni tez va aniq ayt. Ovozingni yozib, ustozga yubor.</div>
+    <button class="reels-big-btn" onclick="reelsTezRecord()">Tayyorman 🎙</button></div>`;
+}
+// step 4: record screen
+function reelsTezRecord(){
+  rStage().innerHTML=`<div class="reels-stage reels-fade">
+    <div class="reels-voice-text">"${reelsTez.text}"</div>
+    <div class="reels-sub">💡 ${reelsTez.hint}</div>
+    <div class="reels-card">
+      <button class="reels-big-btn red" id="rec-btn" style="width:100%" onclick="toggleRecord()">🎤 Ovozni yozish</button>
+      <div id="rec-status" style="font-size:13px;color:var(--mu);text-align:center;padding:10px 0"></div>
+      <audio id="rec-preview" controls style="display:none;width:100%;margin-bottom:10px"></audio>
+      <div class="voice-ctrl" id="rec-ctrl" style="display:none">
+        <button class="btn-sm red" style="padding:12px" onclick="reelsCancelRec()">🗑 Qayta</button>
+        <button class="reels-big-btn green" id="rec-send" style="padding:12px;font-size:16px;animation:none" onclick="reelsSendVoice()">📤 Yuborish</button>
+      </div>
+    </div></div>`;
+  audioBlob=null;audioChunks=[];
+}
+function reelsCancelRec(){if(audioStream)audioStream.getTracks().forEach(t=>t.stop());reelsTezRecord();}
+async function reelsSendVoice(){
+  if(!audioBlob){toast('Avval ovoz yozing','err');return;}
+  const btn=document.getElementById('rec-send');btn.disabled=true;btn.textContent='Yuborilmoqda...';
+  try{
+    const ext=(audioBlob.type.includes('mp4'))?'mp4':'webm';
+    const fileName=`${currentUser.id}_${reelsTez.id}_${Date.now()}.${ext}`;
+    const {error:upErr}=await sb.storage.from('voices').upload(fileName,audioBlob,{contentType:audioBlob.type,upsert:true});
+    if(upErr)throw upErr;
+    const {data:urlData}=sb.storage.from('voices').getPublicUrl(fileName);
+    const {error:insErr}=await sb.from('tez_aytish_submissions').insert({student_id:currentUser.id,lesson_id:reelsTez.id,voice_url:urlData.publicUrl,status:'pending'});
+    if(insErr)throw insErr;
+    // mark tez done (auto-approve so lesson counts; teacher still reviews in panel)
+    await sb.from('tez_aytish_access').upsert({student_id:currentUser.id,lesson_id:reelsTez.id,status:'done'},{onConflict:'student_id,lesson_id'});
+    tezAccess=tezAccess.filter(a=>a.lesson_id!==reelsTez.id);tezAccess.push({lesson_id:reelsTez.id,status:'done'});
+    reelsFinish();
+  }catch(e){btn.disabled=false;btn.textContent='📤 Yuborish';toast('Xato: '+(e.message||e),'err');}
+}
+// step 5: snail grows → finish
+function reelsFinish(){
+  const done=lessonsCompleted();
+  renderSnailMini();renderBrain();
+  rStage().innerHTML=`<div class="reels-stage reels-fade">
+    <div class="snail-wrap" style="animation:floaty 3s ease-in-out infinite">${snailSVG(1.5)}<div class="snail-trail"></div></div>
+    <div class="reels-intro-text">🐌 Salyangozing o'sdi!</div>
+    <div class="reels-sub">Zo'r ish! Sen ${done} ta darsni tugatding.<br>Dam ol — keyingi dars tez orada ochiladi.</div>
+    <button class="reels-big-btn green" onclick="reelsDone()">Tugatish ✅</button></div>`;
+  // celebratory grow animation
+  setTimeout(()=>{const sv=document.getElementById('snail-svg');if(sv){sv.style.transition='transform 1s';sv.style.transform='scale(1.15)';setTimeout(()=>{sv.style.transform='scale(1)';},700);}},200);
+}
+async function reelsDone(){
+  // refresh data & go to rest screen
+  const {data:la}=await sb.from('lesson_access').select('*').eq('student_id',currentUser.id);lessonAccess=la||lessonAccess;
+  const {data:ta}=await sb.from('tez_aytish_access').select('*').eq('student_id',currentUser.id);tezAccess=ta||tezAccess;
+  stuTab('today');
+}
+function resetRecUI(){audioBlob=null;audioChunks=[];}
 async function toggleRecord(){
   if(mediaRec&&mediaRec.state==='recording'){mediaRec.stop();return;}
   try{audioStream=await navigator.mediaDevices.getUserMedia({audio:true});audioChunks=[];
@@ -1214,31 +1378,18 @@ async function toggleRecord(){
     mediaRec=mime?new MediaRecorder(audioStream,{mimeType:mime}):new MediaRecorder(audioStream);
     mediaRec.ondataavailable=e=>{if(e.data.size>0)audioChunks.push(e.data);};
     mediaRec.onstop=()=>{audioBlob=new Blob(audioChunks,{type:mediaRec.mimeType||'audio/webm'});const url=URL.createObjectURL(audioBlob);
-      const ap=document.getElementById('rec-preview');ap.src=url;ap.style.display='block';
-      document.getElementById('rec-ctrl').style.display='grid';document.getElementById('rec-btn').textContent='🔄 Qayta';document.getElementById('rec-btn').className='btn-record';
-      document.getElementById('rec-status').textContent="✅ Yozildi! Eshitib ko'ring.";audioStream.getTracks().forEach(t=>t.stop());};
-    mediaRec.start();document.getElementById('rec-btn').textContent="⏹ To'xtatish";document.getElementById('rec-btn').className='btn-record recording';
-    document.getElementById('rec-status').textContent='🔴 Yozilmoqda...';document.getElementById('rec-ctrl').style.display='none';document.getElementById('rec-preview').style.display='none';
+      const ap=document.getElementById('rec-preview');if(ap){ap.src=url;ap.style.display='block';}
+      const ctrl=document.getElementById('rec-ctrl');if(ctrl)ctrl.style.display='grid';
+      const rb=document.getElementById('rec-btn');if(rb){rb.textContent='🔄 Qayta yozish';rb.className='reels-big-btn red';rb.style.width='100%';}
+      const st=document.getElementById('rec-status');if(st)st.textContent="✅ Yozildi! Eshitib ko'r, keyin yubor.";
+      audioStream.getTracks().forEach(t=>t.stop());};
+    mediaRec.start();
+    const rb=document.getElementById('rec-btn');if(rb){rb.textContent="⏹ To'xtatish";rb.className='reels-big-btn red';rb.style.width='100%';}
+    const st=document.getElementById('rec-status');if(st)st.textContent='🔴 Yozilmoqda... gapir!';
+    const ctrl=document.getElementById('rec-ctrl');if(ctrl)ctrl.style.display='none';
+    const ap=document.getElementById('rec-preview');if(ap)ap.style.display='none';
   }catch(e){toast('Mikrofonga ruxsat bering!','err');}}
 function cancelRec(){if(audioStream)audioStream.getTracks().forEach(t=>t.stop());resetRecUI();}
-async function sendVoice(){
-  if(!audioBlob||!currentTez){toast('Avval ovoz yozing','err');return;}
-  const btn=document.getElementById('rec-send');btn.disabled=true;btn.textContent='Yuborilmoqda...';
-  try{
-    const ext=(audioBlob.type.includes('mp4'))?'mp4':'webm';
-    const fileName=`${currentUser.id}_${currentTez.id}_${Date.now()}.${ext}`;
-    const {error:upErr}=await sb.storage.from('voices').upload(fileName,audioBlob,{contentType:audioBlob.type,upsert:true});
-    if(upErr)throw upErr;
-    const {data:urlData}=sb.storage.from('voices').getPublicUrl(fileName);
-    const {error:insErr}=await sb.from('tez_aytish_submissions').insert({student_id:currentUser.id,lesson_id:currentTez.id,voice_url:urlData.publicUrl,status:'pending'});
-    if(insErr)throw insErr;
-    await sb.from('tez_aytish_access').upsert({student_id:currentUser.id,lesson_id:currentTez.id,status:'pending'},{onConflict:'student_id,lesson_id'});
-    tezAccess=tezAccess.filter(a=>a.lesson_id!==currentTez.id);tezAccess.push({lesson_id:currentTez.id,status:'pending'});
-    document.getElementById('rec-btn').style.display='none';document.getElementById('rec-ctrl').style.display='none';
-    document.getElementById('rec-preview').style.display='none';document.getElementById('rec-status').textContent='';
-    document.getElementById('tl-pending').style.display='block';toast('✅ Ovoz yuborildi!');
-  }catch(e){btn.disabled=false;btn.textContent='📤 Yuborish';toast('Xato: '+(e.message||e),'err');}}
-
 // ════ ADMIN FUNCTIONS ════
 async function getAllStudents(){const{data}=await sb.from('students').select('*').eq('course','bolalar').order('created_at',{ascending:false});allStudents=data||[];return allStudents;}
 
@@ -1394,6 +1545,14 @@ function paymentDays(s){
   const txt=days<0?`${Math.abs(days)} kun kechikdi!`:days===0?'Bugun to\'lov kuni!':`${days} kun qoldi`;
   return {html:`<div class="info-row"><span class="info-key">To'lovgacha</span><span class="info-val" style="color:${col}">${txt}</span></div>`,days};
 }
+function toggleDay(btn){
+  const on=btn.classList.contains('on');
+  if(!on){
+    const cur=document.querySelectorAll('#es-days .day-pick.on').length;
+    if(cur>=2){toast('Faqat 2 kun tanlang','err');return;}
+  }
+  btn.classList.toggle('on');
+}
 function openEditStudent(){
   if(!selectedStudentId)return;const s=allStudents.find(x=>x.id===selectedStudentId);
   document.getElementById('es-id').value=s.id;
@@ -1403,18 +1562,23 @@ function openEditStudent(){
   document.getElementById('es-som').value=s.som_balance||0;
   document.getElementById('es-paid').value=s.paid===1?'1':'0';
   document.getElementById('es-firstlesson').value=s.first_lesson_date?dtDateOnly(s.first_lesson_date):'';
+  // load lesson days
+  const days=(s.lesson_days?String(s.lesson_days).split(','):[]).map(x=>x.trim());
+  document.querySelectorAll('#es-days .day-pick').forEach(b=>b.classList.toggle('on',days.includes(b.dataset.day)));
   hideModal('stu-detail-modal');showModal('edit-student-modal');
 }
 async function saveEditStudent(){
   const id=+document.getElementById('es-id').value;
   const fl=document.getElementById('es-firstlesson').value;
+  const selDays=[...document.querySelectorAll('#es-days .day-pick.on')].map(b=>b.dataset.day);
   const upd={
     full_name:document.getElementById('es-name').value.trim(),
     telegram_username:document.getElementById('es-tg').value.trim().replace('@','')||null,
     access_code:document.getElementById('es-code').value.trim(),
     som_balance:+document.getElementById('es-som').value||0,
     paid:+document.getElementById('es-paid').value,
-    first_lesson_date:fl||null
+    first_lesson_date:fl||null,
+    lesson_days:selDays.length?selDays.join(','):null
   };
   if(!upd.full_name||!upd.access_code){toast('Ism va kod kerak','err');return;}
   const{error}=await sb.from('students').update(upd).eq('id',id);
