@@ -175,6 +175,10 @@ audio{height:36px;border-radius:7px;max-width:240px}
 .filter-btn.active{background:var(--ac);color:#fff;border-color:var(--ac)}
 .day-pick{width:42px;height:42px;border-radius:10px;border:1px solid var(--brd);background:var(--s2);color:var(--mu);font-size:13px;font-weight:600;transition:.15s}
 .day-pick.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+/* student profile drawer */
+.spd-tab{padding:12px 18px;border:none;background:transparent;color:var(--mu);font-size:13px;font-weight:600;border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;transition:.15s}
+.spd-tab.active{color:var(--tx);border-bottom-color:var(--ac)}
+.spd-panel{display:none}.spd-panel.on{display:block}
 
 /* Planned calls */
 .call-day{margin-bottom:20px}
@@ -645,7 +649,68 @@ audio{height:36px;border-radius:7px;max-width:240px}
   <button class="btn-full" onclick="addStudentModal()">Qo'shish</button>
 </div></div>
 
-<div class="modal-bg" id="stu-detail-modal"><div class="modal">
+<!-- STUDENT PROFILE DRAWER (full screen) -->
+<div id="stu-profile-drawer" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:200;overflow-y:auto;flex-direction:column">
+  <!-- header -->
+  <div style="background:var(--s);border-bottom:1px solid var(--brd);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10">
+    <button onclick="closeStudentProfile()" style="background:none;border:none;color:var(--mu);font-size:22px;cursor:pointer;padding:4px">←</button>
+    <div style="font-family:var(--fd);font-size:16px;font-weight:700" id="spd-name">—</div>
+    <div style="display:flex;gap:6px">
+      <button class="btn-sm blue" onclick="openEditStudent()">✏️</button>
+      <button class="btn-sm red" onclick="deleteStudent()">🗑</button>
+    </div>
+  </div>
+  <!-- tab bar -->
+  <div style="display:flex;background:var(--s);border-bottom:1px solid var(--brd);overflow-x:auto">
+    <button class="spd-tab active" onclick="spdTab('info')" id="spdt-info">👤 Profil</button>
+    <button class="spd-tab" onclick="spdTab('tests')" id="spdt-tests">📝 Testlar</button>
+    <button class="spd-tab" onclick="spdTab('tez')" id="spdt-tez">🎤 Tez aytish</button>
+    <button class="spd-tab" onclick="spdTab('monitor')" id="spdt-monitor">📊 Monitoring</button>
+  </div>
+  <!-- content -->
+  <div style="padding:18px;max-width:700px;margin:0 auto;width:100%">
+    <!-- INFO TAB -->
+    <div id="spd-info" class="spd-panel on">
+      <!-- avatar + name -->
+      <div style="text-align:center;padding:20px 0 14px">
+        <div id="spd-avatar" style="width:72px;height:72px;background:linear-gradient(135deg,var(--ac),var(--acd));border-radius:50%;font-family:var(--fd);font-size:28px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 10px">—</div>
+        <div style="font-family:var(--fd);font-size:20px;font-weight:700" id="spd-fullname">—</div>
+        <div style="font-size:12px;color:var(--mu);margin-top:4px" id="spd-status-badge">—</div>
+      </div>
+      <!-- info rows -->
+      <div class="tbl-wrap" style="padding:0;margin-bottom:14px"><div id="spd-info-rows"></div></div>
+      <!-- schedule card -->
+      <div class="tbl-wrap" style="padding:16px;margin-bottom:14px">
+        <div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">📅 Dars jadvali</div>
+        <div id="spd-schedule"></div>
+      </div>
+      <!-- progress card -->
+      <div class="tbl-wrap" style="padding:16px;margin-bottom:14px">
+        <div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">📈 Umumiy progress</div>
+        <div id="spd-progress"></div>
+      </div>
+      <!-- actions -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-sm green" style="flex:1;padding:12px" onclick="adminUnlockWeek()">🔓 Keyingi hafta</button>
+        <button class="btn-sm yellow" style="flex:1;padding:12px" onclick="adminWarn()">⚠️ Ogohlantirish</button>
+      </div>
+    </div>
+    <!-- TESTS TAB -->
+    <div id="spd-tests" class="spd-panel" style="display:none">
+      <div id="spd-tests-content"><div class="loading-center"><div class="spin"></div></div></div>
+    </div>
+    <!-- TEZ AYTISH TAB -->
+    <div id="spd-tez" class="spd-panel" style="display:none">
+      <div id="spd-tez-content"><div class="loading-center"><div class="spin"></div></div></div>
+    </div>
+    <!-- MONITORING TAB -->
+    <div id="spd-monitor" class="spd-panel" style="display:none">
+      <div id="spd-monitor-content"><div class="loading-center"><div class="spin"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="stu-detail-modal" style="display:none"><div class="modal">
   <button class="modal-close" onclick="hideModal('stu-detail-modal')">×</button>
   <div class="modal-title" id="sdm-name">—</div>
   <div id="sdm-body"></div>
@@ -658,6 +723,7 @@ audio{height:36px;border-radius:7px;max-width:240px}
     <button class="btn-sm red" style="flex:1;padding:10px" onclick="deleteStudent()">🗑 O'chirish</button>
   </div>
 </div></div>
+
 
 <div class="modal-bg" id="edit-student-modal"><div class="modal">
   <button class="modal-close" onclick="hideModal('edit-student-modal')">×</button>
@@ -1462,7 +1528,7 @@ async function loadControl(){
     if(openTests>0||openTez>0||td===0){
       const tg=s.telegram_username?`<a class="tg-link" href="https://t.me/${s.telegram_username}" target="_blank">@${s.telegram_username}</a>`:'—';
       let holat=td===0?'<span class="badge warn">Hech narsa qilmagan</span>':`<span class="badge pending">${openTests} test, ${openTez} tez ochiq</span>`;
-      rows.push(`<tr><td><b>${s.full_name}</b></td><td>${s.current_week||1}-hafta</td><td>${holat}</td><td>${tg}</td>
+      rows.push(`<tr><td><b style="cursor:pointer;color:var(--ac2)" onclick="showStudentDetail(${s.id})">${s.full_name}</b></td><td>${s.current_week||1}-hafta</td><td>${holat}</td><td>${tg}</td>
         <td><div class="action-btns"><button class="btn-sm blue" onclick="quickNotify(${s.id},'${s.full_name.replace(/'/g,"")}')">📨</button>
         ${s.telegram_username?`<a class="btn-sm purple" style="text-decoration:none" href="https://t.me/${s.telegram_username}" target="_blank">📞 TG</a>`:''}</div></td></tr>`);
     }
@@ -1499,46 +1565,156 @@ function renderStudentsTable(list){
 }
 function filterStudents(){const q=document.getElementById('stu-search').value.toLowerCase();const f=document.getElementById('stu-filter').value;
   let l=allStudents.filter(s=>s.full_name.toLowerCase().includes(q));if(f!=='')l=l.filter(s=>String(s.is_active)===f);renderStudentsTable(l);}
+// ═══ STUDENT PROFILE DRAWER ═══
+const DOW_UZ_FULL=['','Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba','Yakshanba'];
+let spdStudentId=null, spdData={la:[],ta:[],vis:[],subs:[]};
+
+function openStudentProfile(id){showStudentDetail(id);}
 async function showStudentDetail(id){
-  selectedStudentId=id;const s=allStudents.find(x=>x.id===id);
-  const{data:la}=await sb.from('lesson_access').select('*').eq('student_id',id);
-  const{data:ta}=await sb.from('tez_aytish_access').select('*').eq('student_id',id);
-  document.getElementById('sdm-name').textContent=s.full_name;
-  // per-test scores
-  const tn=Object.fromEntries(LESSONS.map(l=>[l.id,l.title]));
-  let testRows='';
-  (la||[]).sort((a,b)=>a.lesson_id-b.lesson_id).forEach(a=>{
-    if(a.test_passed===1){
-      const sc=(a.test_score!=null)?`${a.test_score}/${a.test_total||5}`:'✓';
-      const pct=(a.test_score!=null&&a.test_total)?Math.round(a.test_score/a.test_total*100):null;
-      const col=pct==null?'var(--gn)':pct>=80?'var(--gn)':pct>=50?'var(--go)':'var(--rd)';
-      testRows+=`<div class="info-row"><span class="info-key">${a.lesson_id}-dars: ${tn[a.lesson_id]||''}</span><span class="info-val" style="color:${col}">${sc}</span></div>`;
-    }
+  selectedStudentId=id;spdStudentId=id;
+  const s=allStudents.find(x=>x.id===id);
+  if(!s)return;
+  // show drawer immediately with loading
+  document.getElementById('stu-profile-drawer').style.display='flex';
+  document.getElementById('stu-profile-drawer').style.flexDirection='column';
+  document.getElementById('spd-name').textContent=s.full_name;
+  document.getElementById('spd-fullname').textContent=s.full_name;
+  document.getElementById('spd-avatar').textContent=ini(s.full_name);
+  document.getElementById('spd-status-badge').innerHTML=s.is_active===1?'<span class="badge active">Faol</span>':'<span class="badge inactive">Faolsiz</span>';
+  // switch to first tab
+  spdTab('info');
+  // fetch all data in parallel
+  const[{data:la},{data:ta},{data:vis},{data:subs}]=await Promise.all([
+    sb.from('lesson_access').select('*').eq('student_id',id),
+    sb.from('tez_aytish_access').select('*').eq('student_id',id),
+    sb.from('student_visits').select('visited_at').eq('student_id',id).order('visited_at',{ascending:false}),
+    sb.from('tez_aytish_submissions').select('*').eq('student_id',id).order('id',{ascending:false})
+  ]);
+  spdData={la:la||[],ta:ta||[],vis:vis||[],subs:subs||[]};
+  renderSpdInfo(s);renderSpdTests(s);renderSpdTez(s);renderSpdMonitor(s);
+}
+function closeStudentProfile(){
+  document.getElementById('stu-profile-drawer').style.display='none';
+}
+function spdTab(name){
+  ['info','tests','tez','monitor'].forEach(t=>{
+    document.getElementById('spdt-'+t).classList.toggle('active',t===name);
+    document.getElementById('spd-'+t).classList.toggle('on',t===name);
+    document.getElementById('spd-'+t).style.display=t===name?'block':'none';
   });
-  if(!testRows)testRows='<div class="info-row"><span class="info-key" style="color:var(--mu)">Hali test topshirmagan</span></div>';
-  // VISITS monitoring
-  let visitsToday=0,visitsTotal=0,lastVisit='—';
-  try{
-    const{data:vis}=await sb.from('student_visits').select('visited_at').eq('student_id',id).order('visited_at',{ascending:false});
-    visitsTotal=(vis||[]).length;
-    const today=todayLocalStr();
-    visitsToday=(vis||[]).filter(v=>dtDateOnly(v.visited_at)===today).length;
-    if(vis&&vis.length)lastVisit=new Date(vis[0].visited_at).toLocaleString('ru',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-  }catch(e){}
-  const testsDone=(la||[]).filter(a=>a.test_passed===1).length;
-  const tezDone=(ta||[]).filter(a=>a.status==='done').length;
-  // payment countdown
+}
+function renderSpdInfo(s){
   const payInfo=paymentDays(s);
-  document.getElementById('sdm-body').innerHTML=
-    [['Kod',s.access_code||'—'],['Telegram',s.telegram_username?'@'+s.telegram_username:'—'],['Bayt',fmt(s.bytes_balance)],["So'm",fmt(s.som_balance)],['To\'lov',s.paid===1?'To\'langan':'Qarzdor'],['Hafta',(s.current_week||1)],['Ogohlantirish',s.warnings||0]].map(([k,v])=>`<div class="info-row"><span class="info-key">${k}</span><span class="info-val">${v}</span></div>`).join('')
-    +`<div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 6px">📊 Monitoring</div>`
-    +`<div class="info-row"><span class="info-key">Bugun kirgan</span><span class="info-val" style="color:${visitsToday>0?'var(--gn)':'var(--rd)'}">${visitsToday} marta</span></div>`
-    +`<div class="info-row"><span class="info-key">Jami kirishlar</span><span class="info-val">${visitsTotal}</span></div>`
-    +`<div class="info-row"><span class="info-key">Oxirgi kirish</span><span class="info-val">${lastVisit}</span></div>`
-    +`<div class="info-row"><span class="info-key">Testlar / Tez aytish</span><span class="info-val">${testsDone}/8 · ${tezDone}/8</span></div>`
-    +(payInfo.html||'')
-    +`<div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 6px">📝 Test natijalari</div>`+testRows;
-  showModal('stu-detail-modal');
+  const testsDone=spdData.la.filter(a=>a.test_passed===1).length;
+  const tezDone=spdData.ta.filter(a=>a.status==='done').length;
+  // basic info rows
+  const rows=[['Kod',s.access_code||'—'],['Telegram',s.telegram_username?`<a class="tg-link" href="https://t.me/${s.telegram_username}" target="_blank">@${s.telegram_username}</a>`:'—'],['Bayt',fmt(s.bytes_balance)],["So'm",fmt(s.som_balance)],['To\'lov',s.paid===1?'<span class="badge active">To\'langan</span>':'<span class="badge warn">Qarzdor</span>'],['Ogoh­lantirish',s.warnings||0]];
+  document.getElementById('spd-info-rows').innerHTML=rows.map(([k,v])=>`<div class="info-row" style="padding:12px 16px"><span class="info-key">${k}</span><span class="info-val">${v}</span></div>`).join('')+(payInfo.html||'').replace('class="info-row"','class="info-row" style="padding:12px 16px"');
+  // schedule card
+  const days=(s.lesson_days?String(s.lesson_days).split(','):[]).map(x=>parseInt(x.trim())).filter(x=>x>=1&&x<=7);
+  const offlineDays=[1,2,3,4,5,6,7].filter(d=>!days.includes(d)&&d<=5).slice(0,2); // simplified guess
+  let schedHtml='';
+  if(!days.length){schedHtml='<div style="color:var(--mu);font-size:13px">Dars kunlari belgilanmagan</div>';}
+  else{
+    schedHtml=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="background:var(--s2);border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">📚 Online DZ kunlari (15:00)</div>
+        ${days.map(d=>`<div style="font-size:14px;font-weight:600;color:var(--ac2);margin-bottom:4px">${DOW_UZ_FULL[d]}</div>`).join('')}
+      </div>
+      <div style="background:var(--s2);border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">⏰ Haftalik jadval</div>
+        ${days.map((d,i)=>`<div style="font-size:13px;color:var(--mu2);margin-bottom:4px">${i+1}. DZ: ${DOW_UZ_FULL[d]} 15:00</div>`).join('')}
+      </div>
+    </div>`;
+  }
+  document.getElementById('spd-schedule').innerHTML=schedHtml;
+  // progress card
+  const pct=Math.round((testsDone+tezDone)/16*100);
+  document.getElementById('spd-progress').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+      <div style="text-align:center;background:var(--s2);border-radius:10px;padding:14px">
+        <div style="font-family:var(--fd);font-size:26px;font-weight:700;color:var(--ac2)">${testsDone}/8</div>
+        <div style="font-size:11px;color:var(--mu);margin-top:4px">Testlar</div>
+      </div>
+      <div style="text-align:center;background:var(--s2);border-radius:10px;padding:14px">
+        <div style="font-family:var(--fd);font-size:26px;font-weight:700;color:var(--gn)">${tezDone}/8</div>
+        <div style="font-size:11px;color:var(--mu);margin-top:4px">Tez aytish</div>
+      </div>
+      <div style="text-align:center;background:var(--s2);border-radius:10px;padding:14px">
+        <div style="font-family:var(--fd);font-size:26px;font-weight:700;color:var(--go)">${pct}%</div>
+        <div style="font-size:11px;color:var(--mu);margin-top:4px">Progress</div>
+      </div>
+    </div>
+    <div style="background:var(--s2);border-radius:6px;height:8px;overflow:hidden">
+      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--ac),var(--cy));border-radius:6px;transition:1s"></div>
+    </div>`;
+}
+function renderSpdTests(s){
+  const la=spdData.la;const tn=Object.fromEntries(LESSONS.map(l=>[l.id,l.title]));
+  if(!la.length){document.getElementById('spd-tests-content').innerHTML='<div class="empty">Hali test topshirmagan</div>';return;}
+  // show ALL lessons (done/not done)
+  document.getElementById('spd-tests-content').innerHTML=LESSONS.map(l=>{
+    const acc=la.find(a=>a.lesson_id===l.id);
+    const done=acc&&acc.test_passed===1;
+    const sc=(done&&acc.test_score!=null)?`${acc.test_score}/${acc.test_total||5}`:done?'✓':'—';
+    const pct=(done&&acc.test_score!=null&&acc.test_total)?Math.round(acc.test_score/acc.test_total*100):null;
+    const col=!done?'var(--mu)':pct==null?'var(--gn)':pct>=80?'var(--gn)':pct>=50?'var(--go)':'var(--rd)';
+    const icon=done?'✅':'⭕';
+    return `<div class="info-row" style="padding:14px 16px;background:var(--s);border-radius:10px;margin-bottom:8px;border:1px solid var(--brd)">
+      <span style="display:flex;align-items:center;gap:10px"><span>${icon}</span><span><b>${l.id}-dars</b><br><span style="font-size:12px;color:var(--mu)">${l.title}</span></span></span>
+      <span style="font-family:var(--fm);font-weight:700;color:${col}">${sc}</span></div>`;
+  }).join('');
+}
+function renderSpdTez(s){
+  const ta=spdData.ta;const subs=spdData.subs;const tm=Object.fromEntries(TEZ.map(t=>[t.id,t]));
+  document.getElementById('spd-tez-content').innerHTML=TEZ.map(t=>{
+    const acc=ta.find(a=>a.lesson_id===t.id);
+    const st=acc?acc.status:'locked';
+    const icon=st==='done'?'✅':st==='pending'?'⏳':st==='open'?'🎤':'🔒';
+    const statusLabel=st==='done'?'<span class="badge active">Bajarildi</span>':st==='pending'?'<span class="badge pending">Tekshirilmoqda</span>':st==='open'?'<span class="badge blue">Ochiq</span>':'<span class="badge inactive">Qulflangan</span>';
+    // find submissions for this lesson
+    const lessonSubs=subs.filter(sb2=>sb2.lesson_id===t.id);
+    const latestSub=lessonSubs[0];
+    return `<div style="background:var(--s);border:1px solid var(--brd);border-radius:12px;padding:16px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${latestSub?'12px':'0'}">
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-size:22px">${icon}</span>
+          <div><b>${t.id}-dars: ${t.title}</b><br><span style="font-size:12px;color:var(--mu);font-style:italic">"${t.text}"</span></div></div>
+        ${statusLabel}</div>
+      ${latestSub&&latestSub.voice_url?`<audio src="${latestSub.voice_url}" controls preload="none" style="width:100%;height:36px;border-radius:8px"></audio>
+        <div style="font-size:11px;color:var(--mu);margin-top:6px">${latestSub.submitted_at?new Date(latestSub.submitted_at).toLocaleString('ru',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):''} · Status: ${latestSub.status||'—'}</div>`:''}
+    </div>`;
+  }).join('');
+}
+function renderSpdMonitor(s){
+  const vis=spdData.vis;const today=todayLocalStr();
+  const visitsToday=vis.filter(v=>dtDateOnly(v.visited_at)===today).length;
+  const lastVisit=vis.length?new Date(vis[0].visited_at).toLocaleString('ru',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+  // visits by day (last 7 days)
+  const byDay={};vis.forEach(v=>{const d=dtDateOnly(v.visited_at);byDay[d]=(byDay[d]||0)+1;});
+  const last7=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;const n=byDay[ds]||0;last7.push({ds,n,label:`${d.getDate()}.${String(d.getMonth()+1).padStart(2,'0')}`});}
+  const maxN=Math.max(...last7.map(x=>x.n),1);
+  document.getElementById('spd-monitor-content').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div style="background:var(--s2);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-family:var(--fd);font-size:28px;font-weight:700;color:${visitsToday>0?'var(--gn)':'var(--rd)'}">${visitsToday}</div>
+        <div style="font-size:11px;color:var(--mu);margin-top:4px">Bugun kirgan</div>
+      </div>
+      <div style="background:var(--s2);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-family:var(--fd);font-size:28px;font-weight:700;color:var(--ac2)">${vis.length}</div>
+        <div style="font-size:11px;color:var(--mu);margin-top:4px">Jami kirishlar</div>
+      </div>
+    </div>
+    <div class="tbl-wrap" style="padding:16px;margin-bottom:14px">
+      <div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">📅 Oxirgi 7 kun</div>
+      <div style="display:flex;align-items:flex-end;gap:6px;height:80px">
+        ${last7.map(x=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+          <div style="font-size:10px;color:var(--mu)">${x.n||''}</div>
+          <div style="width:100%;border-radius:4px 4px 0 0;background:${x.n>0?'var(--ac)':'var(--s2)'};height:${Math.round((x.n/maxN)*60)+4}px;min-height:4px;transition:.3s"></div>
+          <div style="font-size:9px;color:var(--mu)">${x.label}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="info-row" style="padding:12px 0"><span class="info-key">Oxirgi kirish</span><span class="info-val">${lastVisit}</span></div>`;
 }
 // payment countdown: first_lesson_date + 30 days
 function paymentDays(s){
@@ -1571,7 +1747,7 @@ function openEditStudent(){
   // load lesson days
   const days=(s.lesson_days?String(s.lesson_days).split(','):[]).map(x=>x.trim());
   document.querySelectorAll('#es-days .day-pick').forEach(b=>b.classList.toggle('on',days.includes(b.dataset.day)));
-  hideModal('stu-detail-modal');showModal('edit-student-modal');
+  closeStudentProfile();hideModal('stu-detail-modal');showModal('edit-student-modal');
 }
 async function saveEditStudent(){
   const id=+document.getElementById('es-id').value;
@@ -1599,15 +1775,15 @@ async function deleteStudent(){
   await sb.from('tez_aytish_access').delete().eq('student_id',selectedStudentId);
   await sb.from('tez_aytish_submissions').delete().eq('student_id',selectedStudentId);
   await sb.from('students').delete().eq('id',selectedStudentId);
-  hideModal('stu-detail-modal');toast('🗑 O\'quvchi o\'chirildi');loadStudentsTable();
+  closeStudentProfile();hideModal('stu-detail-modal');toast('🗑 O\'quvchi o\'chirildi');loadStudentsTable();
 }
 async function adminUnlockWeek(){if(!selectedStudentId)return;const s=allStudents.find(x=>x.id===selectedStudentId);const nw=(s.current_week||1)+1;
   if(nw>4){toast('4-hafta oxirgi!','err');return;}
   for(const lid of WEEK_LESSONS[nw])await sb.from('lesson_access').upsert({student_id:selectedStudentId,lesson_id:lid,test_passed:0},{onConflict:'student_id,lesson_id'});
   for(const tid of WEEK_TEZ[nw])await sb.from('tez_aytish_access').upsert({student_id:selectedStudentId,lesson_id:tid,status:'open'},{onConflict:'student_id,lesson_id'});
-  await sb.from('students').update({current_week:nw}).eq('id',selectedStudentId);toast(`✅ ${nw}-hafta ochildi`);hideModal('stu-detail-modal');loadStudentsTable();}
+  await sb.from('students').update({current_week:nw}).eq('id',selectedStudentId);toast(`✅ ${nw}-hafta ochildi`);closeStudentProfile();hideModal('stu-detail-modal');loadStudentsTable();}
 async function adminWarn(){if(!selectedStudentId)return;const s=allStudents.find(x=>x.id===selectedStudentId);const w=(s.warnings||0)+1;
-  await sb.from('students').update({warnings:w}).eq('id',selectedStudentId);s.warnings=w;toast('⚠️ Ogohlantirish berildi');hideModal('stu-detail-modal');}
+  await sb.from('students').update({warnings:w}).eq('id',selectedStudentId);s.warnings=w;toast('⚠️ Ogohlantirish berildi');closeStudentProfile();hideModal('stu-detail-modal');}
 async function quickActivate(id){await sb.from('students').update({is_active:1}).eq('id',id);
   for(const lid of WEEK_LESSONS[1])await sb.from('lesson_access').upsert({student_id:id,lesson_id:lid,test_passed:0},{onConflict:'student_id,lesson_id'});
   for(const tid of WEEK_TEZ[1])await sb.from('tez_aytish_access').upsert({student_id:id,lesson_id:tid,status:'open'},{onConflict:'student_id,lesson_id'});
