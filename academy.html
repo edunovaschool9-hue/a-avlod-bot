@@ -1047,6 +1047,10 @@ async function loadStudentApp(){
   const s=currentUser;
   document.getElementById('stu-name-h').textContent=s.full_name;
   document.getElementById('stu-bal-h').textContent=fmt(s.bytes_balance)+' bayt';
+  if(TEST_MODE){
+    const logo=document.querySelector('.stu-logo');
+    if(logo)logo.innerHTML='EDU<span>BLOG</span> <span style="font-size:10px;background:#f59e0b;color:#000;padding:2px 6px;border-radius:4px;font-family:var(--fm)">TEST</span>';
+  }
   document.getElementById('brain-name').textContent=(s.full_name||'').split(' ')[0]||"do'stim";
   document.getElementById('stu-som').textContent=fmt(s.som_balance);
   document.getElementById('stu-bayt').textContent=fmt(s.bytes_balance);
@@ -1078,13 +1082,15 @@ function getLessonDays(){
   return String(raw).split(',').map(x=>parseInt(x.trim())).filter(x=>x>=1&&x<=7);
 }
 // is today a lesson-day? returns true if now is one of the 2 days AND past 15:00
+const TEST_MODE=new URLSearchParams(location.search).get('test')==='1';
 function isLessonOpenNow(){
   const days=getLessonDays();
   if(!days.length)return false;
+  if(TEST_MODE)return true; // bypass 15:00 check for testing
   const now=new Date();
-  const dow=now.getDay()===0?7:now.getDay(); // 1=Mon..7=Sun
+  const dow=now.getDay()===0?7:now.getDay();
   if(!days.includes(dow))return false;
-  return now.getHours()>=15; // opens at 15:00
+  return now.getHours()>=15;
 }
 // next lesson datetime (for rest timer): nearest future lesson-day at 15:00
 function nextLessonDate(){
