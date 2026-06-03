@@ -1607,84 +1607,77 @@ function renderSpdInfo(s){
   const payInfo=paymentDays(s);
   const testsDone=spdData.la.filter(a=>a.test_passed===1).length;
   const tezDone=spdData.ta.filter(a=>a.status==='done').length;
-  // basic info rows
-  const rows=[['Kod',s.access_code||'—'],['Telegram',s.telegram_username?`<a class="tg-link" href="https://t.me/${s.telegram_username}" target="_blank">@${s.telegram_username}</a>`:'—'],['Bayt',fmt(s.bytes_balance)],["So'm",fmt(s.som_balance)],['To\'lov',s.paid===1?'<span class="badge active">To\'langan</span>':'<span class="badge warn">Qarzdor</span>'],['Ogoh­lantirish',s.warnings||0]];
-  document.getElementById('spd-info-rows').innerHTML=rows.map(([k,v])=>`<div class="info-row" style="padding:12px 16px"><span class="info-key">${k}</span><span class="info-val">${v}</span></div>`).join('')+(payInfo.html||'').replace('class="info-row"','class="info-row" style="padding:12px 16px"');
-  // schedule card
-  const days=(s.lesson_days?String(s.lesson_days).split(','):[]).map(x=>parseInt(x.trim())).filter(x=>x>=1&&x<=7);
-  const offlineDays=[1,2,3,4,5,6,7].filter(d=>!days.includes(d)&&d<=5).slice(0,2); // simplified guess
-  let schedHtml='';
-  if(!days.length){schedHtml='<div style="color:var(--mu);font-size:13px">Dars kunlari belgilanmagan</div>';}
-  else{
-    schedHtml=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div style="background:var(--s2);border-radius:10px;padding:14px">
-        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">📚 Online DZ kunlari (15:00)</div>
-        ${days.map(d=>`<div style="font-size:14px;font-weight:600;color:var(--ac2);margin-bottom:4px">${DOW_UZ_FULL[d]}</div>`).join('')}
-      </div>
-      <div style="background:var(--s2);border-radius:10px;padding:14px">
-        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">⏰ Haftalik jadval</div>
-        ${days.map((d,i)=>`<div style="font-size:13px;color:var(--mu2);margin-bottom:4px">${i+1}. DZ: ${DOW_UZ_FULL[d]} 15:00</div>`).join('')}
-      </div>
-    </div>`;
+  const voiceCount=spdData.subs.length;
+  let lastOnline='Hali kirmagan';
+  if(spdData.vis&&spdData.vis.length){
+    const lv=new Date(spdData.vis[0].visited_at);
+    const diffMin=Math.floor((Date.now()-lv.getTime())/60000);
+    let ago='';
+    if(diffMin<2)ago='hozir onlayn 🟢';
+    else if(diffMin<60)ago=diffMin+' daqiqa oldin';
+    else if(diffMin<1440)ago=Math.floor(diffMin/60)+' soat oldin';
+    else ago=Math.floor(diffMin/1440)+' kun oldin';
+    lastOnline=lv.toLocaleString('ru',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})'('+ago+')';
   }
+  const rows=[['Kod',s.access_code||'--'],['Telegram',s.telegram_username?'<a class="tg-link" href="https://t.me/'+s.telegram_username+'" target="_blank">@'+s.telegram_username+'</a>':'--'],['Oxirgi online',lastOnline],['Bayt',fmt(s.bytes_balance)],["So'm",fmt(s.som_balance)],['To\'lov',s.paid===1?'<span class="badge active">To\'langan</span>':'<span class="badge warn">Qarzdor</span>'],['Ogohlantirish',s.warnings||0]];
+  document.getElementById('spd-info-rows').innerHTML=rows.map(([k,v])=>'<div class="info-row" style="padding:12px 16px"><span class="info-key">'+k+'</span><span class="info-val">'+v+'</span></div>').join('')+(payInfo.html||''). replace('class="info-row"','class="info-row" style="padding:12px 16px"');
+  const days=(s.lesson_days?String(s.lesson_days).split(','):[]).map(x=>parseInt(x.trim())).filter(x=>x>=1&&x<=7);
+  let schedHtml='';
+  if(!days.length){schedHtml='<div style="color:var(--mu);font-size:13px">⚠️ Dars kunlari belgilanmagan. "✏️" tugmasi orqali belgilang.</div>';}
+  else{schedHtml='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'+
+    '<div style="background:var(--s2);border-radius:10px;padding:14px"><div style="font-size:11px;color:var(--mu);margin-bottom:8px">📚 Online DZ kunlari (15:00)</div>'+
+    days.map(d=>'<div style="font-size:14px;font-weight:600;color:var(--ac2);margin-bottom:4px">'+DOW_UZ_FULL[d]+'</div>').join('')+
+    '</div><div style="background:var(--s2);border-radius:10px;padding:14px"><div style="font-size:11px;color:var(--mu);margin-bottom:8px">⏰ Haftalik jadval</div>'+
+    days.map((d,i)=>'<div style="font-size:13px;color:var(--mu2);margin-bottom:4px">'+(i+1)+'. DZ: '+DOW_UZ_FULL[d]+' 15:00</div>').join('')+
+    '</div></div>';}
   document.getElementById('spd-schedule').innerHTML=schedHtml;
-  // progress card
   const pct=Math.round((testsDone+tezDone)/16*100);
-  document.getElementById('spd-progress').innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
-      <div style="text-align:center;background:var(--s2);border-radius:10px;padding:14px">
-        <div style="font-family:var(--fd);font-size:26px;font-weight:700;color:var(--ac2)">${testsDone}/8</div>
-        <div style="font-size:11px;color:var(--mu);margin-top:4px">Testlar</div>
-      </div>
-      <div style="text-align:center;background:var(--s2);border-radius:10px;padding:14px">
-        <div style="font-family:var(--fd);font-size:26px;font-weight:700;color:var(--gn)">${tezDone}/8</div>
-        <div style="font-size:11px;color:var(--mu);margin-top:4px">Tez aytish</div>
-      </div>
-      <div style="text-align:center;background:var(--s2);border-radius:10px;padding:14px">
-        <div style="font-family:var(--fd);font-size:26px;font-weight:700;color:var(--go)">${pct}%</div>
-        <div style="font-size:11px;color:var(--mu);margin-top:4px">Progress</div>
-      </div>
-    </div>
-    <div style="background:var(--s2);border-radius:6px;height:8px;overflow:hidden">
-      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--ac),var(--cy));border-radius:6px;transition:1s"></div>
-    </div>`;
+  const voiceBtn='<button class="btn-sm green" style="width:100%;padding:14px;font-size:14px" onclick="spdTab(\'tez\')">🎙️ Bu o\'quvchining ovozlarini tinglash ('+voiceCount+' ta) ›</button>';
+  const testCard='<div onclick="spdTab(\'tests\')" style="cursor:pointer;text-align:center;background:var(--s2);border-radius:10px;padding:14px;border:1px solid transparent;transition:.15s" onmouseover="this.style.borderColor=\'var(--ac)\'" onmouseout="this.style.borderColor=\'transparent\'"><div style="font-family:var(--fd);font-size:26px;font-weight:700;color:var(--ac2)">'+testsDone+'/8</div><div style="font-size:11px;color:var(--mu);margin-top:4px">📝 Testlar ›</div></div>';
+  const tezCard='<div onclick="spdTab(\'tez\')" style="cursor:pointer;text-align:center;background:var(--s2);border-radius:10px;padding:14px;border:1px solid transparent;transition:.15s" onmouseover="this.style.borderColor=\'var(--gn)\'" onmouseout="this.style.borderColor=\'transparent\'"><div style="font-family:var(--fd);font-size:26px;font-weight:700;color:var(--gn)">'+tezDone+'/8</div><div style="font-size:11px;color:var(--mu);margin-top:4px">🎙️ Tez aytish ›</div></div>';
+  const pctCard='<div style="text-align:center;background:var(--s2);border-radius:10px;padding:14px"><div style="font-family:var(--fd);font-size:26px;font-weight:700;color:var(--go)">'+pct+'%</div><div style="font-size:11px;color:var(--mu);margin-top:4px">Progress</div></div>';
+  document.getElementById('spd-progress').innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">'+testCard+tezCard+pctCard+'</div><div style="background:var(--s2);border-radius:6px;height:8px;overflow:hidden;margin-bottom:14px"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--ac),var(--cy));border-radius:6px;transition:1s"></div></div>'+voiceBtn;
 }
+
 function renderSpdTests(s){
-  const la=spdData.la;const tn=Object.fromEntries(LESSONS.map(l=>[l.id,l.title]));
-  if(!la.length){document.getElementById('spd-tests-content').innerHTML='<div class="empty">Hali test topshirmagan</div>';return;}
-  // show ALL lessons (done/not done)
+  const la=spdData.la;
+  if(!la.length){document.getElementById('spd-tests-content').innerHTML='<div class="empty"><div class="empty-icon">📝</div>Hali test topshirmagan</div>';return;}
   document.getElementById('spd-tests-content').innerHTML=LESSONS.map(l=>{
     const acc=la.find(a=>a.lesson_id===l.id);
     const done=acc&&acc.test_passed===1;
-    const sc=(done&&acc.test_score!=null)?`${acc.test_score}/${acc.test_total||5}`:done?'✓':'—';
+    const sc=(done&&acc.test_score!=null)?(acc.test_score+'/'+(acc.test_total||5)):done?'\u2713':'--';
     const pct=(done&&acc.test_score!=null&&acc.test_total)?Math.round(acc.test_score/acc.test_total*100):null;
     const col=!done?'var(--mu)':pct==null?'var(--gn)':pct>=80?'var(--gn)':pct>=50?'var(--go)':'var(--rd)';
-    const icon=done?'✅':'⭕';
-    return `<div class="info-row" style="padding:14px 16px;background:var(--s);border-radius:10px;margin-bottom:8px;border:1px solid var(--brd)">
-      <span style="display:flex;align-items:center;gap:10px"><span>${icon}</span><span><b>${l.id}-dars</b><br><span style="font-size:12px;color:var(--mu)">${l.title}</span></span></span>
-      <span style="font-family:var(--fm);font-weight:700;color:${col}">${sc}</span></div>`;
+    const icon=done?'\u2705':'\u2B55';
+    return '<div class="info-row" style="padding:14px 16px;background:var(--s);border-radius:10px;margin-bottom:8px;border:1px solid var(--brd)"><span style="display:flex;align-items:center;gap:10px"><span>'+icon+'</span><span><b>'+l.id+'-dars</b><br><span style="font-size:12px;color:var(--mu)">'+l.title+'</span></span></span><span style="font-family:var(--fm);font-weight:700;color:'+col+'">'+sc+'</span></div>';
   }).join('');
 }
+
 function renderSpdTez(s){
-  const ta=spdData.ta;const subs=spdData.subs;const tm=Object.fromEntries(TEZ.map(t=>[t.id,t]));
-  document.getElementById('spd-tez-content').innerHTML=TEZ.map(t=>{
+  const ta=spdData.ta;const subs=spdData.subs;
+  const withVoice=subs.length;
+  const pendingCount=subs.filter(x=>!x.status||x.status==='pending').length;
+  let header='<div style="background:var(--s2);border-radius:12px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px"><span style="font-size:24px">🎙️</span><div><b style="font-size:15px">'+withVoice+' ta ovoz yuborilgan</b><div style="font-size:12px;color:var(--mu)">'+( pendingCount>0?pendingCount+' ta tekshirilmagan':'Hammasi tekshirilgan \u2713')+'</div></div></div>';
+  const body=TEZ.map(t=>{
     const acc=ta.find(a=>a.lesson_id===t.id);
     const st=acc?acc.status:'locked';
-    const icon=st==='done'?'✅':st==='pending'?'⏳':st==='open'?'🎤':'🔒';
+    const icon=st==='done'?'\u2705':st==='pending'?'\u23F3':st==='open'?'🎙️':'\uD83D\uDD12';
     const statusLabel=st==='done'?'<span class="badge active">Bajarildi</span>':st==='pending'?'<span class="badge pending">Tekshirilmoqda</span>':st==='open'?'<span class="badge blue">Ochiq</span>':'<span class="badge inactive">Qulflangan</span>';
-    // find submissions for this lesson
     const lessonSubs=subs.filter(sb2=>sb2.lesson_id===t.id);
     const latestSub=lessonSubs[0];
-    return `<div style="background:var(--s);border:1px solid var(--brd);border-radius:12px;padding:16px;margin-bottom:10px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${latestSub?'12px':'0'}">
-        <div style="display:flex;align-items:center;gap:10px"><span style="font-size:22px">${icon}</span>
-          <div><b>${t.id}-dars: ${t.title}</b><br><span style="font-size:12px;color:var(--mu);font-style:italic">"${t.text}"</span></div></div>
-        ${statusLabel}</div>
-      ${latestSub&&latestSub.voice_url?`<audio src="${latestSub.voice_url}" controls preload="none" style="width:100%;height:36px;border-radius:8px"></audio>
-        <div style="font-size:11px;color:var(--mu);margin-top:6px">${latestSub.submitted_at?new Date(latestSub.submitted_at).toLocaleString('ru',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):''} · Status: ${latestSub.status||'—'}</div>`:''}
-    </div>`;
+    const canReview=latestSub&&(!latestSub.status||latestSub.status==='pending');
+    let html='<div style="background:var(--s);border:1px solid var(--brd);border-radius:12px;padding:16px;margin-bottom:10px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:'+(latestSub?'12px':'0')+'"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:22px">'+icon+'</span><div><b>'+t.id+'-dars: '+t.title+'</b><br><span style="font-size:12px;color:var(--mu);font-style:italic">"'+ t.text+'"</span></div></div>'+statusLabel+'</div>';
+    if(latestSub&&latestSub.voice_url){
+      html+='<audio src="'+latestSub.voice_url+'" controls preload="none" style="width:100%;height:36px;border-radius:8px"></audio>';
+      html+='<div style="font-size:11px;color:var(--mu);margin-top:6px">'+(latestSub.submitted_at?new Date(latestSub.submitted_at).toLocaleString('ru',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'')+ ' \u00B7 Status: '+(latestSub.status||'pending')+'</div>';
+      if(canReview){html+='<div style="display:flex;gap:8px;margin-top:10px"><button class="btn-sm green" style="flex:1;padding:10px" onclick="approveTez('+latestSub.id+','+s.id+','+t.id+');setTimeout(()=>showStudentDetail('+s.id+'),400)">\u2705 Qabul</button><button class="btn-sm red" style="flex:1;padding:10px" onclick="rejectTez('+latestSub.id+','+s.id+','+t.id+');setTimeout(()=>showStudentDetail('+s.id+'),400)">\u274C Rad</button></div>';}
+    }
+    html+='</div>';
+    return html;
   }).join('');
+  document.getElementById('spd-tez-content').innerHTML=header+body;
 }
+
 function renderSpdMonitor(s){
   const vis=spdData.vis;const today=todayLocalStr();
   const visitsToday=vis.filter(v=>dtDateOnly(v.visited_at)===today).length;
