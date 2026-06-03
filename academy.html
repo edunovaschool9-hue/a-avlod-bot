@@ -1617,7 +1617,7 @@ function renderSpdInfo(s){
     else if(diffMin<60)ago=diffMin+' daqiqa oldin';
     else if(diffMin<1440)ago=Math.floor(diffMin/60)+' soat oldin';
     else ago=Math.floor(diffMin/1440)+' kun oldin';
-    lastOnline=lv.toLocaleString('ru',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})'('+ago+')';
+    lastOnline=lv.toLocaleString('ru',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'('+ago+')';
   }
   const rows=[['Kod',s.access_code||'--'],['Telegram',s.telegram_username?'<a class="tg-link" href="https://t.me/'+s.telegram_username+'" target="_blank">@'+s.telegram_username+'</a>':'--'],['Oxirgi online',lastOnline],['Bayt',fmt(s.bytes_balance)],["So'm",fmt(s.som_balance)],['To\'lov',s.paid===1?'<span class="badge active">To\'langan</span>':'<span class="badge warn">Qarzdor</span>'],['Ogohlantirish',s.warnings||0]];
   document.getElementById('spd-info-rows').innerHTML=rows.map(([k,v])=>'<div class="info-row" style="padding:12px 16px"><span class="info-key">'+k+'</span><span class="info-val">'+v+'</span></div>').join('')+(payInfo.html||''). replace('class="info-row"','class="info-row" style="padding:12px 16px"');
