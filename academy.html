@@ -573,6 +573,32 @@ audio{height:36px;border-radius:7px;max-width:240px}
       <div class="lead-cards" id="lead-cards"><div class="loading-center"><div class="spin"></div></div></div>
     </div>
 
+
+    <!-- MAKTAB LEADS (separate stream) -->
+    <div class="admin-panel" id="ap-mleads">
+      <div class="ap-head"><div><div class="ap-title">🏫 Maktab lidlari</div><div class="ap-sub">Maktab kursi mijozlari (Yangi yil)</div></div>
+        <button class="btn-sm yellow" onclick="toggleMLeadForm()">+ Yangi lid</button></div>
+      <div class="tbl-wrap" id="mlead-form" style="display:none;padding:18px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field"><label>Ism</label><input id="mld-name" type="text" placeholder="Aziza"></div>
+          <div class="field"><label>Telefon</label><input id="mld-phone" type="tel" placeholder="+998901234567"></div>
+        </div>
+        <div class="field"><label>Manba / izoh</label><textarea id="mld-note" placeholder="Instagram reklama..."></textarea></div>
+        <div style="display:flex;gap:8px"><button class="btn-sm green" style="padding:10px 18px" onclick="saveMLead()">Saqlash</button>
+          <button class="btn-sm red" style="padding:10px 18px" onclick="toggleMLeadForm()">Bekor</button></div>
+      </div>
+      <div id="mleads-unread-banner"></div>
+      <div class="leads-filter-row">
+        <button class="filter-btn active" onclick="filterMLeads('all',this)">Barchasi</button>
+        <button class="filter-btn" onclick="filterMLeads('cold',this)">❄️ Sovuq</button>
+        <button class="filter-btn" onclick="filterMLeads('thinking',this)">🤔 O'ylayotgan</button>
+        <button class="filter-btn" onclick="filterMLeads('hot',this)">🔥 Issiq</button>
+        <button class="filter-btn" onclick="filterMLeads('enrolled',this)">✅ Yozildi</button>
+        <button class="filter-btn" onclick="filterMLeads('refused',this)">❌ Rad</button>
+      </div>
+      <div class="lead-cards" id="mlead-cards"><div class="loading-center"><div class="spin"></div></div></div>
+    </div>
+
     <!-- PLANNED CALLS -->
     <div class="admin-panel" id="ap-calls">
       <div class="ap-head"><div><div class="ap-title">📞 Rejalashtirilgan qo'ng'iroqlar</div><div class="ap-sub">Bugun, ertaga, indinga</div></div>
@@ -863,7 +889,7 @@ const POSITIONS = {
 };
 
 // ── ROLE MENUS ── (Variant B: everyone sees ALL sections; only timer differs)
-const FULL_MENU=['svodka','dash','control','students','tez','notif','activate','leads','calls','meet'];
+const FULL_MENU=['svodka','dash','control','students','tez','notif','activate','leads','mleads','calls','meet'];
 const MENUS = {
   admin:     FULL_MENU,
   marketing: FULL_MENU,
@@ -877,7 +903,8 @@ const MENU_META = {
   tez:     {label:'🎤 Tez aytish',    fn:'loadTezSubmissions'},
   notif:   {label:'🔔 Xabarlar',      fn:'loadNotifLog'},
   activate:{label:'✅ Aktivatsiya',   fn:null},
-  leads:   {label:'🔥 Lidlar',        fn:'loadLeads'},
+  leads:   {label:'🔥 Blog lidlari',  fn:'loadLeads'},
+  mleads:  {label:'🏫 Maktab lidlari',fn:'loadMaktabLeads'},
   calls:   {label:'📞 Qo\'ng\'iroqlar',fn:'loadPlannedCalls'},
   meet:    {label:'🤝 Uchrashuvlar',  fn:'loadMeetings'},
   staff:   {label:'🧑‍💼 Xodimlar',     fn:'loadStaffPanel'}
@@ -1476,7 +1503,7 @@ async function loadSvodka(){
   document.getElementById('sv-paid').textContent=paid.length;
   document.getElementById('sv-debt').textContent=debt.length;
   document.getElementById('sv-income').textContent=fmt(income);
-  const {data:leads}=await sb.from('leads').select('*');allLeads=leads||[];
+  const {data:leads}=await sb.from('leads').select('*');allLeads=(leads||[]).filter(l=>!l.lead_type||l.lead_type==='blog');
   document.getElementById('sv-leads').textContent=allLeads.length;
   document.getElementById('sv-hot').textContent=allLeads.filter(l=>l.status==='hot').length;
   const today=todayLocalStr();
@@ -1869,11 +1896,11 @@ async function addStudentModal(){const name=document.getElementById('ms-name').v
 function toggleLeadForm(){const f=document.getElementById('lead-form');f.style.display=f.style.display==='none'?'block':'none';}
 async function saveLead(){const name=document.getElementById('ld-name').value.trim();const phone=document.getElementById('ld-phone').value.trim();const note=document.getElementById('ld-note').value.trim();
   if(!name||!phone){toast('Ism va telefon kiriting','err');return;}
-  const{error}=await sb.from('leads').insert({name,phone,note,status:'cold',created_at:new Date().toISOString()});
+  const{error}=await sb.from('leads').insert({name,phone,note,status:'cold',lead_type:'blog',created_at:new Date().toISOString()});
   if(error){toast(error.message,'err');return;}
   document.getElementById('ld-name').value='';document.getElementById('ld-phone').value='';document.getElementById('ld-note').value='';
   toggleLeadForm();toast('✅ Lid qo\'shildi');loadLeads();}
-async function loadLeads(){const{data}=await sb.from('leads').select('*').order('created_at',{ascending:false});allLeads=data||[];renderLeads(allLeads);scheduleReminders(allLeads);}
+async function loadLeads(){const{data}=await sb.from('leads').select('*').order('created_at',{ascending:false});allLeads=(data||[]).filter(l=>!l.lead_type||l.lead_type==='blog');renderLeads(allLeads);scheduleReminders(allLeads);}
 function filterLeads(s,btn){leadsFilter=s;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   renderLeads(s==='all'?allLeads:allLeads.filter(l=>l.status===s));}
 const LSTAT={cold:'❄️ Sovuq',thinking:'🤔 O\'ylayotgan',hot:'🔥 Issiq',enrolled:'✅ Yozildi',refused:'❌ Rad'};
@@ -1904,7 +1931,7 @@ function renderLeads(list){const c=document.getElementById('lead-cards');
       <div class="lead-actions"><a href="tel:${l.phone}" class="btn-sm blue" style="text-decoration:none">📞 Qo'ng'iroq</a>
       <button class="btn-sm ${(!closed&&!checked)?'green':'yellow'}" onclick="openLeadComment(${l.id})">${(!closed&&!checked)?'📋 Hisobot yozish':'✏️ Natija'}</button>
       <button class="btn-sm red" onclick="deleteLead(${l.id})">🗑</button></div></div>`;}).join('');}
-function openLeadComment(id){const l=allLeads.find(x=>x.id===id);document.getElementById('lcm-id').value=id;
+function openLeadComment(id){const l=allLeads.find(x=>x.id===id)||(typeof allMLeads!=="undefined"?allMLeads.find(x=>x.id===id):null);document.getElementById('lcm-id').value=id;
   document.getElementById('lcm-name').value=l.name||'';document.getElementById('lcm-phone').value=l.phone||'';
   document.getElementById('lcm-status').value=l.status||'cold';document.getElementById('lcm-note').value='';
   // show history of past reports
@@ -1935,9 +1962,57 @@ async function saveLeadComment(){const id=+document.getElementById('lcm-id').val
     if(mErr)toast('Lid saqlandi, lekin uchrashuv xato: '+mErr.message,'err');
     else toast('✅ Tekshirildi + uchrashuv belgilandi');
   } else { toast('✅ Hisobot saqlandi, lid tekshirildi'); }
-  hideModal('lead-comment-modal');loadLeads();
+  hideModal('lead-comment-modal');
+  if((allMLeads||[]).find(x=>x.id===id))loadMaktabLeads();else loadLeads();
   if(dt)setReminder(id,dtToDateObj(dt),name,phone);}
 async function deleteLead(id){if(!confirm('O\'chirilsinmi?'))return;await sb.from('leads').delete().eq('id',id);toast('🗑 O\'chirildi');loadLeads();}
+
+
+// ════ MAKTAB LEADS (separate stream, same logic) ════
+
+let allMLeads=[], mleadsFilter='all';
+
+function toggleMLeadForm(){const f=document.getElementById('mlead-form');f.style.display=f.style.display==='none'?'block':'none';}
+
+async function saveMLead(){const name=document.getElementById('mld-name').value.trim();const phone=document.getElementById('mld-phone').value.trim();const note=document.getElementById('mld-note').value.trim();
+  if(!name||!phone){toast('Ism va telefon kiriting','err');return;}
+  const{error}=await sb.from('leads').insert({name,phone,note,status:'cold',lead_type:'maktab',created_at:new Date().toISOString()});
+  if(error){toast(error.message,'err');return;}
+  document.getElementById('mld-name').value='';document.getElementById('mld-phone').value='';document.getElementById('mld-note').value='';
+  toggleMLeadForm();toast('✅ Maktab lid qo\'shildi');loadMaktabLeads();}
+
+async function loadMaktabLeads(){const{data}=await sb.from('leads').select('*').order('created_at',{ascending:false});
+  allMLeads=(data||[]).filter(l=>l.lead_type==='maktab');renderMLeads(allMLeads);scheduleReminders(allMLeads);}
+
+function filterMLeads(s,btn){mleadsFilter=s;btn.parentElement.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  renderMLeads(s==='all'?allMLeads:allMLeads.filter(l=>l.status===s));}
+
+function renderMLeads(list){const c=document.getElementById('mlead-cards');
+  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">🏫</div>Maktab lidi yo\'q</div>';return;}
+  const unread=allMLeads.filter(l=>l.status!=='enrolled'&&l.status!=='refused'&&!isCheckedToday(l)).length;
+  const banner=document.getElementById('mleads-unread-banner');
+  if(banner){
+    if(unread>0)banner.innerHTML=`<div style="background:rgba(124,92,255,.12);border:1px solid var(--ac);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:22px">📨</span><div><b style="color:var(--ac2)">${unread} ta maktab lidi bugun tekshirilmagan</b><div style="font-size:12px;color:var(--mu)">Har bir lidni oching, hisobot yozing</div></div></div>`;
+    else banner.innerHTML=`<div style="background:rgba(52,211,153,.1);border:1px solid var(--gn);border-radius:10px;padding:12px 16px;margin-bottom:14px;color:var(--gn)">✅ Barcha maktab lidlari bugun tekshirildi!</div>`;
+  }
+  const sorted=[...list].sort((a,b)=>{const ua=(a.status!=='enrolled'&&a.status!=='refused'&&!isCheckedToday(a))?0:1;const ub=(b.status!=='enrolled'&&b.status!=='refused'&&!isCheckedToday(b))?0:1;return ua-ub;});
+  c.innerHTML=sorted.map(l=>{const rem=l.reminder_at?`<div class="lead-reminder">⏰ Qayta qo'ng'iroq: ${dtFmt(l.reminder_at)}</div>`:'';
+    const com=l.last_comment?`<div class="lead-comment">"${l.last_comment}"</div>`:'';
+    const closed=l.status==='enrolled'||l.status==='refused';
+    const checked=isCheckedToday(l);
+    const unreadDot=(!closed&&!checked)?'<span style="display:inline-block;width:9px;height:9px;background:var(--ac);border-radius:50%;margin-right:6px;vertical-align:middle"></span>':'';
+    const readMark=checked?'<span style="color:var(--gn);font-size:12px">✓✓ bugun tekshirildi</span>':(!closed?'<span style="color:var(--ac2);font-size:12px;font-weight:600">● yangi / tekshirilmagan</span>':'');
+    return `<div class="lead-card ${l.status||'cold'}" style="${(!closed&&!checked)?'border-left-width:4px':''}"><div class="lead-top"><div><div class="lead-name">${unreadDot}${l.name}</div><div class="lead-phone">📱 ${l.phone}</div></div>
+      <div style="text-align:right"><span class="badge ${l.status==='hot'?'warn':l.status==='enrolled'?'active':l.status==='thinking'?'pending':'blue'}">${LSTAT[l.status]||'Sovuq'}</span>
+      <div class="lead-date">${new Date(l.created_at).toLocaleDateString('ru')}</div></div></div>
+      ${l.note?`<div style="font-size:12px;color:var(--mu);margin:4px 0">${l.note}</div>`:''}
+      ${com}${rem}
+      <div style="margin:6px 0">${readMark}</div>
+      <div class="lead-actions"><a href="tel:${l.phone}" class="btn-sm blue" style="text-decoration:none">📞 Qo'ng'iroq</a>
+      <button class="btn-sm ${(!closed&&!checked)?'green':'yellow'}" onclick="openLeadComment(${l.id})">${(!closed&&!checked)?'📋 Hisobot yozish':'✏️ Natija'}</button>
+      <button class="btn-sm red" onclick="deleteMLead(${l.id})">🗑</button></div></div>`;}).join('');}
+
+async function deleteMLead(id){if(!confirm('O\'chirilsinmi?'))return;await sb.from('leads').delete().eq('id',id);toast('🗑 O\'chirildi');loadMaktabLeads();}
 
 // ── REMINDERS (10 min before) ──
 function setReminder(id,date,name,phone){if(!('Notification'in window))return;
