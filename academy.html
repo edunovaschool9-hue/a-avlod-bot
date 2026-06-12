@@ -363,6 +363,55 @@ audio{height:36px;border-radius:7px;max-width:240px}
 .rest-timer{font-family:var(--fm);font-size:34px;font-weight:500;color:var(--ac2);margin:14px 0;letter-spacing:1px}
 .rest-label{font-size:15px;color:var(--mu2);margin-bottom:6px}
 .rest-next{font-family:var(--fd);font-size:18px;font-weight:600;color:var(--tx);margin-bottom:4px}
+
+/* ═══ PRESENTATION — O'QITUVCHILAR ═══ */
+#ap-teachers{padding:0!important}
+.pres-wrap{margin:-26px;min-height:100vh}
+@media(max-width:760px){.pres-wrap{margin:-14px}}
+.pres-sec{min-height:88vh;display:flex;flex-direction:column;justify-content:center;padding:70px 8%;position:relative;overflow:hidden}
+.pres-fade{opacity:0;transform:translateY(40px);transition:opacity .9s cubic-bezier(.2,.7,.3,1),transform .9s cubic-bezier(.2,.7,.3,1)}
+.pres-fade.vis{opacity:1;transform:translateY(0)}
+.pres-eyebrow{font-family:var(--fm);font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--ac2);margin-bottom:18px}
+.pres-h1{font-family:var(--fd);font-weight:800;font-size:clamp(42px,7vw,86px);line-height:1.02;letter-spacing:-2px;margin-bottom:22px;
+  background:linear-gradient(120deg,#fff 20%,var(--ac2) 50%,var(--cy) 80%);background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:presShimmer 6s linear infinite}
+@keyframes presShimmer{to{background-position:200% center}}
+.pres-h2{font-family:var(--fd);font-weight:700;font-size:clamp(28px,4vw,48px);line-height:1.1;letter-spacing:-1px;margin-bottom:16px;color:var(--tx)}
+.pres-lead{font-size:clamp(15px,1.6vw,19px);line-height:1.75;color:var(--mu2);max-width:640px}
+.pres-orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.35;pointer-events:none;animation:orbFloat 9s ease-in-out infinite}
+@keyframes orbFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-40px) scale(1.08)}}
+.pres-scroll-hint{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);color:var(--mu);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:6px;animation:hintBob 2s ease-in-out infinite}
+@keyframes hintBob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
+.pres-grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin-top:38px}
+.pres-card{background:var(--s);border:1px solid var(--brd);border-radius:18px;padding:26px;transition:.3s;position:relative;overflow:hidden}
+.pres-card:hover{border-color:var(--ac);transform:translateY(-5px);box-shadow:0 18px 40px rgba(124,92,255,.18)}
+.pres-card-ic{font-size:30px;margin-bottom:14px}
+.pres-card-t{font-family:var(--fd);font-size:17px;font-weight:700;margin-bottom:8px}
+.pres-card-d{font-size:13.5px;color:var(--mu2);line-height:1.65}
+.pres-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:18px;margin-top:42px}
+.pres-stat{text-align:center;padding:30px 16px;background:var(--s);border:1px solid var(--brd);border-radius:18px;position:relative;overflow:hidden}
+.pres-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--ac),var(--cy))}
+.pres-num{font-family:var(--fd);font-size:clamp(38px,4.5vw,56px);font-weight:800;line-height:1;
+  background:linear-gradient(120deg,var(--ac2),var(--cy));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.pres-num-l{font-size:12.5px;color:var(--mu2);margin-top:10px;text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.pres-goal{display:flex;gap:18px;align-items:flex-start;padding:22px 0;border-bottom:1px solid var(--brd)}
+.pres-goal:last-child{border-bottom:none}
+.pres-goal-n{font-family:var(--fm);font-size:13px;color:var(--ac2);padding-top:4px;flex-shrink:0}
+.pres-goal-t{font-family:var(--fd);font-size:18px;font-weight:700;margin-bottom:5px}
+.pres-goal-d{font-size:14px;color:var(--mu2);line-height:1.6}
+.pres-team{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;margin-top:34px}
+.pres-tcard{background:var(--s);border:1px solid var(--brd);border-radius:18px;padding:24px;transition:.3s}
+.pres-tcard:hover{border-color:var(--ac);transform:translateY(-4px)}
+.pres-tava{width:64px;height:64px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;box-shadow:0 6px 18px rgba(124,92,255,.25)}
+.pres-tname{font-family:var(--fd);font-size:15.5px;font-weight:700}
+.pres-trole{font-size:12px;color:var(--ac2);font-weight:600;margin-top:2px}
+.pres-badge{background:rgba(124,92,255,.13);color:var(--ac2);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700}
+.pres-tdesc{font-size:13px;color:var(--mu2);line-height:1.65;margin-top:12px}
+.pres-dircard{background:linear-gradient(135deg,rgba(124,92,255,.14),rgba(34,211,238,.07));border:1.5px solid rgba(124,92,255,.4);border-radius:22px;padding:32px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin-top:34px;position:relative;overflow:hidden}
+.pres-dircard::after{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(124,92,255,.25),transparent 70%);pointer-events:none}
+.pres-final{text-align:center;align-items:center}
+.pres-quote{font-family:var(--fd);font-size:clamp(24px,3.4vw,40px);font-weight:700;line-height:1.3;max-width:760px;margin:0 auto 18px;
+  background:linear-gradient(120deg,#fff,var(--ac2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 </style>
 
 <!-- ══ LANDING / COURSE SELECT ══ -->
@@ -624,6 +673,185 @@ audio{height:36px;border-radius:7px;max-width:240px}
           <button class="btn-sm red" style="padding:10px 18px" onclick="toggleMeetForm()">Bekor</button></div>
       </div>
       <div id="meet-container"><div class="loading-center"><div class="spin"></div></div></div>
+    </div>
+
+    <!-- O'QITUVCHILAR — PREZENTATSIYA -->
+    <div class="admin-panel" id="ap-teachers">
+      <div class="pres-wrap">
+
+        <!-- 1. HERO -->
+        <section class="pres-sec" style="min-height:92vh;align-items:center;text-align:center">
+          <div class="pres-orb" style="width:420px;height:420px;background:var(--ac);top:-120px;left:-100px"></div>
+          <div class="pres-orb" style="width:340px;height:340px;background:var(--cy);bottom:-80px;right:-60px;animation-delay:3s"></div>
+          <div class="pres-fade">
+            <div class="pres-eyebrow">Farg'ona · Xususiy maktab</div>
+            <div class="pres-h1">EDU NOVA<br>SCHOOL</div>
+            <div class="pres-lead" style="margin:0 auto">Farzandingiz o'qishni sevadigan joy. Bilim, mehr va zamonaviy yondashuv — bir maktabda.</div>
+          </div>
+          <div class="pres-scroll-hint"><span>Pastga suring</span><span style="font-size:18px">↓</span></div>
+        </section>
+
+        <!-- 2. MAKTAB HAQIDA -->
+        <section class="pres-sec">
+          <div class="pres-orb" style="width:300px;height:300px;background:var(--ac);top:10%;right:-80px"></div>
+          <div class="pres-fade">
+            <div class="pres-eyebrow">Maktab haqida</div>
+            <div class="pres-h2">Bu yerda har bir bola —<br>shaxs, raqam emas</div>
+            <div class="pres-lead">Edu Nova School — bu asosiy fanlar va zamonaviy qo'shimcha kurslar bir joyda jamlangan xususiy maktab. Bizning eng katta farqimiz — bolaga bo'lgan munosabat.</div>
+          </div>
+          <div class="pres-grid3 pres-fade">
+            <div class="pres-card">
+              <div class="pres-card-ic">💜</div>
+              <div class="pres-card-t">Iliq muhit</div>
+              <div class="pres-card-d">Befarq o'qituvchilar yo'q. Har bir ustoz bolani ismi bilan biladi, qiziqishini tushunadi va qo'llab-quvvatlaydi.</div>
+            </div>
+            <div class="pres-card">
+              <div class="pres-card-ic">📚</div>
+              <div class="pres-card-t">Hammasi bir joyda</div>
+              <div class="pres-card-d">Asosiy fanlar + ingliz tili, IT, blogerlik va AI kurslari. Bola maktabdan keyin yana boshqa joyga qatnashi shart emas.</div>
+            </div>
+            <div class="pres-card">
+              <div class="pres-card-ic">🚀</div>
+              <div class="pres-card-t">Zamonaviy metodlar</div>
+              <div class="pres-card-d">AI texnologiyalari, amaliy mashg'ulotlar va o'z raqamli platformamiz — har bir bolaning rivojlanishi onlayn kuzatiladi.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. RAQAMLARDA -->
+        <section class="pres-sec">
+          <div class="pres-orb" style="width:320px;height:320px;background:var(--cy);bottom:0;left:-100px"></div>
+          <div class="pres-fade">
+            <div class="pres-eyebrow">Raqamlarda</div>
+            <div class="pres-h2">Natija — tajriba mahsuli</div>
+          </div>
+          <div class="pres-stats pres-fade">
+            <div class="pres-stat"><div class="pres-num" data-count="1000">0</div><div class="pres-num-l">o'quvchi oliygohlarga tayyorlangan</div></div>
+            <div class="pres-stat"><div class="pres-num" data-count="10">0</div><div class="pres-num-l">yillik pedagogik tajriba</div></div>
+            <div class="pres-stat"><div class="pres-num" data-count="13">0</div><div class="pres-num-l">yil — eng tajribali ustozimiz staji</div></div>
+            <div class="pres-stat"><div class="pres-num" data-count="500">0</div><div class="pres-num-l">o'quvchi milliy sertifikatga tayyorlangan</div></div>
+          </div>
+        </section>
+
+        <!-- 4. MAQSADLARIMIZ -->
+        <section class="pres-sec">
+          <div class="pres-fade">
+            <div class="pres-eyebrow">Maqsadlarimiz</div>
+            <div class="pres-h2">Biz nimaga intilamiz</div>
+          </div>
+          <div class="pres-fade" style="max-width:680px;margin-top:24px">
+            <div class="pres-goal">
+              <div class="pres-goal-n">01</div>
+              <div><div class="pres-goal-t">O'qishni sevadigan bola</div>
+              <div class="pres-goal-d">Majburlab emas — qiziqtirib o'qitamiz. Bola maktabga zavq bilan keladi.</div></div>
+            </div>
+            <div class="pres-goal">
+              <div class="pres-goal-n">02</div>
+              <div><div class="pres-goal-t">Zamonaviy ko'nikmalar</div>
+              <div class="pres-goal-d">Ingliz tili, IT va AI — kelajakda eng kerakli bilimlarni bugun beramiz.</div></div>
+            </div>
+            <div class="pres-goal">
+              <div class="pres-goal-n">03</div>
+              <div><div class="pres-goal-t">Ota-ona bilan ochiq aloqa</div>
+              <div class="pres-goal-d">O'z platformamizda farzandingizning har bir qadamini kuzatib borasiz — testlar, ko'nikmalar, rivojlanish.</div></div>
+            </div>
+            <div class="pres-goal">
+              <div class="pres-goal-n">04</div>
+              <div><div class="pres-goal-t">Ishonchli kelajak</div>
+              <div class="pres-goal-d">Maqsadimiz — nufuzli oliygohlarga kiradigan, hayotda o'z o'rnini topadigan avlod tarbiyalash.</div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. JAMOA -->
+        <section class="pres-sec">
+          <div class="pres-orb" style="width:360px;height:360px;background:var(--ac);top:-60px;right:-120px"></div>
+          <div class="pres-fade">
+            <div class="pres-eyebrow">Bizning jamoa</div>
+            <div class="pres-h2">Tajribali ustozlar —<br>maktabning yuragi</div>
+          </div>
+
+          <!-- Директор -->
+          <div class="pres-dircard pres-fade">
+            <div class="pres-tava" style="width:84px;height:84px;font-size:36px;background:linear-gradient(135deg,var(--ac),var(--acd))"><img src="images/director.jpg" alt="" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.parentNode.textContent='🎩'"></div>
+            <div style="flex:1;min-width:220px">
+              <div class="pres-eyebrow" style="margin-bottom:6px">Asoschisi va Direktori</div>
+              <div class="pres-tname" style="font-size:21px">Xolmatov Dostonbek</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin:12px 0">
+                <span class="pres-badge">🏅 10 yil tajriba</span>
+                <span class="pres-badge">⭐ Oliy toifali ustoz</span>
+                <span class="pres-badge">🎓 1000+ o'quvchi</span>
+              </div>
+              <div class="pres-tdesc" style="margin-top:0">Farg'ona davlat universiteti — bakalavr, magistratura, doktorantura. 1000 dan ortiq o'quvchini nufuzli oliygohlarga tayyorlagan. Bugungi natija — tajriba va to'g'ri yondashuv mahsuli.</div>
+            </div>
+          </div>
+
+          <!-- Учителя -->
+          <div class="pres-team pres-fade">
+            <div class="pres-tcard">
+              <div style="display:flex;align-items:center;gap:14px">
+                <div class="pres-tava" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)"><img src="images/teacher1.jpg" alt="" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.parentNode.textContent='👩‍🏫'"></div>
+                <div><div class="pres-tname">Mullajanova Dilafruz Bagvanovna</div>
+                <div class="pres-trole">Boshlang'ich sinf o'qituvchisi</div></div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">
+                <span class="pres-badge">🏅 13+ yil staj</span>
+                <span class="pres-badge">🇷🇺 Moskvada ishlagan</span>
+              </div>
+              <div class="pres-tdesc">5 farzand onasi, 7 nevaraning momosi. Bolalar bilan ishlashni o'z hayotining ma'nosi deb biladi. Yaxshilik, mas'uliyat va bilimga intilishni tarbiyalaydi.</div>
+            </div>
+            <div class="pres-tcard">
+              <div style="display:flex;align-items:center;gap:14px">
+                <div class="pres-tava" style="background:linear-gradient(135deg,#ec4899,#f43f5e)"><img src="images/teacher2.jpg" alt="" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.parentNode.textContent='🌸'"></div>
+                <div><div class="pres-tname">Elnura Mamirovna</div>
+                <div class="pres-trole">Boshlang'ich sinf o'qituvchisi</div></div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">
+                <span class="pres-badge">🏅 10 yil staj</span>
+                <span class="pres-badge">💡 Zamonaviy metodlar</span>
+              </div>
+              <div class="pres-tdesc">Har bir o'quvchida ijodiy tafakkur va mustaqillikni rivojlantiradi. Metodologik seminarlarda ishtirok etadi va doimiy o'sadi.</div>
+            </div>
+            <div class="pres-tcard">
+              <div style="display:flex;align-items:center;gap:14px">
+                <div class="pres-tava" style="background:linear-gradient(135deg,#f59e0b,#f97316)"><img src="images/teacher3.jpg" alt="" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.parentNode.textContent='✍️'"></div>
+                <div><div class="pres-tname">Bahodirova Begoyim Erkinboy qizi</div>
+                <div class="pres-trole">Ona tili va adabiyot o'qituvchisi</div></div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">
+                <span class="pres-badge">🏅 5 yil staj</span>
+                <span class="pres-badge">📚 500+ o'quvchi</span>
+                <span class="pres-badge">🎓 FDPU</span>
+              </div>
+              <div class="pres-tdesc">Milliy sertifikat va DTM imtihonlariga tayyorlash bo'yicha mutaxassis. Chuqur ma'ruzalar, mock sinovlar, esse yozish ko'nikmasi — to'liq tizim.</div>
+            </div>
+            <div class="pres-tcard">
+              <div style="display:flex;align-items:center;gap:14px">
+                <div class="pres-tava" style="background:linear-gradient(135deg,#10b981,#06b6d4)"><img src="images/teacher4.jpg" alt="" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.parentNode.textContent='🌍'"></div>
+                <div><div class="pres-tname">Joraboyeva Mavluda Baxodirjon qizi</div>
+                <div class="pres-trole">Ingliz tili o'qituvchisi</div></div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">
+                <span class="pres-badge">🏅 2 yil tajriba</span>
+                <span class="pres-badge">🎖 A+ sertifikat</span>
+                <span class="pres-badge">📈 10 oyda C+</span>
+              </div>
+              <div class="pres-tdesc">O'zbekiston Milliy universiteti bitiruvchisi. O'quvchilari 10 oy ichida C+ darajasiga chiqadi — natijaga yo'naltirilgan o'qitish.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. FINAL -->
+        <section class="pres-sec pres-final" style="min-height:70vh">
+          <div class="pres-orb" style="width:400px;height:400px;background:var(--ac);top:20%;left:50%;transform:translateX(-50%)"></div>
+          <div class="pres-fade">
+            <div class="pres-quote">«Biz faqat o'qitmaymiz —<br>biz kelajak insonlarni tarbiyalaymiz»</div>
+            <div class="pres-lead" style="margin:0 auto">Har bir o'qituvchi — bu bolangiz uchun ikkinchi oila.</div>
+            <div style="margin-top:30px;font-family:var(--fd);font-size:15px;font-weight:700;color:var(--ac2)">EDU NOVA SCHOOL · Farg'ona</div>
+          </div>
+        </section>
+
+      </div>
     </div>
 
     <!-- STAFF MANAGEMENT (marketer only) -->
@@ -889,25 +1117,26 @@ const POSITIONS = {
 };
 
 // ── ROLE MENUS ── (Variant B: everyone sees ALL sections; only timer differs)
-const FULL_MENU=['svodka','dash','control','students','tez','notif','activate','leads','mleads','calls','meet'];
+const FULL_MENU=['svodka','dash','control','students','tez','notif','activate','leads','mleads','calls','meet','teachers'];
 const MENUS = {
   admin:     FULL_MENU,
   marketing: FULL_MENU,
   director:  FULL_MENU
 };
 const MENU_META = {
-  svodka:  {label:'📊 Svodka',        fn:'loadSvodka'},
-  dash:    {label:'📈 Dashboard',     fn:'loadAdminDash'},
-  control: {label:'🎯 Nazorat',       fn:'loadControl'},
-  students:{label:'👥 O\'quvchilar',  fn:'loadStudentsTable'},
-  tez:     {label:'🎤 Tez aytish',    fn:'loadTezSubmissions'},
-  notif:   {label:'🔔 Xabarlar',      fn:'loadNotifLog'},
-  activate:{label:'✅ Aktivatsiya',   fn:null},
-  leads:   {label:'🔥 Blog lidlari',  fn:'loadLeads'},
-  mleads:  {label:'🏫 Maktab lidlari',fn:'loadMaktabLeads'},
-  calls:   {label:'📞 Qo\'ng\'iroqlar',fn:'loadPlannedCalls'},
-  meet:    {label:'🤝 Uchrashuvlar',  fn:'loadMeetings'},
-  staff:   {label:'🧑‍💼 Xodimlar',     fn:'loadStaffPanel'}
+  svodka:   {label:'📊 Svodka',          fn:'loadSvodka'},
+  dash:     {label:'📈 Dashboard',       fn:'loadAdminDash'},
+  control:  {label:'🎯 Nazorat',         fn:'loadControl'},
+  students: {label:'👥 O\'quvchilar',    fn:'loadStudentsTable'},
+  tez:      {label:'🎤 Tez aytish',      fn:'loadTezSubmissions'},
+  notif:    {label:'🔔 Xabarlar',        fn:'loadNotifLog'},
+  activate: {label:'✅ Aktivatsiya',     fn:null},
+  leads:    {label:'🔥 Blog lidlari',    fn:'loadLeads'},
+  mleads:   {label:'🏫 Maktab lidlari',  fn:'loadMaktabLeads'},
+  calls:    {label:'📞 Qo\'ng\'iroqlar', fn:'loadPlannedCalls'},
+  meet:     {label:'🤝 Uchrashuvlar',    fn:'loadMeetings'},
+  teachers: {label:'👩‍🏫 O\'qituvchilar', fn:'loadTeachers'},
+  staff:    {label:'🧑‍💼 Xodimlar',       fn:'loadStaffPanel'}
 };
 
 // ── LESSONS ──
@@ -2145,6 +2374,38 @@ async function deleteStaff(id,name){
   if(!confirm(name+' o\'chirilsinmi?'))return;
   await sb.from('staff_accounts').delete().eq('id',id);
   toast('🗑 O\'chirildi');loadStaffPanel();
+}
+let presObserver=null;
+async function loadTeachers(){
+  // Презентационная страница — анимация появления секций при скролле
+  if(presObserver)presObserver.disconnect();
+  presObserver=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('vis');
+        // Анимируем счётчики когда секция видна
+        e.target.querySelectorAll('.pres-num[data-count]').forEach(el=>{
+          if(el.dataset.done)return;
+          el.dataset.done='1';
+          const target=parseInt(el.dataset.count);
+          const dur=1600;const t0=performance.now();
+          function tick(t){
+            const p=Math.min((t-t0)/dur,1);
+            const eased=1-Math.pow(1-p,3);
+            el.textContent=Math.round(target*eased)+(p>=1?'+':'');
+            if(p<1)requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+        });
+      }
+    });
+  },{threshold:.15});
+  document.querySelectorAll('#ap-teachers .pres-fade').forEach(el=>{
+    el.classList.remove('vis');presObserver.observe(el);
+  });
+  // Hero виден сразу
+  const first=document.querySelector('#ap-teachers .pres-fade');
+  if(first)setTimeout(()=>first.classList.add('vis'),100);
 }
 async function loadStaffPanel(){
   const listC=document.getElementById('staff-list');
