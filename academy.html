@@ -1585,7 +1585,12 @@ function getLessonDays(){
 }
 // is today a lesson-day? returns true if now is one of the 2 days AND past 15:00
 const TEST_MODE=new URLSearchParams(location.search).get('test')==='1';
+// Test account: bypasses timer entirely. Login name "TEST" + code "test2024".
+function isTestAccount(){
+  return currentUser && (currentUser.is_test===1 || (currentUser.access_code==='test2024'));
+}
 function isLessonOpenNow(){
+  if(isTestAccount())return true; // test account — no timer, all lessons open
   const days=getLessonDays();
   if(!days.length)return false;
   if(TEST_MODE)return true; // bypass 15:00 check for testing
@@ -1731,7 +1736,7 @@ function renderToday(){
     return;
   }
   // no schedule set yet
-  if(!days.length){
+  if(!days.length && !isTestAccount()){
     c.innerHTML='<div class="reels-stage"><div class="dz-hero"><div class="dz-orb" style="width:220px;height:220px;background:var(--ac);top:0;left:50%;transform:translateX(-50%)"></div><div class="dz-card" style="text-align:center"><div class="dz-lesson-icon">📅</div><div class="dz-lesson-title" style="font-size:26px">Jadval belgilanmagan</div><div class="dz-lesson-sub">Ustozing tez orada sening dars kunlaringni belgilaydi. Keyinroq kel! 😊</div></div></div></div>';
     return;
   }
