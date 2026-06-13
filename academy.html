@@ -364,6 +364,69 @@ audio{height:36px;border-radius:7px;max-width:240px}
 .rest-label{font-size:15px;color:var(--mu2);margin-bottom:6px}
 .rest-next{font-family:var(--fd);font-size:18px;font-weight:600;color:var(--tx);margin-bottom:4px}
 
+
+/* ═══ DZ PANEL — POWERFUL VISUAL ═══ */
+
+.dz-hero{position:relative;width:100%;max-width:480px;margin:0 auto;padding:8px}
+
+.dz-orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.4;pointer-events:none;z-index:0;animation:dzFloat 7s ease-in-out infinite}
+
+@keyframes dzFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-26px) scale(1.1)}}
+
+.dz-month-pill{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,rgba(124,92,255,.18),rgba(34,211,238,.12));border:1px solid rgba(124,92,255,.35);border-radius:30px;padding:7px 16px;font-family:var(--fm);font-size:12px;font-weight:600;letter-spacing:1px;color:var(--ac2);margin-bottom:20px;position:relative;z-index:1}
+
+.dz-card{position:relative;z-index:1;background:linear-gradient(160deg,var(--s2),var(--s));border:1px solid var(--brd2);border-radius:26px;padding:32px 26px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+
+.dz-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--ac),var(--cy),var(--gn));background-size:200% auto;animation:presShimmer 4s linear infinite}
+
+.dz-lesson-icon{font-size:72px;line-height:1;margin-bottom:18px;display:inline-block;animation:floaty 3s ease-in-out infinite;filter:drop-shadow(0 8px 20px rgba(124,92,255,.4))}
+
+.dz-lesson-num{font-family:var(--fm);font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--cy);margin-bottom:8px}
+
+.dz-lesson-title{font-family:var(--fd);font-size:clamp(26px,7vw,38px);font-weight:800;line-height:1.1;letter-spacing:-1px;margin-bottom:14px;background:linear-gradient(120deg,#fff 30%,var(--ac2) 70%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+
+.dz-lesson-sub{font-size:15px;color:var(--mu2);line-height:1.55;margin-bottom:8px}
+
+.dz-tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:18px 0 26px}
+
+.dz-tag{background:var(--s3);border:1px solid var(--brd);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--mu2);display:flex;align-items:center;gap:5px}
+
+.dz-start-btn{width:100%;max-width:300px;padding:19px 32px;border:none;border-radius:18px;font-family:var(--fd);font-size:19px;font-weight:700;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--ac),var(--acd));box-shadow:0 10px 30px rgba(124,92,255,.5);transition:.2s;position:relative;overflow:hidden}
+
+.dz-start-btn:active{transform:scale(.96)}
+
+.dz-start-btn::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:dzShine 2.5s infinite}
+
+@keyframes dzShine{to{left:100%}}
+
+/* Journey ribbon */
+
+.dz-journey{position:relative;z-index:1;width:100%;max-width:480px;margin:24px auto 0;padding:18px 16px;background:var(--s);border:1px solid var(--brd);border-radius:18px}
+
+.dz-journey-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+
+.dz-journey-title{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--tx)}
+
+.dz-journey-count{font-family:var(--fm);font-size:12px;color:var(--ac2);font-weight:600}
+
+.dz-dots{display:grid;grid-template-columns:repeat(12,1fr);gap:6px}
+
+.dz-dot{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;transition:.3s;position:relative}
+
+.dz-dot.done{background:linear-gradient(135deg,var(--gn),#22d3ee);color:#04140e;box-shadow:0 2px 8px rgba(52,211,153,.4)}
+
+.dz-dot.current{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;box-shadow:0 0 0 3px rgba(124,92,255,.3);animation:dzPulse 1.6s infinite}
+
+@keyframes dzPulse{0%,100%{box-shadow:0 0 0 3px rgba(124,92,255,.3)}50%{box-shadow:0 0 0 6px rgba(124,92,255,.15)}}
+
+.dz-dot.locked{background:var(--s3);color:var(--mu)}
+
+.dz-month-row{display:flex;gap:6px;margin-top:12px;font-size:10px;color:var(--mu);font-family:var(--fm)}
+
+.dz-month-seg{flex:1;text-align:center;padding-top:6px;border-top:2px solid var(--brd)}
+
+.dz-month-seg.active{border-color:var(--ac);color:var(--ac2)}
+
 /* ═══ PRESENTATION — O'QITUVCHILAR ═══ */
 #ap-teachers{padding:0!important}
 .pres-wrap{margin:-26px;min-height:100vh}
@@ -1189,7 +1252,106 @@ const LESSONS=[
     {q:"1 oyda nima o'rgandingiz?",opts:["Hech narsa","AI, ovoz, kamera, g'oya","O'yin","Rasm"],c:1},
     {q:"Eng muhim qadam?",opts:["Boshlash","Kutish","Pul","Mashhurlik"],c:0},
     {q:"Vlog siri?",opts:["Jihoz","Muntazamlik","Omad","Pul"],c:1}]}
+,
+  {id:9,title:"Stsenariy asoslari",week:5,icon:'📝',skill:'speech',tests:[
+    {q:"Video stsenariy nima?",opts:["Kamera turi","Videoning yozma rejasi","Musiqa","Filtr"],c:1},
+    {q:"Stsenariy nima uchun kerak?",opts:["Chiroyli","Adashmaslik uchun","Pul uchun","Shart emas"],c:1},
+    {q:"Yaxshi video qanday boshlanadi?",opts:["Uzoq kirish","Qiziqarli ilk soniya","Reklama","Salom-alik"],c:1},
+    {q:"Stsenariyda eng avval?",opts:["Final","Mavzu va g'oya","Musiqa","Titrlar"],c:1},
+    {q:"Video qismlari nechta?",opts:["Kirish, asosiy, yakun","Faqat bitta","Ko'p","Yo'q"],c:0}]},
+  {id:10,title:"Hikoya aytish",week:5,icon:'📖',skill:'speech',tests:[
+    {q:"Storytelling nima?",opts:["Hikoya aytish san'ati","O'yin","Raqs","Rasm"],c:0},
+    {q:"Hikoya nimani uyg'otadi?",opts:["Zerikish","His-tuyg'u","Uyqu","Hech narsa"],c:1},
+    {q:"Yaxshi hikoyada nima bor?",opts:["Faqat faktlar","Boshlanish, voqea, yechim","Raqamlar","Reklama"],c:1},
+    {q:"Tomoshabin nimani yoqtiradi?",opts:["Zerikarli","Samimiy hikoya","Uzun","Murakkab"],c:1},
+    {q:"Hikoyani qanday aytish kerak?",opts:["Tez","His bilan, jonli","Past ovozda","Shoshmay"],c:1}]},
+  {id:11,title:"AI bilan stsenariy",week:6,icon:'✨',skill:'ai',tests:[
+    {q:"ChatGPT stsenariyda nima qiladi?",opts:["Suratga oladi","G'oya va matn beradi","Montaj qiladi","Hech narsa"],c:1},
+    {q:"AI dan qanday so'rash kerak?",opts:["Qisqa","Aniq va batafsil","Umumiy","So'ramaslik"],c:1},
+    {q:"Prompt nima?",opts:["Kamera","AI ga buyruq-savol","Filtr","Musiqa"],c:1},
+    {q:"AI g'oyani nima qiladi?",opts:["O'g'irlaydi","Yordam beradi, kengaytiradi","Buzadi","Yashiradi"],c:1},
+    {q:"AI matnini nima qilish kerak?",opts:["O'zgartirmay","O'zingcha tahrirlash","Tashlash","Sotish"],c:1}]},
+  {id:12,title:"Rasm generatsiya",week:6,icon:'🎨',skill:'ai',tests:[
+    {q:"AI rasm yaratadigan vosita?",opts:["CapCut","Midjourney, DALL-E","YouTube","Telegram"],c:1},
+    {q:"Rasm uchun nima yoziladi?",opts:["Raqam","Tavsif (prompt)","Ism","Hech narsa"],c:1},
+    {q:"Yaxshi rasm uchun prompt?",opts:["Bir so'z","Batafsil tavsif","Bo'sh","Raqamlar"],c:1},
+    {q:"AI rasm nimaga kerak?",opts:["Video bezagi uchun","Ovqat","O'yin","Hech narsa"],c:0},
+    {q:"Rasm uslubi qanday tanlanadi?",opts:["Tasodifan","Promptda ko'rsatiladi","Mumkin emas","O'zi"],c:1}]},
+  {id:13,title:"Musiqa va ovoz",week:7,icon:'🎵',skill:'ai',tests:[
+    {q:"Videoga musiqa nima beradi?",opts:["Zerikish","Kayfiyat va jonlanish","Shovqin","Hech narsa"],c:1},
+    {q:"AI ovoz (TTS) nima?",opts:["Matnni ovozga aylantirish","Rasm","O'yin","Filtr"],c:0},
+    {q:"Musiqa qanday tanlanadi?",opts:["Baland","Mavzuga mos","Tasodifan","Shart emas"],c:1},
+    {q:"Ovoz balandligi qanday?",opts:["Juda baland","Muvozanatli","Eshitilmas","Shart emas"],c:1},
+    {q:"Mualliflik musiqasi nima?",opts:["Bepul har doim","Ruxsat kerak bo'lishi mumkin","O'g'irlik","Hech narsa"],c:1}]},
+  {id:14,title:"Kadr va rakurs",week:7,icon:'🎥',skill:'camera',tests:[
+    {q:"Kadr nima?",opts:["Videoning bir ko'rinishi","Musiqa","Matn","Filtr"],c:0},
+    {q:"Yaqin kadr (close-up) nima?",opts:["Uzoqdan","Yaqindan, yuzga","Yon tomondan","Yuqoridan"],c:1},
+    {q:"Kamera balandligi muhimmi?",opts:["Yo'q","Ha, ko'rinishni o'zgartiradi","Shart emas","Bilmayman"],c:1},
+    {q:"Yaxshi kadr uchun?",opts:["Qaltirash","Barqaror ushlash","Yugurish","Aylanish"],c:1},
+    {q:"Yorug'lik qayerdan yaxshi?",opts:["Orqadan","Yuzga tushishi kerak","Pastdan","Kerak emas"],c:1}]},
+  {id:15,title:"Kontent reja",week:8,icon:'📅',skill:'blogging',tests:[
+    {q:"Kontent-reja nima?",opts:["Videolar jadvali","Kamera","Pul","Filtr"],c:0},
+    {q:"Nima uchun reja kerak?",opts:["Muntazamlik uchun","Chiroyli","Shart emas","Pul"],c:0},
+    {q:"Blogerlik siri nima?",opts:["Qimmat jihoz","Muntazam kontent","Omad","Pul"],c:1},
+    {q:"Haftada nechta video yaxshi?",opts:["Hech qachon","Muntazam, masalan 1-2","100 ta","Bittasi yiliga"],c:1},
+    {q:"G'oyalarni qayerga yozish?",opts:["Hech qayerga","Daftarga yoki ilovaga","Yodda","Boshqaga"],c:1}]},
+  {id:16,title:"2-oy yakuni: Mini-loyiha",week:8,icon:'🏆',skill:'blogging',tests:[
+    {q:"Mini-loyiha nima?",opts:["Katta film","O'rgangandan video","O'yin","Test"],c:1},
+    {q:"Loyiha uchun avval?",opts:["Pul","Stsenariy va g'oya","Million","Do'st"],c:1},
+    {q:"2-oyda nima o'rgandingiz?",opts:["Hech narsa","Stsenariy, AI, kadr, musiqa","O'yin","Raqs"],c:1},
+    {q:"Video tayyor bo'lgach?",opts:["Tashlash","Ko'rib, yaxshilash","Unutish","Sotish"],c:1},
+    {q:"Eng muhim narsa?",opts:["Mukammallik","Boshlash va tugatish","Pul","Mashhurlik"],c:1}]},
+  {id:17,title:"Montaj asoslari",week:9,icon:'✂️',skill:'camera',tests:[
+    {q:"Montaj nima?",opts:["Suratga olish","Videolarni birlashtirish","Yozish","Rasm"],c:1},
+    {q:"Montaj dasturi qaysi?",opts:["Word","CapCut, InShot","Excel","Telegram"],c:1},
+    {q:"Ortiqcha qism nima qilinadi?",opts:["Qoldiriladi","Kesib tashlanadi","Takrorlanadi","Bilmayman"],c:1},
+    {q:"Montajda nima muhim?",opts:["Tezlik","Ravon va tushunarli","Uzunlik","Shovqin"],c:1},
+    {q:"O'tish (perehod) nima?",opts:["Kadrlar orasidagi effekt","Musiqa","Matn","Kamera"],c:0}]},
+  {id:18,title:"Effekt va titrlar",week:9,icon:'🌈',skill:'camera',tests:[
+    {q:"Titr (subtitr) nima?",opts:["Musiqa","Ekrandagi matn","Filtr","Kamera"],c:1},
+    {q:"Titr nima uchun kerak?",opts:["Bezak","Tushunish osonlashadi","Shart emas","Pul"],c:1},
+    {q:"Effekt qanday ishlatiladi?",opts:["Ko'p","Me'yorida, kerakli joyda","Hech qachon","Doim"],c:1},
+    {q:"Stiker va emoji?",opts:["Videoni jonlantiradi","Buzadi","Shart emas","Yomon"],c:0},
+    {q:"Eng yaxshi effekt qanday?",opts:["Ko'zni charchatadigan","Tabiiy, mos","Yorqin doim","Shovqinli"],c:1}]},
+  {id:19,title:"Thumbnail va sarlavha",week:10,icon:'🖼',skill:'blogging',tests:[
+    {q:"Thumbnail nima?",opts:["Video qopqog'i (muqova)","Musiqa","Filtr","Titr"],c:0},
+    {q:"Thumbnail nima uchun muhim?",opts:["Bezak","Bosishga undaydi","Shart emas","Pul"],c:1},
+    {q:"Yaxshi sarlavha qanday?",opts:["Uzun","Qisqa va qiziqarli","Bo'sh","Murakkab"],c:1},
+    {q:"Sarlavhada nima bo'lishi kerak?",opts:["Yolg'on","Aniq mavzu","Reklama","Raqamlar"],c:1},
+    {q:"Birinchi nima ko'rinadi?",opts:["Video","Thumbnail va sarlavha","Izoh","Musiqa"],c:1}]},
+  {id:20,title:"Platformalar",week:10,icon:'📲',skill:'blogging',tests:[
+    {q:"YouTube nima?",opts:["O'yin","Video platforma","Do'kon","Maktab"],c:1},
+    {q:"Qisqa video qayerda?",opts:["Faqat TV","Reels, Shorts, TikTok","Gazeta","Kitob"],c:1},
+    {q:"Har platforma uchun?",opts:["Bir xil","Mos format kerak","Shart emas","Bilmayman"],c:1},
+    {q:"Qaysi yosh uchun ruxsat muhim?",opts:["Shart emas","Ota-ona nazorati kerak","Hech qachon","Katta"],c:1},
+    {q:"Xavfsizlik nima uchun?",opts:["Shart emas","Internetda ehtiyot bo'lish","Pul","O'yin"],c:1}]},
+  {id:21,title:"Tomoshabin bilan aloqa",week:11,icon:'💬',skill:'speech',tests:[
+    {q:"Izohlarga javob berish?",opts:["Shart emas","Aloqani mustahkamlaydi","Yomon","Vaqt sarfi"],c:1},
+    {q:"Tomoshabin nimani yoqtiradi?",opts:["E'tiborsizlik","Samimiy muloqot","Maqtanish","Shovqin"],c:1},
+    {q:"Yomon izohga qanday?",opts:["Janjal","Xotirjam yoki e'tiborsiz","Yig'lash","Qochish"],c:1},
+    {q:"Obunachi nima?",opts:["Pul","Kanalni kuzatuvchi","Kamera","Filtr"],c:1},
+    {q:"Aloqa nima beradi?",opts:["Hech narsa","Sodiq tomoshabin","Zarar","Shovqin"],c:1}]},
+  {id:22,title:"Trend va g'oyalar",week:11,icon:'🔥',skill:'blogging',tests:[
+    {q:"Trend nima?",opts:["Eski narsa","Hozir ommabop mavzu","Filtr","Pul"],c:1},
+    {q:"G'oya qayerdan topiladi?",opts:["Hech qayerdan","Atrofdan, kuzatishdan","Faqat puldan","Uxlab"],c:1},
+    {q:"Trendni qanday ishlatish?",opts:["Ko'chirib","O'zingcha, ijodiy","O'g'irlab","Shart emas"],c:1},
+    {q:"O'ziga xoslik nima beradi?",opts:["Zarar","Ajralib turish","Shovqin","Hech narsa"],c:1},
+    {q:"Eng yaxshi g'oya qanday?",opts:["Boshqanikidek","O'zingga xos, samimiy","Murakkab","Qimmat"],c:1}]},
+  {id:23,title:"Katta loyiha tayyorlash",week:12,icon:'🎬',skill:'blogging',tests:[
+    {q:"Katta loyiha uchun avval?",opts:["Pul","Reja va stsenariy","Million","Omad"],c:1},
+    {q:"Loyiha bosqichlari?",opts:["Faqat bitta","G'oya, suratga olish, montaj","Ko'p","Yo'q"],c:1},
+    {q:"3 oyda nima o'rgandingiz?",opts:["Hech narsa","To'liq video yaratish","O'yin","Raqs"],c:1},
+    {q:"Sifatli video siri?",opts:["Qimmat jihoz","Mehnat va reja","Omad","Pul"],c:1},
+    {q:"Tayyor loyihani nima qilish?",opts:["Yashirish","Ulashish, faxrlanish","Tashlash","Unutish"],c:1}]},
+  {id:24,title:"Bitiruv: Sening kanaling",week:12,icon:'🏆',skill:'blogging',tests:[
+    {q:"Endi sen kimsan?",opts:["Hech kim","Yosh bloger","O'quvchi","Tomoshabin"],c:1},
+    {q:"Blogerlikda eng muhim?",opts:["Jihoz","Muntazamlik va ishtiyoq","Pul","Omad"],c:1},
+    {q:"3 oylik kursda nima o'rgandingiz?",opts:["Hech narsa","AI, kamera, nutq, montaj, loyiha","O'yin","Raqs"],c:1},
+    {q:"Keyingi qadam nima?",opts:["To'xtash","Davom etish, ijod qilish","Unutish","Uxlash"],c:1},
+    {q:"Eng katta yutuq nima?",opts:["Mashhurlik","O'zingga ishonch","Pul","Jihoz"],c:1}]}
+
 ];
+
 const TEZ=[
   {id:1,week:1,title:"Birinchi",text:"Sariq sarig'ich, sarig'ich sariq.",hint:"Sekin ayt, keyin tezlashtir!"},
   {id:2,week:1,title:"Ikkinchi",text:"Bola bolali, bolali bola.",hint:"Nafas ol, tekis gapir."},
@@ -1199,7 +1361,26 @@ const TEZ=[
   {id:6,week:3,title:"Oltinchi",text:"Shovqinli shahar, shahar shovqinli.",hint:"SH ni aniq ayt!"},
   {id:7,week:4,title:"Yettinchi",text:"Kichik ko'chada kichkina ko'chuk.",hint:"K va CH ni aniq ayt."},
   {id:8,week:4,title:"Sakkizinchi",text:"Temir temirchi temirni tindi.",hint:"T harfli so'zlar — aniq!"}
+,
+  {id:9,week:5,title:"To'qqizinchi",text:"Stol ustida besh shisha, shisha ustida besh stakan.",hint:"SH va S ni aralashtirmay ayt!"},
+  {id:10,week:5,title:"O'ninchi",text:"Bir bog' bug'doy, bug'doy bog'ida bulbul.",hint:"B va G' tovushiga e'tibor."},
+  {id:11,week:6,title:"O'n birinchi",text:"Parrak parillab, parvona parvoz qildi.",hint:"P va R ni aniq ayt!"},
+  {id:12,week:6,title:"O'n ikkinchi",text:"Chumchuq chumolichani chaqirdi.",hint:"CH tovushini toza ayt."},
+  {id:13,week:7,title:"O'n uchinchi",text:"Tez aytar tilda terib, temir teshildi.",hint:"T harfli so'zlar tez!"},
+  {id:14,week:7,title:"O'n to'rtinchi",text:"Olti ola ot, ola otda olti ola.",hint:"O va L tovushlari."},
+  {id:15,week:8,title:"O'n beshinchi",text:"Qizil g'ozlar guzar bo'yida g'ovg'a qildi.",hint:"Q va G' aniq bo'lsin!"},
+  {id:16,week:8,title:"O'n oltinchi",text:"Sap-sariq sumalak sumkada saqlanadi.",hint:"S tovushi takrorlanadi."},
+  {id:17,week:9,title:"O'n yettinchi",text:"Marmar minorada maymun maraqani maqtadi.",hint:"M harfli so'zlar - tez!"},
+  {id:18,week:9,title:"O'n sakkizinchi",text:"Yetti yetuk yigit yengil yelpidi.",hint:"Y tovushini toza ayt."},
+  {id:19,week:10,title:"O'n to'qqizinchi",text:"Do'ng tepada dovul, dovulda do'mbira.",hint:"D va O' tovushlari."},
+  {id:20,week:10,title:"Yigirmanchi",text:"Kapkir kaftda, kaftda kapkir.",hint:"K va F ni aniq ayt!"},
+  {id:21,week:11,title:"Yigirma birinchi",text:"Zangori zarbof zarrin zinada zo'r.",hint:"Z tovushi takrorlanadi."},
+  {id:22,week:11,title:"Yigirma ikkinchi",text:"Lola laylakka laganda lavlagi berdi.",hint:"L harfli so'zlar tez!"},
+  {id:23,week:12,title:"Yigirma uchinchi",text:"Nor nordon nokni novvotga noz qildi.",hint:"N va O tovushlari."},
+  {id:24,week:12,title:"Yigirma to'rtinchi",text:"Gdeveli gulzorda gala-gala gul.",hint:"G tovushini toza ayt. Bitiruv!"}
+
 ];
+
 const BOOK_QUOTES=[
   {emoji:'🦊',q:"Eng muhim narsalar ko'zga ko'rinmaydi, ular faqat yurak bilan ko'riladi.",author:"Antuan de Sent-Ekzюperi",book:"Kichkina shahzoda"},
   {emoji:'🧙',q:"Boshlash uchun ajoyib bo'lish shart emas, lekin ajoyib bo'lish uchun boshlash shart.",author:"Xalq donoligi",book:"Hikmatlar"},
@@ -1212,8 +1393,8 @@ const BOOK_QUOTES=[
   {emoji:'📚',q:"Bilim — bu yagona xazina, uni hech kim o'g'irlay olmaydi.",author:"Xalq donoligi",book:"Hikmatlar"},
   {emoji:'🌈',q:"Xato qilishdan qo'rqma — bu o'rganishning bir qismi.",author:"Tomas Edison",book:"Ixtirochi saboqlari"}
 ];
-const WEEK_LESSONS={1:[1,2],2:[3,4],3:[5,6],4:[7,8]};
-const WEEK_TEZ={1:[1,2],2:[3,4],3:[5,6],4:[7,8]};
+const WEEK_LESSONS={1:[1,2],2:[3,4],3:[5,6],4:[7,8],5:[9,10],6:[11,12],7:[13,14],8:[15,16],9:[17,18],10:[19,20],11:[21,22],12:[23,24]};
+const WEEK_TEZ={1:[1,2],2:[3,4],3:[5,6],4:[7,8],5:[9,10],6:[11,12],7:[13,14],8:[15,16],9:[17,18],10:[19,20],11:[21,22],12:[23,24]};
 const CALF_STAGES=[{min:0,max:45,label:"Yangi tug'ilgan"},{min:45,max:55,label:"1-hafta"},{min:55,max:70,label:"2-hafta"},{min:70,max:90,label:"3-hafta"},{min:90,max:120,label:"4-hafta"},{min:120,max:999,label:"Katta buzoq"}];
 const SKILLS={ai:{emoji:'🤖',name:'AI bilimi',color:'#7c5cff'},camera:{emoji:'📹',name:'Kamera',color:'#22d3ee'},speech:{emoji:'🎙',name:'Nutq',color:'#34d399'},blogging:{emoji:'✨',name:'Bloging',color:'#fbbf24'}};
 
@@ -1387,7 +1568,7 @@ async function loadStudentApp(){
 // how many full lessons completed (test passed AND tez done for that lesson id)
 function lessonsCompleted(){
   let n=0;
-  for(let id=1;id<=8;id++){
+  for(let id=1;id<=LESSONS.length;id++){
     const t=lessonAccess.find(a=>a.lesson_id===id&&a.test_passed===1);
     const z=tezAccess.find(a=>a.lesson_id===id&&a.status==='done');
     if(t&&z)n++; else break; // sequential
@@ -1395,8 +1576,7 @@ function lessonsCompleted(){
   return n;
 }
 // which lesson id is "next" to do (1-8), or 0 if all done
-function nextLessonId(){const c=lessonsCompleted();return c>=8?0:c+1;}
-
+function nextLessonId(){const c=lessonsCompleted();return c>=LESSONS.length?0:c+1;}
 // parse lesson_days "1,4" (1=Mon..7=Sun) → array of ints
 function getLessonDays(){
   const raw=currentUser.lesson_days;
@@ -1451,7 +1631,7 @@ function renderBrain(){
   const lvl=Math.floor(totalDone/2)+1;
   const xpPct=((totalDone%2)/2)*100;
   document.getElementById('brain-level').textContent=`Daraja ${lvl} · ${totalDone>=6?'Pro':totalDone>=3?'Middle':'Junior'} Bloger`;
-  document.getElementById('brain-xp').style.width=(totalDone>=8?100:xpPct)+'%';
+  document.getElementById('brain-xp').style.width=(totalDone>=LESSONS.length?100:xpPct)+'%';
   // brain nodes (skill points around brain)
   const nodes=Object.entries(SKILLS).map(([k,v],i)=>{
     const ang=(i/4)*Math.PI*2-Math.PI/2;
@@ -1504,10 +1684,10 @@ function renderSnailMini(){
   const stages=["Yangi salyangoz","Kichik salyangoz","O'syapti","Tezlashmoqda","Yarim yo'l","Kuchli","Deyarli tayyor","Katta salyangoz","Chempion! 🏆"];
   if(stageEl)stageEl.textContent=stages[Math.min(done,8)];
   const kgEl=document.getElementById('cv-kg');if(kgEl)kgEl.textContent=done;
-  const fillEl=document.getElementById('cv-fill');if(fillEl)fillEl.style.width=(done/8*100)+'%';
+  const fillEl=document.getElementById('cv-fill');if(fillEl)fillEl.style.width=(done/LESSONS.length*100)+'%';
   // relabel "daraja" suffix
   const kgParent=kgEl?kgEl.parentElement:null;
-  if(kgParent)kgParent.innerHTML=`<span id="cv-kg">${done}</span>/8 dars`;
+  if(kgParent)kgParent.innerHTML=`<span id="cv-kg">${done}</span>/LESSONS.length dars`;
 }
 
 // ── TABS (2 only: today / brain) ──
@@ -1520,51 +1700,60 @@ function stuTab(name){
 }
 
 // ═══ TODAY: decide rest-screen or lesson-available ═══
+
+// Month for a lesson (1-8=oy1, 9-16=oy2, 17-24=oy3)
+function lessonMonth(id){return id<=8?1:id<=16?2:3;}
+function monthName(m){return m===1?"1-OY · ASOSLAR":m===2?"2-OY · KONTENT":"3-OY · USTALIK";}
+
+// Build journey ribbon HTML showing all lessons
+function dzJourney(currentId){
+  const done=lessonsCompleted();
+  let dots='';
+  for(let i=1;i<=LESSONS.length;i++){
+    let cls='locked';
+    if(i<=done)cls='done';
+    else if(i===currentId)cls='current';
+    const content=i<=done?'\u2713':i;
+    dots+='<div class="dz-dot '+cls+'">'+content+'</div>';
+  }
+  const curMonth=currentId?lessonMonth(currentId):(done>=LESSONS.length?3:1);
+  const seg=(m,label)=>'<div class="dz-month-seg '+(m===curMonth?'active':'')+'">'+label+'</div>';
+  return '<div class="dz-journey"><div class="dz-journey-head"><div class="dz-journey-title">🗺 Sening yo\'ling</div><div class="dz-journey-count">'+done+'/'+LESSONS.length+' dars</div></div><div class="dz-dots">'+dots+'</div><div class="dz-month-row">'+seg(1,'1-oy')+seg(2,'2-oy')+seg(3,'3-oy')+'</div></div>';
+}
+
 function renderToday(){
   const c=document.getElementById('today-content');
   const days=getLessonDays();
   const nextId=nextLessonId();
   // program finished
   if(nextId===0){
-    c.innerHTML=`<div class="reels-stage"><div class="snail-wrap">${snailSVG(1.4)}<div class="snail-trail"></div></div>
-      <div class="reels-intro-text">🏆 Tabriklaymiz!</div>
-      <div class="reels-sub">Sen butun 1 oylik dasturni tugatding! Salyangozing eng katta bo'ldi. Zo'r ish, ${(currentUser.full_name||'').split(' ')[0]}!</div></div>`;
+    c.innerHTML='<div class="reels-stage"><div class="dz-hero"><div class="dz-orb" style="width:240px;height:240px;background:var(--gn);top:-40px;left:50%;transform:translateX(-50%)"></div><div class="snail-wrap" style="position:relative;z-index:1">'+snailSVG(1.5)+'<div class="snail-trail"></div></div><div class="dz-lesson-title" style="margin-top:10px">🏆 Tabriklaymiz!</div><div class="dz-lesson-sub">Sen butun 3 oylik dasturni tugatding, '+((currentUser.full_name||'').split(' ')[0])+'! Salyangozing eng katta bo\'ldi. Sen endi haqiqiy yosh blogersan! 🎬</div>'+dzJourney(0)+'</div></div>';
     return;
   }
   // no schedule set yet
   if(!days.length){
-    c.innerHTML=`<div class="reels-stage"><div class="reels-emoji-big">📅</div>
-      <div class="reels-intro-text">Dars jadvali hali belgilanmagan</div>
-      <div class="reels-sub">Ustozing tez orada sening dars kunlaringni belgilaydi. Keyinroq kel!</div></div>`;
+    c.innerHTML='<div class="reels-stage"><div class="dz-hero"><div class="dz-orb" style="width:220px;height:220px;background:var(--ac);top:0;left:50%;transform:translateX(-50%)"></div><div class="dz-card" style="text-align:center"><div class="dz-lesson-icon">📅</div><div class="dz-lesson-title" style="font-size:26px">Jadval belgilanmagan</div><div class="dz-lesson-sub">Ustozing tez orada sening dars kunlaringni belgilaydi. Keyinroq kel! 😊</div></div></div></div>';
     return;
   }
   // is today open?
   if(isLessonOpenNow()){
-    // lesson available now
     const lesson=LESSONS.find(l=>l.id===nextId);
-    c.innerHTML=`<div class="reels-stage reels-fade">
-      <div class="reels-emoji-big">🎯</div>
-      <div class="reels-intro-text">Bugungi dars tayyor!</div>
-      <div class="reels-sub">${nextId}-dars: ${lesson?lesson.title:''}<br>Test va tez aytishni bajaramiz. Tayyormisan?</div>
-      <button class="reels-big-btn" onclick="startReelsLesson(${nextId})">Boshlash 🚀</button></div>`;
+    const m=lessonMonth(nextId);
+    const sk=lesson&&SKILLS[lesson.skill]?SKILLS[lesson.skill]:{emoji:'✨',name:'Bloging'};
+    c.innerHTML='<div class="reels-stage reels-fade"><div class="dz-hero"><div class="dz-orb" style="width:260px;height:260px;background:var(--ac);top:-30px;left:-40px"></div><div class="dz-orb" style="width:200px;height:200px;background:var(--cy);bottom:0;right:-30px;animation-delay:3s"></div><div class="dz-month-pill">📚 '+monthName(m)+'</div><div class="dz-card" style="text-align:center"><div class="dz-lesson-icon">'+(lesson?lesson.icon:'🎯')+'</div><div class="dz-lesson-num">'+nextId+'-DARS TAYYOR</div><div class="dz-lesson-title">'+(lesson?lesson.title:'')+'</div><div class="dz-lesson-sub">Bugun yangi bilim seni kutmoqda!</div><div class="dz-tags"><span class="dz-tag">'+sk.emoji+' '+sk.name+'</span><span class="dz-tag">📝 Test</span><span class="dz-tag">🏙 Tez aytish</span></div><button class="dz-start-btn" onclick="startReelsLesson('+nextId+')">Boshlash 🚀</button></div>'+dzJourney(nextId)+'</div></div>';
   }else{
-    // rest screen with snail + countdown
     showRestScreen(c);
   }
 }
 
 function showRestScreen(c){
   const done=lessonsCompleted();
+  const nextId=nextLessonId();
   const nd=nextLessonDate();
   const name=(currentUser.full_name||'').split(' ')[0];
   let nextLabel='tez orada';
-  if(nd){const dow=nd.getDay()===0?7:nd.getDay();nextLabel=`${DOW_UZ[dow]} 15:00`;}
-  c.innerHTML=`<div class="reels-stage reels-fade">
-    <div class="snail-wrap">${snailSVG(1.3)}<div class="snail-trail"></div></div>
-    <div class="rest-label">Dam ol, ${name}! 😴</div>
-    <div class="rest-next">Keyingi dars: ${nextLabel}</div>
-    <div class="rest-timer" id="rest-timer">--:--:--</div>
-    <div class="reels-sub">Sen ${done} ta darsni tugatding. Salyangozing o'smoqda! 🐌</div></div>`;
+  if(nd){const dow=nd.getDay()===0?7:nd.getDay();nextLabel=DOW_UZ[dow]+' 15:00';}
+  c.innerHTML='<div class="reels-stage reels-fade"><div class="dz-hero"><div class="dz-orb" style="width:240px;height:240px;background:var(--ac);top:-20px;left:50%;transform:translateX(-50%);opacity:.25"></div><div class="dz-card" style="text-align:center"><div class="snail-wrap" style="position:relative;z-index:1">'+snailSVG(1.3)+'<div class="snail-trail"></div></div><div class="rest-label">Dam ol, '+name+'! 😴</div><div class="rest-next">Keyingi dars: '+nextLabel+'</div><div class="rest-timer" id="rest-timer">--:--:--</div><div class="dz-lesson-sub">Sen '+done+' ta darsni tugatding. Salyangozing o\'smoqda! 🐌</div></div>'+dzJourney(nextId)+'</div></div>';
   if(window._restInterval)clearInterval(window._restInterval);
   const tick=()=>{
     const t=document.getElementById('rest-timer');if(!t){clearInterval(window._restInterval);return;}
@@ -1572,7 +1761,7 @@ function showRestScreen(c){
     let diff=Math.floor((nd.getTime()-Date.now())/1000);
     if(diff<=0){t.textContent='Tayyor! 🎉';clearInterval(window._restInterval);renderToday();return;}
     const h=Math.floor(diff/3600),m=Math.floor((diff%3600)/60),s=diff%60;
-    t.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    t.textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
   };
   tick();window._restInterval=setInterval(tick,1000);
 }
@@ -1764,8 +1953,8 @@ async function loadAdminDash(){
     const mw=s.current_week||1;
     return `<tr><td><b>${s.full_name}</b>${s.warnings>0?` <span class="badge warn">⚠${s.warnings}</span>`:''}</td>
       <td><span style="font-family:var(--fm);font-size:12px">${mw}-hafta</span><div class="progress-bar"><div class="progress-fill" style="width:${(mw/4)*100}%"></div></div></td>
-      <td><span class="badge ${td>=8?'active':'pending'}">${td}/8</span></td>
-      <td><span class="badge ${zd>=8?'active':zd>0?'pending':'inactive'}">${zd}/8</span></td>
+      <td><span class="badge ${td>=LESSONS.length?'active':'pending'}">${td}/LESSONS.length</span></td>
+      <td><span class="badge ${zd>=LESSONS.length?'active':zd>0?'pending':'inactive'}">${zd}/LESSONS.length</span></td>
       <td style="font-family:var(--fm)">${fmt(s.bytes_balance)}</td></tr>`;}));
   document.getElementById('dash-tbody').innerHTML=rows.join('')||'<tr><td colspan="5" class="empty">Faol o\'quvchi yo\'q</td></tr>';
 }
@@ -1889,8 +2078,8 @@ function renderSpdInfo(s){
   document.getElementById('spd-schedule').innerHTML=schedHtml;
   const pct=Math.round((testsDone+tezDone)/16*100);
   const voiceBtn='<button class="btn-sm green" style="width:100%;padding:14px;font-size:14px" onclick="spdTab(\'tez\')">🎙️ Bu o\'quvchining ovozlarini tinglash ('+voiceCount+' ta) ›</button>';
-  const testCard='<div onclick="spdTab(\'tests\')" style="cursor:pointer;text-align:center;background:var(--s2);border-radius:10px;padding:14px;border:1px solid transparent;transition:.15s" onmouseover="this.style.borderColor=\'var(--ac)\'" onmouseout="this.style.borderColor=\'transparent\'"><div style="font-family:var(--fd);font-size:26px;font-weight:700;color:var(--ac2)">'+testsDone+'/8</div><div style="font-size:11px;color:var(--mu);margin-top:4px">📝 Testlar ›</div></div>';
-  const tezCard='<div onclick="spdTab(\'tez\')" style="cursor:pointer;text-align:center;background:var(--s2);border-radius:10px;padding:14px;border:1px solid transparent;transition:.15s" onmouseover="this.style.borderColor=\'var(--gn)\'" onmouseout="this.style.borderColor=\'transparent\'"><div style="font-family:var(--fd);font-size:26px;font-weight:700;color:var(--gn)">'+tezDone+'/8</div><div style="font-size:11px;color:var(--mu);margin-top:4px">🎙️ Tez aytish ›</div></div>';
+  const testCard='<div onclick="spdTab(\'tests\')" style="cursor:pointer;text-align:center;background:var(--s2);border-radius:10px;padding:14px;border:1px solid transparent;transition:.15s" onmouseover="this.style.borderColor=\'var(--ac)\'" onmouseout="this.style.borderColor=\'transparent\'"><div style="font-family:var(--fd);font-size:26px;font-weight:700;color:var(--ac2)">'+testsDone+'/LESSONS.length</div><div style="font-size:11px;color:var(--mu);margin-top:4px">📝 Testlar ›</div></div>';
+  const tezCard='<div onclick="spdTab(\'tez\')" style="cursor:pointer;text-align:center;background:var(--s2);border-radius:10px;padding:14px;border:1px solid transparent;transition:.15s" onmouseover="this.style.borderColor=\'var(--gn)\'" onmouseout="this.style.borderColor=\'transparent\'"><div style="font-family:var(--fd);font-size:26px;font-weight:700;color:var(--gn)">'+tezDone+'/LESSONS.length</div><div style="font-size:11px;color:var(--mu);margin-top:4px">🎙️ Tez aytish ›</div></div>';
   const pctCard='<div style="text-align:center;background:var(--s2);border-radius:10px;padding:14px"><div style="font-family:var(--fd);font-size:26px;font-weight:700;color:var(--go)">'+pct+'%</div><div style="font-size:11px;color:var(--mu);margin-top:4px">Progress</div></div>';
   document.getElementById('spd-progress').innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">'+testCard+tezCard+pctCard+'</div><div style="background:var(--s2);border-radius:6px;height:8px;overflow:hidden;margin-bottom:14px"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--ac),var(--cy));border-radius:6px;transition:1s"></div></div>'+voiceBtn;
 }
@@ -1903,7 +2092,7 @@ function renderSpdTests(s){
     const done=acc&&acc.test_passed===1;
     const sc=(done&&acc.test_score!=null)?(acc.test_score+'/'+(acc.test_total||5)):done?'\u2713':'--';
     const pct=(done&&acc.test_score!=null&&acc.test_total)?Math.round(acc.test_score/acc.test_total*100):null;
-    const col=!done?'var(--mu)':pct==null?'var(--gn)':pct>=80?'var(--gn)':pct>=50?'var(--go)':'var(--rd)';
+    const col=!done?'var(--mu)':pct==null?'var(--gn)':pct>=LESSONS.length0?'var(--gn)':pct>=50?'var(--go)':'var(--rd)';
     const icon=done?'\u2705':'\u2B55';
     return '<div class="info-row" style="padding:14px 16px;background:var(--s);border-radius:10px;margin-bottom:8px;border:1px solid var(--brd)"><span style="display:flex;align-items:center;gap:10px"><span>'+icon+'</span><span><b>'+l.id+'-dars</b><br><span style="font-size:12px;color:var(--mu)">'+l.title+'</span></span></span><span style="font-family:var(--fm);font-weight:700;color:'+col+'">'+sc+'</span></div>';
   }).join('');
@@ -2027,7 +2216,7 @@ async function deleteStudent(){
   closeStudentProfile();hideModal('stu-detail-modal');toast('🗑 O\'quvchi o\'chirildi');loadStudentsTable();
 }
 async function adminUnlockWeek(){if(!selectedStudentId)return;const s=allStudents.find(x=>x.id===selectedStudentId);const nw=(s.current_week||1)+1;
-  if(nw>4){toast('4-hafta oxirgi!','err');return;}
+  if(nw>12){toast('12-hafta oxirgi!','err');return;}
   for(const lid of WEEK_LESSONS[nw])await sb.from('lesson_access').upsert({student_id:selectedStudentId,lesson_id:lid,test_passed:0},{onConflict:'student_id,lesson_id'});
   for(const tid of WEEK_TEZ[nw])await sb.from('tez_aytish_access').upsert({student_id:selectedStudentId,lesson_id:tid,status:'open'},{onConflict:'student_id,lesson_id'});
   await sb.from('students').update({current_week:nw}).eq('id',selectedStudentId);toast(`✅ ${nw}-hafta ochildi`);closeStudentProfile();hideModal('stu-detail-modal');loadStudentsTable();}
@@ -2073,7 +2262,7 @@ async function approveTez(subId,stuId,lessonId){
   const{data:ta}=await sb.from('tez_aytish_access').select('*').eq('student_id',stuId);
   const allT=WEEK_LESSONS[week].every(lid=>(la||[]).find(a=>a.lesson_id===lid&&a.test_passed===1));
   const allTz=WEEK_TEZ[week].every(tid=>(ta||[]).find(a=>a.lesson_id===tid&&a.status==='done'));
-  if(allT&&allTz&&week<4){const nw=week+1;
+  if(allT&&allTz&&week<12){const nw=week+1;
     for(const lid of WEEK_LESSONS[nw])await sb.from('lesson_access').upsert({student_id:stuId,lesson_id:lid,test_passed:0},{onConflict:'student_id,lesson_id'});
     for(const tid of WEEK_TEZ[nw])await sb.from('tez_aytish_access').upsert({student_id:stuId,lesson_id:tid,status:'open'},{onConflict:'student_id,lesson_id'});
     await sb.from('students').update({current_week:nw}).eq('id',stuId);toast(`✅ Qabul! ${nw}-hafta ochildi`);}
