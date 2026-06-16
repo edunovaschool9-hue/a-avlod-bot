@@ -695,7 +695,13 @@ audio{height:36px;border-radius:7px;max-width:240px}
 <div class="page" id="p-admin">
   <div class="sidebar">
     <div>
-      <div class="sb-logo">UTKO<span>NOS</span><div class="sb-role" id="sb-role">ADMIN</div></div>
+      <div class="sb-logo">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding-bottom:4px">
+          <svg viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg" style="width:54px;height:auto"><defs><linearGradient id="sbwb" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d8dae0"/></linearGradient></defs><path d="M150 50 Q188 38 200 56 Q204 65 200 74 Q188 92 150 80 Q144 65 150 50 Z" fill="url(#sbwb)"/><ellipse cx="95" cy="65" rx="62" ry="38" fill="url(#sbwb)"/><ellipse cx="48" cy="63" rx="28" ry="26" fill="url(#sbwb)"/><path d="M48 56 Q14 50 0 60 Q-4 65 0 70 Q14 80 50 74 Q56 65 52 58 Z" fill="#b8bac2"/><ellipse cx="12" cy="65" rx="2.5" ry="2" fill="#0a0b0f" opacity="0.4"/><circle cx="42" cy="54" r="4.5" fill="#0a0b0f"/></svg>
+          <div style="font-family:var(--fd);font-size:15px;font-weight:800;letter-spacing:3px;color:#fff">UTKONOS</div>
+        </div>
+        <div class="sb-role" id="sb-role" style="text-align:center">ADMIN</div>
+      </div>
     </div>
     <div class="sb-nav" id="sb-nav"><!-- filled by JS based on role --></div>
     <div class="sb-bottom">
@@ -1078,7 +1084,7 @@ audio{height:36px;border-radius:7px;max-width:240px}
         </div>
         <div style="display:flex;gap:8px"><button class="btn-sm green" style="padding:10px 18px" onclick="saveStaff()">Saqlash</button>
           <button class="btn-sm red" style="padding:10px 18px" onclick="toggleStaffForm()">Bekor</button></div>
-        <div style="font-size:11px;color:var(--mu);margin-top:8px">⏱ Administrator lavozimida "Ishni boshlash/yakunlash" tugmasi bo'ladi. Direktor va menejer uchun yo'q.</div>
+        <div style="font-size:11px;color:var(--mu);margin-top:8px">🤖 Xodimlarning ish faoliyati avtomatik kuzatiladi — qachon kirgani va qaysi bo'limlarda ishlagani quyida ko'rinadi.</div>
       </div>
       <div style="font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin:8px 0 10px">📋 Xodimlar ro'yxati</div>
       <div id="staff-list"><div class="loading-center"><div class="spin"></div></div></div>
@@ -1089,17 +1095,7 @@ audio{height:36px;border-radius:7px;max-width:240px}
   </div>
 </div>
 
-<!-- WORK TIMER BAR (admin only, floating) -->
-<div id="work-timer-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s);border-top:1px solid var(--ac);padding:12px 18px;z-index:60;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-  <div style="display:flex;align-items:center;gap:14px">
-    <span style="font-size:13px;color:var(--mu2)" id="wt-label">Ishni boshlang</span>
-    <span style="font-family:var(--fm);font-size:20px;font-weight:500;color:var(--ac2)" id="wt-clock" style="display:none"></span>
-  </div>
-  <div style="display:flex;gap:8px">
-    <button class="btn-sm green" id="wt-start" style="padding:10px 20px" onclick="startWork()">▶️ Ishni boshlash</button>
-    <button class="btn-sm red" id="wt-end" style="padding:10px 20px;display:none" onclick="endWork()">⏹ Yakunlash</button>
-  </div>
-</div>
+<!-- WORK TIMER BAR removed — work tracking is now automatic -->
 
 <!-- ══ MODALS ══ -->
 <div class="modal-bg" id="add-student-modal"><div class="modal">
@@ -1776,6 +1772,8 @@ function enterStaffPanel(){
   // Admin work-timer bar
   setupWorkTimer();
   startPinLockTimer(); // auto PIN-lock after 15s for non-exempt staff
+  // auto-log: logged in (once per fresh login, not on PIN re-entry)
+  if(!window._loggedInThisSession){ window._loggedInThisSession=true; logActivity('🔑 Tizimga kirdi'); }
   navTo(items[0],nav.querySelector('.sb-item'));
 }
 
@@ -1926,9 +1924,17 @@ function navTo(panel,el){
   if(el)el.classList.add('active');
   const fn=MENU_META[panel].fn;
   if(fn&&window[fn])window[fn]();
+  // auto-log section visit (skip the very first auto-nav right after login to avoid noise)
+  if(window._navReady && MENU_META[panel]){
+    const label=(MENU_META[panel].label||panel).replace(/^[^\s]+\s/,''); // strip emoji
+    logActivity('📂 '+label);
+  }
+  window._navReady=true;
 }
 
 function doLogout(){
+  if(currentStaff){ logActivity('🚪 Tizimdan chiqdi'); }
+  window._loggedInThisSession=false; window._navReady=false;
   currentUser=null;currentStaff=null;lessonAccess=[];tezAccess=[];
   if(_pinLockTimer){clearTimeout(_pinLockTimer);_pinLockTimer=null;}
   document.getElementById('pinlock').classList.remove('on');
@@ -3016,97 +3022,96 @@ async function loadStaffPanel(){
         <div class="sub-meta">Login: <b style="color:var(--mu2)">${s.login}</b> · Parol: <b style="color:var(--mu2)">${s.password}</b> ${pos.timer?'· ⏱ Taymer bor':''}</div></div>
         <button class="btn-sm red" onclick="deleteStaff(${s.id},'${s.name.replace(/'/g,'')}')">🗑</button></div>`;}).join('');
   }
-  // today's work report (only admins have sessions)
+  // ═══ AUTO ACTIVITY REPORT (like browser history) ═══
+  // Show today's activity timeline per staff member
   const today=todayLocalStr();
-  const{data:sessions}=await sb.from('work_sessions').select('*').eq('work_date',today);
-  const admins=staff.filter(s=>s.position==='admin');
-  if(!admins.length){repC.innerHTML='<div class="empty">Administrator lavozimidagi xodim yo\'q</div>';return;}
-  repC.innerHTML=admins.map(a=>{
-    const mySessions=(sessions||[]).filter(x=>x.staff_id===a.id);
-    const totalMin=mySessions.reduce((sum,x)=>sum+(x.minutes||0),0);
-    const totalLeads=mySessions.reduce((sum,x)=>sum+(x.leads_handled||0),0);
-    const isWorking=mySessions.some(x=>!x.ended_at);
-    const h=Math.floor(totalMin/60),m=totalMin%60;
-    return `<div class="sub-card"><div class="sub-info"><div class="sub-name">${a.name} ${isWorking?'<span class="badge active">🟢 Ishlamoqda</span>':''}</div>
-      <div class="sub-meta">⏱ Bugun: <b style="color:var(--ac2)">${h} soat ${m} daqiqa</b> · 📋 Lidlar: <b style="color:var(--gn)">${totalLeads} ta</b></div></div></div>`;
-  }).join('');
+  let activities=[];
+  try{
+    const{data:acts}=await sb.from('staff_activity').select('*').eq('work_date',today).order('at',{ascending:true});
+    activities=acts||[];
+  }catch(e){ activities=[]; }
+
+  if(!activities.length){
+    repC.innerHTML='<div class="empty">Bugun hali faollik yo\'q. Xodimlar tizimga kirganda bu yerda avtomatik hisobot paydo bo\'ladi.</div>';
+    return;
+  }
+
+  // group by staff
+  const byStaff={};
+  activities.forEach(a=>{
+    const key=a.staff_id+'|'+a.staff_name;
+    if(!byStaff[key])byStaff[key]=[];
+    byStaff[key].push(a);
+  });
+
+  const fmtTime=(at)=>{ // "2026-06-17T09:30:15" → "09:30"
+    const m=String(at).match(/T(\d{2}):(\d{2})/);
+    return m?`${m[1]}:${m[2]}`:'';
+  };
+
+  let html='';
+  Object.keys(byStaff).forEach(key=>{
+    const list=byStaff[key];
+    const name=list[0].staff_name;
+    const pos=POSITIONS[list[0].position]?POSITIONS[list[0].position].label:(list[0].position||'Xodim');
+    const first=list[0], last=list[list.length-1];
+    // compute active duration (first activity → last activity)
+    const t0=fmtTime(first.at), t1=fmtTime(last.at);
+    // duration in minutes
+    let durMin=0;
+    try{
+      const p0=String(first.at).match(/T(\d{2}):(\d{2})/);
+      const p1=String(last.at).match(/T(\d{2}):(\d{2})/);
+      if(p0&&p1){ durMin=(parseInt(p1[1])*60+parseInt(p1[2]))-(parseInt(p0[1])*60+parseInt(p0[2])); }
+    }catch(e){}
+    const dh=Math.floor(durMin/60), dm=durMin%60;
+    const durStr=dh>0?`${dh} soat ${dm} daqiqa`:`${dm} daqiqa`;
+    const visits=list.filter(x=>x.action&&x.action.indexOf('📂')===0).length;
+
+    // timeline items
+    const timeline=list.map(a=>
+      `<div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--brd);font-size:13px">
+        <span style="font-family:var(--fm);color:var(--ac2);min-width:42px">${fmtTime(a.at)}</span>
+        <span style="color:var(--mu2)">${a.action||''}</span>
+      </div>`).join('');
+
+    html+=`<div class="sub-card" style="flex-direction:column;align-items:stretch">
+      <div class="sub-info" style="margin-bottom:8px">
+        <div class="sub-name">${name} <span class="badge ${list[0].position==='admin'?'active':list[0].position==='director'?'warn':'blue'}">${pos}</span></div>
+        <div class="sub-meta">🕐 Faol: <b style="color:var(--ac2)">${t0}–${t1}</b> (${durStr}) · 📂 ${visits} ta bo'limga kirdi</div>
+      </div>
+      <details style="margin-top:4px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--mu);padding:4px 0">📜 Batafsil tarix (${list.length} ta amal)</summary>
+        <div style="margin-top:6px;max-height:240px;overflow-y:auto;padding-right:6px">${timeline}</div>
+      </details>
+    </div>`;
+  });
+  repC.innerHTML=html;
 }
 
-// ════ WORK TIMER (admin position only) ════
-let workSessionId=null, workStartTime=null, workClockInterval=null, workLeadsAtStart=0;
-function setupWorkTimer(){
-  const bar=document.getElementById('work-timer-bar');
-  if(currentStaff&&currentStaff.timer){
-    bar.style.display='flex';
-    // check if already has open session today (resume)
-    checkOpenSession();
-  }else{
-    bar.style.display='none';
-  }
+// ════ AUTO ACTIVITY TRACKING (no manual button) ════
+// Logs staff activity automatically (like browser history): login + section visits.
+// Stored in 'staff_activity' table. Report visible to marketer/director in Xodimlar panel.
+function nowStamp(){
+  const n=new Date();
+  return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}T${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
 }
-async function checkOpenSession(){
-  if(!currentStaff||!currentStaff.staffId)return;
-  const today=todayLocalStr();
-  const{data}=await sb.from('work_sessions').select('*').eq('staff_id',currentStaff.staffId).eq('work_date',today).is('ended_at',null).maybeSingle();
-  if(data){
-    // resume running session
-    workSessionId=data.id;
-    workStartTime=dtToDateObj(data.started_at)||new Date(data.started_at);
-    workLeadsAtStart=data.leads_at_start||0;
-    showWorkRunning();
-  }
+async function logActivity(action){
+  if(!currentStaff)return;
+  const sid=currentStaff.staffId||0;
+  const sname=currentStaff.name||'Xodim';
+  const pos=currentStaff.position||(currentStaff.isMarketer?'marketing':'admin');
+  try{
+    await sb.from('staff_activity').insert({
+      staff_id:sid, staff_name:sname, position:pos,
+      action:action, at:nowStamp(), work_date:todayLocalStr()
+    });
+  }catch(e){/* table may not exist yet — skip silently */}
 }
-function showWorkRunning(){
-  document.getElementById('wt-start').style.display='none';
-  document.getElementById('wt-end').style.display='inline-block';
-  document.getElementById('wt-label').textContent='Ish vaqti:';
-  const clock=document.getElementById('wt-clock');clock.style.display='inline-block';
-  if(workClockInterval)clearInterval(workClockInterval);
-  const tick=()=>{const diff=Math.floor((Date.now()-workStartTime.getTime())/1000);
-    const h=Math.floor(diff/3600),m=Math.floor((diff%3600)/60),s=diff%60;
-    clock.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;};
-  tick();workClockInterval=setInterval(tick,1000);
-}
-async function startWork(){
-  if(!currentStaff||!currentStaff.staffId){toast('Xato: xodim aniqlanmadi','err');return;}
-  const now=new Date();
-  const nowStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-  const today=todayLocalStr();
-  // count leads checked today by this admin already (so we measure delta)
-  const leadsNow=await countMyLeadsToday();
-  const{data,error}=await sb.from('work_sessions').insert({staff_id:currentStaff.staffId,staff_name:currentStaff.name,started_at:nowStr,work_date:today,leads_at_start:leadsNow}).select().single();
-  if(error){toast(error.message,'err');return;}
-  workSessionId=data.id;workStartTime=now;workLeadsAtStart=leadsNow;
-  showWorkRunning();toast('▶️ Ish boshlandi! Omad, '+currentStaff.name);
-}
-async function countMyLeadsToday(){
-  // leads this admin checked today (last_checked is today). We count all leads checked today.
-  const today=todayLocalStr();
-  const{data}=await sb.from('leads').select('last_checked').eq('last_checked_by',currentStaff.staffId);
-  // fallback: if last_checked_by not tracked, count all checked-today
-  if(data&&data.length)return data.filter(l=>dtDateOnly(l.last_checked)===today).length;
-  const{data:all}=await sb.from('leads').select('last_checked');
-  return (all||[]).filter(l=>l.last_checked&&dtDateOnly(l.last_checked)===today).length;
-}
-async function endWork(){
-  if(!workSessionId){toast('Faol sessiya yo\'q','err');return;}
-  const now=new Date();
-  const nowStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-  const minutes=Math.max(1,Math.round((now.getTime()-workStartTime.getTime())/60000));
-  const leadsNow=await countMyLeadsToday();
-  const leadsHandled=Math.max(0,leadsNow-workLeadsAtStart);
-  await sb.from('work_sessions').update({ended_at:nowStr,minutes,leads_handled:leadsHandled}).eq('id',workSessionId);
-  if(workClockInterval)clearInterval(workClockInterval);
-  const h=Math.floor(minutes/60),m=minutes%60;
-  // nice summary
-  const timeStr=h>0?`${h} soat ${m} daqiqa`:`${m} daqiqa`;
-  alert(`✅ Ajoyib ish, ${currentStaff.name}!\n\n⏱ Bugun siz ${timeStr} ishladingiz\n📋 ${leadsHandled} ta lid bilan ishladingiz\n\nDam oling, ertaga ko'rishguncha! 👋`);
-  workSessionId=null;workStartTime=null;
-  document.getElementById('wt-start').style.display='inline-block';
-  document.getElementById('wt-end').style.display='none';
-  document.getElementById('wt-clock').style.display='none';
-  document.getElementById('wt-label').textContent='Ishni boshlang';
-}
+// no-ops so any old references don't break
+function setupWorkTimer(){ const b=document.getElementById('work-timer-bar'); if(b)b.style.display='none'; }
+function startWork(){}
+function endWork(){}
 
 // ── INIT ──
 (async function(){await restoreSession();})();
