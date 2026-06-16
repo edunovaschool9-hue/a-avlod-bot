@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>EDU BLOG PLATFORM</title>
+<title>UTKONOS Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -73,6 +73,125 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .btn-full:hover{filter:brightness(1.1)}
 .btn-full:disabled{background:var(--s2);color:var(--mu);box-shadow:none;cursor:default}
 .err{font-size:13px;color:var(--rd);margin-top:12px;display:none}
+
+/* ═══ UNIFIED LOGIN (Instagram-style two-column) ═══ */
+#p-ulogin{padding:0;flex-direction:row;align-items:stretch;justify-content:flex-start}
+.ul-wrap{display:flex;width:100%;min-height:100vh}
+.ul-brand{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 6%;position:relative;overflow:hidden}
+.ul-orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.22;pointer-events:none}
+.ul-brand-inner{position:relative;z-index:1;max-width:460px}
+.ul-logo-row{display:flex;align-items:center;gap:18px;margin-bottom:8px;opacity:0;transform:translateY(20px);animation:ulRise .8s .1s forwards}
+.ul-platypus{width:90px;height:auto;filter:drop-shadow(0 6px 18px rgba(124,92,255,.25))}
+.ul-platypus.swim{animation:ulSwim 4s ease-in-out infinite}
+.ul-name{font-family:var(--fd);font-size:40px;font-weight:800;letter-spacing:4px;line-height:1;color:#fff}
+.ul-sub{font-family:var(--fm);font-size:11px;letter-spacing:6px;color:var(--mu);margin-top:6px}
+.ul-tagline{font-family:var(--fd);font-size:25px;font-weight:700;line-height:1.3;margin-top:38px;opacity:0;transform:translateY(20px);animation:ulRise .8s .35s forwards}
+.ul-tagline .ac{color:var(--ac2)}
+.ul-login{width:440px;background:#0d0e13;border-left:1px solid var(--brd);display:flex;flex-direction:column;justify-content:center;padding:0 48px;position:relative}
+.ul-login-orb{position:absolute;top:20%;right:-60px;width:300px;height:300px;border-radius:50%;background:var(--cy);filter:blur(100px);opacity:.08;pointer-events:none}
+.ul-box{position:relative;z-index:1;width:100%;opacity:0;transform:translateY(20px);animation:ulRise .8s .55s forwards}
+.ul-box .login-title{margin-bottom:24px}
+.ul-mini{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:32px;opacity:.55}
+.ul-mini svg{width:26px;height:auto}
+.ul-mini span{font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:2px;color:var(--mu2)}
+.ul-divider{height:1px;background:var(--brd);margin:26px 0 16px}
+@keyframes ulRise{to{opacity:1;transform:translateY(0)}}
+@keyframes ulSwim{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-8px) rotate(-2deg)}}
+@media(max-width:880px){
+  #p-ulogin{flex-direction:column}
+  .ul-wrap{flex-direction:column}
+  /* softer, cleaner brand area so white logo stands out */
+  .ul-brand{flex:none;padding:50px 8% 26px;align-items:center;text-align:center;
+    background:linear-gradient(180deg,#101218 0%,#0c0d12 100%)}
+  .ul-orb{opacity:.1!important;filter:blur(70px)!important} /* much softer glow */
+  .ul-brand-inner{text-align:center}
+  .ul-logo-row{flex-direction:column;gap:14px}
+  /* subtle soft halo behind platypus so it never blends */
+  .ul-platypus{width:78px;filter:drop-shadow(0 4px 20px rgba(255,255,255,.12))}
+  .ul-name{font-size:32px;letter-spacing:5px}
+  .ul-sub{letter-spacing:7px}
+  .ul-tagline{font-size:18px;margin-top:20px;color:#aab1c2}
+  .ul-tagline .ac{color:#9d7bff}
+  .ul-login{width:100%;border-left:none;border-top:1px solid var(--brd);padding:24px 8% 46px;background:#0a0b0f}
+}
+
+/* ═══ 15-SEC SPLASH (welcome loader) ═══ */
+#splash{position:fixed;inset:0;z-index:200;background:#0a0b0f;display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;overflow:hidden}
+#splash.on{display:flex}
+.sp-orb{position:absolute;border-radius:50%;filter:blur(100px);pointer-events:none;animation:spFloat 6s ease-in-out infinite}
+@keyframes spFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.1)}}
+.sp-platypus{width:120px;height:auto;position:relative;z-index:1;animation:ulSwim 3s ease-in-out infinite;filter:drop-shadow(0 8px 24px rgba(124,92,255,.4))}
+.sp-welcome{position:relative;z-index:1;font-family:var(--fd);font-size:clamp(28px,5vw,42px);font-weight:800;margin-top:24px;text-align:center;
+  background:linear-gradient(120deg,#fff 30%,var(--ac2) 70%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  opacity:0;animation:spFade .8s .3s forwards}
+.sp-name{position:relative;z-index:1;font-family:var(--fd);font-size:clamp(22px,4vw,32px);font-weight:700;color:var(--ac2);margin-top:2px;text-align:center;opacity:0;animation:spFade .8s .5s forwards}
+.sp-status{position:relative;z-index:1;font-size:15px;color:var(--mu2);margin-top:28px;height:22px;text-align:center;transition:.3s;font-family:var(--fm)}
+.sp-bar-wrap{position:relative;z-index:1;width:min(420px,80vw);height:8px;background:var(--s2);border-radius:10px;margin-top:16px;overflow:hidden}
+.sp-bar{height:100%;width:0%;border-radius:10px;background:linear-gradient(90deg,var(--ac),var(--cy));transition:width .25s linear;box-shadow:0 0 16px rgba(124,92,255,.6)}
+.sp-pct{position:relative;z-index:1;font-family:var(--fd);font-size:13px;color:var(--mu2);margin-top:10px;font-weight:600}
+@keyframes spFade{to{opacity:1}}
+
+/* ═══ PIN LOCK (time-of-day) ═══ */
+#pinlock{position:fixed;inset:0;z-index:300;display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;overflow:hidden;transition:background .8s}
+#pinlock.on{display:flex}
+/* time backgrounds */
+#pinlock.morning{background:linear-gradient(180deg,#1a2540 0%,#2d3a5c 40%,#4a5578 100%)}
+#pinlock.day{background:linear-gradient(180deg,#1e3a5f 0%,#2c5a8c 50%,#3d6fa5 100%)}
+#pinlock.evening{background:linear-gradient(180deg,#2a1a3e 0%,#5c2d4a 45%,#8c3d2e 100%)}
+#pinlock.night{background:linear-gradient(180deg,#070912 0%,#0d1228 55%,#141a38 100%)}
+.pin-sky{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+/* sun */
+.pin-sun{position:absolute;border-radius:50%;transition:.8s}
+.morning .pin-sun{width:120px;height:120px;background:radial-gradient(circle,#ffd98a,#ff9d5c);bottom:18%;left:50%;transform:translateX(-50%);box-shadow:0 0 80px 30px rgba(255,180,100,.4);animation:sunRise 3s ease-out}
+.day .pin-sun{width:140px;height:140px;background:radial-gradient(circle,#fff4d6,#ffd24d);top:14%;left:50%;transform:translateX(-50%);box-shadow:0 0 100px 40px rgba(255,220,120,.5)}
+.evening .pin-sun{width:150px;height:150px;background:radial-gradient(circle,#ffb37a,#ff6b4a);bottom:12%;left:50%;transform:translateX(-50%);box-shadow:0 0 90px 36px rgba(255,120,80,.4)}
+@keyframes sunRise{0%{bottom:-10%;opacity:.4}100%{bottom:18%;opacity:1}}
+/* moon + stars for night */
+.night .pin-moon{position:absolute;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 38% 38%,#f4f6ff,#c4cae0);top:14%;left:50%;transform:translateX(-50%);box-shadow:0 0 60px 18px rgba(200,210,255,.25)}
+.pin-star{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:0;animation:twinkle 3s infinite}
+.night .pin-star{opacity:.8}
+@keyframes twinkle{0%,100%{opacity:.3}50%{opacity:.9}}
+/* cloud (morning/day) minimal */
+.pin-cloud{position:absolute;background:rgba(255,255,255,.12);border-radius:40px;filter:blur(2px)}
+.pin-card{position:relative;z-index:2;background:rgba(13,14,19,.55);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:36px 30px;width:min(360px,90vw);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.pin-greet{font-family:var(--fd);font-size:26px;font-weight:800;color:#fff;margin-bottom:4px}
+.pin-greet-name{font-family:var(--fd);font-size:17px;font-weight:600;color:rgba(255,255,255,.7);margin-bottom:22px}
+.pin-lock-ic{font-size:34px;margin-bottom:14px}
+.pin-dots{display:flex;gap:14px;justify-content:center;margin:8px 0 26px}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.4);transition:.2s}
+.pin-dot.filled{background:var(--ac2);border-color:var(--ac2);box-shadow:0 0 12px rgba(157,123,255,.6)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:260px;margin:0 auto}
+.pin-key{aspect-ratio:1.3;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);border-radius:14px;color:#fff;font-family:var(--fd);font-size:24px;font-weight:700;cursor:pointer;transition:.12s;display:flex;align-items:center;justify-content:center}
+.pin-key:active{background:rgba(124,92,255,.4);transform:scale(.94)}
+.pin-key.wide{grid-column:span 1}
+.pin-err{color:#fb7185;font-size:14px;margin-top:14px;height:18px}
+@media(max-width:880px){.pin-greet{font-size:22px}.pin-pad{max-width:230px}}
+
+/* ═══ GREETING SCENE (after PIN, time-of-day) ═══ */
+#greetscene{position:fixed;inset:0;z-index:250;display:none;overflow:hidden}
+#greetscene.on{display:block}
+.gs-layer{position:absolute;inset:0}
+.gs-greet{position:absolute;top:13%;left:0;right:0;text-align:center;z-index:10;color:#fff;padding:0 24px}
+.gs-greet-h{font-family:var(--fd);font-size:clamp(28px,7vw,38px);font-weight:800;text-shadow:0 2px 24px rgba(0,0,0,.5)}
+.gs-greet-n{font-family:var(--fd);font-size:clamp(20px,5vw,26px);font-weight:700;margin-top:2px;text-shadow:0 2px 24px rgba(0,0,0,.5);opacity:.95}
+.gs-ring{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%);width:130px;height:130px;border-radius:50%;
+  border:5px solid rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;z-index:9;
+  box-shadow:0 8px 40px rgba(0,0,0,.3),inset 0 0 30px rgba(255,255,255,.2);animation:gsRingPulse 2.5s ease-in-out infinite}
+@keyframes gsRingPulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.05)}}
+.gs-ring svg{width:78px;height:auto}
+.gs-bar-wrap{position:absolute;bottom:13%;left:12%;right:12%;z-index:10}
+.gs-bar-bg{height:7px;background:rgba(255,255,255,.25);border-radius:6px;overflow:hidden}
+.gs-bar-fill{height:100%;width:0%;border-radius:6px;background:#fff;transition:width .2s linear;box-shadow:0 0 14px rgba(255,255,255,.6)}
+.gs-bar-txt{text-align:center;color:#fff;font-size:14px;margin-top:10px;font-family:var(--fm);opacity:.92;text-shadow:0 1px 10px rgba(0,0,0,.45)}
+/* sky elements */
+.gs-sun{position:absolute;border-radius:50%}
+.gs-star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;animation:gsTwinkle 3s infinite}
+@keyframes gsTwinkle{0%,100%{opacity:.3}50%{opacity:.9}}
+/* backgrounds */
+.gs-morning{background:linear-gradient(180deg,#acd3e8 0%,#cfe5d4 45%,#7fae8a 100%)}
+.gs-day{background:linear-gradient(180deg,#7ec0ee 0%,#bfe0c8 50%,#86c08e 100%)}
+.gs-evening{background:linear-gradient(180deg,#3a2a5c 0%,#8c4a6e 40%,#d98555 75%,#f0a060 100%)}
+.gs-night{background:linear-gradient(180deg,#070b1c 0%,#10183a 50%,#1a2348 100%)}
 
 /* ══ GENERIC ══ */
 .btn-primary{background:linear-gradient(135deg,var(--ac),var(--acd));color:#fff;border:none;padding:14px 28px;border-radius:11px;font-size:15px;font-weight:700;box-shadow:var(--glow)}
@@ -478,78 +597,105 @@ audio{height:36px;border-radius:7px;max-width:240px}
 </style>
 
 <!-- ══ LANDING / COURSE SELECT ══ -->
-<div class="page on" id="p-land">
-  <div class="brand-logo">EDU BLOG PLATFORM</div>
-  <div class="brand-title">O'rgan.<br><span>Bloging qil.</span></div>
-  <div class="brand-sub">Bolalar va ayollar uchun zamonaviy blogerlik va AI kursi.</div>
-  <div class="course-cards">
-    <div class="course-card" onclick="selectCourse('bolalar')">
-      <span class="cc-badge active">FAOL</span>
-      <div class="cc-icon">🐄</div>
-      <div class="cc-title">Child Blog</div>
-      <div class="cc-desc">8-15 yosh bolalar uchun bloging, AI va nutq mahorati. Buzoqcha o'sadi!</div>
+<!-- ══ UNIFIED LOGIN (single entry for students + staff) ══ -->
+<div class="page on" id="p-ulogin">
+  <div class="ul-wrap">
+    <!-- LEFT: brand -->
+    <div class="ul-brand">
+      <div class="ul-orb" style="width:420px;height:420px;background:var(--ac);top:10%;left:5%"></div>
+      <div class="ul-brand-inner">
+        <div class="ul-logo-row">
+          <svg class="ul-platypus swim" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ulwb" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d8dae0"/></linearGradient></defs><path d="M150 50 Q188 38 200 56 Q204 65 200 74 Q188 92 150 80 Q144 65 150 50 Z" fill="url(#ulwb)"/><ellipse cx="95" cy="65" rx="62" ry="38" fill="url(#ulwb)"/><ellipse cx="48" cy="63" rx="28" ry="26" fill="url(#ulwb)"/><path d="M48 56 Q14 50 0 60 Q-4 65 0 70 Q14 80 50 74 Q56 65 52 58 Z" fill="#b8bac2"/><ellipse cx="12" cy="65" rx="2.5" ry="2" fill="#0a0b0f" opacity="0.4"/><path d="M70 100 L64 116 L74 104 Z" fill="#c4c6cc"/><path d="M92 102 L88 118 L98 106 Z" fill="#c4c6cc"/><circle cx="42" cy="54" r="4.5" fill="#0a0b0f"/></svg>
+          <div>
+            <div class="ul-name">UTKONOS</div>
+            <div class="ul-sub">PLATFORM</div>
+          </div>
+        </div>
+        <div class="ul-tagline">Bilim olishning yangi avlodi<br><span class="ac">shu yerdan boshlanadi.</span></div>
+      </div>
     </div>
-    <div class="course-card soon" onclick="toast('Women Blog tez kunda ochiladi!','err')">
-      <span class="cc-badge soon">TEZ KUNDA</span>
-      <div class="cc-icon">🌸</div>
-      <div class="cc-title">Women Blog</div>
-      <div class="cc-desc">Ayollar uchun blogerlik va shaxsiy brend kursi. Tez kunda...</div>
+    <!-- RIGHT: login -->
+    <div class="ul-login">
+      <div class="ul-login-orb"></div>
+      <div class="ul-box">
+        <div class="login-title">Platformaga kirish</div>
+        <div class="field">
+          <label>Ism / Login</label>
+          <input id="ul-name" type="text" placeholder="Ism yoki login" autocomplete="off">
+        </div>
+        <div class="field">
+          <label>Kod / Parol</label>
+          <input id="ul-pass" type="password" placeholder="Kod yoki parol" autocomplete="off" onkeydown="if(event.key==='Enter')doUnifiedLogin()">
+        </div>
+        <button class="btn-full" id="ul-btn" onclick="doUnifiedLogin()">Kirish →</button>
+        <div class="err" id="ul-err">Noto'g'ri ma'lumot</div>
+        <div class="ul-divider"></div>
+        <div class="login-sub" style="text-align:center;margin:0">O'quvchilar va xodimlar uchun yagona kirish</div>
+        <div class="ul-mini">
+          <svg viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg"><ellipse cx="95" cy="65" rx="62" ry="38" fill="#9aa1b3"/><ellipse cx="48" cy="63" rx="28" ry="26" fill="#9aa1b3"/><path d="M48 56 Q14 50 0 60 Q-4 65 0 70 Q14 80 50 74 Q56 65 52 58 Z" fill="#7a8196"/><path d="M150 50 Q188 38 200 56 Q204 65 200 74 Q188 92 150 80 Q144 65 150 50 Z" fill="#9aa1b3"/><circle cx="42" cy="54" r="4.5" fill="#0d0e13"/></svg>
+          <span>UTKONOS</span>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="land-staff-link" onclick="showStaffLogin()">🛡 Xodimlar uchun kirish</div>
 </div>
 
-<!-- ══ STUDENT LOGIN ══ -->
-<div class="page" id="p-login">
-  <div class="login-box">
-    <div class="login-back" onclick="showPage('p-land')">← Orqaga</div>
-    <div class="login-icon" id="li-icon">🎓</div>
-    <div class="login-title" id="login-title">O'quvchi kirish</div>
-    <div class="login-sub" id="login-sub">Ustoz bergan kodni kiriting</div>
-    <div class="field" id="li-name-wrap">
-      <label>To'liq ism</label>
-      <input id="li-name" type="text" placeholder="Aziz Karimov" autocomplete="off">
+<!-- ══ 15-SEC WELCOME SPLASH ══ -->
+<div id="splash">
+  <div class="sp-orb" style="width:340px;height:340px;background:var(--ac);top:15%;left:50%;transform:translateX(-50%)"></div>
+  <div class="sp-orb" style="width:260px;height:260px;background:var(--cy);bottom:15%;right:20%;animation-delay:3s"></div>
+  <svg class="sp-platypus" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ulwb" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d8dae0"/></linearGradient></defs><path d="M150 50 Q188 38 200 56 Q204 65 200 74 Q188 92 150 80 Q144 65 150 50 Z" fill="url(#ulwb)"/><ellipse cx="95" cy="65" rx="62" ry="38" fill="url(#ulwb)"/><ellipse cx="48" cy="63" rx="28" ry="26" fill="url(#ulwb)"/><path d="M48 56 Q14 50 0 60 Q-4 65 0 70 Q14 80 50 74 Q56 65 52 58 Z" fill="#b8bac2"/><ellipse cx="12" cy="65" rx="2.5" ry="2" fill="#0a0b0f" opacity="0.4"/><path d="M70 100 L64 116 L74 104 Z" fill="#c4c6cc"/><path d="M92 102 L88 118 L98 106 Z" fill="#c4c6cc"/><circle cx="42" cy="54" r="4.5" fill="#0a0b0f"/></svg>
+  <div class="sp-welcome" id="sp-welcome">Xush kelibsiz,</div>
+  <div class="sp-name" id="sp-name">Foydalanuvchi</div>
+  <div class="sp-status" id="sp-status">Tizimga ulanmoqda...</div>
+  <div class="sp-bar-wrap"><div class="sp-bar" id="sp-bar"></div></div>
+  <div class="sp-pct" id="sp-pct">0%</div>
+</div>
+
+<!-- ══ PIN LOCK (auto-lock for staff) ══ -->
+<div id="pinlock">
+  <div class="pin-sky" id="pin-sky"></div>
+  <div class="pin-card">
+    <div class="pin-lock-ic" id="pin-lock-ic">🔒</div>
+    <div class="pin-greet" id="pin-greet">Xayrli kun</div>
+    <div class="pin-greet-name" id="pin-greet-name"></div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd-0"></div>
+      <div class="pin-dot" id="pd-1"></div>
+      <div class="pin-dot" id="pd-2"></div>
+      <div class="pin-dot" id="pd-3"></div>
     </div>
-    <div class="field">
-      <label id="li-pass-label">Kirish kodi</label>
-      <input id="li-pass" type="text" placeholder="kod" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="pin-pad">
+      <div class="pin-key" onclick="pinPress('1')">1</div>
+      <div class="pin-key" onclick="pinPress('2')">2</div>
+      <div class="pin-key" onclick="pinPress('3')">3</div>
+      <div class="pin-key" onclick="pinPress('4')">4</div>
+      <div class="pin-key" onclick="pinPress('5')">5</div>
+      <div class="pin-key" onclick="pinPress('6')">6</div>
+      <div class="pin-key" onclick="pinPress('7')">7</div>
+      <div class="pin-key" onclick="pinPress('8')">8</div>
+      <div class="pin-key" onclick="pinPress('9')">9</div>
+      <div class="pin-key" style="visibility:hidden"></div>
+      <div class="pin-key" onclick="pinPress('0')">0</div>
+      <div class="pin-key" onclick="pinBack()">⌫</div>
     </div>
-    <button class="btn-full" id="li-btn" onclick="doLogin()">Kirish</button>
-    <div class="err" id="li-err">Noto'g'ri ma'lumot</div>
+    <div class="pin-err" id="pin-err"></div>
   </div>
 </div>
 
-<!-- ══ STAFF LOGIN ══ -->
-<div class="page" id="p-staff-login">
-  <div class="login-box">
-    <div class="login-back" onclick="showPage('p-land')">← Orqaga</div>
-    <div class="login-icon">🛡</div>
-    <div class="login-title">Xodimlar kirish</div>
-    <div class="login-sub" id="staff-login-sub">Login va parolni kiriting</div>
-    <div style="display:flex;gap:6px;background:var(--s2);border-radius:9px;padding:4px;margin-bottom:18px">
-      <button class="stf-tab active" id="stf-tab-emp" onclick="staffTab('emp')" style="flex:1;padding:9px;border:none;background:var(--s);color:var(--tx);font-size:13px;font-weight:600;border-radius:7px">👤 Xodim</button>
-      <button class="stf-tab" id="stf-tab-mkt" onclick="staffTab('mkt')" style="flex:1;padding:9px;border:none;background:transparent;color:var(--mu);font-size:13px;font-weight:600;border-radius:7px">📊 Marketolog</button>
-    </div>
-    <!-- Employee login (login + pass) -->
-    <div id="stf-emp-form">
-      <div class="field"><label>Login</label><input id="staff-login" type="text" placeholder="mohijahon" autocomplete="off"></div>
-      <div class="field"><label>Parol</label><input id="staff-emp-pass" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter')doEmployeeLogin()"></div>
-      <button class="btn-full" onclick="doEmployeeLogin()">Kirish</button>
-    </div>
-    <!-- Marketer login (master pass) -->
-    <div id="stf-mkt-form" style="display:none">
-      <div class="field"><label>Marketolog paroli</label><input id="staff-pass" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter')doStaffLogin()"></div>
-      <button class="btn-full" onclick="doStaffLogin()">Kirish</button>
-    </div>
-    <div class="err" id="staff-err">Noto'g'ri ma'lumot</div>
-  </div>
+<!-- ══ GREETING SCENE (after PIN) ══ -->
+<div id="greetscene">
+  <div class="gs-layer" id="gs-bg"></div>
+  <div class="gs-greet"><div class="gs-greet-h" id="gs-greet-h">Xayrli kun,</div><div class="gs-greet-n" id="gs-greet-n">Xodim</div></div>
+  <div class="gs-ring"><svg viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg" style="width:74px;height:auto"><path d="M150 50 Q188 38 200 56 Q204 65 200 74 Q188 92 150 80 Q144 65 150 50 Z" fill="#fff"/><ellipse cx="95" cy="65" rx="62" ry="38" fill="#fff"/><ellipse cx="48" cy="63" rx="28" ry="26" fill="#fff"/><path d="M48 56 Q14 50 0 60 Q-4 65 0 70 Q14 80 50 74 Q56 65 52 58 Z" fill="rgba(255,255,255,.75)"/><ellipse cx="12" cy="65" rx="2.5" ry="2" fill="rgba(0,0,0,.4)"/><path d="M70 100 L64 116 L74 104 Z" fill="rgba(255,255,255,.85)"/><path d="M92 102 L88 118 L98 106 Z" fill="rgba(255,255,255,.85)"/><circle cx="42" cy="54" r="4.5" fill="rgba(0,0,0,.55)"/></svg></div>
+  <div class="gs-bar-wrap"><div class="gs-bar-bg"><div class="gs-bar-fill" id="gs-bar"></div></div><div class="gs-bar-txt" id="gs-bar-txt">Yuklanmoqda... 0%</div></div>
 </div>
 
 <!-- ══ ADMIN / STAFF PANEL ══ -->
 <div class="page" id="p-admin">
   <div class="sidebar">
     <div>
-      <div class="sb-logo">EDU<span>BLOG</span><div class="sb-role" id="sb-role">ADMIN</div></div>
+      <div class="sb-logo">UTKO<span>NOS</span><div class="sb-role" id="sb-role">ADMIN</div></div>
     </div>
     <div class="sb-nav" id="sb-nav"><!-- filled by JS based on role --></div>
     <div class="sb-bottom">
@@ -1102,7 +1248,7 @@ audio{height:36px;border-radius:7px;max-width:240px}
 <!-- ══ STUDENT APP ══ -->
 <div class="page" id="p-student">
   <div class="stu-header">
-    <div class="stu-logo">EDU<span>BLOG</span></div>
+    <div class="stu-logo">UTKO<span>NOS</span></div>
     <div class="stu-user"><b id="stu-name-h">—</b> · <span id="stu-bal-h">0 bayt</span></div>
     <button class="btn-sm red" onclick="doLogout()">Chiqish</button>
   </div>
@@ -1382,7 +1528,7 @@ const TEZ=[
 ];
 
 const BOOK_QUOTES=[
-  {emoji:'🦊',q:"Eng muhim narsalar ko'zga ko'rinmaydi, ular faqat yurak bilan ko'riladi.",author:"Antuan de Sent-Ekzюperi",book:"Kichkina shahzoda"},
+  {emoji:'🦊',q:"Eng muhim narsalar ko'zga ko'rinmaydi, ular faqat yurak bilan ko'riladi.",author:"Antuan de Sent-Ekzyuperi",book:"Kichkina shahzoda"},
   {emoji:'🧙',q:"Boshlash uchun ajoyib bo'lish shart emas, lekin ajoyib bo'lish uchun boshlash shart.",author:"Xalq donoligi",book:"Hikmatlar"},
   {emoji:'🦁',q:"Qo'rquvni yengish — bu jasoratning boshlanishi.",author:"K.S. Lyuis",book:"Narniya yilnomalari"},
   {emoji:'🐉',q:"Kitob o'qigan inson ming hayot yashaydi, o'qimagan esa faqat bittasini.",author:"Jorj Martin",book:"Hikmatli so'zlar"},
@@ -1430,11 +1576,24 @@ function hideModal(id){document.getElementById(id).classList.remove('on')}
 // ── SESSION (remember login) ──
 function saveSession(type,data){try{localStorage.setItem('edu_session',JSON.stringify({type,data,ts:Date.now()}))}catch(e){}}
 function clearSession(){try{localStorage.removeItem('edu_session')}catch(e){}}
+// Staff roles EXEMPT from 30-min auto-reset (marketer + admin stay logged in)
+// Staff roles that get AUTO PIN-LOCK (marketer + admin are exempt — no lock)
+function isStaffPinLocked(staff){
+  if(!staff)return false;
+  return true;  // ALL staff (incl. marketer, director, admin) get PIN-lock every 15s
+}
+const PIN_LOCK_MS=15*1000;   // auto-lock after 15 seconds
+const STAFF_PIN='8888';      // standard PIN for all staff
+
 async function restoreSession(){
   let s;try{s=JSON.parse(localStorage.getItem('edu_session'))}catch(e){return false}
   if(!s)return false;
-  if(s.type==='staff'){currentStaff=s.data;enterStaffPanel();return true;}
+  if(s.type==='staff'){
+    // Staff session restores normally; PIN-lock handled by live timer (not on restore)
+    currentStaff=s.data;enterStaffPanel();return true;
+  }
   if(s.type==='student'){
+    // Students: NEVER auto-reset — restore as before
     const {data}=await sb.from('students').select('*').eq('id',s.data.id).single();
     if(data&&data.is_active===1){currentUser=data;await loadStudentApp();showPage('p-student');return true;}
   }
@@ -1442,6 +1601,103 @@ async function restoreSession(){
 }
 
 // ── COURSE / AUTH ──
+
+// ═══ UNIFIED LOGIN: tries marketer → staff → student, auto-routes ═══
+async function doUnifiedLogin(){
+  const name=document.getElementById('ul-name').value.trim();
+  const pass=document.getElementById('ul-pass').value.trim();
+  const err=document.getElementById('ul-err');
+  const btn=document.getElementById('ul-btn');
+  err.style.display='none';
+  if(!name||!pass){err.textContent='Ism va kodni kiriting';err.style.display='block';return;}
+  btn.disabled=true;btn.textContent='Tekshirilmoqda...';
+
+  // 1) Marketer master password (login can be anything, pass matches master)
+  if(pass===STAFF.marketing.pass){
+    currentStaff={role:'marketing',name:'Marketolog',position:'marketing',isMarketer:true};
+    saveSession('staff',currentStaff);
+    btn.disabled=false;btn.textContent='Kirish →';
+    runSplash('Marketolog', ()=>enterStaffPanel());
+    return;
+  }
+
+  // 2) Staff account (login + password)
+  try{
+    const{data:staff}=await sb.from('staff_accounts').select('*').eq('login',name).eq('password',pass).maybeSingle();
+    if(staff){
+      const pos=POSITIONS[staff.position]||POSITIONS.admin;
+      currentStaff={role:pos.menuRole,name:staff.name,position:staff.position,staffId:staff.id,timer:pos.timer,isMarketer:false};
+      saveSession('staff',currentStaff);
+      btn.disabled=false;btn.textContent='Kirish →';
+      runSplash(staff.name, ()=>enterStaffPanel());
+      return;
+    }
+  }catch(e){}
+
+  // 3) Student (name + access_code)
+  try{
+    const{data:stu}=await sb.from('students').select('*').ilike('full_name',name).eq('access_code',pass).eq('is_active',1).maybeSingle();
+    if(stu){
+      currentUser=stu;
+      saveSession('student',{id:stu.id});
+      try{sb.from('student_visits').insert({student_id:stu.id,visited_at:new Date().toISOString()}).then(()=>{});}catch(e){}
+      btn.disabled=false;btn.textContent='Kirish →';
+      const fname=(stu.full_name||'').split(' ')[0];
+      runSplash(fname, async()=>{await loadStudentApp();showPage('p-student');});
+      return;
+    }
+  }catch(e){}
+
+  // nothing matched
+  err.textContent="Ism yoki kod noto'g'ri";err.style.display='block';
+  btn.disabled=false;btn.textContent='Kirish →';
+}
+
+// ═══ 15-SECOND WELCOME SPLASH ═══
+const SPLASH_STAGES=[
+  {at:0,  text:"Tizimga ulanmoqda..."},
+  {at:20, text:"Ma'lumotlar yuklanmoqda..."},
+  {at:42, text:"Baza tayyorlanmoqda..."},
+  {at:64, text:"Profil sozlanmoqda..."},
+  {at:84, text:"Deyarli tayyor..."},
+  {at:97, text:"Xush kelibsiz! 🎉"}
+];
+let _splashTimer=null;
+function runSplash(displayName, onDone){
+  // default 15-sec welcome splash (login)
+  runSplashTimed('Xush kelibsiz,', displayName, 15000, onDone);
+}
+function runSplashTimed(welcomeText, displayName, duration, onDone){
+  const sp=document.getElementById('splash');
+  const bar=document.getElementById('sp-bar');
+  const pct=document.getElementById('sp-pct');
+  const status=document.getElementById('sp-status');
+  const wel=document.getElementById('sp-welcome');
+  if(wel)wel.textContent=welcomeText||'Xush kelibsiz,';
+  document.getElementById('sp-name').textContent=displayName||'Foydalanuvchi';
+  bar.style.width='0%';pct.textContent='0%';
+  status.textContent=SPLASH_STAGES[0].text;
+  sp.classList.add('on');
+  const DURATION=duration||15000;
+  const t0=performance.now();
+  if(_splashTimer)clearInterval(_splashTimer);
+  let doneFired=false;
+  _splashTimer=setInterval(async()=>{
+    const p=Math.min((performance.now()-t0)/DURATION,1);
+    const shown=Math.round(p*100);
+    bar.style.width=shown+'%';pct.textContent=shown+'%';
+    let stage=SPLASH_STAGES[0];
+    for(const s of SPLASH_STAGES){if(shown>=s.at)stage=s;}
+    if(status.textContent!==stage.text)status.textContent=stage.text;
+    if(p>=1 && !doneFired){
+      doneFired=true;
+      clearInterval(_splashTimer);_splashTimer=null;
+      try{ if(onDone) await onDone(); }catch(e){ console.error('splash onDone error',e); }
+      sp.classList.remove('on');
+    }
+  },80);
+}
+
 function selectCourse(course){
   if(course==='bolalar'){
     document.getElementById('li-icon').textContent='🐄';
@@ -1519,7 +1775,148 @@ function enterStaffPanel(){
   showPage('p-admin');
   // Admin work-timer bar
   setupWorkTimer();
+  startPinLockTimer(); // auto PIN-lock after 15s for non-exempt staff
   navTo(items[0],nav.querySelector('.sb-item'));
+}
+
+// ═══ AUTO PIN-LOCK (every 15s, time-of-day greeting) ═══
+let _pinLockTimer=null;
+let _pinBuffer='';
+let _pinGreetTimer=null;
+
+function startPinLockTimer(){
+  if(_pinLockTimer){clearTimeout(_pinLockTimer);_pinLockTimer=null;}
+  if(!isStaffPinLocked(currentStaff))return; // marketer + admin not locked
+  _pinLockTimer=setTimeout(()=>{
+    if(currentStaff && isStaffPinLocked(currentStaff)) showPinLock();
+  }, PIN_LOCK_MS);
+}
+
+// Determine time-of-day theme + greeting
+function timeOfDay(){
+  const h=new Date().getHours();
+  if(h>=5 && h<12) return {key:'morning', greet:"Xayrli tong", ic:'🌅'};
+  if(h>=12 && h<18) return {key:'day',     greet:"Xayrli kun",  ic:'☀️'};
+  if(h>=18 && h<22) return {key:'evening', greet:"Xayrli kech", ic:'🌇'};
+  return {key:'night', greet:"Xayrli tun", ic:'🌙'};
+}
+
+function buildPinSky(themeKey){
+  const sky=document.getElementById('pin-sky');
+  let html='';
+  if(themeKey==='night'){
+    html+='<div class="pin-moon"></div>';
+    // scatter stars
+    for(let i=0;i<28;i++){
+      const x=Math.random()*100, y=Math.random()*55, d=(Math.random()*3).toFixed(1);
+      html+=`<div class="pin-star" style="left:${x}%;top:${y}%;animation-delay:${d}s"></div>`;
+    }
+  }else if(themeKey==='morning'||themeKey==='day'){
+    html+='<div class="pin-sun"></div>';
+    html+='<div class="pin-cloud" style="width:120px;height:34px;top:22%;left:14%"></div>';
+    html+='<div class="pin-cloud" style="width:90px;height:26px;top:32%;right:16%"></div>';
+  }else{ // evening
+    html+='<div class="pin-sun"></div>';
+    html+='<div class="pin-cloud" style="width:110px;height:30px;top:26%;right:18%"></div>';
+  }
+  sky.innerHTML=html;
+}
+
+function showPinLock(){
+  const t=timeOfDay();
+  const pl=document.getElementById('pinlock');
+  pl.className='on '+t.key;
+  document.getElementById('pin-greet').textContent=t.greet;
+  document.getElementById('pin-lock-ic').textContent=t.ic;
+  document.getElementById('pin-greet-name').textContent=(currentStaff&&currentStaff.name)?currentStaff.name:'';
+  document.getElementById('pin-err').textContent='';
+  buildPinSky(t.key);
+  _pinBuffer='';renderPinDots();
+}
+
+function renderPinDots(){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('pd-'+i);
+    if(d)d.classList.toggle('filled', i<_pinBuffer.length);
+  }
+}
+
+function pinPress(n){
+  if(_pinBuffer.length>=4)return;
+  _pinBuffer+=n;renderPinDots();
+  if(_pinBuffer.length===4) checkPin();
+}
+function pinBack(){
+  _pinBuffer=_pinBuffer.slice(0,-1);renderPinDots();
+  document.getElementById('pin-err').textContent='';
+}
+function checkPin(){
+  if(_pinBuffer===STAFF_PIN){
+    // correct → hide pinlock, show 10-sec time-of-day GREETING SCENE, then back to panel
+    document.getElementById('pinlock').classList.remove('on');
+    const name=(currentStaff&&currentStaff.name)?currentStaff.name:'Xodim';
+    runGreetScene(name, 10000, ()=>{ startPinLockTimer(); });
+  }else{
+    document.getElementById('pin-err').textContent="Noto'g'ri PIN";
+    _pinBuffer='';
+    setTimeout(renderPinDots,400);
+  }
+}
+
+// ═══ GREETING SCENE (time-of-day, 10-sec) ═══
+function buildGreetSceneBg(key){
+  const bg=document.getElementById('gs-bg');
+  bg.className='gs-layer gs-'+key;
+  let html='';
+  if(key==='morning'){
+    html+='<div class="gs-sun" style="top:18%;left:50%;transform:translateX(-50%);width:90px;height:90px;background:radial-gradient(circle,#fff7e0,#ffd98a 60%,transparent);box-shadow:0 0 70px 30px rgba(255,225,160,.6)"></div>';
+    html+='<svg style="position:absolute;bottom:34%;left:0;right:0;height:18%;width:100%" viewBox="0 0 300 130" preserveAspectRatio="none"><g fill="#3f6b4f"><path d="M20 130 L35 50 L50 130 Z"/><path d="M55 130 L72 30 L89 130 Z"/><path d="M95 130 L110 60 L125 130 Z"/><path d="M210 130 L228 40 L246 130 Z"/><path d="M250 130 L266 65 L282 130 Z"/></g><g fill="#4f7d5c"><path d="M130 130 L150 70 L170 130 Z"/><path d="M175 130 L195 50 L215 130 Z"/></g></svg>';
+    html+='<div style="position:absolute;bottom:0;left:0;right:0;height:36%;background:linear-gradient(180deg,#9ec5b8,#6a9d96);opacity:.85"></div>';
+  }else if(key==='day'){
+    html+='<div class="gs-sun" style="top:12%;left:50%;transform:translateX(-50%);width:80px;height:80px;background:radial-gradient(circle,#fffef0,#ffe680);box-shadow:0 0 90px 40px rgba(255,240,150,.7)"></div>';
+    html+='<svg style="position:absolute;bottom:0;left:0;right:0;height:42%;width:100%" viewBox="0 0 300 235" preserveAspectRatio="none"><path d="M0 120 Q75 80 150 110 Q225 140 300 105 L300 235 L0 235 Z" fill="#6fae7a"/><path d="M0 160 Q90 130 180 155 Q240 172 300 150 L300 235 L0 235 Z" fill="#588c63"/></svg>';
+  }else if(key==='evening'){
+    html+='<div class="gs-sun" style="bottom:30%;left:50%;transform:translateX(-50%);width:110px;height:110px;background:radial-gradient(circle,#ffe4b0,#ff8c5a 70%,transparent);box-shadow:0 0 80px 30px rgba(255,140,90,.5)"></div>';
+    html+='<svg style="position:absolute;bottom:24%;left:0;right:0;height:18%;width:100%" viewBox="0 0 300 120" preserveAspectRatio="none"><g fill="#2a1a3e" opacity="0.9"><rect x="20" y="40" width="28" height="80"/><rect x="54" y="20" width="22" height="100"/><rect x="82" y="55" width="26" height="65"/><rect x="200" y="30" width="24" height="90"/><rect x="228" y="50" width="30" height="70"/><rect x="262" y="25" width="20" height="95"/></g></svg>';
+    html+='<div style="position:absolute;bottom:0;left:0;right:0;height:24%;background:linear-gradient(180deg,#b56a4a,#6e3a4a);opacity:.8"></div>';
+  }else{ // night
+    html+='<div style="position:absolute;top:14%;right:22%;width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 38% 38%,#f4f6ff,#c4cae0);box-shadow:0 0 50px 14px rgba(200,210,255,.3)"></div>';
+    html+='<svg style="position:absolute;bottom:18%;left:0;right:0;height:24%;width:100%" viewBox="0 0 300 160" preserveAspectRatio="none"><g fill="#0a1130"><rect x="10" y="60" width="34" height="100"/><rect x="48" y="30" width="26" height="130"/><rect x="78" y="80" width="30" height="80"/><rect x="112" y="45" width="24" height="115"/><rect x="180" y="55" width="28" height="105"/><rect x="212" y="25" width="22" height="135"/><rect x="238" y="70" width="32" height="90"/><rect x="274" y="50" width="18" height="110"/></g><g fill="#ffd97a" opacity="0.8"><rect x="18" y="72" width="4" height="5"/><rect x="28" y="90" width="4" height="5"/><rect x="56" y="44" width="4" height="5"/><rect x="62" y="70" width="4" height="5"/><rect x="120" y="60" width="4" height="5"/><rect x="190" y="70" width="4" height="5"/><rect x="220" y="40" width="4" height="5"/><rect x="248" y="85" width="4" height="5"/></g></svg>';
+    html+='<div style="position:absolute;bottom:0;left:0;right:0;height:18%;background:linear-gradient(180deg,#141d44,#0a0f28)"></div>';
+    // stars
+    let stars='';
+    for(let i=0;i<36;i++){stars+=`<div class="gs-star" style="left:${(Math.random()*100).toFixed(1)}%;top:${(Math.random()*42).toFixed(1)}%;opacity:${(0.3+Math.random()*0.6).toFixed(2)};animation-delay:${(Math.random()*3).toFixed(1)}s"></div>`;}
+    html+=stars;
+  }
+  bg.innerHTML=html;
+}
+
+let _gsTimer=null;
+function runGreetScene(name, duration, onDone){
+  const t=timeOfDay();
+  const gs=document.getElementById('greetscene');
+  document.getElementById('gs-greet-h').textContent=t.greet+',';
+  document.getElementById('gs-greet-n').textContent=name||'Xodim';
+  buildGreetSceneBg(t.key);
+  const bar=document.getElementById('gs-bar');
+  const txt=document.getElementById('gs-bar-txt');
+  bar.style.width='0%';txt.textContent='Yuklanmoqda... 0%';
+  gs.classList.add('on');
+  const DUR=duration||10000;
+  const t0=performance.now();
+  if(_gsTimer)clearInterval(_gsTimer);
+  let done=false;
+  _gsTimer=setInterval(async()=>{
+    const p=Math.min((performance.now()-t0)/DUR,1);
+    const shown=Math.round(p*100);
+    bar.style.width=shown+'%';
+    txt.textContent='Yuklanmoqda... '+shown+'%';
+    if(p>=1 && !done){
+      done=true;clearInterval(_gsTimer);_gsTimer=null;
+      try{ if(onDone) await onDone(); }catch(e){ console.error('greet scene error',e); }
+      gs.classList.remove('on');
+    }
+  },80);
 }
 
 function navTo(panel,el){
@@ -1533,8 +1930,10 @@ function navTo(panel,el){
 
 function doLogout(){
   currentUser=null;currentStaff=null;lessonAccess=[];tezAccess=[];
+  if(_pinLockTimer){clearTimeout(_pinLockTimer);_pinLockTimer=null;}
+  document.getElementById('pinlock').classList.remove('on');
   clearSession();
-  showPage('p-land');
+  showPage('p-ulogin');
 }
 
 // ── CALF SVG (mini) ──
@@ -1552,7 +1951,7 @@ async function loadStudentApp(){
   document.getElementById('stu-bal-h').textContent=fmt(s.bytes_balance)+' bayt';
   if(TEST_MODE){
     const logo=document.querySelector('.stu-logo');
-    if(logo)logo.innerHTML='EDU<span>BLOG</span> <span style="font-size:10px;background:#f59e0b;color:#000;padding:2px 6px;border-radius:4px;font-family:var(--fm)">TEST</span>';
+    if(logo)logo.innerHTML='UTKO<span>NOS</span> <span style="font-size:10px;background:#f59e0b;color:#000;padding:2px 6px;border-radius:4px;font-family:var(--fm)">TEST</span>';
   }
   document.getElementById('brain-name').textContent=(s.full_name||'').split(' ')[0]||"do'stim";
   document.getElementById('stu-som').textContent=fmt(s.som_balance);
