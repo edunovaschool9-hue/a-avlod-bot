@@ -229,6 +229,18 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .dt-power-pct{font-family:var(--fm);font-size:13px;color:var(--ac2);width:42px;text-align:right;flex-shrink:0}
 .dt-rec{background:linear-gradient(135deg,rgba(52,211,153,.12),rgba(34,211,238,.08));border:1px solid rgba(52,211,153,.3);border-radius:16px;padding:22px;margin-top:20px;text-align:center}
 
+/* professions block (job market) */
+.dc-professions{background:var(--s);border:1px solid var(--brd);border-radius:16px;padding:20px;margin-top:14px}
+.dc-prof-head{margin-bottom:14px}
+.dc-prof-title{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--tx)}
+.dc-prof-sub{font-size:12px;color:var(--mu2);margin-top:2px}
+.dc-prof-list{display:flex;flex-direction:column;gap:8px}
+.dc-prof-row{display:flex;align-items:center;justify-content:space-between;background:var(--s2);border-radius:10px;padding:12px 14px}
+.dc-prof-name{font-size:13.5px;font-weight:600;color:var(--tx)}
+.dc-prof-demand{font-size:18px;flex-shrink:0;margin-left:10px}
+.dc-prof-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--brd)}
+.dc-prof-leg-item{font-size:11px;color:var(--mu);white-space:nowrap}
+
 /* ═══ DIAGNOSTIKA MARKAZI (center model) ═══ */
 .dc-screen{max-width:600px;margin:0 auto}
 .dc-center{text-align:center;padding:30px 20px}
@@ -366,6 +378,13 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .mc-s-diag-label{font-size:11px;color:#8891a8;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px}
 .mc-s-diag-skill{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:800;color:#1e3a8a;margin-bottom:8px}
 .mc-s-diag-dir{font-size:13px;color:#3a4256;line-height:1.5}
+/* medcard professions */
+.mc-s-profs{margin-top:18px;border:1px solid #d5dae6;border-radius:10px;padding:16px 20px;background:#fff}
+.mc-s-profs-title{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:800;letter-spacing:.5px;color:#1e3a8a;margin-bottom:12px}
+.mc-s-profs-list{display:flex;flex-direction:column;gap:7px}
+.mc-s-prof-row{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:#1e2536;padding-bottom:7px;border-bottom:1px dashed #e8ebf2}
+.mc-s-prof-row:last-child{border-bottom:none;padding-bottom:0}
+.mc-s-prof-dem{font-size:11px;color:#6b7488;white-space:nowrap;margin-left:12px}
 /* AI psychologist section */
 .mc-s-ai{margin-top:18px;border:1.5px solid #7c5cff;border-radius:10px;padding:0;overflow:hidden;background:#fbfaff}
 .mc-s-ai-head{display:flex;align-items:center;gap:12px;padding:14px 20px;background:linear-gradient(135deg,#7c5cff,#5b3fd6);color:#fff}
@@ -3387,6 +3406,9 @@ const DC_T={
     consilium:"Konsilium — Iqtidor xaritasi",
     consiliumSub:"5 ta mutaxassisning xulosasi",
     topSkill:"Eng kuchli tomoni",
+    professionsTitle:"Mos keladigan kasblar",
+    professionsSub:"O'zbekiston bozoridagi talab bilan",
+    marketNote:"Bozordagi talab:",
     nextStep:"Keyingi qadam",
     nextStepDesc:"Farzandingizni <b>3 kunlik BEPUL sinov darsiga</b> taklif qilamiz. Bola maktabni o'zi ko'radi va to'g'ri xulosa qiladi.",
     finishBtn:"✓ Yakunlash",
@@ -3427,6 +3449,9 @@ const DC_T={
     consilium:"Консилиум — Карта потенциала",
     consiliumSub:"Заключение 5 специалистов",
     topSkill:"Самая сильная сторона",
+    professionsTitle:"Подходящие профессии",
+    professionsSub:"со спросом на рынке Узбекистана",
+    marketNote:"Спрос на рынке:",
     nextStep:"Следующий шаг",
     nextStepDesc:"Приглашаем вашего ребёнка на <b>3 дня БЕСПЛАТНОГО пробного обучения</b>. Ребёнок сам увидит школу и сделает честный вывод.",
     finishBtn:"✓ Завершить",
@@ -3444,6 +3469,37 @@ const DC_SKILLS={
   xotira: {ic:'🧠', color:'#34d399', uz:"Xotira",   ru:"Память"},
   fantaziya:{ic:'🎨', color:'#fbbf24', uz:"Fantaziya", ru:"Фантазия"},
   yurak:  {ic:'❤️', color:'#fb7185', uz:"Yurak",    ru:"Сердце"}
+};
+
+// ── Professions linked to each skill, with Uzbekistan job-market demand ──
+// Markers: 🔥 high demand & growth, ✅ stable demand, 🌱 future prospect
+// (Based on hh.uz 2025-2026 data + WEF Future of Jobs adapted to Uzbekistan)
+const DC_PROFESSIONS={
+  aql:{
+    uz:[{p:"Dasturchi / IT mutaxassisi",d:"🔥"},{p:"Ma'lumotlar tahlilchisi",d:"🔥"},{p:"Muhandis",d:"✅"},{p:"Moliyachi / buxgalter",d:"✅"}],
+    ru:[{p:"Программист / IT-специалист",d:"🔥"},{p:"Аналитик данных",d:"🔥"},{p:"Инженер",d:"✅"},{p:"Финансист / бухгалтер",d:"✅"}]
+  },
+  soz:{
+    uz:[{p:"Marketolog / SMM mutaxassisi",d:"🔥"},{p:"Sotuv menejeri",d:"🔥"},{p:"O'qituvchi / pedagog",d:"✅"},{p:"Jurnalist / kontent-ijodkor",d:"🌱"}],
+    ru:[{p:"Маркетолог / SMM-специалист",d:"🔥"},{p:"Менеджер по продажам",d:"🔥"},{p:"Учитель / педагог",d:"✅"},{p:"Журналист / контент-мейкер",d:"🌱"}]
+  },
+  xotira:{
+    uz:[{p:"Shifokor / tibbiyot xodimi",d:"✅"},{p:"Huquqshunos / advokat",d:"✅"},{p:"Olim / tadqiqotchi",d:"🌱"},{p:"Farmatsevt",d:"✅"}],
+    ru:[{p:"Врач / медработник",d:"✅"},{p:"Юрист / адвокат",d:"✅"},{p:"Учёный / исследователь",d:"🌱"},{p:"Фармацевт",d:"✅"}]
+  },
+  fantaziya:{
+    uz:[{p:"Dizayner (grafik/UX)",d:"🔥"},{p:"Arxitektor",d:"✅"},{p:"Reklama ijodkori",d:"🔥"},{p:"Video / animatsiya ustasi",d:"🌱"}],
+    ru:[{p:"Дизайнер (графика/UX)",d:"🔥"},{p:"Архитектор",d:"✅"},{p:"Креатор в рекламе",d:"🔥"},{p:"Видео / анимация",d:"🌱"}]
+  },
+  yurak:{
+    uz:[{p:"Psixolog",d:"🌱"},{p:"HR mutaxassisi",d:"✅"},{p:"Sotuv / mijoz xizmati",d:"🔥"},{p:"Tadbirkor / loyiha rahbari",d:"🔥"}],
+    ru:[{p:"Психолог",d:"🌱"},{p:"HR-специалист",d:"✅"},{p:"Продажи / клиент-сервис",d:"🔥"},{p:"Предприниматель / руководитель",d:"🔥"}]
+  }
+};
+// demand legend (bilingual)
+const DC_DEMAND_LEGEND={
+  uz:{'🔥':"yuqori talab va o'sish",'✅':"barqaror talab",'🌱':"kelajak istiqboli"},
+  ru:{'🔥':"высокий спрос и рост",'✅':"стабильный спрос",'🌱':"перспектива будущего"}
 };
 
 // CABINETS for 1-2 class. Each = a specialist room with intro + questions + time limit.
@@ -4109,6 +4165,36 @@ function dcFinishCabinet(){
   renderDcIntro(); // next cabinet intro (or result if done)
 }
 
+// build professions block from top-2 skills (with Uzbekistan market demand)
+function dcProfessionsBlock(pcts, t){
+  const lang=_dc.lang;
+  // top 2 skills
+  const sorted=Object.keys(pcts).sort((a,b)=>pcts[b]-pcts[a]);
+  const top2=[sorted[0], sorted[1]];
+  // collect professions (dedupe), max 5
+  let profs=[];
+  top2.forEach(k=>{
+    (DC_PROFESSIONS[k][lang]||[]).forEach(pr=>{
+      if(!profs.find(x=>x.p===pr.p)) profs.push(pr);
+    });
+  });
+  profs=profs.slice(0,5);
+  const rows=profs.map(pr=>`<div class="dc-prof-row">
+    <span class="dc-prof-name">${pr.p}</span>
+    <span class="dc-prof-demand" title="${(DC_DEMAND_LEGEND[lang][pr.d]||'')}">${pr.d}</span>
+  </div>`).join('');
+  // legend
+  const legend=Object.keys(DC_DEMAND_LEGEND[lang]).map(k=>`<span class="dc-prof-leg-item">${k} ${DC_DEMAND_LEGEND[lang][k]}</span>`).join('');
+  return `<div class="dc-professions">
+    <div class="dc-prof-head">
+      <div class="dc-prof-title">💼 ${t.professionsTitle}</div>
+      <div class="dc-prof-sub">${t.professionsSub}</div>
+    </div>
+    <div class="dc-prof-list">${rows}</div>
+    <div class="dc-prof-legend">${legend}</div>
+  </div>`;
+}
+
 // FINAL: consilium result
 function renderDcResult(){
   const t=dct();
@@ -4155,6 +4241,7 @@ function renderDcResult(){
         <div style="font-size:13px;color:var(--mu2);margin-bottom:6px">🏆 ${t.topSkill}: <b style="color:var(--ac2)">${sk.ic} ${sk[_dc.lang]}</b></div>
         <div style="font-family:var(--fd);font-size:15px;font-weight:600;color:var(--tx);line-height:1.5">${REC[_dc.lang][topSkill]}</div>
       </div>
+      ${dcProfessionsBlock(pcts, t)}
       <div style="background:linear-gradient(135deg,rgba(124,92,255,.1),rgba(34,211,238,.06));border:1px solid rgba(124,92,255,.25);border-radius:14px;padding:18px;margin-top:14px;text-align:center">
         <div style="font-family:var(--fd);font-size:16px;font-weight:700;color:var(--tx);margin-bottom:6px">🎓 ${t.nextStep}</div>
         <div style="font-size:13px;color:var(--mu2);line-height:1.6">${t.nextStepDesc}</div>
@@ -4294,8 +4381,26 @@ function dcAiComment(){
   };
 
   // assemble — pick one from each, sometimes skip second-strength for variety
+  // ── market/profession sentence (ties top skill to real Uzbekistan professions) ──
+  const topProfs=(DC_PROFESSIONS[top] && DC_PROFESSIONS[top][lang]) || [];
+  const hotProf=topProfs.find(p=>p.d==='🔥')||topProfs[0];
+  const profName=hotProf?hotProf.p:'';
+  const MARKET={
+    uz:[
+      `Bu yo'nalish O'zbekiston bozorida talab yuqori — masalan, "${profName}" kabi kasblar kelajakda istiqbolli.`,
+      `Mehnat bozori nuqtai nazaridan bu kuchli tomon foydali: "${profName}" sohasi rivojlanmoqda.`,
+      `Bola ulg'aygach, "${profName}" kabi yo'nalishlarda o'zini topishi mumkin — bozorda bunga talab bor.`
+    ],
+    ru:[
+      `Это направление востребовано на рынке Узбекистана — например, профессии вроде "${profName}" перспективны.`,
+      `С точки зрения рынка труда эта сильная сторона выгодна: сфера "${profName}" растёт.`,
+      `Когда ребёнок вырастет, он может реализоваться в направлениях вроде "${profName}" — спрос на рынке есть.`
+    ]
+  };
+
   const parts=[rnd(OPEN[lang]), rnd(STRONG[lang])];
   if(r.pcts[second]>=70) parts.push(rnd(SECOND[lang]));
+  if(profName) parts.push(rnd(MARKET[lang]));
   parts.push(rnd(GROWTH[lang]));
   parts.push(rnd(ADVICE[lang]));
   parts.push(rnd(CLOSE[lang]));
@@ -4329,6 +4434,23 @@ function dcDownloadCard(){
       if(btn){btn.disabled=false;btn.textContent='📄 '+t.downloadCard;}
     });
   },300);
+}
+
+// professions for the printed med-card (top-2 skills, with market demand)
+function dcMedCardProfessions(r, L){
+  const lang=_dc.lang;
+  const sorted=Object.keys(r.pcts).sort((a,b)=>r.pcts[b]-r.pcts[a]);
+  const top2=[sorted[0], sorted[1]];
+  let profs=[];
+  top2.forEach(k=>{
+    (DC_PROFESSIONS[k][lang]||[]).forEach(pr=>{ if(!profs.find(x=>x.p===pr.p)) profs.push(pr); });
+  });
+  profs=profs.slice(0,5);
+  const rows=profs.map(pr=>`<div class="mc-s-prof-row"><span>${pr.p}</span><span class="mc-s-prof-dem">${pr.d} ${DC_DEMAND_LEGEND[lang][pr.d]||''}</span></div>`).join('');
+  return `<div class="mc-s-profs">
+    <div class="mc-s-profs-title">💼 ${L.profsTitle}</div>
+    <div class="mc-s-profs-list">${rows}</div>
+  </div>`;
 }
 
 function buildMedCard(){
@@ -4370,6 +4492,7 @@ function buildMedCard(){
       overall:"Umumiy ko'rsatkich",
       diag:"ASOSIY XULOSA",
       direction:"Tavsiya etilgan yo'nalish",
+      profsTitle:"MOS KASBLAR (O'zbekiston bozori)",
       aiTitle:"PSIXOLOG-AI SHARHI",
       aiSpec:"Sun'iy intellekt psixolog tahlili",
       rx:"TAVSIYANOMA",
@@ -4387,6 +4510,7 @@ function buildMedCard(){
       overall:"Общий показатель",
       diag:"ОСНОВНОЕ ЗАКЛЮЧЕНИЕ",
       direction:"Рекомендованное направление",
+      profsTitle:"ПОДХОДЯЩИЕ ПРОФЕССИИ (рынок Узбекистана)",
       aiTitle:"КОММЕНТАРИЙ AI-ПСИХОЛОГА",
       aiSpec:"Анализ психолога на базе искусственного интеллекта",
       rx:"РЕКОМЕНДАЦИЯ",
@@ -4440,6 +4564,8 @@ function buildMedCard(){
         </div>
         <div class="mc-s-diag-dir"><b>${L.direction}:</b> ${REC[_dc.lang][r.topSkill]}</div>
       </div>
+
+      ${dcMedCardProfessions(r, L)}
 
       <div class="mc-s-ai">
         <div class="mc-s-ai-head">
