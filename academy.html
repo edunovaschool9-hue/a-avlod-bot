@@ -465,6 +465,57 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .opq-final{background:linear-gradient(135deg,rgba(52,211,153,.12),rgba(34,211,238,.08));border:1px solid rgba(52,211,153,.3);border-radius:16px;padding:26px;text-align:center;margin-top:20px}
 .opq-final-ic{font-size:50px;margin-bottom:12px}
 
+/* ═══ HISOB-KITOB (accounting) ═══ */
+.hk-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.hk-card{background:var(--s);border:1px solid var(--brd);border-radius:14px;padding:18px 20px}
+.hk-card-label{font-size:12px;color:var(--mu2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.hk-card-val{font-family:var(--fd);font-size:26px;font-weight:800}
+.hk-card.income .hk-card-val{color:var(--gn)}
+.hk-card.expense .hk-card-val{color:#fb7185}
+.hk-card.balance .hk-card-val{color:var(--ac2)}
+.hk-card-sub{font-size:12px;color:var(--mu);margin-top:4px}
+/* form */
+.hk-form{background:var(--s);border:1px solid var(--brd);border-radius:14px;padding:20px;margin-bottom:20px;display:none}
+.hk-form.open{display:block}
+.hk-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.hk-form-row.three{grid-template-columns:1fr 1fr 1fr}
+.hk-field label{display:block;font-size:12px;color:var(--mu2);margin-bottom:6px;font-weight:600}
+.hk-input,.hk-select{width:100%;padding:11px 14px;background:var(--s2);border:1px solid var(--brd);border-radius:10px;color:var(--tx);font-size:14px;outline:none;box-sizing:border-box}
+.hk-input:focus,.hk-select:focus{border-color:var(--ac)}
+.hk-type-btns{display:flex;gap:10px}
+.hk-type-btn{flex:1;padding:12px;border:2px solid var(--brd);border-radius:10px;background:var(--s2);color:var(--mu2);font-weight:700;cursor:pointer;text-align:center;transition:.15s;font-size:14px}
+.hk-type-btn.sel-in{border-color:var(--gn);background:rgba(52,211,153,.12);color:var(--gn)}
+.hk-type-btn.sel-out{border-color:#fb7185;background:rgba(251,113,133,.1);color:#fb7185}
+.hk-save{width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--ac),var(--cy));color:#fff;font-family:var(--fd);font-size:15px;font-weight:700;cursor:pointer;margin-top:6px}
+.hk-save:active{transform:scale(.98)}
+/* chart */
+.hk-chart-wrap{background:var(--s);border:1px solid var(--brd);border-radius:14px;padding:20px;margin-bottom:20px}
+.hk-chart-title{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--tx);margin-bottom:16px}
+.hk-chart-flex{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.hk-donut{flex-shrink:0}
+.hk-legend{flex:1;min-width:200px;display:flex;flex-direction:column;gap:10px}
+.hk-legend-item{display:flex;align-items:center;gap:10px;font-size:13px}
+.hk-legend-dot{width:14px;height:14px;border-radius:4px;flex-shrink:0}
+.hk-legend-name{color:var(--tx);flex:1}
+.hk-legend-val{font-family:var(--fm);color:var(--mu2);font-weight:600}
+.hk-legend-pct{font-family:var(--fm);color:var(--ac2);font-weight:700;width:44px;text-align:right}
+/* table */
+.hk-table-wrap{background:var(--s);border:1px solid var(--brd);border-radius:14px;padding:6px;overflow-x:auto}
+.hk-table{width:100%;border-collapse:collapse;font-size:13px;min-width:560px}
+.hk-table th{text-align:left;padding:12px 14px;color:var(--mu2);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid var(--brd)}
+.hk-table td{padding:12px 14px;border-bottom:1px solid var(--brd);color:var(--tx)}
+.hk-table tr:last-child td{border-bottom:none}
+.hk-amount-in{color:var(--gn);font-weight:700;font-family:var(--fm)}
+.hk-amount-out{color:#fb7185;font-weight:700;font-family:var(--fm)}
+.hk-cat-badge{display:inline-block;font-size:11px;padding:3px 10px;border-radius:12px;background:var(--s3);color:var(--mu2)}
+.hk-del{background:none;border:none;color:var(--mu);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:6px}
+.hk-del:hover{color:#fb7185;background:rgba(251,113,133,.1)}
+.hk-section-h{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--mu2);margin:8px 0 12px;text-transform:uppercase;letter-spacing:.5px}
+.hk-empty{text-align:center;padding:30px;color:var(--mu)}
+.hk-filter{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.hk-filter-btn{padding:8px 16px;border:1px solid var(--brd);border-radius:20px;background:var(--s2);color:var(--mu2);font-size:13px;cursor:pointer;transition:.15s}
+.hk-filter-btn.active{background:var(--ac);border-color:var(--ac);color:#fff}
+
 /* ══ GENERIC ══ */
 .btn-primary{background:linear-gradient(135deg,var(--ac),var(--acd));color:#fff;border:none;padding:14px 28px;border-radius:11px;font-size:15px;font-weight:700;box-shadow:var(--glow)}
 .btn-ghost{background:transparent;color:var(--tx);border:1px solid var(--brd);padding:14px 28px;border-radius:11px;font-size:15px;font-weight:600}
@@ -1408,6 +1459,18 @@ audio{height:36px;border-radius:7px;max-width:240px}
       <div id="opq-container"></div>
     </div>
 
+    <!-- HISOB-KITOB (accounting — marketer only) -->
+    <div class="admin-panel" id="ap-hisobkitob">
+      <div class="ap-head">
+        <div>
+          <div class="ap-title">💰 Hisob-kitob</div>
+          <div class="ap-sub">Kirim va chiqimlar hisoboti</div>
+        </div>
+        <button class="btn-sm yellow" onclick="hkToggleForm()">+ Yangi yozuv</button>
+      </div>
+      <div id="hk-container"></div>
+    </div>
+
     <!-- STAFF MANAGEMENT (marketer only) -->
     <div class="admin-panel" id="ap-staff">
       <div class="ap-head"><div><div class="ap-title">🧑‍💼 Xodimlar</div><div class="ap-sub">Xodim qo'shish va ish hisoboti</div></div>
@@ -1662,14 +1725,16 @@ const POSITIONS = {
 
 // ── ROLE MENUS ── (Variant B: everyone sees ALL sections; only timer differs)
 const FULL_MENU=['svodka','dash','control','students','tez','notif','activate','leads','mleads','calls','meet','teachers','diagnostika','operatorquv'];
+const MARKETING_MENU=['svodka','dash','hisobkitob','control','students','tez','notif','activate','leads','mleads','calls','meet','teachers','diagnostika','operatorquv'];
 const MENUS = {
   admin:     FULL_MENU,
-  marketing: FULL_MENU,
+  marketing: MARKETING_MENU,
   director:  FULL_MENU
 };
 const MENU_META = {
   svodka:   {label:'📊 Svodka',          fn:'loadSvodka'},
   dash:     {label:'📈 Dashboard',       fn:'loadAdminDash'},
+  hisobkitob:{label:'💰 Hisob-kitob',    fn:'loadHisobKitob'},
   control:  {label:'🎯 Nazorat',         fn:'loadControl'},
   students: {label:'👥 O\'quvchilar',    fn:'loadStudentsTable'},
   tez:      {label:'🎤 Tez aytish',      fn:'loadTezSubmissions'},
@@ -4871,6 +4936,234 @@ function opqComplete(id){
     const next=id+1;
     if(document.getElementById('opq-les-'+next)){ document.getElementById('opq-les-'+next).classList.add('open'); document.getElementById('opq-les-'+next).scrollIntoView({behavior:'smooth',block:'center'}); }
   },200);
+}
+
+// ═══════════════════════════════════════════
+// HISOB-KITOB (accounting — income/expense + chart)
+// ═══════════════════════════════════════════
+const HK_CATEGORIES={
+  income:[
+    {id:'diagnostika', uz:"Diagnostika testi", color:'#34d399'},
+    {id:'oquv', uz:"O'quv to'lovi", color:'#22d3ee'},
+    {id:'mahsulot', uz:"Mahsulot sotuvi", color:'#a78bfa'},
+    {id:'boshqa_in', uz:"Boshqa kirim", color:'#60a5fa'}
+  ],
+  expense:[
+    {id:'ish_haqi', uz:"Ish haqi", color:'#fb7185'},
+    {id:'ijara', uz:"Ijara", color:'#f59e0b'},
+    {id:'reklama', uz:"Reklama", color:'#c084fc'},
+    {id:'materiallar', uz:"Materiallar", color:'#fbbf24'},
+    {id:'kommunal', uz:"Kommunal", color:'#38bdf8'},
+    {id:'boshqa_out', uz:"Boshqa chiqim", color:'#94a3b8'}
+  ]
+};
+let _hkType='income';
+let _hkFilter='all';
+let _hkData=[];
+
+function hkCatList(type){ return HK_CATEGORIES[type]||[]; }
+function hkCatInfo(type,id){ return (HK_CATEGORIES[type]||[]).find(c=>c.id===id)||{uz:id,color:'#888'}; }
+function hkFmt(n){ return Number(n).toLocaleString('ru-RU'); }
+
+async function loadHisobKitob(){
+  const c=document.getElementById('hk-container');
+  c.innerHTML='<div class="loading-center"><div class="spin"></div></div>';
+  // load from Supabase (finance table)
+  try{
+    const {data,error}=await sb.from('finance').select('*').order('op_date',{ascending:false}).order('created_at',{ascending:false});
+    if(error){ _hkData=[]; }
+    else { _hkData=data||[]; }
+  }catch(e){ _hkData=[]; }
+  hkRender();
+}
+
+function hkRender(){
+  const c=document.getElementById('hk-container');
+  // compute totals
+  let totalIn=0, totalOut=0;
+  _hkData.forEach(r=>{ if(r.type==='income')totalIn+=Number(r.amount); else totalOut+=Number(r.amount); });
+  const balance=totalIn-totalOut;
+
+  // expense breakdown by category (for chart)
+  const expByCat={};
+  _hkData.filter(r=>r.type==='expense').forEach(r=>{
+    expByCat[r.category]=(expByCat[r.category]||0)+Number(r.amount);
+  });
+
+  // filtered rows
+  let rows=_hkData;
+  if(_hkFilter==='income')rows=_hkData.filter(r=>r.type==='income');
+  else if(_hkFilter==='expense')rows=_hkData.filter(r=>r.type==='expense');
+
+  c.innerHTML=`
+    <!-- summary cards -->
+    <div class="hk-summary">
+      <div class="hk-card income"><div class="hk-card-label">📥 Jami kirim</div><div class="hk-card-val">+${hkFmt(totalIn)}</div><div class="hk-card-sub">so'm</div></div>
+      <div class="hk-card expense"><div class="hk-card-label">📤 Jami chiqim</div><div class="hk-card-val">−${hkFmt(totalOut)}</div><div class="hk-card-sub">so'm</div></div>
+      <div class="hk-card balance"><div class="hk-card-label">💼 Balans</div><div class="hk-card-val">${balance>=0?'+':'−'}${hkFmt(Math.abs(balance))}</div><div class="hk-card-sub">so'm</div></div>
+    </div>
+
+    <!-- add form -->
+    <div class="hk-form" id="hk-form">
+      <div class="hk-field" style="margin-bottom:14px">
+        <label>Turi</label>
+        <div class="hk-type-btns">
+          <div class="hk-type-btn ${_hkType==='income'?'sel-in':''}" id="hk-btn-in" onclick="hkSetType('income')">📥 Kirim</div>
+          <div class="hk-type-btn ${_hkType==='expense'?'sel-out':''}" id="hk-btn-out" onclick="hkSetType('expense')">📤 Chiqim</div>
+        </div>
+      </div>
+      <div class="hk-form-row">
+        <div class="hk-field">
+          <label>Summa (so'm)</label>
+          <input class="hk-input" id="hk-amount" type="number" placeholder="0" inputmode="numeric">
+        </div>
+        <div class="hk-field">
+          <label>Kategoriya</label>
+          <select class="hk-select" id="hk-category">${hkCatList(_hkType).map(c=>`<option value="${c.id}">${c.uz}</option>`).join('')}</select>
+        </div>
+      </div>
+      <div class="hk-form-row three">
+        <div class="hk-field">
+          <label>Sana</label>
+          <input class="hk-input" id="hk-date" type="date">
+        </div>
+        <div class="hk-field">
+          <label>Vaqt</label>
+          <input class="hk-input" id="hk-time" type="time">
+        </div>
+        <div class="hk-field">
+          <label>Izoh (ixtiyoriy)</label>
+          <input class="hk-input" id="hk-note" placeholder="Izoh...">
+        </div>
+      </div>
+      <button class="hk-save" onclick="hkSave()">✓ Saqlash</button>
+    </div>
+
+    ${Object.keys(expByCat).length ? `
+    <!-- expense chart -->
+    <div class="hk-chart-wrap">
+      <div class="hk-chart-title">📊 Chiqimlar taqsimoti</div>
+      <div class="hk-chart-flex">
+        <div class="hk-donut">${hkDonutSVG(expByCat,totalOut)}</div>
+        <div class="hk-legend">${hkLegend(expByCat,totalOut)}</div>
+      </div>
+    </div>` : ''}
+
+    <!-- filter -->
+    <div class="hk-filter">
+      <div class="hk-filter-btn ${_hkFilter==='all'?'active':''}" onclick="hkSetFilter('all')">Hammasi</div>
+      <div class="hk-filter-btn ${_hkFilter==='income'?'active':''}" onclick="hkSetFilter('income')">📥 Kirimlar</div>
+      <div class="hk-filter-btn ${_hkFilter==='expense'?'active':''}" onclick="hkSetFilter('expense')">📤 Chiqimlar</div>
+    </div>
+
+    <!-- table -->
+    <div class="hk-table-wrap">
+      ${rows.length ? `<table class="hk-table">
+        <thead><tr><th>Sana</th><th>Vaqt</th><th>Kategoriya</th><th>Izoh</th><th style="text-align:right">Summa</th><th></th></tr></thead>
+        <tbody>${rows.map(r=>hkRow(r)).join('')}</tbody>
+      </table>` : '<div class="hk-empty">Hozircha yozuvlar yo\'q. "+ Yangi yozuv" tugmasini bosing.</div>'}
+    </div>`;
+
+  // set today's date/time defaults
+  const d=document.getElementById('hk-date');
+  const t=document.getElementById('hk-time');
+  if(d && !d.value){ const now=new Date(); d.value=now.toISOString().slice(0,10); }
+  if(t && !t.value){ const now=new Date(); t.value=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0'); }
+}
+
+function hkRow(r){
+  const cat=hkCatInfo(r.type,r.category);
+  const amtClass=r.type==='income'?'hk-amount-in':'hk-amount-out';
+  const sign=r.type==='income'?'+':'−';
+  const timeStr=r.op_time||'—';
+  return `<tr>
+    <td>${r.op_date||'—'}</td>
+    <td>${timeStr}</td>
+    <td><span class="hk-cat-badge" style="background:${cat.color}22;color:${cat.color}">${cat.uz}</span></td>
+    <td style="color:var(--mu2)">${r.note||'—'}</td>
+    <td style="text-align:right"><span class="${amtClass}">${sign}${hkFmt(r.amount)}</span></td>
+    <td style="text-align:right"><button class="hk-del" onclick="hkDelete(${r.id})" title="O'chirish">🗑</button></td>
+  </tr>`;
+}
+
+// donut chart SVG
+function hkDonutSVG(byCat,total){
+  if(!total) return '';
+  const size=160, r=60, cx=80, cy=80, sw=28;
+  const circ=2*Math.PI*r;
+  let offset=0;
+  let segs='';
+  Object.keys(byCat).forEach(catId=>{
+    const val=byCat[catId];
+    const frac=val/total;
+    const cat=hkCatInfo('expense',catId);
+    const dash=circ*frac;
+    segs+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${cat.color}" stroke-width="${sw}" stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})"/>`;
+    offset+=dash;
+  });
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--s3)" stroke-width="${sw}"/>
+    ${segs}
+    <text x="${cx}" y="${cy-6}" text-anchor="middle" fill="var(--mu2)" font-size="11" font-family="var(--fm)">Jami chiqim</text>
+    <text x="${cx}" y="${cy+12}" text-anchor="middle" fill="var(--tx)" font-size="15" font-weight="700" font-family="var(--fd)">${hkFmt(total)}</text>
+  </svg>`;
+}
+
+function hkLegend(byCat,total){
+  return Object.keys(byCat).sort((a,b)=>byCat[b]-byCat[a]).map(catId=>{
+    const val=byCat[catId];
+    const cat=hkCatInfo('expense',catId);
+    const pct=total?Math.round(val/total*100):0;
+    return `<div class="hk-legend-item">
+      <span class="hk-legend-dot" style="background:${cat.color}"></span>
+      <span class="hk-legend-name">${cat.uz}</span>
+      <span class="hk-legend-val">${hkFmt(val)}</span>
+      <span class="hk-legend-pct">${pct}%</span>
+    </div>`;
+  }).join('');
+}
+
+function hkToggleForm(){
+  const f=document.getElementById('hk-form');
+  if(f)f.classList.toggle('open');
+}
+function hkSetType(type){
+  _hkType=type;
+  document.getElementById('hk-btn-in').className='hk-type-btn'+(type==='income'?' sel-in':'');
+  document.getElementById('hk-btn-out').className='hk-type-btn'+(type==='expense'?' sel-out':'');
+  // refresh category options
+  const sel=document.getElementById('hk-category');
+  if(sel)sel.innerHTML=hkCatList(type).map(c=>`<option value="${c.id}">${c.uz}</option>`).join('');
+}
+function hkSetFilter(f){ _hkFilter=f; hkRender(); document.getElementById('hk-form').classList.remove('open'); }
+
+async function hkSave(){
+  const amount=Number(document.getElementById('hk-amount').value);
+  const category=document.getElementById('hk-category').value;
+  const op_date=document.getElementById('hk-date').value;
+  const op_time=document.getElementById('hk-time').value;
+  const note=document.getElementById('hk-note').value.trim();
+  if(!amount||amount<=0){ toast("Summani kiriting",'err'); return; }
+  if(!op_date){ toast("Sanani tanlang",'err'); return; }
+  const rec={ type:_hkType, amount, category, op_date, op_time:op_time||null, note:note||null };
+  try{
+    const {data,error}=await sb.from('finance').insert([rec]).select();
+    if(error){ toast("Xatolik: "+error.message,'err'); return; }
+    toast("✓ Saqlandi",'ok');
+    if(data&&data[0])_hkData.unshift(data[0]);
+    hkRender();
+  }catch(e){ toast("Xatolik yuz berdi",'err'); }
+}
+
+async function hkDelete(id){
+  if(!confirm("Bu yozuvni o'chirilsinmi?"))return;
+  try{
+    const {error}=await sb.from('finance').delete().eq('id',id);
+    if(error){ toast("Xatolik: "+error.message,'err'); return; }
+    _hkData=_hkData.filter(r=>r.id!==id);
+    toast("O'chirildi",'ok');
+    hkRender();
+  }catch(e){ toast("Xatolik",'err'); }
 }
 
 async function loadStaffPanel(){
