@@ -2389,8 +2389,10 @@ function resetInactivityTimer(){
   if(document.getElementById('pinlock').classList.contains('on'))return;
   if(document.getElementById('greetscene') && document.getElementById('greetscene').classList.contains('on'))return;
   if(_pinLockTimer){clearTimeout(_pinLockTimer);_pinLockTimer=null;}
+  // ⛔ don't auto-lock while the diagnostic test is in progress (don't interrupt the child)
+  if(window._dcActive)return;
   _pinLockTimer=setTimeout(()=>{
-    if(currentStaff && isStaffPinLocked(currentStaff)) showPinLock();
+    if(currentStaff && isStaffPinLocked(currentStaff) && !window._dcActive) showPinLock();
   }, PIN_LOCK_MS);
 }
 
@@ -2656,6 +2658,11 @@ function gsBuildParticles(){
 }
 
 function navTo(panel,el){
+  // leaving the diagnostic test → re-enable auto-lock (loadDiagnostika re-arms it if going back in)
+  if(panel!=='diagnostika' && window._dcActive){
+    window._dcActive=false;
+    if(currentStaff && isStaffPinLocked(currentStaff)) resetInactivityTimer();
+  }
   document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('on'));
   document.getElementById('ap-'+panel).classList.add('on');
   document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
@@ -2672,7 +2679,7 @@ function navTo(panel,el){
 
 function doLogout(){
   if(currentStaff){ logActivity('🚪 Tizimdan chiqdi'); }
-  window._loggedInThisSession=false; window._navReady=false;
+  window._loggedInThisSession=false; window._navReady=false; window._dcActive=false;
   currentUser=null;currentStaff=null;lessonAccess=[];tezAccess=[];
   if(_pinLockTimer){clearTimeout(_pinLockTimer);_pinLockTimer=null;}
   document.getElementById('pinlock').classList.remove('on');
@@ -4251,6 +4258,8 @@ function dcCabinetsForClass(cls){
 let _dc=null; // diagnostic center state
 
 function loadDiagnostika(){
+  window._dcActive=true; // ⛔ pause auto-lock while in the diagnostic test
+  if(_pinLockTimer){clearTimeout(_pinLockTimer);_pinLockTimer=null;}
   document.getElementById('diag-groups').style.display='none';
   const runner=document.getElementById('diag-runner');
   runner.style.display='block';
