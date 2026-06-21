@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="EduNova">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/edunovaschool9-hue/a-avlod-bot/main/icon-192.png">
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/edunovaschool9-hue/a-avlod-bot/main/icon-192.png">
-<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22EduNova%20Platform%22%2C%22short_name%22%3A%22EduNova%22%2C%22description%22%3A%22EduNova%20Iqtidor%20markazi%20%5Cu2014%20boshqaruv%20paneli%22%2C%22id%22%3A%22com.edunova.app%22%2C%22start_url%22%3A%22/academy.html%22%2C%22scope%22%3A%22/%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%231a1d2e%22%2C%22theme_color%22%3A%22%237c5cff%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A//raw.githubusercontent.com/edunovaschool9-hue/a-avlod-bot/main/icon-192.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image/png%22%2C%22purpose%22%3A%22any%22%7D%2C%7B%22src%22%3A%22https%3A//raw.githubusercontent.com/edunovaschool9-hue/a-avlod-bot/main/icon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image/png%22%2C%22purpose%22%3A%22any%22%7D%2C%7B%22src%22%3A%22https%3A//raw.githubusercontent.com/edunovaschool9-hue/a-avlod-bot/main/icon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image/png%22%2C%22purpose%22%3A%22maskable%22%7D%5D%7D">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22EduNova%20Platform%22%2C%22short_name%22%3A%22EduNova%22%2C%22description%22%3A%22EduNova%20Iqtidor%20markazi%20%5Cu2014%20boshqaruv%20paneli%22%2C%22id%22%3A%22com.edunova.app%22%2C%22start_url%22%3A%22https%3A//www.edunovaschool.uz/academy.html%22%2C%22scope%22%3A%22https%3A//www.edunovaschool.uz/%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%231a1d2e%22%2C%22theme_color%22%3A%22%237c5cff%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A//raw.githubusercontent.com/edunovaschool9-hue/a-avlod-bot/main/icon-192.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image/png%22%2C%22purpose%22%3A%22any%22%7D%2C%7B%22src%22%3A%22https%3A//raw.githubusercontent.com/edunovaschool9-hue/a-avlod-bot/main/icon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image/png%22%2C%22purpose%22%3A%22any%22%7D%2C%7B%22src%22%3A%22https%3A//raw.githubusercontent.com/edunovaschool9-hue/a-avlod-bot/main/icon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image/png%22%2C%22purpose%22%3A%22maskable%22%7D%5D%7D">
 <script>
 // Service worker (offline кэш) — встроен как blob
 (function(){
@@ -130,16 +130,31 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 /* ═══ UNIFIED LOGIN (Instagram-style two-column) ═══ */
 #p-ulogin{padding:0;flex-direction:row;align-items:stretch;justify-content:flex-start}
 .ul-wrap{display:flex;width:100%;min-height:100vh}
-.ul-brand{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 6%;position:relative;overflow:hidden}
+.ul-brand{flex:1;display:flex;flex-direction:column;justify-content:center;padding:40px 6%;position:relative;overflow:hidden;max-height:100vh}
 .ul-orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.22;pointer-events:none}
-.ul-brand-inner{position:relative;z-index:1;max-width:460px}
+.ul-brand-inner{position:relative;z-index:1;max-width:460px;width:100%;max-height:100%;overflow-y:auto;padding-right:8px}
+.ul-brand-inner::-webkit-scrollbar{width:6px}
+.ul-brand-inner::-webkit-scrollbar-track{background:transparent}
+.ul-brand-inner::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px}
+.ul-brand-inner::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.2)}
 .ul-logo-row{display:flex;align-items:center;gap:18px;margin-bottom:8px;opacity:0;transform:translateY(20px);animation:ulRise .8s .1s forwards}
+.ul-logo-badge{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,rgba(124,92,255,.35),rgba(34,211,238,.2));display:flex;align-items:center;justify-content:center;font-size:38px;border:1px solid rgba(255,255,255,.18);box-shadow:0 8px 28px rgba(124,92,255,.3),inset 0 1px 0 rgba(255,255,255,.2);flex-shrink:0}
 .ul-platypus{width:90px;height:auto;filter:drop-shadow(0 6px 18px rgba(124,92,255,.25))}
 .ul-platypus.swim{animation:ulSwim 4s ease-in-out infinite}
 .ul-name{font-family:var(--fd);font-size:40px;font-weight:800;letter-spacing:4px;line-height:1;color:#fff}
 .ul-sub{font-family:var(--fm);font-size:11px;letter-spacing:6px;color:var(--mu);margin-top:6px}
-.ul-tagline{font-family:var(--fd);font-size:25px;font-weight:700;line-height:1.3;margin-top:38px;opacity:0;transform:translateY(20px);animation:ulRise .8s .35s forwards}
+.ul-tagline{font-family:var(--fd);font-size:25px;font-weight:700;line-height:1.3;margin-top:32px;margin-bottom:8px;opacity:0;transform:translateY(20px);animation:ulRise .8s .35s forwards}
 .ul-tagline .ac{color:var(--ac2)}
+/* scrollable school info */
+.ul-info{margin-top:28px;display:flex;flex-direction:column;gap:14px;opacity:0;transform:translateY(20px);animation:ulRise .8s .55s forwards}
+.ul-info-block{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--glass-brd);border-radius:16px;padding:18px 20px;transition:.2s}
+.ul-info-block:hover{border-color:var(--glass-hi);transform:translateX(4px)}
+.ul-info-icon{font-size:26px;margin-bottom:8px}
+.ul-info-title{font-family:var(--fd);font-size:17px;font-weight:700;color:#fff;margin-bottom:6px}
+.ul-info-text{font-size:13.5px;line-height:1.55;color:var(--mu2)}
+.ul-info-cta{background:linear-gradient(135deg,rgba(124,92,255,.25),rgba(124,92,255,.08));border:1px solid rgba(124,92,255,.35);border-radius:16px;padding:20px;margin-top:4px}
+.ul-info-cta-title{font-family:var(--fd);font-size:17px;font-weight:800;color:#fff;margin-bottom:6px}
+.ul-info-cta-text{font-size:13.5px;line-height:1.55;color:#d8dae0}
 .ul-login{width:440px;background:#0d0e13;border-left:1px solid var(--brd);display:flex;flex-direction:column;justify-content:center;padding:0 48px;position:relative}
 .ul-login-orb{position:absolute;top:20%;right:-60px;width:300px;height:300px;border-radius:50%;background:var(--cy);filter:blur(100px);opacity:.08;pointer-events:none}
 .ul-box{position:relative;z-index:1;width:100%;opacity:0;transform:translateY(20px);animation:ulRise .8s .55s forwards}
@@ -153,18 +168,19 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 @media(max-width:880px){
   #p-ulogin{flex-direction:column}
   .ul-wrap{flex-direction:column}
-  /* softer, cleaner brand area so white logo stands out */
-  .ul-brand{flex:none;padding:50px 8% 26px;align-items:center;text-align:center;
+  /* softer, cleaner brand area */
+  .ul-brand{flex:none;padding:40px 7% 26px;align-items:center;text-align:center;max-height:none;
     background:linear-gradient(180deg,#101218 0%,#0c0d12 100%)}
-  .ul-orb{opacity:.1!important;filter:blur(70px)!important} /* much softer glow */
-  .ul-brand-inner{text-align:center}
+  .ul-orb{opacity:.1!important;filter:blur(70px)!important}
+  .ul-brand-inner{text-align:center;max-height:none;overflow-y:visible;padding-right:0}
   .ul-logo-row{flex-direction:column;gap:14px}
-  /* subtle soft halo behind platypus so it never blends */
+  .ul-logo-badge{width:66px;height:66px;font-size:34px}
   .ul-platypus{width:78px;filter:drop-shadow(0 4px 20px rgba(255,255,255,.12))}
   .ul-name{font-size:32px;letter-spacing:5px}
   .ul-sub{letter-spacing:7px}
   .ul-tagline{font-size:18px;margin-top:20px;color:#aab1c2}
   .ul-tagline .ac{color:#9d7bff}
+  .ul-info{text-align:left}
   .ul-login{width:100%;border-left:none;border-top:1px solid var(--brd);padding:24px 8% 46px;background:#0a0b0f}
 }
 
@@ -1008,18 +1024,62 @@ audio{height:36px;border-radius:7px;max-width:240px}
 <!-- ══ UNIFIED LOGIN (single entry for students + staff) ══ -->
 <div class="page on" id="p-ulogin">
   <div class="ul-wrap">
-    <!-- LEFT: brand -->
+    <!-- LEFT: brand + school info (scrollable) -->
     <div class="ul-brand">
       <div class="ul-orb" style="width:420px;height:420px;background:var(--ac);top:10%;left:5%"></div>
       <div class="ul-brand-inner">
         <div class="ul-logo-row">
-          <svg class="ul-platypus swim" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ulwb" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d8dae0"/></linearGradient></defs><path d="M150 50 Q188 38 200 56 Q204 65 200 74 Q188 92 150 80 Q144 65 150 50 Z" fill="url(#ulwb)"/><ellipse cx="95" cy="65" rx="62" ry="38" fill="url(#ulwb)"/><ellipse cx="48" cy="63" rx="28" ry="26" fill="url(#ulwb)"/><path d="M48 56 Q14 50 0 60 Q-4 65 0 70 Q14 80 50 74 Q56 65 52 58 Z" fill="#b8bac2"/><ellipse cx="12" cy="65" rx="2.5" ry="2" fill="#0a0b0f" opacity="0.4"/><path d="M70 100 L64 116 L74 104 Z" fill="#c4c6cc"/><path d="M92 102 L88 118 L98 106 Z" fill="#c4c6cc"/><circle cx="42" cy="54" r="4.5" fill="#0a0b0f"/></svg>
+          <div class="ul-logo-badge">🎓</div>
           <div>
-            <div class="ul-name">UTKONOS</div>
-            <div class="ul-sub">PLATFORM</div>
+            <div class="ul-name">EDUNOVA</div>
+            <div class="ul-sub">SCHOOL</div>
           </div>
         </div>
-        <div class="ul-tagline">Bilim olishning yangi avlodi<br><span class="ac">shu yerdan boshlanadi.</span></div>
+        <div class="ul-tagline">Iste'dod kashf etiladigan<br><span class="ac">yangi avlod maktabi.</span></div>
+
+        <!-- scrollable school info -->
+        <div class="ul-info">
+          <div class="ul-info-block">
+            <div class="ul-info-icon">🎯</div>
+            <div class="ul-info-title">Biz kim?</div>
+            <div class="ul-info-text">EduNova — Farg'onadagi yangi avlod maktabi. Biz bolalarni faqat "baho" uchun emas, balki hayotga, ijodga va tadbirkorlikka tayyorlaymiz.</div>
+          </div>
+
+          <div class="ul-info-block">
+            <div class="ul-info-icon">🧪</div>
+            <div class="ul-info-title">Iqtidor diagnostikasi</div>
+            <div class="ul-info-text">Maxsus test farzandingizning tabiiy iste'dodini ochadi — u mantiqqami, ijodgami yoki muloqotga moyilmi. Va kelajakda qaysi kasb mos kelishini ko'rsatadi. Farg'onada birinchi marta!</div>
+          </div>
+
+          <div class="ul-info-block">
+            <div class="ul-info-icon">🏺</div>
+            <div class="ul-info-title">Hunar ustaxonalari</div>
+            <div class="ul-info-text">Bolalar o'z qo'li bilan yaratadi: kulolchilik (loydan buyumlar) va qandolatchilik (shirinliklar). Ular zerikmaydi — ijod qiladi va natijani ko'radi.</div>
+          </div>
+
+          <div class="ul-info-block">
+            <div class="ul-info-icon">🎨</div>
+            <div class="ul-info-title">Bloging va prezentatsiya</div>
+            <div class="ul-info-text">O'quvchilar o'z mahsulotini chiroyli qadoqlash, suratga olish va sotishni o'rganadi. Bu — bozorga kerakli zamonaviy ko'nikma.</div>
+          </div>
+
+          <div class="ul-info-block">
+            <div class="ul-info-icon">💰</div>
+            <div class="ul-info-title">O'z mahsulotini sotadi</div>
+            <div class="ul-info-text">Maktab do'koni va yarmarkalarda bolalar yaratgan buyumlarini sotadi. Sotuvdan tushgan pulning bir qismi bolaga beriladi — u birinchi daromadini topadi!</div>
+          </div>
+
+          <div class="ul-info-block">
+            <div class="ul-info-icon">🏆</div>
+            <div class="ul-info-title">Natija</div>
+            <div class="ul-info-text">Bir yildan keyin farzandingiz: noldan mahsulot yarata oladi, gapirish va taqdim etishdan qo'rqmaydi, pul qadrini biladi va o'ziga ishonadi — "Men qila olaman!"</div>
+          </div>
+
+          <div class="ul-info-cta">
+            <div class="ul-info-cta-title">📲 Batafsil ma'lumot</div>
+            <div class="ul-info-cta-text">Farzandingizning iste'dodini bilib olishni xohlaysizmi? Direktga yozing — biz bog'lanamiz. Joylar cheklangan!</div>
+          </div>
+        </div>
       </div>
     </div>
     <!-- RIGHT: login -->
@@ -1040,8 +1100,8 @@ audio{height:36px;border-radius:7px;max-width:240px}
         <div class="ul-divider"></div>
         <div class="login-sub" style="text-align:center;margin:0">O'quvchilar va xodimlar uchun yagona kirish</div>
         <div class="ul-mini">
-          <svg viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg"><ellipse cx="95" cy="65" rx="62" ry="38" fill="#9aa1b3"/><ellipse cx="48" cy="63" rx="28" ry="26" fill="#9aa1b3"/><path d="M48 56 Q14 50 0 60 Q-4 65 0 70 Q14 80 50 74 Q56 65 52 58 Z" fill="#7a8196"/><path d="M150 50 Q188 38 200 56 Q204 65 200 74 Q188 92 150 80 Q144 65 150 50 Z" fill="#9aa1b3"/><circle cx="42" cy="54" r="4.5" fill="#0d0e13"/></svg>
-          <span>UTKONOS</span>
+          <span style="font-size:18px">🎓</span>
+          <span>EDUNOVA SCHOOL</span>
         </div>
       </div>
     </div>
