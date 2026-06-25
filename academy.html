@@ -609,6 +609,44 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .hk-filter-btn{padding:8px 16px;border:1px solid var(--brd);border-radius:20px;background:var(--s2);color:var(--mu2);font-size:13px;cursor:pointer;transition:.15s}
 .hk-filter-btn.active{background:var(--ac);border-color:var(--ac);color:#fff}
 
+/* ═══ OTA-ONALAR FIKRI (parent survey) ═══ */
+.oo-script{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--glass-brd);border-radius:14px;overflow:hidden}
+.oo-script-head{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-family:var(--fd);font-weight:700;font-size:15px;color:var(--ac2);user-select:none;transition:.15s}
+.oo-script-head:hover{background:var(--glass)}
+.oo-script-body{padding:0 20px;max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s}
+.oo-script-body.open{max-height:1500px;padding:0 20px 20px}
+.oo-step{margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--brd)}
+.oo-step:last-of-type{border-bottom:none}
+.oo-step-t{font-family:var(--fd);font-weight:700;font-size:14px;color:var(--tx);margin-bottom:10px}
+.oo-script-line{background:rgba(34,211,238,.08);border-left:3px solid var(--cy);border-radius:8px;padding:12px 14px;font-size:13.5px;line-height:1.5;color:var(--tx);font-style:italic}
+.oo-q{background:var(--s2);border-radius:8px;padding:10px 14px;font-size:13.5px;line-height:1.5;color:var(--mu2);margin-bottom:8px}
+.oo-tip{font-size:12.5px;color:var(--go);margin-top:8px;padding-left:4px}
+.oo-rules{background:rgba(124,92,255,.1);border:1px solid rgba(124,92,255,.3);border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.7;color:var(--mu2)}
+.oo-rules b{color:var(--ac2);display:block;margin-bottom:6px;font-size:14px}
+/* survey cards */
+.oo-stats{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+.oo-stat{background:var(--glass);border:1px solid var(--glass-brd);border-radius:12px;padding:14px 20px;flex:1;min-width:130px}
+.oo-stat-n{font-family:var(--fd);font-size:24px;font-weight:800;color:var(--ac2)}
+.oo-stat-l{font-size:12px;color:var(--mu2);margin-top:2px}
+.oo-card{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--glass-brd);border-radius:14px;padding:18px 20px;margin-bottom:14px;transition:.2s}
+.oo-card:hover{border-color:var(--glass-hi)}
+.oo-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.oo-card-name{font-family:var(--fd);font-size:17px;font-weight:700;color:#fff}
+.oo-card-child{font-size:13px;color:var(--mu2);margin-top:2px}
+.oo-card-phone{font-family:var(--fm);font-size:13px;color:var(--bl);text-decoration:none}
+.oo-freetime{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--go)}
+.oo-freetime b{color:#fde68a}
+.oo-answers{display:grid;gap:10px}
+.oo-ans{background:var(--s2);border-radius:10px;padding:12px 14px}
+.oo-ans-q{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;font-weight:600}
+.oo-ans-a{font-size:13.5px;color:var(--tx);line-height:1.5}
+.oo-ans.pos{border-left:3px solid var(--gn)}
+.oo-ans.sat{border-left:3px solid var(--cy)}
+.oo-ans.unsat{border-left:3px solid var(--rd)}
+.oo-ans.sug{border-left:3px solid var(--ac)}
+.oo-card-date{font-size:12px;color:var(--mu);font-family:var(--fm)}
+.oo-card-actions{display:flex;gap:8px;margin-top:14px}
+
 /* ══ GENERIC ══ */
 .btn-primary{background:linear-gradient(135deg,var(--ac),var(--acd));color:#fff;border:none;padding:14px 28px;border-radius:11px;font-size:15px;font-weight:700;box-shadow:var(--glow)}
 .btn-ghost{background:transparent;color:var(--tx);border:1px solid var(--brd);padding:14px 28px;border-radius:11px;font-size:15px;font-weight:600}
@@ -1493,6 +1531,69 @@ audio{height:36px;border-radius:7px;max-width:240px}
       <div class="lead-cards" id="nlead-cards"><div class="loading-center"><div class="spin"></div></div></div>
     </div>
 
+    <!-- OTA-ONALAR FIKRI (parent feedback survey) -->
+    <div class="admin-panel" id="ap-otaona">
+      <div class="ap-head"><div><div class="ap-title">👨‍👩‍👧 Ota-onalar fikri</div><div class="ap-sub">Ota-onalarni qo'ng'iroq qilib, fikr va bo'sh vaqtini yig'ish</div></div>
+        <button class="btn-sm yellow" onclick="toggleOtaonaForm()">+ Yangi so'rov</button></div>
+
+      <!-- collapsible call script for operator -->
+      <div class="oo-script">
+        <div class="oo-script-head" onclick="toggleOoScript()">
+          <span>📞 Qo'ng'iroq skripti — avval o'qing</span>
+          <span id="oo-script-arrow">▼</span>
+        </div>
+        <div class="oo-script-body" id="oo-script-body">
+          <div class="oo-step">
+            <div class="oo-step-t">1️⃣ Salomlashuv</div>
+            <div class="oo-script-line">"Assalomu alaykum! Men EduNova maktabidan [Ismingiz]. Farzandingiz [bola ismi] haqida bir-ikki daqiqa suhbatlashsak bo'ladimi? Sizning fikringiz biz uchun juda muhim."</div>
+          </div>
+          <div class="oo-step">
+            <div class="oo-step-t">2️⃣ Bo'sh vaqtini so'rang</div>
+            <div class="oo-script-line">"Sizga qaysi kunlari va soatlarda qo'ng'iroq qilish yoki uchrashish qulay? Buni yozib qo'yaman, keyin shu vaqtda bog'lanamiz."</div>
+            <div class="oo-tip">💡 Bo'sh vaqtini aniq yozib oling — keyin shu vaqtda qo'ng'iroq qilamiz.</div>
+          </div>
+          <div class="oo-step">
+            <div class="oo-step-t">3️⃣ Savollar bering (yumshoq, samimiy)</div>
+            <div class="oo-q">❓ "Bu o'quv yilida farzandingizda qanday ijobiy o'zgarishlar bo'ldi? Nimadan xursandsiz?"</div>
+            <div class="oo-q">❓ "Farzandingizning qaysi natijalaridan ko'proq mamnunsiz?"</div>
+            <div class="oo-q">❓ "Qaysi narsalardan unchalik mamnun emassiz? Nima yetishmadi?"</div>
+            <div class="oo-q">❓ "Maktab tizimiga yana nima qo'shishimizni xohlaysiz? Qanday takliflaringiz bor?"</div>
+            <div class="oo-tip">💡 Shoshmang. Ota-onaga gapirishga imkon bering. Javoblarni shu yerga yozib boring.</div>
+          </div>
+          <div class="oo-step">
+            <div class="oo-step-t">4️⃣ Xayrlashuv</div>
+            <div class="oo-script-line">"Fikringiz uchun katta rahmat! Biz har bir farzandni yaxshiroq qilish uchun harakat qilamiz. Yaxshi kun tilayman!"</div>
+          </div>
+          <div class="oo-rules">
+            <b>🌟 Oltin qoidalar:</b>
+            <div>• Iliq va samimiy gapiring, tabassum bilan</div>
+            <div>• Ota-onani eshiting, bo'lmang</div>
+            <div>• Tanqidni xotirjam qabul qiling — bu rivojlanish uchun</div>
+            <div>• Har bir javobni to'liq yozib oling</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- add form -->
+      <div class="tbl-wrap" id="otaona-form" style="display:none;padding:18px;margin-top:16px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div class="field"><label>Ota-ona ismi</label><input id="oo-parent" type="text" placeholder="Gulnora opa"></div>
+          <div class="field"><label>Bola ismi</label><input id="oo-child" type="text" placeholder="Aziz"></div>
+          <div class="field"><label>Telefon</label><input id="oo-phone" type="tel" placeholder="+998901234567"></div>
+        </div>
+        <div class="field"><label>🕐 Bo'sh vaqti (qachon qulay)</label><input id="oo-freetime" type="text" placeholder="Dushanba-juma 18:00 dan keyin, dam olish kunlari ertalab"></div>
+        <div class="field"><label>✅ Bu yil qanday ijobiy o'zgarishlar bo'ldi?</label><textarea id="oo-positive" placeholder="Ota-ona javobini yozing..."></textarea></div>
+        <div class="field"><label>😊 Qaysi natijalardan mamnun?</label><textarea id="oo-satisfied" placeholder="Ota-ona javobini yozing..."></textarea></div>
+        <div class="field"><label>😕 Qaysi narsalardan mamnun emas?</label><textarea id="oo-unsatisfied" placeholder="Ota-ona javobini yozing..."></textarea></div>
+        <div class="field"><label>💡 Maktabga nima qo'shishni xohlaydi?</label><textarea id="oo-suggest" placeholder="Ota-ona takliflari..."></textarea></div>
+        <div style="display:flex;gap:8px"><button class="btn-sm green" style="padding:10px 18px" onclick="saveOtaona()">Saqlash</button>
+          <button class="btn-sm red" style="padding:10px 18px" onclick="toggleOtaonaForm()">Bekor</button></div>
+      </div>
+
+      <div class="oo-stats" id="oo-stats"></div>
+      <div id="otaona-list" style="margin-top:16px"><div class="loading-center"><div class="spin"></div></div></div>
+    </div>
+
     <!-- PLANNED CALLS -->
     <div class="admin-panel" id="ap-calls">
       <div class="ap-head"><div><div class="ap-title">📞 Rejalashtirilgan qo'ng'iroqlar</div><div class="ap-sub">Bugun, ertaga, indinga</div></div>
@@ -2031,8 +2132,8 @@ const POSITIONS = {
 };
 
 // ── ROLE MENUS ── (Variant B: everyone sees ALL sections; only timer differs)
-const FULL_MENU=['svodka','dash','control','students','tez','notif','activate','leads','mleads','nolavoy','calls','meet','teachers','diagnostika','operatorquv'];
-const MARKETING_MENU=['svodka','dash','hisobkitob','control','students','tez','notif','activate','leads','mleads','nolavoy','calls','meet','teachers','diagnostika','operatorquv'];
+const FULL_MENU=['svodka','dash','control','students','tez','notif','activate','leads','mleads','nolavoy','otaona','calls','meet','teachers','diagnostika','operatorquv'];
+const MARKETING_MENU=['svodka','dash','hisobkitob','control','students','tez','notif','activate','leads','mleads','nolavoy','otaona','calls','meet','teachers','diagnostika','operatorquv'];
 const MENUS = {
   admin:     FULL_MENU,
   marketing: MARKETING_MENU,
@@ -2050,6 +2151,7 @@ const MENU_META = {
   leads:    {label:'🔥 Blog lidlari',    fn:'loadLeads'},
   mleads:   {label:'🏫 Maktab lidlari',  fn:'loadMaktabLeads'},
   nolavoy:  {label:'🧸 Nolavoy lidlari', fn:'loadNolavoyLeads'},
+  otaona:   {label:'👨‍👩‍👧 Ota-onalar fikri', fn:'loadOtaona'},
   calls:    {label:'📞 Qo\'ng\'iroqlar', fn:'loadPlannedCalls'},
   meet:     {label:'🤝 Uchrashuvlar',    fn:'loadMeetings'},
   teachers: {label:'👩‍🏫 O\'qituvchilar', fn:'loadTeachers'},
@@ -3746,6 +3848,87 @@ function renderNLeads(list){const c=document.getElementById('nlead-cards');
       <button class="btn-sm red" onclick="deleteNLead(${l.id})">🗑</button></div></div>`;}).join('');}
 
 async function deleteNLead(id){if(!confirm('O\'chirilsinmi?'))return;await sb.from('leads').delete().eq('id',id);toast('🗑 O\'chirildi');loadNolavoyLeads();}
+
+// ── OTA-ONALAR FIKRI (parent feedback survey) ──
+let allOtaona=[];
+
+function toggleOoScript(){
+  const b=document.getElementById('oo-script-body');
+  const a=document.getElementById('oo-script-arrow');
+  b.classList.toggle('open');
+  a.textContent=b.classList.contains('open')?'▲':'▼';
+}
+function toggleOtaonaForm(){const f=document.getElementById('otaona-form');f.style.display=f.style.display==='none'?'block':'none';}
+
+async function saveOtaona(){
+  const parent=document.getElementById('oo-parent').value.trim();
+  const child=document.getElementById('oo-child').value.trim();
+  const phone=document.getElementById('oo-phone').value.trim();
+  const freetime=document.getElementById('oo-freetime').value.trim();
+  const positive=document.getElementById('oo-positive').value.trim();
+  const satisfied=document.getElementById('oo-satisfied').value.trim();
+  const unsatisfied=document.getElementById('oo-unsatisfied').value.trim();
+  const suggest=document.getElementById('oo-suggest').value.trim();
+  if(!parent||!phone){toast('Ota-ona ismi va telefon kiriting','err');return;}
+  const{error}=await sb.from('parent_feedback').insert({parent_name:parent,child_name:child,phone,free_time:freetime,positive,satisfied,unsatisfied,suggestion:suggest,created_at:new Date().toISOString()});
+  if(error){toast(error.message,'err');return;}
+  ['oo-parent','oo-child','oo-phone','oo-freetime','oo-positive','oo-satisfied','oo-unsatisfied','oo-suggest'].forEach(id=>document.getElementById(id).value='');
+  toggleOtaonaForm();toast('✅ So\'rov saqlandi');loadOtaona();
+}
+
+async function loadOtaona(){
+  const c=document.getElementById('otaona-list');
+  c.innerHTML='<div class="loading-center"><div class="spin"></div></div>';
+  const{data,error}=await sb.from('parent_feedback').select('*').order('created_at',{ascending:false});
+  if(error){c.innerHTML='<div class="empty">Jadval topilmadi. Avval Supabase\'da parent_feedback jadvalini yarating.</div>';allOtaona=[];renderOoStats();return;}
+  allOtaona=data||[];
+  renderOoStats();
+  renderOtaona(allOtaona);
+}
+
+function renderOoStats(){
+  const s=document.getElementById('oo-stats');
+  if(!s)return;
+  const total=allOtaona.length;
+  const withTime=allOtaona.filter(o=>o.free_time&&o.free_time.trim()).length;
+  const withSuggest=allOtaona.filter(o=>o.suggestion&&o.suggestion.trim()).length;
+  s.innerHTML=`
+    <div class="oo-stat"><div class="oo-stat-n">${total}</div><div class="oo-stat-l">Jami so'rovlar</div></div>
+    <div class="oo-stat"><div class="oo-stat-n">${withTime}</div><div class="oo-stat-l">Bo'sh vaqti yozilgan</div></div>
+    <div class="oo-stat"><div class="oo-stat-n">${withSuggest}</div><div class="oo-stat-l">Taklif bergan</div></div>`;
+}
+
+function ooEsc(t){return t?String(t).replace(/</g,'&lt;').replace(/>/g,'&gt;'):'';}
+
+function renderOtaona(list){
+  const c=document.getElementById('otaona-list');
+  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">👨‍👩‍👧</div>Hozircha so\'rovlar yo\'q. Skriptni o\'qing va qo\'ng\'iroq qilishni boshlang.</div>';return;}
+  c.innerHTML=list.map(o=>{
+    const ans=[];
+    if(o.positive)ans.push(`<div class="oo-ans pos"><div class="oo-ans-q">✅ Ijobiy o'zgarishlar</div><div class="oo-ans-a">${ooEsc(o.positive)}</div></div>`);
+    if(o.satisfied)ans.push(`<div class="oo-ans sat"><div class="oo-ans-q">😊 Mamnun</div><div class="oo-ans-a">${ooEsc(o.satisfied)}</div></div>`);
+    if(o.unsatisfied)ans.push(`<div class="oo-ans unsat"><div class="oo-ans-q">😕 Mamnun emas</div><div class="oo-ans-a">${ooEsc(o.unsatisfied)}</div></div>`);
+    if(o.suggestion)ans.push(`<div class="oo-ans sug"><div class="oo-ans-q">💡 Takliflar</div><div class="oo-ans-a">${ooEsc(o.suggestion)}</div></div>`);
+    return `<div class="oo-card">
+      <div class="oo-card-top">
+        <div>
+          <div class="oo-card-name">${ooEsc(o.parent_name)}</div>
+          ${o.child_name?`<div class="oo-card-child">👶 Bola: ${ooEsc(o.child_name)}</div>`:''}
+          <a href="tel:${o.phone}" class="oo-card-phone">📱 ${o.phone}</a>
+        </div>
+        <div class="oo-card-date">${new Date(o.created_at).toLocaleDateString('ru')}</div>
+      </div>
+      ${o.free_time?`<div class="oo-freetime">🕐 <b>Bo'sh vaqti:</b> ${ooEsc(o.free_time)}</div>`:''}
+      ${ans.length?`<div class="oo-answers">${ans.join('')}</div>`:'<div style="font-size:13px;color:var(--mu)">Javoblar yozilmagan</div>'}
+      <div class="oo-card-actions">
+        <a href="tel:${o.phone}" class="btn-sm blue" style="text-decoration:none">📞 Qo'ng'iroq</a>
+        <button class="btn-sm red" onclick="deleteOtaona(${o.id})">🗑 O'chirish</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function deleteOtaona(id){if(!confirm('O\'chirilsinmi?'))return;await sb.from('parent_feedback').delete().eq('id',id);toast('🗑 O\'chirildi');loadOtaona();}
 
 // ── REMINDERS (10 min before) ──
 function setReminder(id,date,name,phone){if(!('Notification'in window))return;
