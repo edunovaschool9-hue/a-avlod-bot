@@ -1576,10 +1576,11 @@ audio{height:36px;border-radius:7px;max-width:240px}
 
       <!-- add form -->
       <div class="tbl-wrap" id="otaona-form" style="display:none;padding:18px;margin-top:16px">
+        <div style="font-size:13px;color:var(--mu2);margin-bottom:14px;padding:10px 14px;background:rgba(34,211,238,.08);border-radius:8px">💡 Faqat <b style="color:var(--cy)">telefon raqami</b> majburiy. Qolgan maydonlarni keyin — qo'ng'iroq qilganda to'ldirishingiz mumkin.</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
           <div class="field"><label>Ota-ona ismi</label><input id="oo-parent" type="text" placeholder="Gulnora opa"></div>
           <div class="field"><label>Bola ismi</label><input id="oo-child" type="text" placeholder="Aziz"></div>
-          <div class="field"><label>Telefon</label><input id="oo-phone" type="tel" placeholder="+998901234567"></div>
+          <div class="field"><label>📱 Telefon *</label><input id="oo-phone" type="tel" placeholder="+998901234567"></div>
         </div>
         <div class="field"><label>🕐 Bo'sh vaqti (qachon qulay)</label><input id="oo-freetime" type="text" placeholder="Dushanba-juma 18:00 dan keyin, dam olish kunlari ertalab"></div>
         <div class="field"><label>✅ Bu yil qanday ijobiy o'zgarishlar bo'ldi?</label><textarea id="oo-positive" placeholder="Ota-ona javobini yozing..."></textarea></div>
@@ -3858,7 +3859,12 @@ function toggleOoScript(){
   b.classList.toggle('open');
   a.textContent=b.classList.contains('open')?'▲':'▼';
 }
-function toggleOtaonaForm(){const f=document.getElementById('otaona-form');f.style.display=f.style.display==='none'?'block':'none';}
+function toggleOtaonaForm(){const f=document.getElementById('otaona-form');
+  if(f.style.display==='none'){ _ooEditId=null; ['oo-parent','oo-child','oo-phone','oo-freetime','oo-positive','oo-satisfied','oo-unsatisfied','oo-suggest'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';}); f.style.display='block'; }
+  else { f.style.display='none'; }
+}
+
+let _ooEditId=null; // null = new, id = editing existing
 
 async function saveOtaona(){
   const parent=document.getElementById('oo-parent').value.trim();
@@ -3869,11 +3875,39 @@ async function saveOtaona(){
   const satisfied=document.getElementById('oo-satisfied').value.trim();
   const unsatisfied=document.getElementById('oo-unsatisfied').value.trim();
   const suggest=document.getElementById('oo-suggest').value.trim();
-  if(!parent||!phone){toast('Ota-ona ismi va telefon kiriting','err');return;}
-  const{error}=await sb.from('parent_feedback').insert({parent_name:parent,child_name:child,phone,free_time:freetime,positive,satisfied,unsatisfied,suggestion:suggest,created_at:new Date().toISOString()});
+  // only phone is required — the rest can be filled in later by phone
+  if(!phone){toast('Telefon raqamini kiriting','err');return;}
+  const rec={parent_name:parent,child_name:child,phone,free_time:freetime,positive,satisfied,unsatisfied,suggestion:suggest};
+  let error;
+  if(_ooEditId){
+    ({error}=await sb.from('parent_feedback').update(rec).eq('id',_ooEditId));
+  }else{
+    rec.created_at=new Date().toISOString();
+    ({error}=await sb.from('parent_feedback').insert(rec));
+  }
   if(error){toast(error.message,'err');return;}
   ['oo-parent','oo-child','oo-phone','oo-freetime','oo-positive','oo-satisfied','oo-unsatisfied','oo-suggest'].forEach(id=>document.getElementById(id).value='');
-  toggleOtaonaForm();toast('✅ So\'rov saqlandi');loadOtaona();
+  toast(_ooEditId?'✅ Yangilandi':'✅ Saqlandi');
+  _ooEditId=null;
+  document.getElementById('otaona-form').style.display='none';
+  loadOtaona();
+}
+
+// edit an existing survey — load its data into the form
+function editOtaona(id){
+  const o=allOtaona.find(x=>x.id===id);
+  if(!o)return;
+  _ooEditId=id;
+  document.getElementById('oo-parent').value=o.parent_name||'';
+  document.getElementById('oo-child').value=o.child_name||'';
+  document.getElementById('oo-phone').value=o.phone||'';
+  document.getElementById('oo-freetime').value=o.free_time||'';
+  document.getElementById('oo-positive').value=o.positive||'';
+  document.getElementById('oo-satisfied').value=o.satisfied||'';
+  document.getElementById('oo-unsatisfied').value=o.unsatisfied||'';
+  document.getElementById('oo-suggest').value=o.suggestion||'';
+  document.getElementById('otaona-form').style.display='block';
+  document.getElementById('otaona-form').scrollIntoView({behavior:'smooth',block:'center'});
 }
 
 async function loadOtaona(){
@@ -3890,39 +3924,43 @@ function renderOoStats(){
   const s=document.getElementById('oo-stats');
   if(!s)return;
   const total=allOtaona.length;
-  const withTime=allOtaona.filter(o=>o.free_time&&o.free_time.trim()).length;
-  const withSuggest=allOtaona.filter(o=>o.suggestion&&o.suggestion.trim()).length;
+  const filled=allOtaona.filter(o=>(o.free_time&&o.free_time.trim())||(o.positive&&o.positive.trim())).length;
+  const pending=total-filled;
   s.innerHTML=`
-    <div class="oo-stat"><div class="oo-stat-n">${total}</div><div class="oo-stat-l">Jami so'rovlar</div></div>
-    <div class="oo-stat"><div class="oo-stat-n">${withTime}</div><div class="oo-stat-l">Bo'sh vaqti yozilgan</div></div>
-    <div class="oo-stat"><div class="oo-stat-n">${withSuggest}</div><div class="oo-stat-l">Taklif bergan</div></div>`;
+    <div class="oo-stat"><div class="oo-stat-n">${total}</div><div class="oo-stat-l">Jami raqamlar</div></div>
+    <div class="oo-stat"><div class="oo-stat-n" style="color:var(--gn)">${filled}</div><div class="oo-stat-l">To'ldirilgan</div></div>
+    <div class="oo-stat"><div class="oo-stat-n" style="color:var(--go)">${pending}</div><div class="oo-stat-l">Qo'ng'iroq kutmoqda</div></div>`;
 }
 
 function ooEsc(t){return t?String(t).replace(/</g,'&lt;').replace(/>/g,'&gt;'):'';}
 
 function renderOtaona(list){
   const c=document.getElementById('otaona-list');
-  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">👨‍👩‍👧</div>Hozircha so\'rovlar yo\'q. Skriptni o\'qing va qo\'ng\'iroq qilishni boshlang.</div>';return;}
+  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">👨‍👩‍👧</div>Hozircha raqamlar yo\'q. "+ Yangi so\'rov" tugmasi bilan raqamlarni qo\'shing.</div>';return;}
   c.innerHTML=list.map(o=>{
     const ans=[];
     if(o.positive)ans.push(`<div class="oo-ans pos"><div class="oo-ans-q">✅ Ijobiy o'zgarishlar</div><div class="oo-ans-a">${ooEsc(o.positive)}</div></div>`);
     if(o.satisfied)ans.push(`<div class="oo-ans sat"><div class="oo-ans-q">😊 Mamnun</div><div class="oo-ans-a">${ooEsc(o.satisfied)}</div></div>`);
     if(o.unsatisfied)ans.push(`<div class="oo-ans unsat"><div class="oo-ans-q">😕 Mamnun emas</div><div class="oo-ans-a">${ooEsc(o.unsatisfied)}</div></div>`);
     if(o.suggestion)ans.push(`<div class="oo-ans sug"><div class="oo-ans-q">💡 Takliflar</div><div class="oo-ans-a">${ooEsc(o.suggestion)}</div></div>`);
-    return `<div class="oo-card">
+    // is this survey still pending (only phone, nothing filled)?
+    const isPending=!((o.free_time&&o.free_time.trim())||(o.positive&&o.positive.trim()));
+    const pendingTag=isPending?'<span style="display:inline-block;background:rgba(251,191,36,.15);color:var(--go);font-size:11px;padding:3px 10px;border-radius:10px;margin-left:8px">⏳ qo\'ng\'iroq kutmoqda</span>':'';
+    return `<div class="oo-card" style="${isPending?'border-left:3px solid var(--go)':''}">
       <div class="oo-card-top">
         <div>
-          <div class="oo-card-name">${ooEsc(o.parent_name)}</div>
+          <div class="oo-card-name">${o.parent_name?ooEsc(o.parent_name):'<span style="color:var(--mu)">Ism yo\'q</span>'}${pendingTag}</div>
           ${o.child_name?`<div class="oo-card-child">👶 Bola: ${ooEsc(o.child_name)}</div>`:''}
           <a href="tel:${o.phone}" class="oo-card-phone">📱 ${o.phone}</a>
         </div>
         <div class="oo-card-date">${new Date(o.created_at).toLocaleDateString('ru')}</div>
       </div>
       ${o.free_time?`<div class="oo-freetime">🕐 <b>Bo'sh vaqti:</b> ${ooEsc(o.free_time)}</div>`:''}
-      ${ans.length?`<div class="oo-answers">${ans.join('')}</div>`:'<div style="font-size:13px;color:var(--mu)">Javoblar yozilmagan</div>'}
+      ${ans.length?`<div class="oo-answers">${ans.join('')}</div>`:''}
       <div class="oo-card-actions">
         <a href="tel:${o.phone}" class="btn-sm blue" style="text-decoration:none">📞 Qo'ng'iroq</a>
-        <button class="btn-sm red" onclick="deleteOtaona(${o.id})">🗑 O'chirish</button>
+        <button class="btn-sm green" onclick="editOtaona(${o.id})">✏️ ${isPending?'To\'ldirish':'Tahrirlash'}</button>
+        <button class="btn-sm red" onclick="deleteOtaona(${o.id})">🗑</button>
       </div>
     </div>`;
   }).join('');
