@@ -3722,7 +3722,9 @@ function renderLeads(list){const c=document.getElementById('lead-cards');
       <div class="lead-actions"><a href="tel:${l.phone}" class="btn-sm blue" style="text-decoration:none">📞 Qo'ng'iroq</a>
       <button class="btn-sm ${(!closed&&!checked)?'green':'yellow'}" onclick="openLeadComment(${l.id})">${(!closed&&!checked)?'📋 Hisobot yozish':'✏️ Natija'}</button>
       <button class="btn-sm red" onclick="deleteLead(${l.id})">🗑</button></div></div>`;}).join('');}
-function openLeadComment(id){const l=allLeads.find(x=>x.id===id)||(typeof allMLeads!=="undefined"?allMLeads.find(x=>x.id===id):null);document.getElementById('lcm-id').value=id;
+function openLeadComment(id){const l=allLeads.find(x=>x.id===id)||(typeof allMLeads!=="undefined"?allMLeads.find(x=>x.id===id):null)||(typeof allNLeads!=="undefined"?allNLeads.find(x=>x.id===id):null);
+  if(!l){toast('Lid topilmadi','err');return;}
+  document.getElementById('lcm-id').value=id;
   document.getElementById('lcm-name').value=l.name||'';document.getElementById('lcm-phone').value=l.phone||'';
   document.getElementById('lcm-status').value=l.status||'cold';document.getElementById('lcm-note').value='';
   // show history of past reports
@@ -3739,7 +3741,7 @@ async function saveLeadComment(){const id=+document.getElementById('lcm-id').val
   if(!note){toast('❗ Iltimos, hisobot yozing: lid bilan nima bo\'ldi?','err');document.getElementById('lcm-note').focus();return;}
   const now=new Date();const nowStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
   // append to history log
-  const l=allLeads.find(x=>x.id===id);
+  const l=allLeads.find(x=>x.id===id)||(typeof allMLeads!=="undefined"?allMLeads.find(x=>x.id===id):null)||(typeof allNLeads!=="undefined"?allNLeads.find(x=>x.id===id):null);
   let history='';try{history=l&&l.history?l.history:'';}catch(e){}
   const newEntry=`[${dtFmt(nowStr)}] ${LSTAT[status]||status}: ${note}`;
   history=history?(history+'\n'+newEntry):newEntry;
