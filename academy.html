@@ -758,6 +758,8 @@ audio{height:36px;border-radius:7px;max-width:240px}
 .leads-filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
 .filter-btn{padding:7px 14px;border-radius:7px;border:1px solid var(--brd);background:transparent;color:var(--mu);font-size:12px;font-weight:600;transition:.15s}
 .filter-btn.active{background:var(--ac);color:#fff;border-color:var(--ac)}
+.sort-btn{padding:7px 14px;border-radius:7px;border:1px solid var(--ac);background:rgba(124,92,255,.1);color:var(--ac2);font-size:12px;font-weight:700;transition:.15s;margin-left:auto;display:inline-flex;align-items:center;gap:5px}
+.sort-btn:hover{background:rgba(124,92,255,.2)}
 .day-pick{width:42px;height:42px;border-radius:10px;border:1px solid var(--brd);background:var(--s2);color:var(--mu);font-size:13px;font-weight:600;transition:.15s}
 .day-pick.on{background:var(--ac);color:#fff;border-color:var(--ac)}
 /* student profile drawer */
@@ -1476,8 +1478,8 @@ audio{height:36px;border-radius:7px;max-width:240px}
         <button class="filter-btn" onclick="filterLeads('hot',this)">🔥 Issiq</button>
         <button class="filter-btn" onclick="filterLeads('enrolled',this)">✅ Yozildi</button>
         <button class="filter-btn" onclick="filterLeads('refused',this)">❌ Rad</button>
-      </div>
-      <div class="lead-cards" id="lead-cards"><div class="loading-center"><div class="spin"></div></div></div>
+        <button class="sort-btn" id="leads-sort-btn" onclick="toggleLeadsSort()">⬇️ Yangi birinchi</button>
+      </div><div class="loading-center"><div class="spin"></div></div></div>
     </div>
 
 
@@ -1502,8 +1504,8 @@ audio{height:36px;border-radius:7px;max-width:240px}
         <button class="filter-btn" onclick="filterMLeads('hot',this)">🔥 Issiq</button>
         <button class="filter-btn" onclick="filterMLeads('enrolled',this)">✅ Yozildi</button>
         <button class="filter-btn" onclick="filterMLeads('refused',this)">❌ Rad</button>
-      </div>
-      <div class="lead-cards" id="mlead-cards"><div class="loading-center"><div class="spin"></div></div></div>
+        <button class="sort-btn" id="mleads-sort-btn" onclick="toggleMLeadsSort()">⬇️ Yangi birinchi</button>
+      </div><div class="loading-center"><div class="spin"></div></div></div>
     </div>
 
     <!-- NOLAVOY (PRESCHOOL) LEADS -->
@@ -1527,8 +1529,8 @@ audio{height:36px;border-radius:7px;max-width:240px}
         <button class="filter-btn" onclick="filterNLeads('hot',this)">🔥 Issiq</button>
         <button class="filter-btn" onclick="filterNLeads('enrolled',this)">✅ Yozildi</button>
         <button class="filter-btn" onclick="filterNLeads('refused',this)">❌ Rad</button>
-      </div>
-      <div class="lead-cards" id="nlead-cards"><div class="loading-center"><div class="spin"></div></div></div>
+        <button class="sort-btn" id="nleads-sort-btn" onclick="toggleNLeadsSort()">⬇️ Yangi birinchi</button>
+      </div><div class="loading-center"><div class="spin"></div></div></div>
     </div>
 
     <!-- OTA-ONALAR FIKRI (parent feedback survey) -->
@@ -3694,8 +3696,27 @@ async function saveLead(){const name=document.getElementById('ld-name').value.tr
 async function loadLeads(){const{data}=await sb.from('leads').select('*').order('created_at',{ascending:false});allLeads=(data||[]).filter(l=>!l.lead_type||l.lead_type==='blog');renderLeads(allLeads);scheduleReminders(allLeads);}
 function filterLeads(s,btn){leadsFilter=s;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   renderLeads(s==='all'?allLeads:allLeads.filter(l=>l.status===s));}
+function toggleLeadsSort(){leadsSortDir=leadsSortDir==='new'?'old':'new';
+  const btn=document.getElementById('leads-sort-btn');if(btn)btn.textContent=leadsSortDir==='new'?'⬇️ Yangi birinchi':'⬆️ Eski birinchi';
+  renderLeads(leadsFilter==='all'?allLeads:allLeads.filter(l=>l.status===leadsFilter));}
 const LSTAT={cold:'❄️ Sovuq',thinking:'🤔 O\'ylayotgan',hot:'🔥 Issiq',enrolled:'✅ Yozildi',refused:'❌ Rad'};
 function isCheckedToday(l){return l.last_checked&&dtDateOnly(l.last_checked)===todayLocalStr();}
+// ── LEAD SORT (by last activity date) ──
+// Sort direction per stream: 'new' = newest activity first, 'old' = oldest first
+let leadsSortDir='new', mleadsSortDir='new', nleadsSortDir='new';
+// "last activity" = last report/update if exists, else creation date
+function leadActivityTime(l){return new Date(l.updated_at||l.last_checked||l.created_at).getTime();}
+// Sort a list: unchecked/new leads always stay on top (so operator never misses them),
+// then within each group sort by activity date according to direction.
+function sortLeadsList(list,dir){
+  return [...list].sort((a,b)=>{
+    const ua=(a.status!=='enrolled'&&a.status!=='refused'&&!isCheckedToday(a))?0:1;
+    const ub=(b.status!=='enrolled'&&b.status!=='refused'&&!isCheckedToday(b))?0:1;
+    if(ua!==ub)return ua-ub; // unchecked group first
+    const ta=leadActivityTime(a),tb=leadActivityTime(b);
+    return dir==='new'?(tb-ta):(ta-tb); // newest first or oldest first
+  });
+}
 function renderLeads(list){const c=document.getElementById('lead-cards');
   if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">📞</div>Lid yo\'q</div>';return;}
   // unread count = leads not yet checked today (skip enrolled/refused — yopilgan)
@@ -3705,8 +3726,8 @@ function renderLeads(list){const c=document.getElementById('lead-cards');
     if(unread>0)banner.innerHTML=`<div style="background:rgba(124,92,255,.12);border:1px solid var(--ac);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:22px">📨</span><div><b style="color:var(--ac2)">${unread} ta lid bugun tekshirilmagan</b><div style="font-size:12px;color:var(--mu)">Har bir lidni oching, hisobot yozing va "tekshirildi" deb belgilang</div></div></div>`;
     else banner.innerHTML=`<div style="background:rgba(52,211,153,.1);border:1px solid var(--gn);border-radius:10px;padding:12px 16px;margin-bottom:14px;color:var(--gn)">✅ Barcha lidlar bugun tekshirildi! Zo'r ish!</div>`;
   }
-  // sort: unchecked first
-  const sorted=[...list].sort((a,b)=>{const ua=(a.status!=='enrolled'&&a.status!=='refused'&&!isCheckedToday(a))?0:1;const ub=(b.status!=='enrolled'&&b.status!=='refused'&&!isCheckedToday(b))?0:1;return ua-ub;});
+  // sort: unchecked first, then by activity date (direction toggle)
+  const sorted=sortLeadsList(list,leadsSortDir);
   c.innerHTML=sorted.map(l=>{const rem=l.reminder_at?`<div class="lead-reminder">⏰ Qayta qo'ng'iroq: ${dtFmt(l.reminder_at)}</div>`:'';
     const com=l.last_comment?`<div class="lead-comment">"${l.last_comment}"</div>`:'';
     const closed=l.status==='enrolled'||l.status==='refused';
@@ -3779,6 +3800,9 @@ async function loadMaktabLeads(){const{data}=await sb.from('leads').select('*').
 
 function filterMLeads(s,btn){mleadsFilter=s;btn.parentElement.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   renderMLeads(s==='all'?allMLeads:allMLeads.filter(l=>l.status===s));}
+function toggleMLeadsSort(){mleadsSortDir=mleadsSortDir==='new'?'old':'new';
+  const btn=document.getElementById('mleads-sort-btn');if(btn)btn.textContent=mleadsSortDir==='new'?'⬇️ Yangi birinchi':'⬆️ Eski birinchi';
+  renderMLeads(mleadsFilter==='all'?allMLeads:allMLeads.filter(l=>l.status===mleadsFilter));}
 
 function renderMLeads(list){const c=document.getElementById('mlead-cards');
   if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">🏫</div>Maktab lidi yo\'q</div>';return;}
@@ -3788,7 +3812,7 @@ function renderMLeads(list){const c=document.getElementById('mlead-cards');
     if(unread>0)banner.innerHTML=`<div style="background:rgba(124,92,255,.12);border:1px solid var(--ac);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:22px">📨</span><div><b style="color:var(--ac2)">${unread} ta maktab lidi bugun tekshirilmagan</b><div style="font-size:12px;color:var(--mu)">Har bir lidni oching, hisobot yozing</div></div></div>`;
     else banner.innerHTML=`<div style="background:rgba(52,211,153,.1);border:1px solid var(--gn);border-radius:10px;padding:12px 16px;margin-bottom:14px;color:var(--gn)">✅ Barcha maktab lidlari bugun tekshirildi!</div>`;
   }
-  const sorted=[...list].sort((a,b)=>{const ua=(a.status!=='enrolled'&&a.status!=='refused'&&!isCheckedToday(a))?0:1;const ub=(b.status!=='enrolled'&&b.status!=='refused'&&!isCheckedToday(b))?0:1;return ua-ub;});
+  const sorted=sortLeadsList(list,mleadsSortDir);
   c.innerHTML=sorted.map(l=>{const rem=l.reminder_at?`<div class="lead-reminder">⏰ Qayta qo'ng'iroq: ${dtFmt(l.reminder_at)}</div>`:'';
     const com=l.last_comment?`<div class="lead-comment">"${l.last_comment}"</div>`:'';
     const closed=l.status==='enrolled'||l.status==='refused';
@@ -3824,6 +3848,9 @@ async function loadNolavoyLeads(){const{data}=await sb.from('leads').select('*')
 
 function filterNLeads(s,btn){nleadsFilter=s;btn.parentElement.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   renderNLeads(s==='all'?allNLeads:allNLeads.filter(l=>l.status===s));}
+function toggleNLeadsSort(){nleadsSortDir=nleadsSortDir==='new'?'old':'new';
+  const btn=document.getElementById('nleads-sort-btn');if(btn)btn.textContent=nleadsSortDir==='new'?'⬇️ Yangi birinchi':'⬆️ Eski birinchi';
+  renderNLeads(nleadsFilter==='all'?allNLeads:allNLeads.filter(l=>l.status===nleadsFilter));}
 
 function renderNLeads(list){const c=document.getElementById('nlead-cards');
   if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">🧸</div>Nolavoy lidi yo\'q</div>';return;}
@@ -3833,7 +3860,7 @@ function renderNLeads(list){const c=document.getElementById('nlead-cards');
     if(unread>0)banner.innerHTML=`<div style="background:rgba(124,92,255,.12);border:1px solid var(--ac);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:22px">📨</span><div><b style="color:var(--ac2)">${unread} ta nolavoy lidi bugun tekshirilmagan</b><div style="font-size:12px;color:var(--mu)">Har bir lidni oching, hisobot yozing</div></div></div>`;
     else banner.innerHTML=`<div style="background:rgba(52,211,153,.1);border:1px solid var(--gn);border-radius:10px;padding:12px 16px;margin-bottom:14px;color:var(--gn)">✅ Barcha nolavoy lidlari bugun tekshirildi!</div>`;
   }
-  const sorted=[...list].sort((a,b)=>{const ua=(a.status!=='enrolled'&&a.status!=='refused'&&!isCheckedToday(a))?0:1;const ub=(b.status!=='enrolled'&&b.status!=='refused'&&!isCheckedToday(b))?0:1;return ua-ub;});
+  const sorted=sortLeadsList(list,nleadsSortDir);
   c.innerHTML=sorted.map(l=>{const rem=l.reminder_at?`<div class="lead-reminder">⏰ Qayta qo'ng'iroq: ${dtFmt(l.reminder_at)}</div>`:'';
     const com=l.last_comment?`<div class="lead-comment">"${l.last_comment}"</div>`:'';
     const closed=l.status==='enrolled'||l.status==='refused';
