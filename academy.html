@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>UTKONOS Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -795,15 +795,76 @@ audio{height:36px;border-radius:7px;max-width:240px}
 .toast.ok{border-color:var(--gn);color:var(--gn)}.toast.err{border-color:var(--rd);color:var(--rd)}
 
 @media(max-width:600px){
-  .sidebar{width:100%;height:auto;min-height:0;position:relative;flex-direction:row;overflow-x:auto;padding:10px}
-  .sb-logo,.sb-bottom{display:none}
-  .sb-nav{display:flex;padding:0}
-  .sb-item{border-left:none;border-bottom:2px solid transparent;white-space:nowrap;padding:10px 14px}
-  .sb-item.active{border-left:none;border-bottom-color:var(--ac)}
-  #p-admin{flex-direction:column}
-  .main-area{padding:16px}
   .stats-row{grid-template-columns:1fr 1fr}
 }
+
+/* ══════════ MOBILE APP LAYER (bottom-nav, app look) ══════════ */
+@media(max-width:768px){
+  .sidebar{display:none!important}
+  #p-admin{flex-direction:column}
+  .main-area{padding:66px 12px calc(86px + env(safe-area-inset-bottom))}
+
+  /* top brand bar */
+  .mtop{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;
+    padding:calc(10px + env(safe-area-inset-top)) 16px 10px;background:rgba(11,14,26,.85);backdrop-filter:blur(18px) saturate(140%);
+    -webkit-backdrop-filter:blur(18px) saturate(140%);border-bottom:1px solid var(--glass-brd)}
+  .mtop-logo{font-family:var(--fd);font-size:14px;font-weight:800;letter-spacing:2.5px;color:#fff}
+  .mtop-logo span{color:var(--ac2)}
+  .mtop-role{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--mu);background:var(--glass);
+    border:1px solid var(--glass-brd);padding:4px 10px;border-radius:20px}
+
+  /* bottom navigation */
+  .bnav{position:fixed;bottom:0;left:0;right:0;z-index:60;display:flex;
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom));background:rgba(11,14,26,.88);
+    backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%);
+    border-top:1px solid var(--glass-brd)}
+  .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;
+    border:none;background:transparent;color:var(--mu);border-radius:12px;transition:.15s;min-width:0}
+  .bnav-item .bi{font-size:21px;line-height:1;filter:grayscale(.55) brightness(.9);transition:.15s}
+  .bnav-item .bt{font-size:9.5px;font-weight:700;letter-spacing:.2px;white-space:nowrap;overflow:hidden;
+    text-overflow:ellipsis;max-width:100%}
+  .bnav-item.active{color:var(--ac2)}
+  .bnav-item.active .bi{filter:none;transform:translateY(-1px)}
+  .bnav-item:active{transform:scale(.93)}
+
+  /* bottom sheet (more menu) */
+  .bsheet-back{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:70;opacity:0;pointer-events:none;transition:.25s}
+  .bsheet-back.on{opacity:1;pointer-events:auto}
+  .bsheet{position:fixed;left:0;right:0;bottom:0;z-index:71;background:var(--s);border-radius:22px 22px 0 0;
+    border:1px solid var(--glass-brd);border-bottom:none;padding:10px 14px calc(18px + env(safe-area-inset-bottom));
+    transform:translateY(105%);transition:.3s cubic-bezier(.3,1,.4,1);max-height:75vh;overflow-y:auto}
+  .bsheet.on{transform:none}
+  .bsheet-grab{width:42px;height:4px;border-radius:4px;background:var(--brd);margin:2px auto 14px}
+  .bsheet-title{font-family:var(--fd);font-size:15px;font-weight:700;margin-bottom:12px;padding-left:4px}
+  .bsheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .bsheet-it{display:flex;align-items:center;gap:10px;padding:13px 13px;border-radius:13px;background:var(--glass);
+    border:1px solid var(--glass-brd);color:var(--tx);font-size:12.5px;font-weight:600;text-align:left}
+  .bsheet-it .bi{font-size:19px}
+  .bsheet-it.active{border-color:rgba(124,92,255,.45);background:linear-gradient(135deg,rgba(124,92,255,.2),rgba(124,92,255,.06))}
+  .bsheet-it:active{transform:scale(.96)}
+  .bsheet-logout{margin-top:14px;width:100%;padding:14px;border-radius:13px;border:1px solid rgba(255,90,90,.3);
+    background:rgba(255,90,90,.08);color:#ff7a7a;font-size:13px;font-weight:700}
+
+  /* touch-friendly leads & UI */
+  .ap-title{font-size:21px}
+  .ap-head{flex-wrap:wrap;gap:10px}
+  .stats-row{grid-template-columns:1fr 1fr;gap:9px}
+  .stat-card{padding:14px 12px}
+  .stat-val{font-size:22px}
+  .leads-filter-row{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .leads-filter-row::-webkit-scrollbar{display:none}
+  .filter-btn,.sort-btn{white-space:nowrap;padding:10px 15px;font-size:12.5px;flex-shrink:0}
+  #leads-sort-btn,#mleads-sort-btn,#nleads-sort-btn{margin-left:4px}
+  .lead-card{padding:15px 14px;border-radius:15px}
+  .lead-name{font-size:15px}
+  .lead-phone{font-size:14px}
+  .lead-actions{gap:8px;flex-wrap:wrap}
+  .lead-actions .btn-sm,.lead-actions a.btn-sm{padding:11px 15px;font-size:13px;border-radius:11px}
+  .btn-sm{padding:10px 14px}
+  .tbl-scroll{-webkit-overflow-scrolling:touch}
+  input,select,textarea{font-size:16px!important} /* prevent iOS zoom-on-focus */
+}
+
 </style>
 </head>
 <body>
@@ -6061,6 +6122,88 @@ function endWork(){}
 })();
 
 (async function(){await restoreSession();})();
+
+/* ══════════ MOBILE APP NAV (bottom bar + sheet) ══════════ */
+(function(){
+  const MQ=window.matchMedia('(max-width:768px)');
+  let built=false;
+
+  function labelParts(lbl){
+    const m=lbl.trim().match(/^(\S+)\s+(.*)$/);
+    return m?{icon:m[1],text:m[2]}:{icon:'•',text:lbl};
+  }
+
+  function buildMobileNav(){
+    const sbItems=[...document.querySelectorAll('#sb-nav .sb-item')];
+    if(!sbItems.length)return;
+    // remove previous
+    document.querySelectorAll('.mtop,.bnav,.bsheet,.bsheet-back').forEach(e=>e.remove());
+
+    // top brand bar
+    const top=document.createElement('div');top.className='mtop';
+    const role=(document.getElementById('sb-role')||{}).textContent||'';
+    top.innerHTML=`<div class="mtop-logo">UTKO<span>NOS</span></div><div class="mtop-role">${role}</div>`;
+    document.body.appendChild(top);
+
+    // bottom nav: first 4 + "Yana"
+    const items=sbItems.map(el=>({panel:el.dataset.panel,label:el.textContent,el}));
+    const main=items.slice(0,4);
+    const bnav=document.createElement('div');bnav.className='bnav';
+    bnav.innerHTML=main.map(it=>{const p=labelParts(it.label);
+      return `<button class="bnav-item" data-panel="${it.panel}"><span class="bi">${p.icon}</span><span class="bt">${p.text}</span></button>`;
+    }).join('')+`<button class="bnav-item" data-panel="__more"><span class="bi">☰</span><span class="bt">Yana</span></button>`;
+    document.body.appendChild(bnav);
+
+    // bottom sheet with ALL items + logout
+    const back=document.createElement('div');back.className='bsheet-back';document.body.appendChild(back);
+    const sheet=document.createElement('div');sheet.className='bsheet';
+    sheet.innerHTML=`<div class="bsheet-grab"></div><div class="bsheet-title">Bo'limlar</div>
+      <div class="bsheet-grid">${items.map(it=>{const p=labelParts(it.label);
+        return `<button class="bsheet-it" data-panel="${it.panel}"><span class="bi">${p.icon}</span><span>${p.text}</span></button>`;}).join('')}</div>
+      <button class="bsheet-logout" onclick="doLogout()">🚪 Chiqish</button>`;
+    document.body.appendChild(sheet);
+
+    const openSheet=()=>{back.classList.add('on');sheet.classList.add('on');};
+    const closeSheet=()=>{back.classList.remove('on');sheet.classList.remove('on');};
+    back.addEventListener('click',closeSheet);
+
+    bnav.addEventListener('click',e=>{
+      const b=e.target.closest('.bnav-item');if(!b)return;
+      if(b.dataset.panel==='__more'){openSheet();return;}
+      const it=items.find(x=>x.panel===b.dataset.panel);
+      if(it)navTo(it.panel,it.el);
+    });
+    sheet.addEventListener('click',e=>{
+      const b=e.target.closest('.bsheet-it');if(!b)return;
+      const it=items.find(x=>x.panel===b.dataset.panel);
+      if(it){navTo(it.panel,it.el);closeSheet();}
+    });
+
+    window.__syncBnav=function(panel){
+      bnav.querySelectorAll('.bnav-item').forEach(b=>b.classList.toggle('active',b.dataset.panel===panel));
+      sheet.querySelectorAll('.bsheet-it').forEach(b=>b.classList.toggle('active',b.dataset.panel===panel));
+      // if panel not in main 4 → highlight "Yana"
+      if(!main.some(m=>m.panel===panel)) bnav.querySelector('[data-panel="__more"]').classList.add('active');
+    };
+    const cur=document.querySelector('#sb-nav .sb-item.active');
+    if(cur)window.__syncBnav(cur.dataset.panel);
+    built=true;
+  }
+
+  // hook navTo to sync bottom nav highlight
+  const _origNavTo=window.navTo;
+  window.navTo=function(panel,el){_origNavTo(panel,el);if(window.__syncBnav)window.__syncBnav(panel);};
+
+  // rebuild whenever role menu is (re)built
+  const target=document.getElementById('sb-nav');
+  if(target){new MutationObserver(()=>{if(MQ.matches)buildMobileNav();}).observe(target,{childList:true});}
+  if(MQ.matches&&target&&target.children.length)buildMobileNav();
+  MQ.addEventListener('change',e=>{
+    if(e.matches){buildMobileNav();}
+    else{document.querySelectorAll('.mtop,.bnav,.bsheet,.bsheet-back').forEach(x=>x.remove());built=false;}
+  });
+})();
+
 </script>
 </body>
 </html>
