@@ -799,6 +799,13 @@ audio{height:36px;border-radius:7px;max-width:240px}
 }
 
 /* ══════════ MOBILE APP LAYER (bottom-nav, app look) ══════════ */
+/* admin bottom-nav only shows when admin page is active */
+@media(max-width:768px){
+  body:not(.mob-admin) .mtop,
+  body:not(.mob-admin) .bnav,
+  body:not(.mob-admin) .bsheet,
+  body:not(.mob-admin) .bsheet-back{display:none!important}
+}
 @media(max-width:768px){
   .sidebar{display:none!important}
   #p-admin{flex-direction:column}
@@ -865,6 +872,24 @@ audio{height:36px;border-radius:7px;max-width:240px}
   input,select,textarea{font-size:16px!important} /* prevent iOS zoom-on-focus */
 }
 
+/* ══════════ STUDENT MOBILE (bottom tabs, app look) ══════════ */
+@media(max-width:768px){
+  .stu-header{padding:calc(11px + env(safe-area-inset-top)) 16px 11px}
+  .stu-main{padding:16px 14px calc(84px + env(safe-area-inset-bottom))}
+  /* turn top pill-nav into a fixed bottom bar */
+  .stu-nav{position:fixed;bottom:0;left:0;right:0;top:auto;z-index:60;margin:0;border-radius:0;
+    gap:0;padding:6px 8px calc(6px + env(safe-area-inset-bottom));
+    background:rgba(11,14,26,.9);backdrop-filter:blur(20px) saturate(150%);
+    -webkit-backdrop-filter:blur(20px) saturate(150%);border:none;border-top:1px solid var(--glass-brd)}
+  .stu-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    padding:8px 4px;border-radius:14px;line-height:1.1;color:var(--mu)}
+  .stu-tab .ti{font-size:22px;line-height:1;margin-right:0;filter:grayscale(.5) brightness(.92);transition:.15s}
+  .stu-tab .tl{font-size:10px;font-weight:700}
+  .stu-tab.active{background:transparent;color:var(--ac2)}
+  .stu-tab.active .ti{filter:none;transform:translateY(-1px)}
+  .stu-tab:active{transform:scale(.94)}
+}
+
 </style>
 </head>
 <body>
@@ -880,6 +905,7 @@ audio{height:36px;border-radius:7px;max-width:240px}
 .stu-nav{display:flex;gap:3px;background:var(--s);border:1px solid var(--brd);border-radius:12px;padding:4px;margin-bottom:18px;position:sticky;top:60px;z-index:40}
 .stu-tab{flex:1;padding:10px 4px;border:none;background:transparent;color:var(--mu);font-size:12px;font-weight:600;border-radius:8px;transition:.15s}
 .stu-tab.active{background:var(--s2);color:var(--tx)}
+.stu-tab .ti{margin-right:5px}
 .stu-panel{display:none}.stu-panel.on{display:block}
 
 /* ── BRAIN ── */
@@ -2123,8 +2149,8 @@ audio{height:36px;border-radius:7px;max-width:240px}
   </div>
   <div class="stu-main">
     <div class="stu-nav">
-      <button class="stu-tab active" onclick="stuTab('today')">📚 Bugungi dars</button>
-      <button class="stu-tab" onclick="stuTab('brain')">🧠 Mening miyam</button>
+      <button class="stu-tab active" onclick="stuTab('today')"><span class="ti">📚</span><span class="tl">Bugungi dars</span></button>
+      <button class="stu-tab" onclick="stuTab('brain')"><span class="ti">🧠</span><span class="tl">Mening miyam</span></button>
     </div>
 
     <!-- ═══ BUGUNGI DARS (reels) ═══ -->
@@ -2429,7 +2455,7 @@ let allStudents=[], allLeads=[], leadsFilter='all', selectedStudentId=null;
 let reminderTimers={};
 
 // ── UTILS ──
-function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.getElementById(id).classList.add('on');}
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.getElementById(id).classList.add('on');document.body.classList.toggle('mob-admin',id==='p-admin');}
 function toast(m,t='ok'){const e=document.getElementById('toast');e.textContent=m;e.className='toast on '+(t==='ok'?'ok':'err');setTimeout(()=>e.classList.remove('on'),2800);}
 function fmt(n){return Number(n||0).toLocaleString('ru')}
 // Time helpers — store & show EXACTLY what user entered, no timezone shift
