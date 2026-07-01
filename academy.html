@@ -758,6 +758,10 @@ audio{height:36px;border-radius:7px;max-width:240px}
 .leads-filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
 .filter-btn{padding:7px 14px;border-radius:7px;border:1px solid var(--brd);background:transparent;color:var(--mu);font-size:12px;font-weight:600;transition:.15s}
 .filter-btn.active{background:var(--ac);color:#fff;border-color:var(--ac)}
+.sort-btn{padding:7px 14px;border-radius:7px;border:1px solid var(--brd);background:transparent;color:var(--mu);font-size:12px;font-weight:700;transition:.15s;display:inline-flex;align-items:center;gap:5px}
+.sort-btn:hover{border-color:var(--ac);color:var(--ac2)}
+.sort-btn.sort-active{border-color:var(--ac);background:var(--ac);color:#fff}
+#leads-sort-btn,#mleads-sort-btn,#nleads-sort-btn{margin-left:auto}
 .day-pick{width:42px;height:42px;border-radius:10px;border:1px solid var(--brd);background:var(--s2);color:var(--mu);font-size:13px;font-weight:600;transition:.15s}
 .day-pick.on{background:var(--ac);color:#fff;border-color:var(--ac)}
 /* student profile drawer */
@@ -1473,6 +1477,8 @@ audio{height:36px;border-radius:7px;max-width:240px}
         <button class="filter-btn active" onclick="filterLeads('all',this)">📋 Barchasi</button>
         <button class="filter-btn" onclick="filterLeads('cold',this)">❄️ Sovuqlar</button>
         <button class="filter-btn" onclick="filterLeads('enrolled',this)">✅ Yozilganlar</button>
+        <button class="sort-btn sort-active" id="leads-sort-btn" onclick="toggleLeadsSort()">⬇️ Yangi birinchi</button>
+        <button class="sort-btn" id="leads-sortc-btn" onclick="toggleLeadsSortCreated()">🕔 Qo'shilgan: yangi</button>
       </div>
       <div class="lead-cards" id="lead-cards"><div class="loading-center"><div class="spin"></div></div></div>
     </div>
@@ -1496,6 +1502,8 @@ audio{height:36px;border-radius:7px;max-width:240px}
         <button class="filter-btn active" onclick="filterMLeads('all',this)">📋 Barchasi</button>
         <button class="filter-btn" onclick="filterMLeads('cold',this)">❄️ Sovuqlar</button>
         <button class="filter-btn" onclick="filterMLeads('enrolled',this)">✅ Yozilganlar</button>
+        <button class="sort-btn sort-active" id="mleads-sort-btn" onclick="toggleMLeadsSort()">⬇️ Yangi birinchi</button>
+        <button class="sort-btn" id="mleads-sortc-btn" onclick="toggleMLeadsSortCreated()">🕔 Qo'shilgan: yangi</button>
       </div>
       <div class="lead-cards" id="mlead-cards"><div class="loading-center"><div class="spin"></div></div></div>
     </div>
@@ -1518,6 +1526,8 @@ audio{height:36px;border-radius:7px;max-width:240px}
         <button class="filter-btn active" onclick="filterNLeads('all',this)">📋 Barchasi</button>
         <button class="filter-btn" onclick="filterNLeads('cold',this)">❄️ Sovuqlar</button>
         <button class="filter-btn" onclick="filterNLeads('enrolled',this)">✅ Yozilganlar</button>
+        <button class="sort-btn sort-active" id="nleads-sort-btn" onclick="toggleNLeadsSort()">⬇️ Yangi birinchi</button>
+        <button class="sort-btn" id="nleads-sortc-btn" onclick="toggleNLeadsSortCreated()">🕔 Qo'shilgan: yangi</button>
       </div>
       <div class="lead-cards" id="nlead-cards"><div class="loading-center"><div class="spin"></div></div></div>
     </div>
@@ -3685,13 +3695,37 @@ async function saveLead(){const name=document.getElementById('ld-name').value.tr
 async function loadLeads(){const{data}=await sb.from('leads').select('*').order('created_at',{ascending:false});allLeads=(data||[]).filter(l=>!l.lead_type||l.lead_type==='blog');renderLeads(allLeads);scheduleReminders(allLeads);}
 function filterLeads(s,btn){leadsFilter=s;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   renderLeads(s==='all'?allLeads:allLeads.filter(l=>l.status===s));}
+function toggleLeadsSort(){
+  if(leadsSortField==='activity')leadsSortDir=leadsSortDir==='new'?'old':'new';else{leadsSortField='activity';leadsSortDir='new';}
+  updateLeadsSortBtns();
+  renderLeads(leadsFilter==='all'?allLeads:allLeads.filter(l=>l.status===leadsFilter));}
+function toggleLeadsSortCreated(){
+  if(leadsSortField==='created')leadsSortDir=leadsSortDir==='new'?'old':'new';else{leadsSortField='created';leadsSortDir='new';}
+  updateLeadsSortBtns();
+  renderLeads(leadsFilter==='all'?allLeads:allLeads.filter(l=>l.status===leadsFilter));}
+function updateLeadsSortBtns(){
+  const a=document.getElementById('leads-sort-btn'),c=document.getElementById('leads-sortc-btn');
+  if(a){a.classList.toggle('sort-active',leadsSortField==='activity');a.textContent=(leadsSortField==='activity'&&leadsSortDir==='old')?'⬆️ Eski birinchi':'⬇️ Yangi birinchi';}
+  if(c){c.classList.toggle('sort-active',leadsSortField==='created');c.textContent=(leadsSortField==='created'&&leadsSortDir==='old')?'🕔 Qo\'shilgan: eski':'🕔 Qo\'shilgan: yangi';}}
 const LSTAT={cold:'❄️ Sovuq',thinking:'🤔 O\'ylayotgan',hot:'🔥 Issiq',enrolled:'✅ Yozildi',refused:'❌ Rad'};
 function isCheckedToday(l){return l.last_checked&&dtDateOnly(l.last_checked)===todayLocalStr();}
 // ── LEAD SORT (by last activity date) ──
 // Sort direction per stream: 'new' = newest activity first, 'old' = oldest first
-// ── LEAD SORT: FIXED — always by creation date, newest first ──
-function sortLeadsList(list){
-  return [...list].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+// ── LEAD SORT: two axes — 'activity' (last change) or 'created' (date added) ──
+// Sorting is PURE by the chosen date: strict date order, no regrouping.
+let leadsSortField='activity', leadsSortDir='new';
+let mleadsSortField='activity', mleadsSortDir='new';
+let nleadsSortField='activity', nleadsSortDir='new';
+// last change = last report/update if exists, else creation date
+function leadActivityTime(l){return new Date(l.updated_at||l.last_checked||l.created_at||0).getTime();}
+// date added to the base
+function leadCreatedTime(l){return new Date(l.created_at||0).getTime();}
+function sortLeadsList(list,field,dir){
+  const timeFn=field==='created'?leadCreatedTime:leadActivityTime;
+  return [...list].sort((a,b)=>{
+    const ta=timeFn(a),tb=timeFn(b);
+    return dir==='new'?(tb-ta):(ta-tb);
+  });
 }
 function renderLeads(list){const c=document.getElementById('lead-cards');
   if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">📞</div>Lid yo\'q</div>';return;}
@@ -3703,7 +3737,7 @@ function renderLeads(list){const c=document.getElementById('lead-cards');
     else banner.innerHTML=`<div style="background:rgba(52,211,153,.1);border:1px solid var(--gn);border-radius:10px;padding:12px 16px;margin-bottom:14px;color:var(--gn)">✅ Barcha lidlar bugun tekshirildi! Zo'r ish!</div>`;
   }
   // sort: unchecked first, then by activity date (direction toggle)
-  const sorted=sortLeadsList(list);
+  const sorted=sortLeadsList(list,leadsSortField,leadsSortDir);
   c.innerHTML=sorted.map(l=>{const rem=l.reminder_at?`<div class="lead-reminder">⏰ Qayta qo'ng'iroq: ${dtFmt(l.reminder_at)}</div>`:'';
     const com=l.last_comment?`<div class="lead-comment">"${l.last_comment}"</div>`:'';
     const closed=l.status==='enrolled'||l.status==='refused';
@@ -3776,6 +3810,18 @@ async function loadMaktabLeads(){const{data}=await sb.from('leads').select('*').
 
 function filterMLeads(s,btn){mleadsFilter=s;btn.parentElement.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   renderMLeads(s==='all'?allMLeads:allMLeads.filter(l=>l.status===s));}
+function toggleMLeadsSort(){
+  if(mleadsSortField==='activity')mleadsSortDir=mleadsSortDir==='new'?'old':'new';else{mleadsSortField='activity';mleadsSortDir='new';}
+  updateMLeadsSortBtns();
+  renderMLeads(mleadsFilter==='all'?allMLeads:allMLeads.filter(l=>l.status===mleadsFilter));}
+function toggleMLeadsSortCreated(){
+  if(mleadsSortField==='created')mleadsSortDir=mleadsSortDir==='new'?'old':'new';else{mleadsSortField='created';mleadsSortDir='new';}
+  updateMLeadsSortBtns();
+  renderMLeads(mleadsFilter==='all'?allMLeads:allMLeads.filter(l=>l.status===mleadsFilter));}
+function updateMLeadsSortBtns(){
+  const a=document.getElementById('mleads-sort-btn'),c=document.getElementById('mleads-sortc-btn');
+  if(a){a.classList.toggle('sort-active',mleadsSortField==='activity');a.textContent=(mleadsSortField==='activity'&&mleadsSortDir==='old')?'⬆️ Eski birinchi':'⬇️ Yangi birinchi';}
+  if(c){c.classList.toggle('sort-active',mleadsSortField==='created');c.textContent=(mleadsSortField==='created'&&mleadsSortDir==='old')?'🕔 Qo\'shilgan: eski':'🕔 Qo\'shilgan: yangi';}}
 
 function renderMLeads(list){const c=document.getElementById('mlead-cards');
   if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">🏫</div>Maktab lidi yo\'q</div>';return;}
@@ -3785,7 +3831,7 @@ function renderMLeads(list){const c=document.getElementById('mlead-cards');
     if(unread>0)banner.innerHTML=`<div style="background:rgba(124,92,255,.12);border:1px solid var(--ac);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:22px">📨</span><div><b style="color:var(--ac2)">${unread} ta maktab lidi bugun tekshirilmagan</b><div style="font-size:12px;color:var(--mu)">Har bir lidni oching, hisobot yozing</div></div></div>`;
     else banner.innerHTML=`<div style="background:rgba(52,211,153,.1);border:1px solid var(--gn);border-radius:10px;padding:12px 16px;margin-bottom:14px;color:var(--gn)">✅ Barcha maktab lidlari bugun tekshirildi!</div>`;
   }
-  const sorted=sortLeadsList(list);
+  const sorted=sortLeadsList(list,mleadsSortField,mleadsSortDir);
   c.innerHTML=sorted.map(l=>{const rem=l.reminder_at?`<div class="lead-reminder">⏰ Qayta qo'ng'iroq: ${dtFmt(l.reminder_at)}</div>`:'';
     const com=l.last_comment?`<div class="lead-comment">"${l.last_comment}"</div>`:'';
     const closed=l.status==='enrolled'||l.status==='refused';
@@ -3821,6 +3867,18 @@ async function loadNolavoyLeads(){const{data}=await sb.from('leads').select('*')
 
 function filterNLeads(s,btn){nleadsFilter=s;btn.parentElement.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   renderNLeads(s==='all'?allNLeads:allNLeads.filter(l=>l.status===s));}
+function toggleNLeadsSort(){
+  if(nleadsSortField==='activity')nleadsSortDir=nleadsSortDir==='new'?'old':'new';else{nleadsSortField='activity';nleadsSortDir='new';}
+  updateNLeadsSortBtns();
+  renderNLeads(nleadsFilter==='all'?allNLeads:allNLeads.filter(l=>l.status===nleadsFilter));}
+function toggleNLeadsSortCreated(){
+  if(nleadsSortField==='created')nleadsSortDir=nleadsSortDir==='new'?'old':'new';else{nleadsSortField='created';nleadsSortDir='new';}
+  updateNLeadsSortBtns();
+  renderNLeads(nleadsFilter==='all'?allNLeads:allNLeads.filter(l=>l.status===nleadsFilter));}
+function updateNLeadsSortBtns(){
+  const a=document.getElementById('nleads-sort-btn'),c=document.getElementById('nleads-sortc-btn');
+  if(a){a.classList.toggle('sort-active',nleadsSortField==='activity');a.textContent=(nleadsSortField==='activity'&&nleadsSortDir==='old')?'⬆️ Eski birinchi':'⬇️ Yangi birinchi';}
+  if(c){c.classList.toggle('sort-active',nleadsSortField==='created');c.textContent=(nleadsSortField==='created'&&nleadsSortDir==='old')?'🕔 Qo\'shilgan: eski':'🕔 Qo\'shilgan: yangi';}}
 
 function renderNLeads(list){const c=document.getElementById('nlead-cards');
   if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">🧸</div>Nolavoy lidi yo\'q</div>';return;}
@@ -3830,7 +3888,7 @@ function renderNLeads(list){const c=document.getElementById('nlead-cards');
     if(unread>0)banner.innerHTML=`<div style="background:rgba(124,92,255,.12);border:1px solid var(--ac);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:22px">📨</span><div><b style="color:var(--ac2)">${unread} ta nolavoy lidi bugun tekshirilmagan</b><div style="font-size:12px;color:var(--mu)">Har bir lidni oching, hisobot yozing</div></div></div>`;
     else banner.innerHTML=`<div style="background:rgba(52,211,153,.1);border:1px solid var(--gn);border-radius:10px;padding:12px 16px;margin-bottom:14px;color:var(--gn)">✅ Barcha nolavoy lidlari bugun tekshirildi!</div>`;
   }
-  const sorted=sortLeadsList(list);
+  const sorted=sortLeadsList(list,nleadsSortField,nleadsSortDir);
   c.innerHTML=sorted.map(l=>{const rem=l.reminder_at?`<div class="lead-reminder">⏰ Qayta qo'ng'iroq: ${dtFmt(l.reminder_at)}</div>`:'';
     const com=l.last_comment?`<div class="lead-comment">"${l.last_comment}"</div>`:'';
     const closed=l.status==='enrolled'||l.status==='refused';
