@@ -756,6 +756,12 @@ audio{height:36px;border-radius:7px;max-width:240px}
 .lead-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .lead-date{font-size:11px;color:var(--mu);font-family:var(--fm)}
 .leads-filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.lead-search{position:relative;margin-bottom:12px}
+.lead-search input{width:100%;padding:11px 14px 11px 40px;border-radius:10px;border:1px solid var(--brd);background:var(--s);color:var(--tx);font-size:14px;transition:.15s}
+.lead-search input:focus{border-color:var(--ac);outline:none;box-shadow:0 0 0 3px rgba(124,92,255,.12)}
+.lead-search .ls-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:15px;opacity:.6;pointer-events:none}
+.lead-search .ls-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:var(--glass);border:1px solid var(--glass-brd);color:var(--mu);width:24px;height:24px;border-radius:6px;font-size:14px;cursor:pointer;display:none;align-items:center;justify-content:center}
+.lead-search.has-val .ls-clear{display:flex}
 .filter-btn{padding:7px 14px;border-radius:7px;border:1px solid var(--brd);background:transparent;color:var(--mu);font-size:12px;font-weight:600;transition:.15s}
 .filter-btn.active{background:var(--ac);color:#fff;border-color:var(--ac)}
 .sort-btn{padding:7px 14px;border-radius:7px;border:1px solid var(--brd);background:transparent;color:var(--mu);font-size:12px;font-weight:700;transition:.15s;display:inline-flex;align-items:center;gap:5px}
@@ -1560,6 +1566,11 @@ audio{height:36px;border-radius:7px;max-width:240px}
           <button class="btn-sm red" style="padding:10px 18px" onclick="toggleLeadForm()">Bekor</button></div>
       </div>
       <div id="leads-unread-banner"></div>
+      <div class="lead-search" id="leads-search-wrap">
+        <span class="ls-ico">🔍</span>
+        <input type="text" placeholder="Raqam yoki ism bo'yicha qidirish..." oninput="searchLeads(this.value);this.parentElement.classList.toggle('has-val',!!this.value)">
+        <button class="ls-clear" onclick="const i=this.parentElement.querySelector('input');i.value='';searchLeads('');this.parentElement.classList.remove('has-val')">✕</button>
+      </div>
       <div class="leads-filter-row">
         <button class="filter-btn active" onclick="filterLeads('all',this)">📋 Barchasi</button>
         <button class="filter-btn" onclick="filterLeads('cold',this)">❄️ Sovuqlar</button>
@@ -1585,6 +1596,11 @@ audio{height:36px;border-radius:7px;max-width:240px}
           <button class="btn-sm red" style="padding:10px 18px" onclick="toggleMLeadForm()">Bekor</button></div>
       </div>
       <div id="mleads-unread-banner"></div>
+      <div class="lead-search">
+        <span class="ls-ico">🔍</span>
+        <input type="text" placeholder="Raqam yoki ism bo'yicha qidirish..." oninput="searchMLeads(this.value);this.parentElement.classList.toggle('has-val',!!this.value)">
+        <button class="ls-clear" onclick="const i=this.parentElement.querySelector('input');i.value='';searchMLeads('');this.parentElement.classList.remove('has-val')">✕</button>
+      </div>
       <div class="leads-filter-row">
         <button class="filter-btn active" onclick="filterMLeads('all',this)">📋 Barchasi</button>
         <button class="filter-btn" onclick="filterMLeads('cold',this)">❄️ Sovuqlar</button>
@@ -1609,6 +1625,11 @@ audio{height:36px;border-radius:7px;max-width:240px}
           <button class="btn-sm red" style="padding:10px 18px" onclick="toggleNLeadForm()">Bekor</button></div>
       </div>
       <div id="nleads-unread-banner"></div>
+      <div class="lead-search">
+        <span class="ls-ico">🔍</span>
+        <input type="text" placeholder="Raqam yoki ism bo'yicha qidirish..." oninput="searchNLeads(this.value);this.parentElement.classList.toggle('has-val',!!this.value)">
+        <button class="ls-clear" onclick="const i=this.parentElement.querySelector('input');i.value='';searchNLeads('');this.parentElement.classList.remove('has-val')">✕</button>
+      </div>
       <div class="leads-filter-row">
         <button class="filter-btn active" onclick="filterNLeads('all',this)">📋 Barchasi</button>
         <button class="filter-btn" onclick="filterNLeads('cold',this)">❄️ Sovuqlar</button>
@@ -1680,6 +1701,11 @@ audio{height:36px;border-radius:7px;max-width:240px}
       </div>
 
       <div class="oo-stats" id="oo-stats"></div>
+      <div class="lead-search" style="margin-top:16px">
+        <span class="ls-ico">🔍</span>
+        <input type="text" placeholder="Raqam, ota-ona yoki bola ismi bo'yicha qidirish..." oninput="searchOtaona(this.value);this.parentElement.classList.toggle('has-val',!!this.value)">
+        <button class="ls-clear" onclick="const i=this.parentElement.querySelector('input');i.value='';searchOtaona('');this.parentElement.classList.remove('has-val')">✕</button>
+      </div>
       <div id="otaona-list" style="margin-top:16px"><div class="loading-center"><div class="spin"></div></div></div>
     </div>
 
@@ -2452,6 +2478,20 @@ let currentLesson=null, curQ=0, testAnswers=[];
 let currentTez=null;
 let mediaRec=null, audioChunks=[], audioBlob=null, audioStream=null;
 let allStudents=[], allLeads=[], leadsFilter='all', selectedStudentId=null;
+// ── LEAD SEARCH (by phone or name) ──
+let leadsSearch='', mleadsSearch='', nleadsSearch='';
+// normalize phone for matching: keep only digits
+function _digits(s){return String(s||'').replace(/\D/g,'');}
+// does a lead match a search query (name substring OR phone digits substring)?
+function leadMatchesSearch(l,q){
+  q=(q||'').trim().toLowerCase();
+  if(!q)return true;
+  const name=(l.name||'').toLowerCase();
+  if(name.includes(q))return true;
+  const qd=_digits(q);
+  if(qd && _digits(l.phone).includes(qd))return true;
+  return false;
+}
 let reminderTimers={};
 
 // ── UTILS ──
@@ -3779,17 +3819,23 @@ async function saveLead(){const name=document.getElementById('ld-name').value.tr
   if(error){toast(error.message,'err');return;}
   document.getElementById('ld-name').value='';document.getElementById('ld-phone').value='';document.getElementById('ld-note').value='';
   toggleLeadForm();toast('✅ Lid qo\'shildi');loadLeads();}
-async function loadLeads(){const{data}=await sb.from('leads').select('*').order('created_at',{ascending:false});allLeads=(data||[]).filter(l=>!l.lead_type||l.lead_type==='blog');renderLeads(allLeads);scheduleReminders(allLeads);}
+async function loadLeads(){const{data}=await sb.from('leads').select('*').order('created_at',{ascending:false});allLeads=(data||[]).filter(l=>!l.lead_type||l.lead_type==='blog');applyLeads();scheduleReminders(allLeads);}
+function applyLeads(){
+  let list=leadsFilter==='all'?allLeads:allLeads.filter(l=>l.status===leadsFilter);
+  if(leadsSearch)list=list.filter(l=>leadMatchesSearch(l,leadsSearch));
+  renderLeads(list);
+}
+function searchLeads(v){leadsSearch=v;applyLeads();}
 function filterLeads(s,btn){leadsFilter=s;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
-  renderLeads(s==='all'?allLeads:allLeads.filter(l=>l.status===s));}
+  applyLeads();}
 function toggleLeadsSort(){
   if(leadsSortField==='activity')leadsSortDir=leadsSortDir==='new'?'old':'new';else{leadsSortField='activity';leadsSortDir='new';}
   updateLeadsSortBtns();
-  renderLeads(leadsFilter==='all'?allLeads:allLeads.filter(l=>l.status===leadsFilter));}
+  applyLeads();}
 function toggleLeadsSortCreated(){
   if(leadsSortField==='created')leadsSortDir=leadsSortDir==='new'?'old':'new';else{leadsSortField='created';leadsSortDir='new';}
   updateLeadsSortBtns();
-  renderLeads(leadsFilter==='all'?allLeads:allLeads.filter(l=>l.status===leadsFilter));}
+  applyLeads();}
 function updateLeadsSortBtns(){
   const a=document.getElementById('leads-sort-btn'),c=document.getElementById('leads-sortc-btn');
   if(a){a.classList.toggle('sort-active',leadsSortField==='activity');a.textContent=(leadsSortField==='activity'&&leadsSortDir==='old')?'⬆️ Eski birinchi':'⬇️ Yangi birinchi';}
@@ -3893,18 +3939,25 @@ async function saveMLead(){const name=document.getElementById('mld-name').value.
   toggleMLeadForm();toast('✅ Maktab lid qo\'shildi');loadMaktabLeads();}
 
 async function loadMaktabLeads(){const{data}=await sb.from('leads').select('*').order('created_at',{ascending:false});
-  allMLeads=(data||[]).filter(l=>l.lead_type==='maktab');renderMLeads(allMLeads);scheduleReminders(allMLeads);}
+  allMLeads=(data||[]).filter(l=>l.lead_type==='maktab');applyMLeads();scheduleReminders(allMLeads);}
+function applyMLeads(){
+  let list=mleadsFilter==='all'?allMLeads:allMLeads.filter(l=>l.status===mleadsFilter);
+  if(mleadsSearch)list=list.filter(l=>leadMatchesSearch(l,mleadsSearch));
+  renderMLeads(list);
+}
+function searchMLeads(v){mleadsSearch=v;applyMLeads();}
 
 function filterMLeads(s,btn){mleadsFilter=s;btn.parentElement.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
-  renderMLeads(s==='all'?allMLeads:allMLeads.filter(l=>l.status===s));}
+  applyMLeads();}
 function toggleMLeadsSort(){
   if(mleadsSortField==='activity')mleadsSortDir=mleadsSortDir==='new'?'old':'new';else{mleadsSortField='activity';mleadsSortDir='new';}
   updateMLeadsSortBtns();
-  renderMLeads(mleadsFilter==='all'?allMLeads:allMLeads.filter(l=>l.status===mleadsFilter));}
+  applyMLeads();}
 function toggleMLeadsSortCreated(){
   if(mleadsSortField==='created')mleadsSortDir=mleadsSortDir==='new'?'old':'new';else{mleadsSortField='created';mleadsSortDir='new';}
   updateMLeadsSortBtns();
-  renderMLeads(mleadsFilter==='all'?allMLeads:allMLeads.filter(l=>l.status===mleadsFilter));}
+  applyMLeads();}
+
 function updateMLeadsSortBtns(){
   const a=document.getElementById('mleads-sort-btn'),c=document.getElementById('mleads-sortc-btn');
   if(a){a.classList.toggle('sort-active',mleadsSortField==='activity');a.textContent=(mleadsSortField==='activity'&&mleadsSortDir==='old')?'⬆️ Eski birinchi':'⬇️ Yangi birinchi';}
@@ -3950,18 +4003,24 @@ async function saveNLead(){const name=document.getElementById('nld-name').value.
   toggleNLeadForm();toast('✅ Nolavoy lid qo\'shildi');loadNolavoyLeads();}
 
 async function loadNolavoyLeads(){const{data}=await sb.from('leads').select('*').order('created_at',{ascending:false});
-  allNLeads=(data||[]).filter(l=>l.lead_type==='nolavoy');renderNLeads(allNLeads);scheduleReminders(allNLeads);}
+  allNLeads=(data||[]).filter(l=>l.lead_type==='nolavoy');applyNLeads();scheduleReminders(allNLeads);}
+function applyNLeads(){
+  let list=nleadsFilter==='all'?allNLeads:allNLeads.filter(l=>l.status===nleadsFilter);
+  if(nleadsSearch)list=list.filter(l=>leadMatchesSearch(l,nleadsSearch));
+  renderNLeads(list);
+}
+function searchNLeads(v){nleadsSearch=v;applyNLeads();}
 
 function filterNLeads(s,btn){nleadsFilter=s;btn.parentElement.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
-  renderNLeads(s==='all'?allNLeads:allNLeads.filter(l=>l.status===s));}
+  applyNLeads();}
 function toggleNLeadsSort(){
   if(nleadsSortField==='activity')nleadsSortDir=nleadsSortDir==='new'?'old':'new';else{nleadsSortField='activity';nleadsSortDir='new';}
   updateNLeadsSortBtns();
-  renderNLeads(nleadsFilter==='all'?allNLeads:allNLeads.filter(l=>l.status===nleadsFilter));}
+  applyNLeads();}
 function toggleNLeadsSortCreated(){
   if(nleadsSortField==='created')nleadsSortDir=nleadsSortDir==='new'?'old':'new';else{nleadsSortField='created';nleadsSortDir='new';}
   updateNLeadsSortBtns();
-  renderNLeads(nleadsFilter==='all'?allNLeads:allNLeads.filter(l=>l.status===nleadsFilter));}
+  applyNLeads();}
 function updateNLeadsSortBtns(){
   const a=document.getElementById('nleads-sort-btn'),c=document.getElementById('nleads-sortc-btn');
   if(a){a.classList.toggle('sort-active',nleadsSortField==='activity');a.textContent=(nleadsSortField==='activity'&&nleadsSortDir==='old')?'⬆️ Eski birinchi':'⬇️ Yangi birinchi';}
@@ -4061,8 +4120,24 @@ async function loadOtaona(){
   if(error){c.innerHTML='<div class="empty">Jadval topilmadi. Avval Supabase\'da parent_feedback jadvalini yarating.</div>';allOtaona=[];renderOoStats();return;}
   allOtaona=data||[];
   renderOoStats();
-  renderOtaona(allOtaona);
+  applyOtaona();
 }
+let otaonaSearch='';
+function applyOtaona(){
+  let list=allOtaona;
+  const q=(otaonaSearch||'').trim().toLowerCase();
+  if(q){
+    const qd=_digits(q);
+    list=list.filter(o=>{
+      const pn=(o.parent_name||'').toLowerCase(), cn=(o.child_name||'').toLowerCase();
+      if(pn.includes(q)||cn.includes(q))return true;
+      if(qd&&_digits(o.phone).includes(qd))return true;
+      return false;
+    });
+  }
+  renderOtaona(list);
+}
+function searchOtaona(v){otaonaSearch=v;applyOtaona();}
 
 function renderOoStats(){
   const s=document.getElementById('oo-stats');
