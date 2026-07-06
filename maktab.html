@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>EduNova Maktab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ================== EDUNOVA LIQUID 2026 — DESIGN TOKENS ================== */
+:root{
+  --bg:#05070F; --bg2:#080C18;
+  --glass:rgba(255,255,255,.045); --glass2:rgba(255,255,255,.08);
+  --stroke:rgba(255,255,255,.10); --stroke2:rgba(255,255,255,.18);
+  --spec:rgba(255,255,255,.28);
+  --orange:#FF7A1A; --orange2:#FFA24F; --amber:#FF8E38;
+  --blue:#4DA3FF; --blue2:#8FC6FF;
+  --mint:#3DE8A0; --gold:#FFC94D; --red:#FF5D5D;
+  --ink:#F2F5FF; --mut:#8B97B8; --mut2:#5D6A8C;
+  --disp:'Unbounded',sans-serif; --body:'Manrope',sans-serif;
+  --r:24px; --r-sm:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--body);color:var(--ink);background:var(--bg);min-height:100vh;line-height:1.5;overflow-x:hidden}
+.aurora{position:fixed;inset:-20%;z-index:-1;pointer-events:none;filter:blur(60px);opacity:.9}
+.aurora i{position:absolute;border-radius:50%}
+.aurora i:nth-child(1){width:55vw;height:55vw;left:-10vw;top:-8vh;background:radial-gradient(circle,rgba(255,122,26,.24),transparent 65%);animation:dr1 26s ease-in-out infinite alternate}
+.aurora i:nth-child(2){width:60vw;height:60vw;right:-15vw;top:22vh;background:radial-gradient(circle,rgba(77,163,255,.20),transparent 65%);animation:dr2 32s ease-in-out infinite alternate}
+.aurora i:nth-child(3){width:50vw;height:50vw;left:15vw;bottom:-12vh;background:radial-gradient(circle,rgba(61,232,160,.10),transparent 65%);animation:dr1 38s ease-in-out infinite alternate-reverse}
+@keyframes dr1{to{transform:translate(6vw,5vh) scale(1.12)}}
+@keyframes dr2{to{transform:translate(-6vw,-4vh) scale(1.08)}}
+
+.app{max-width:480px;margin:0 auto;min-height:100vh;position:relative;padding:0 16px calc(96px + env(safe-area-inset-bottom))}
+@media(min-width:900px){ .app{max-width:560px} body{font-size:16.5px} }
+
+.scr{display:none;animation:in .45s cubic-bezier(.2,.9,.3,1)}
+.scr.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+.lg{position:relative;background:linear-gradient(180deg,var(--glass2),var(--glass));
+  border:1px solid var(--stroke);border-radius:var(--r);
+  backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);
+  box-shadow:0 18px 44px -18px rgba(0,0,0,.6)}
+.lg::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,var(--spec),transparent 18%);opacity:.5;mix-blend-mode:screen}
+.lg.warm{border-color:rgba(255,122,26,.35);box-shadow:0 18px 50px -16px rgba(255,122,26,.4)}
+.lg.cool{border-color:rgba(77,163,255,.32);box-shadow:0 18px 50px -16px rgba(77,163,255,.35)}
+.lg.good{border-color:rgba(61,232,160,.3)}
+
+h1{font-family:var(--disp);font-weight:800;font-size:clamp(26px,7vw,34px);line-height:1.06;letter-spacing:-.01em}
+h2{font-family:var(--disp);font-weight:700;font-size:19px;line-height:1.15}
+.eyebrow{font-family:var(--disp);font-weight:600;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--mut)}
+.grad{background:linear-gradient(92deg,var(--orange),var(--orange2) 45%,var(--blue2));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.mut{color:var(--mut)}.sm{font-size:13px}.xs{font-size:11.5px}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  font-family:var(--disp);font-weight:700;font-size:15px;color:#0A0E1A;
+  background:linear-gradient(135deg,var(--orange),var(--amber));
+  border:none;border-radius:18px;padding:17px;cursor:pointer;
+  box-shadow:0 12px 30px -8px rgba(255,122,26,.65),inset 0 1px 0 rgba(255,255,255,.4);
+  transition:transform .12s,box-shadow .2s}
+.btn:active{transform:scale(.965)}
+.btn.ghost{background:var(--glass2);color:var(--ink);box-shadow:none;border:1px solid var(--stroke2)}
+.btn:disabled{opacity:.45;pointer-events:none}
+
+.field{background:var(--glass);border:1px solid var(--stroke);border-radius:18px;
+  display:flex;align-items:center;gap:11px;padding:15px 16px;margin-bottom:12px;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.field svg{flex:none;width:19px;height:19px;opacity:.6}
+.field input{flex:1;background:none;border:none;outline:none;color:var(--ink);
+  font-family:var(--body);font-size:16px;font-weight:600}
+.field input::placeholder{color:var(--mut2)}
+
+/* ================== LOGIN ================== */
+#s-login{padding-top:8vh}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:34px}
+.logo .mark{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--orange),var(--amber));
+  font-family:var(--disp);font-weight:800;font-size:22px;color:#0A0E1A;
+  box-shadow:0 10px 26px -6px rgba(255,122,26,.7)}
+.logo b{font-family:var(--disp);font-weight:700;font-size:17px}
+.logo b i{font-style:normal;color:var(--orange)}
+.hero-plat{position:absolute;right:-6px;top:5vh;width:110px;opacity:.95;animation:float 4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+.login-card{padding:22px 20px;margin-top:30px}
+.staff{display:block;text-align:center;margin-top:20px;color:var(--mut);font-size:13px;text-decoration:none}
+.staff b{color:var(--blue2);font-weight:700;cursor:pointer}
+
+/* ================== INTAKE (diag rejimi) ================== */
+.t-top{display:flex;align-items:center;gap:12px;padding:18px 0 8px}
+.back{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;cursor:pointer;
+  background:var(--glass2);border:1px solid var(--stroke2)}
+.intake-card{padding:20px;margin-top:14px}
+.gchips{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 14px}
+.gchip{font-family:var(--disp);font-weight:700;font-size:13px;min-width:44px;text-align:center;
+  padding:10px 0;border-radius:13px;cursor:pointer;color:var(--mut);
+  background:var(--glass);border:1px solid var(--stroke);transition:.15s}
+.gchip.on{color:#0A0E1A;background:linear-gradient(135deg,var(--orange),var(--amber));
+  border-color:transparent;box-shadow:0 8px 18px -6px rgba(255,122,26,.6)}
+.lab{font-size:12px;font-weight:800;color:var(--mut);margin:2px 0 8px;letter-spacing:.04em;text-transform:uppercase}
+.today-log{padding:15px 16px;margin-top:14px}
+.tl-row{display:flex;align-items:center;gap:10px;font-size:13px;padding:7px 0;border-bottom:1px dashed var(--stroke)}
+.tl-row:last-child{border:none}
+.tl-row .dotp{width:8px;height:8px;border-radius:50%;background:var(--mint);flex:none}
+.tl-row b{font-weight:800}
+.tl-row .r{margin-left:auto;color:var(--mut);font-size:12px}
+
+/* ================== DIAGNOSTIC ================== */
+.diag-top{display:flex;align-items:center;gap:12px;padding:18px 0 6px}
+.dots{display:flex;gap:6px;flex:1}
+.dots i{flex:1;height:5px;border-radius:5px;background:rgba(255,255,255,.09);transition:.3s}
+.dots i.on{background:linear-gradient(90deg,var(--orange),var(--amber));box-shadow:0 0 10px rgba(255,122,26,.5)}
+.dq{padding:24px 20px;margin-top:14px;text-align:center}
+.dq .pw{font-family:var(--disp);font-weight:600;font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  display:inline-block;padding:5px 12px;border-radius:999px;margin-bottom:16px;
+  background:rgba(77,163,255,.13);color:var(--blue2);border:1px solid rgba(77,163,255,.3)}
+.dq h2{margin-bottom:6px}
+.dq .big-emoji{font-size:52px;margin:14px 0;letter-spacing:8px}
+.opts{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;
+  background:var(--glass);border:1px solid var(--stroke);border-radius:18px;
+  padding:15px 16px;cursor:pointer;font-family:var(--body);font-weight:700;font-size:15.5px;color:var(--ink);
+  transition:transform .12s,border-color .2s,background .2s;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.opt:active{transform:scale(.97)}
+.opt .em{font-size:24px;flex:none}
+.opt.right{border-color:var(--mint);background:rgba(61,232,160,.12)}
+.opt.wrong{border-color:var(--red);background:rgba(255,93,93,.10)}
+.compute{text-align:center;padding:60px 20px}
+.brainwave{width:110px;height:110px;margin:0 auto 24px;border-radius:50%;
+  display:grid;place-items:center;font-size:48px;
+  background:radial-gradient(circle at 35% 30%,rgba(77,163,255,.25),rgba(255,122,26,.12));
+  border:1px solid var(--stroke2);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,122,26,.35)}50%{box-shadow:0 0 0 22px rgba(255,122,26,0)}}
+
+/* ================== RESULT ================== */
+.res-head{text-align:center;padding:26px 0 18px}
+.res-head .conf{font-size:44px}
+.powers{padding:18px 18px 8px;margin-bottom:14px}
+.pw-row{display:flex;align-items:center;gap:11px;margin-bottom:13px}
+.pw-row .ic{flex:none;width:34px;height:34px;border-radius:12px;display:grid;place-items:center;font-size:17px;
+  background:var(--glass2);border:1px solid var(--stroke)}
+.pw-row .nm{flex:none;width:76px;font-weight:800;font-size:13px}
+.pw-row .tr{flex:1;height:11px;border-radius:8px;background:rgba(255,255,255,.07);overflow:hidden}
+.pw-row .tr i{display:block;height:100%;width:0;border-radius:8px;
+  background:linear-gradient(90deg,var(--orange),var(--amber));transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+.pw-row .vl{flex:none;width:38px;text-align:right;font-family:var(--disp);font-weight:700;font-size:13px}
+.leader{padding:20px 18px;margin-bottom:14px;display:flex;gap:14px;align-items:center}
+.leader .ava{flex:none;width:64px;height:64px;border-radius:22px;display:grid;place-items:center;
+  font-family:var(--disp);font-weight:800;font-size:22px;color:#0A0E1A;
+  background:linear-gradient(135deg,var(--blue2),var(--blue));
+  box-shadow:0 12px 28px -8px rgba(77,163,255,.6)}
+.leader .who .tag{font-family:var(--disp);font-weight:600;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--blue2)}
+.leader .who h2{font-size:20px;margin:2px 0 3px}
+.profs{padding:18px;margin-bottom:14px}
+.prof-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}
+.pchip{font-size:13px;font-weight:700;padding:8px 13px;border-radius:999px;
+  background:var(--glass2);border:1px solid var(--stroke2)}
+.sent{padding:15px 16px;margin-bottom:14px;text-align:center}
+.sent .ok{font-weight:800;color:var(--mint);font-size:14px}
+.sent .nx{font-size:12px;color:var(--mut);margin-top:5px}
+
+/* ================== HOME (BENTO) ================== */
+.home-top{display:flex;align-items:center;justify-content:space-between;padding:20px 0 4px}
+.hi{display:flex;gap:11px;align-items:center}
+.ava-s{width:44px;height:44px;border-radius:15px;display:grid;place-items:center;
+  font-family:var(--disp);font-weight:800;font-size:18px;color:#0A0E1A;
+  background:linear-gradient(135deg,var(--orange),var(--amber));box-shadow:0 8px 20px -6px rgba(255,122,26,.6)}
+.streak{font-family:var(--disp);font-weight:700;font-size:13px;color:var(--gold);
+  background:rgba(255,201,77,.1);border:1px solid rgba(255,201,77,.3);border-radius:14px;padding:8px 12px}
+.bento{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.bento .cell{padding:17px 16px;cursor:pointer;transition:transform .15s}
+.bento .cell:active{transform:scale(.97)}
+.cell.span2{grid-column:span 2}
+.cell .emo{font-size:26px;margin-bottom:9px;display:block}
+.cell h3{font-family:var(--disp);font-weight:700;font-size:15px;margin-bottom:3px}
+.cell .st{font-size:12px;color:var(--mut)}
+.cell.locked{opacity:.55;cursor:default}
+.cell.locked .soon{display:inline-block;margin-top:8px;font-size:10px;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--blue2);background:rgba(77,163,255,.12);
+  border:1px solid rgba(77,163,255,.3);border-radius:999px;padding:4px 9px}
+.ring-wrap{display:flex;align-items:center;gap:15px}
+.ring{position:relative;flex:none;width:74px;height:74px}
+.ring svg{transform:rotate(-90deg)}
+.ring .pct{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--disp);font-weight:800;font-size:16px}
+.macro-line{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--mut)}
+.macro-line .b{flex:1;height:5px;border-radius:5px;background:rgba(255,255,255,.08);overflow:hidden}
+.macro-line .b i{display:block;height:100%;width:2.5%;background:linear-gradient(90deg,var(--orange),var(--blue))}
+
+/* ================== ENGLISH WEEK ================== */
+.wk-hero{padding:20px 18px;margin-top:16px}
+.wk-hero .row{display:flex;justify-content:space-between;align-items:baseline}
+.wk-pct{font-family:var(--disp);font-weight:800;font-size:22px}
+.seg{display:flex;gap:6px;margin:30px 0 8px;position:relative}
+.seg i{flex:1;height:16px;border-radius:8px;background:rgba(255,255,255,.08);border:1px solid var(--stroke);transition:.4s}
+.seg i.lit{background:linear-gradient(90deg,var(--orange),var(--amber));border-color:transparent;box-shadow:0 0 16px rgba(255,122,26,.55)}
+.seg i.today{border-color:var(--orange);animation:segp 1.8s infinite}
+@keyframes segp{0%,100%{box-shadow:0 0 0 0 rgba(255,122,26,.5)}50%{box-shadow:0 0 0 5px rgba(255,122,26,.12)}}
+.pmark{position:absolute;top:-34px;transition:left .8s cubic-bezier(.2,.8,.2,1)}
+.pmark svg{width:46px;height:46px;filter:drop-shadow(0 5px 10px rgba(0,0,0,.5))}
+.ab{display:flex;justify-content:space-between;font-size:11px;margin-top:8px}
+.ab .a{color:var(--orange2);font-weight:800}.ab .b{color:var(--blue2);font-weight:800}
+.day{display:flex;align-items:center;gap:12px;padding:14px 15px;margin-top:10px}
+.day .ic{flex:none;width:36px;height:36px;border-radius:13px;display:grid;place-items:center;font-size:16px;
+  background:var(--glass2);border:1px solid var(--stroke)}
+.day .mid{flex:1;min-width:0}
+.day .wd{font-family:var(--disp);font-weight:700;font-size:13px}
+.day .tp{font-size:12.5px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.day .stars{font-size:13px;color:var(--gold);letter-spacing:1px}
+.day .stars .off{color:rgba(255,255,255,.14)}
+.day .cta{flex:none;font-family:var(--disp);font-weight:700;font-size:12px;color:#0A0E1A;border:none;border-radius:12px;
+  padding:10px 13px;cursor:pointer;background:linear-gradient(135deg,var(--orange),var(--amber));
+  box-shadow:0 8px 18px -5px rgba(255,122,26,.6)}
+.day.dn{border-color:rgba(61,232,160,.35)}
+.day.dn .ic{background:rgba(61,232,160,.13);border-color:rgba(61,232,160,.4)}
+.day.tdy{border-color:rgba(255,122,26,.45);box-shadow:0 12px 30px -14px rgba(255,122,26,.5)}
+.day.lk{opacity:.55}
+.day.fri{border-style:dashed}
+.coach{display:flex;gap:12px;align-items:flex-end;padding:14px;margin-top:14px}
+.coach svg{flex:none;width:58px;height:58px;animation:float 3.6s ease-in-out infinite}
+.coach .t{font-size:13px}
+.coach .t b{color:var(--orange2)}
+.coach .t .f{display:block;margin-top:5px;font-size:11.5px;color:var(--mut)}
+
+/* ================== TEST ================== */
+.t-q{padding:24px 20px;margin-top:12px;text-align:center}
+.t-q .n{font-family:var(--disp);font-weight:600;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
+.t-q h2{font-size:20px}
+.t-q .vis{font-size:46px;margin:12px 0 4px}
+.done-card{text-align:center;padding:36px 22px}
+.done-card .big{font-family:var(--disp);font-weight:800;font-size:56px;line-height:1;
+  background:linear-gradient(120deg,var(--orange),var(--gold));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.done-card .stars-lg{font-size:30px;letter-spacing:6px;color:var(--gold);margin:12px 0 4px}
+.done-card .stars-lg .off{color:rgba(255,255,255,.15)}
+
+/* ================== BRAIN ================== */
+.shelf{padding:16px;margin-top:14px}
+.shelf-lab{display:flex;align-items:center;gap:8px;font-family:var(--disp);font-weight:700;font-size:11px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--mint);margin-bottom:11px}
+.shelf-lab b{margin-left:auto;color:var(--mut);font-family:var(--body);font-size:11px;letter-spacing:0;text-transform:none}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;white-space:nowrap;
+  background:var(--glass2);border:1px solid var(--stroke2);border-radius:999px;padding:7px 12px}
+.empty{font-size:12.5px;color:var(--mut)}
+
+/* ================== NAV ================== */
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));
+  width:min(440px,calc(100% - 32px));display:none;z-index:50;
+  background:rgba(10,14,26,.72);border:1px solid var(--stroke2);border-radius:26px;
+  backdrop-filter:blur(28px) saturate(1.5);-webkit-backdrop-filter:blur(28px) saturate(1.5);
+  box-shadow:0 20px 50px -12px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.15);padding:9px}
+nav.on{display:flex;gap:4px}
+nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px;border-radius:18px;
+  color:var(--mut);font-size:10px;font-weight:800;cursor:pointer;transition:.2s;text-decoration:none}
+nav a svg{width:21px;height:21px}
+nav a.on{color:var(--orange2);background:rgba(255,122,26,.12)}
+
+.modal{position:fixed;inset:0;z-index:80;display:none;place-items:end center;background:rgba(3,5,12,.6);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.modal.on{display:grid}
+.sheet{width:min(480px,100%);border-radius:28px 28px 0 0;padding:24px 20px calc(28px + env(safe-area-inset-bottom))}
+.sheet h2{margin-bottom:8px}
+canvas#fx{position:fixed;inset:0;z-index:70;pointer-events:none}
+/* ================== AI CHAT ================== */
+.chat-head{display:flex;align-items:center;gap:12px;padding:18px 0 8px}
+.chat-head .bot{width:44px;height:44px;border-radius:15px;display:grid;place-items:center;font-size:22px;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));box-shadow:0 8px 20px -6px rgba(77,163,255,.6)}
+.limit-pill{margin-left:auto;font-family:var(--disp);font-weight:700;font-size:12px;
+  padding:7px 12px;border-radius:13px;background:rgba(255,201,77,.1);color:var(--gold);border:1px solid rgba(255,201,77,.3)}
+.limit-pill.out{background:rgba(255,93,93,.12);color:var(--red);border-color:rgba(255,93,93,.35)}
+.chat-box{margin-top:14px;display:flex;flex-direction:column;gap:12px;padding-bottom:6px}
+.msg{max-width:85%;padding:12px 14px;border-radius:18px;font-size:14px;line-height:1.55;white-space:pre-wrap}
+.msg.bot{align-self:flex-start;background:var(--glass2);border:1px solid var(--stroke);border-bottom-left-radius:5px}
+.msg.me{align-self:flex-end;color:#0A0E1A;font-weight:600;
+  background:linear-gradient(135deg,var(--orange),var(--amber));border-bottom-right-radius:5px}
+.msg.think{align-self:flex-start;color:var(--mut);font-style:italic}
+.chat-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));
+  width:min(448px,calc(100% - 32px));display:none;gap:8px;z-index:45}
+.chat-bar.on{display:flex}
+.chat-bar input{flex:1;background:rgba(10,14,26,.82);border:1px solid var(--stroke2);border-radius:18px;
+  padding:14px 16px;color:var(--ink);font-family:var(--body);font-size:15px;outline:none;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.chat-bar button{flex:none;width:50px;border:none;border-radius:16px;cursor:pointer;
+  background:linear-gradient(135deg,var(--orange),var(--amber));box-shadow:0 8px 20px -6px rgba(255,122,26,.6)}
+.chat-bar button:disabled{opacity:.4}
+.chat-bar button svg{width:20px;height:20px}
+.chat-suggest{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.chat-suggest .s{font-size:12.5px;font-weight:600;padding:8px 12px;border-radius:999px;cursor:pointer;
+  background:var(--glass2);border:1px solid var(--stroke2)}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head>
+<body>
+<div class="aurora"><i></i><i></i><i></i></div>
+<canvas id="fx"></canvas>
+
+<div class="app">
+
+<!-- ============ LOADER (boot paytida) ============ -->
+<section class="scr on" id="s-boot">
+  <div style="min-height:80vh;display:grid;place-items:center">
+    <div style="text-align:center">
+      <div style="width:90px;height:90px;margin:0 auto 20px;border-radius:50%;display:grid;place-items:center;font-size:40px;
+        background:radial-gradient(circle at 35% 30%,rgba(77,163,255,.25),rgba(255,122,26,.12));border:1px solid var(--stroke2);
+        animation:pulse 1.4s ease-in-out infinite">🎒</div>
+      <p class="eyebrow">Yuklanmoqda…</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LOGIN ============ -->
+<section class="scr" id="s-login">
+  <svg class="hero-plat" viewBox="0 0 100 100" fill="none">
+    <ellipse cx="26" cy="66" rx="14" ry="8" fill="#7c5a3a"/><ellipse cx="52" cy="62" rx="25" ry="17" fill="#9a744c"/>
+    <ellipse cx="52" cy="66" rx="21" ry="11" fill="#b08a5e"/><path d="M40 77c-3 4-2 6 1 6s5-3 4-6z" fill="#FF7A1A"/>
+    <path d="M60 77c-3 4-2 6 1 6s5-3 4-6z" fill="#FF934D"/><circle cx="66" cy="52" r="14" fill="#9a744c"/>
+    <ellipse cx="81" cy="55" rx="11" ry="6.5" fill="#FF7A1A"/><path d="M70 55h22" stroke="#d8620d" stroke-width="1.2"/>
+    <circle cx="66" cy="48" r="3.3" fill="#101820"/><circle cx="67.2" cy="46.9" r="1.1" fill="#fff"/>
+  </svg>
+  <div class="logo"><div class="mark">E</div><b>Edu<i>Nova</i> Maktab</b></div>
+  <p class="eyebrow">Kelajak shu yerda boshlanadi</p>
+  <h1>Salom!<br><span class="grad">Yo'lingga xush kelibsan</span></h1>
+  <div class="lg login-card">
+    <div class="field">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-3.5 3.6-6 8-6s8 2.5 8 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="in-login" placeholder="Login" autocomplete="username">
+    </div>
+    <div class="field">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="10" rx="3" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg>
+      <input id="in-pass" type="password" placeholder="Parol" autocomplete="current-password">
+    </div>
+    <button class="btn" onclick="doLogin()">Kirish</button>
+  </div>
+  <a class="staff" onclick="openSheet('staff')">Xodimmisiz? <b>Xodimlar uchun kirish →</b></a>
+</section>
+
+<!-- ============ INTAKE — diagnostika rejimi ============ -->
+<section class="scr" id="s-intake">
+  <div class="t-top">
+    <div class="back" onclick="logout()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div><h2>Diagnostika rejimi 🩺</h2><p class="mut xs">Kelajak Xaritasi · qabul bo'limi</p></div>
+  </div>
+  <div class="lg warm intake-card">
+    <p class="eyebrow" style="color:var(--orange2);margin-bottom:12px">Yangi o'quvchi</p>
+    <div class="lab">Ism</div>
+    <div class="field" style="margin-bottom:14px">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-3.5 3.6-6 8-6s8 2.5 8 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="d-name" placeholder="Bolaning ismi">
+    </div>
+    <div class="lab">Sinf</div>
+    <div class="gchips" id="d-grades"></div>
+    <div class="lab">Ota-ona telefoni</div>
+    <div class="field">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M6 3h4l2 5-3 2c1.5 3 3.5 5 6.5 6.5l2-3 5 2v4c0 1-1 2-2 2C10 21 3 14 3 5c0-1 1-2 3-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      <input id="d-phone" inputmode="tel" placeholder="+998 __ ___ __ __">
+    </div>
+    <button class="btn" style="margin-top:6px" onclick="startDiagChild()">Diagnostikani boshlash</button>
+  </div>
+  <div class="lg today-log" id="d-log-card" style="display:none">
+    <div class="shelf-lab"><span>📤 Bugun admin panelga yuborildi</span><b id="d-count">0 ta</b></div>
+    <div id="d-log"></div>
+  </div>
+</section>
+
+<!-- ============ DIAGNOSTIC ============ -->
+<section class="scr" id="s-diag">
+  <div class="diag-top">
+    <div class="logo" style="margin:0"><div class="mark" style="width:36px;height:36px;font-size:17px;border-radius:12px">E</div></div>
+    <div class="dots" id="dg-dots"><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
+  <p class="eyebrow" style="margin-top:10px" id="dg-who">Kelajak Xaritasi</p>
+  <div id="dg-body"></div>
+</section>
+
+<!-- ============ RESULT (diagnostika) ============ -->
+<section class="scr" id="s-res">
+  <div class="res-head">
+    <div class="conf">🎉</div>
+    <p class="eyebrow">Diagnostika yakunlandi</p>
+    <h1 id="res-name">Zo'r!</h1>
+    <p class="mut sm" style="margin-top:6px">5 ta superkuch aniqlandi</p>
+  </div>
+  <div class="lg powers" id="res-powers"></div>
+  <div class="lg cool leader" id="res-leader"></div>
+  <div class="lg profs" id="res-ai-card">
+    <p class="eyebrow">🤖 AI-psixolog xulosasi</p>
+    <p class="sm" id="res-ai-txt" style="margin-top:10px;line-height:1.65">Yozilmoqda…</p>
+  </div>
+  <div class="lg profs">
+    <p class="eyebrow">Mos kasblar · O'zbekiston bozori</p>
+    <div class="prof-chips" id="res-profs"></div>
+  </div>
+  <div class="lg good sent">
+    <div class="ok">✓ Natija admin panelga yuborildi</div>
+    <div class="nx">Admin «Akaunt yaratish» tugmasi orqali o'quvchiga login va parol beradi</div>
+  </div>
+  <button class="btn" onclick="nextChild()">Keyingi o'quvchi →</button>
+  <div style="height:20px"></div>
+</section>
+
+<!-- ============ HOME ============ -->
+<section class="scr" id="s-home">
+  <div class="home-top">
+    <div class="hi">
+      <div class="ava-s" id="h-ava">A</div>
+      <div><h2 id="h-name" style="font-size:17px">Salom!</h2><p class="mut xs" id="h-grade">1-sinf</p></div>
+    </div>
+    <div class="streak">🔥 1</div>
+  </div>
+  <div class="bento">
+    <div class="lg warm cell span2" onclick="go('s-eng');navSel('eng')">
+      <div class="ring-wrap">
+        <div class="ring">
+          <svg width="74" height="74"><circle cx="37" cy="37" r="31" stroke="rgba(255,255,255,.08)" stroke-width="7" fill="none"/>
+          <circle id="h-ring" cx="37" cy="37" r="31" stroke="url(#gr1)" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="195" stroke-dashoffset="195" style="transition:stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1)"/>
+          <defs><linearGradient id="gr1"><stop offset="0" stop-color="#FF7A1A"/><stop offset="1" stop-color="#FFC94D"/></linearGradient></defs></svg>
+          <div class="pct" id="h-pct">0%</div>
+        </div>
+        <div style="flex:1">
+          <span class="emo">🇬🇧</span>
+          <h3>Ingliz tili</h3>
+          <p class="st" id="h-wk">1-hafta · bugungi test kutmoqda</p>
+        </div>
+        <div style="font-size:22px;opacity:.5">›</div>
+      </div>
+    </div>
+    <div class="lg cool cell" onclick="go('s-brain');navSel('brain')">
+      <span class="emo">🧠</span><h3>Mening miyam</h3><p class="st">5 superkuch</p>
+    </div>
+    <div class="lg cell locked"><span class="emo">➗</span><h3>Matematika</h3><span class="soon">Tez kunda</span></div>
+    <div class="lg cell locked"><span class="emo">💻</span><h3>Informatika</h3><span class="soon">Tez kunda</span></div>
+    <div class="lg cell locked"><span class="emo">🧩</span><h3>Mantiq</h3><span class="soon">Tez kunda</span></div>
+    <div class="lg cell span2" style="cursor:default">
+      <div class="macro-line"><span>Umumiy yo'l</span><span class="b"><i></i></span><span>1 / 40 hafta · IELTS 6</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ENGLISH WEEK ============ -->
+<section class="scr" id="s-eng">
+  <div class="t-top">
+    <div class="back" onclick="go('s-home');navSel('home')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div><h2>Ingliz tili 🇬🇧</h2><p class="mut xs" id="e-grade">1-sinf · 1-hafta</p></div>
+  </div>
+  <div class="lg warm wk-hero">
+    <div class="row"><p class="eyebrow" style="color:var(--orange2)">Bu hafta</p><div class="wk-pct" id="e-pct">0%</div></div>
+    <h2 id="e-theme" style="margin-top:4px;font-size:21px">—</h2>
+    <div class="seg" id="e-seg">
+      <div class="pmark" id="e-mark" style="left:0%">
+        <svg viewBox="0 0 100 100" fill="none"><ellipse cx="26" cy="66" rx="14" ry="8" fill="#7c5a3a"/><ellipse cx="52" cy="62" rx="25" ry="17" fill="#9a744c"/><ellipse cx="52" cy="66" rx="21" ry="11" fill="#b08a5e"/><path d="M40 77c-3 4-2 6 1 6s5-3 4-6z" fill="#FF7A1A"/><path d="M60 77c-3 4-2 6 1 6s5-3 4-6z" fill="#FF934D"/><circle cx="66" cy="52" r="14" fill="#9a744c"/><ellipse cx="81" cy="55" rx="11" ry="6.5" fill="#FF7A1A"/><path d="M70 55h22" stroke="#d8620d" stroke-width="1.2"/><circle cx="66" cy="48" r="3.3" fill="#101820"/><circle cx="67.2" cy="46.9" r="1.1" fill="#fff"/></svg>
+      </div>
+      <i></i><i></i><i></i><i></i><i></i>
+    </div>
+    <div class="ab"><span class="a">📍 Nuqta A · Dushanba</span><span class="b">Nuqta B · Juma 🏁</span></div>
+  </div>
+  <div id="e-days"></div>
+  <div class="lg coach">
+    <svg viewBox="0 0 100 100" fill="none"><path d="M74 22v40" stroke="#6b7690" stroke-width="2.2" stroke-linecap="round"/><path d="M74 23l16 5-16 6z" fill="#FF7A1A"/><ellipse cx="26" cy="66" rx="14" ry="8" fill="#7c5a3a"/><ellipse cx="52" cy="62" rx="25" ry="17" fill="#9a744c"/><ellipse cx="52" cy="66" rx="21" ry="11" fill="#b08a5e"/><path d="M40 77c-3 4-2 6 1 6s5-3 4-6z" fill="#FF7A1A"/><path d="M60 77c-3 4-2 6 1 6s5-3 4-6z" fill="#FF934D"/><circle cx="66" cy="52" r="14" fill="#9a744c"/><ellipse cx="81" cy="55" rx="11" ry="6.5" fill="#FF7A1A"/><path d="M70 55h22" stroke="#d8620d" stroke-width="1.2"/><circle cx="66" cy="48" r="3.3" fill="#101820"/><circle cx="67.2" cy="46.9" r="1.1" fill="#fff"/></svg>
+    <div class="t" id="e-coach">Men gidingman! Bugungi testni yech — yo'l yorishadi. <span class="f">Juma kuni o'qituvching tasdiqlaydi → ko'nikma «Men bilaman»ga qo'shiladi.</span></div>
+  </div>
+</section>
+
+<!-- ============ TEST ============ -->
+<section class="scr" id="s-test">
+  <div class="t-top">
+    <div class="back" onclick="go('s-eng')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div><h2 id="t-title">Dushanba testi</h2><p class="mut xs" id="t-sub">—</p></div>
+  </div>
+  <div class="dots" id="t-dots" style="margin-top:8px"><i></i><i></i><i></i></div>
+  <div id="t-body"></div>
+</section>
+
+<!-- ============ BRAIN ============ -->
+<section class="scr" id="s-brain">
+  <div class="t-top">
+    <div class="back" onclick="go('s-home');navSel('home')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div><h2>Mening miyam 🧠</h2><p class="mut xs">Superkuchlar va ko'nikmalar</p></div>
+  </div>
+  <div class="lg powers" id="b-powers" style="margin-top:14px"></div>
+  <div class="lg cool leader" id="b-leader" style="margin-top:14px"></div>
+  <div class="lg good shelf">
+    <div class="shelf-lab"><span>✅ Men bilaman</span><b id="b-count">0 ta ko'nikma</b></div>
+    <div class="chips" id="b-shelf"><span class="empty">Hali bo'sh — birinchi haftani yakunlab, birinchi ko'nikmangni qo'sh! 💪</span></div>
+  </div>
+  <div class="lg shelf">
+    <div class="macro-line"><span>IELTS 6 yo'li</span><span class="b"><i style="width:2.5%"></i></span><span>1 / 40 hafta</span></div>
+  </div>
+</section>
+
+<!-- ============ AI CHAT (o'quvchi repetitor) ============ -->
+<section class="scr" id="s-chat">
+  <div class="chat-head">
+    <div class="bot">🤖</div>
+    <div><h2>AI Yordamchi</h2><p class="mut xs">Savol ber — men tushuntiraman</p></div>
+    <div class="limit-pill" id="c-limit">5 / 5</div>
+  </div>
+  <div class="chat-box" id="c-box">
+    <div class="msg bot">Salom! Men sening AI yordamchingman 🤖 Ingliz tili yoki boshqa dars bo'yicha xohlagan savolingni yoz. Kuniga 5 ta savol bera olasan!</div>
+  </div>
+  <div class="chat-suggest" id="c-suggest">
+    <span class="s" onclick="chatQuick(this)">«Hello» nima degani?</span>
+    <span class="s" onclick="chatQuick(this)">Ranglarni o'rgat</span>
+    <span class="s" onclick="chatQuick(this)">1 dan 10 gacha sanashni ko'rsat</span>
+  </div>
+</section>
+
+</div>
+
+<!-- ============ CHAT INPUT BAR ============ -->
+<div class="chat-bar" id="chat-bar">
+  <input id="c-input" placeholder="Savolingni yoz…" onkeydown="if(event.key==='Enter')chatSend()">
+  <button id="c-send" onclick="chatSend()"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l16-8-6 16-3-6-7-2z" fill="#0A0E1A"/></svg></button>
+</div>
+
+<!-- ============ NAV ============ -->
+<nav id="nav">
+  <a data-n="home" class="on" onclick="go('s-home');navSel('home')">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Bosh</a>
+  <a data-n="eng" onclick="go('s-eng');navSel('eng')">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Ingliz</a>
+  <a data-n="chat" onclick="openChat()">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v11H8l-4 4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="9" cy="10.5" r="1" fill="currentColor"/><circle cx="12" cy="10.5" r="1" fill="currentColor"/><circle cx="15" cy="10.5" r="1" fill="currentColor"/></svg>Yordam</a>
+  <a data-n="brain" onclick="go('s-brain');navSel('brain')">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 4a4 4 0 0 0-4 4v1a3 3 0 0 0-1 5.8V16a4 4 0 0 0 4 4h2a4 4 0 0 0 4-4v-1.2A3 3 0 0 0 16 9V8a4 4 0 0 0-4-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Miyam</a>
+</nav>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeSheet()">
+  <div class="lg sheet" id="sheet-body"></div>
+</div>
+
+<script>
+/* ================== AI SOZLAMALARI ==================
+   Supabase Edge Function joylangach shu ikki qatorni to'ldiring.
+   Bo'sh qolsa — tayyor shablon xulosa ishlaydi (taqdimot buzilmaydi). */
+const AI_CFG={
+  fnUrl:'https://unaodltahuevrfnarfha.supabase.co/functions/v1/ai-tahlil',   // masalan: https://XXXX.supabase.co/functions/v1/ai-tahlil
+  chatUrl:'https://unaodltahuevrfnarfha.supabase.co/functions/v1/ai-chat',    // ai-chat funksiyasi deploy qilingach ishlaydi
+  anonKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVuYW9kbHRhaHVldnJmbmFyZmhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNDE0NDEsImV4cCI6MjA5NDkxNzQ0MX0.e6vf7eMkihzmGlBidSb5WtKtDu9FYn-C1C_EOLhByeQ'  // Supabase anon (public) kaliti
+};
+
+/* ================== REAL SUPABASE ULANISH (academy.html bilan bir xil) ================== */
+const sb = supabase.createClient('https://unaodltahuevrfnarfha.supabase.co','sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP');
+/* diagnostika rejimi hali shu sahifada mavjud (kabinet uchun), lekin oddiy o'quvchi
+   academy.html orqali kiradi va bu sahifaga edu_session bilan keladi. */
+const DIAG_LOGIN='diagnostika';
+const PASS='1111';
+
+/* ================== DATA ================== */
+const POWERS=[
+ {k:'aql',n:'Aql',e:'🧩'},{k:'nutq',n:'Nutq',e:'💬'},{k:'xotira',n:'Xotira',e:'🧠'},
+ {k:'fantaziya',n:'Fantaziya',e:'🎨'},{k:'yurak',n:'Yurak',e:'❤️'}
+];
+const LEADERS={
+ aql:{ini:'EM',name:'Elon Musk',tag:'Texno-vizioner',t:'Kuchli mantiq va bosim ostida ishlash — xuddi senda bor sifatlar. U ham shu kuch bilan raketalar quradi!'},
+ xotira:{ini:'JH',name:'Jensen Huang',tag:'Chuqur diqqat ustasi',t:'Diqqat va qat\u02bciyat — sening kuching. U 30 yil bitta g\u02bcoyaga sodiq qolib, dunyodagi eng qimmat kompaniyani qurdi.'},
+ nutq:{ini:'MB',name:'MrBeast',tag:'Dunyo №1 kreator',t:'So\u02bcz va hikoya qilish kuchi senda bor. U shu kuch bilan 300 milliondan ortiq odamni ergashtirdi!'},
+ fantaziya:{ini:'SA',name:'Sam Altman',tag:'AI kelajak me\u02bcmori',t:'Tasavvur — sening superkuching. U kelajakni tasavvur qilib, sun\u02bciy intellekt davrini boshlab berdi.'},
+ yurak:{ini:'SN',name:'Satya Nadella',tag:'Empatik lider',t:'Odamlarni his qilish — noyob kuch. U aynan shu sifat bilan Microsoft\u2019ni qayta uyg\u02bcotdi.'}
+};
+const PROFS={
+ aql:['Dasturchi 🔥','AI-muhandis 🔥','Kiberxavfsizlik 🔥'],
+ xotira:['Data-analitik 🔥','Moliyachi ✅','Loyiha menejeri ✅'],
+ nutq:['Marketolog 🔥','Bloger-kreator 🔥','Jurnalist ✅'],
+ fantaziya:['Dizayner 🔥','Kontent-prodyuser 🔥','Arxitektor ✅'],
+ yurak:['Psixolog 🌱','HR-mutaxassis ✅','Pedagog ✅']
+};
+const DIAG=[
+ {p:'aql',pw:'Mantiq',q:'Qaysi biri boshqacha?',vis:'',opts:[['🍎','Olma'],['🍌','Banan'],['🚗','Mashina'],['🍊','Apelsin']],right:2},
+ {p:'nutq',pw:'Nutq',q:'\u00abKatta\u00bbning teskarisi qaysi?',vis:'',opts:[['🐜','Kichkina'],['🏔️','Baland'],['🔥','Issiq']],right:0},
+ {p:'xotira',pw:'Xotira',q:'Eslab qol!',vis:'🐱 🌟 🍦',mem:true,q2:'Qaysi biri bor edi?',opts:[['🐶','Kuchuk'],['🌟','Yulduz'],['🚲','Velosiped']],right:1},
+ {p:'fantaziya',pw:'Fantaziya',q:'Bulut nimaga o\u02bcxshaydi? O\u02bczing tanla!',vis:'☁️',opts:[['🐘','Filga'],['🏰','Qasrga'],['🚀','Raketaga']],right:-1},
+ {p:'yurak',pw:'Yurak',q:'Do\u02bcsting yig\u02bclayapti. Nima qilasan?',vis:'🥺',opts:[['🤗','Yordam beraman'],['😆','Kulaman'],['🚶','Ketaman']],right:0}
+];
+const GRADES={
+1:{theme:'Salom, Ingliz tili! 👋',days:['Greetings — Salomlashish','My name is… — Ismim','Colors — Ranglar','Numbers 1–5 — Sonlar','Haftalik test + o\u02bcqituvchi tasdig\u02bci'],
+ q:[{q:'Salomlashish qaysi so\u02bcz?',vis:'👋',opts:[['','Hello'],['','Cat'],['','Red']],right:0},
+    {q:'Xayrlashish-chi?',vis:'🙋',opts:[['','Bye'],['','Dog'],['','One']],right:0},
+    {q:'Do\u02bcstingga qisqa salom:',vis:'😊',opts:[['','Hi!'],['','Apple'],['','Blue']],right:0}]},
+2:{theme:'Men va oilam 👨‍👩‍👧',days:['Family — Oila a\u02bczolari','This is my… — Tanishtirish','Numbers 1–10','Pets — Uy hayvonlari','Haftalik test + o\u02bcqituvchi tasdig\u02bci'],
+ q:[{q:'\u00abOna\u00bb inglizcha?',vis:'👩',opts:[['','Mother'],['','Father'],['','Sister']],right:0},
+    {q:'\u00abThis is my ___\u00bb (aka)',vis:'👦',opts:[['','brother'],['','table'],['','green']],right:0},
+    {q:'\u00abOpa\u00bb-chi?',vis:'👧',opts:[['','Sister'],['','Dog'],['','Ten']],right:0}]},
+3:{theme:'Mening kunim ⏰',days:['Daily actions — Kundalik ishlar','I like / I don\u02bct like','School objects — Maktab buyumlari','Days of week — Hafta kunlari','Haftalik test + o\u02bcqituvchi tasdig\u02bci'],
+ q:[{q:'\u00abMen ertalab uyg\u02bconaman\u00bb = I ___ up',vis:'🌅',opts:[['','wake'],['','sleep'],['','eat']],right:0},
+    {q:'\u00abMen nonushta qilaman\u00bb = I ___ breakfast',vis:'🥞',opts:[['','eat'],['','go'],['','see']],right:0},
+    {q:'\u00abKechqurun uxlayman\u00bb = I ___ at night',vis:'🌙',opts:[['','sleep'],['','run'],['','play']],right:0}]},
+4:{theme:'Bizning maktab 🏫',days:['School subjects — Fanlar','Present Simple: I / You / We','Time — Soat necha?','My timetable — Jadvalim','Haftalik test + o\u02bcqituvchi tasdig\u02bci'],
+ q:[{q:'\u00abMatematika\u00bb inglizcha?',vis:'➗',opts:[['','Maths'],['','Music'],['','Sport']],right:0},
+    {q:'\u00abMen maktabga boraman\u00bb = I ___ to school',vis:'🎒',opts:[['','go'],['','goes'],['','going']],right:0},
+    {q:'\u00abO\u02bcqish darsi\u00bb-chi?',vis:'📖',opts:[['','Reading'],['','Running'],['','Rain']],right:0}]},
+5:{theme:'Men haqimda 🙋',days:['Introducing yourself — To\u02bcliq tanishuv','have got / has got','My room — There is / There are','Hobbies — Sevimli mashg\u02bculotlar','Haftalik test + o\u02bcqituvchi tasdig\u02bci'],
+ q:[{q:'To\u02bcg\u02bcri variantni tanla:',vis:'💬',opts:[['','My name is Aziz.'],['','Me name Aziz.'],['','I name is Aziz.']],right:0},
+    {q:'\u00abI ___ got a bike\u00bb',vis:'🚲',opts:[['','have'],['','has'],['','is']],right:0},
+    {q:'\u00abShe ___ got a cat\u00bb',vis:'🐱',opts:[['','has'],['','have'],['','am']],right:0}]},
+6:{theme:'Sayohat boshlanadi ✈️',days:['Countries & nationalities','Present Continuous','Weather — Ob-havo','Clothes — Kiyimlar','Haftalik test + o\u02bcqituvchi tasdig\u02bci'],
+ q:[{q:'O\u02bczbekistonlik odam — ?',vis:'🇺🇿',opts:[['','Uzbek'],['','Uzbekistan'],['','Uzbekly']],right:0},
+    {q:'\u00abHe ___ playing football now\u00bb',vis:'⚽',opts:[['','is'],['','are'],['','am']],right:0},
+    {q:'France → millati?',vis:'🇫🇷',opts:[['','French'],['','France'],['','Franch']],right:0}]},
+7:{theme:'Hikoyalar davri 📖',days:['Past Simple — to\u02bcg\u02bcri fe\u02bcllar','Past Simple — noto\u02bcg\u02bcri fe\u02bcllar','Telling a story — Hikoya aytish','Linking words — Bog\u02bclovchilar','Haftalik test + o\u02bcqituvchi tasdig\u02bci'],
+ q:[{q:'\u00abplay\u00bb o\u02bctgan zamonda?',vis:'🎮',opts:[['','played'],['','plaied'],['','playd']],right:0},
+    {q:'\u00abgo\u00bb o\u02bctgan zamonda?',vis:'🚶',opts:[['','went'],['','goed'],['','gone']],right:0},
+    {q:'\u00abKecha kino ko\u02bcrdim\u00bb = I ___ a film yesterday',vis:'🎬',opts:[['','watched'],['','watch'],['','watching']],right:0}]},
+8:{theme:'Mening fikrim bor 🗣️',days:['Giving opinions — Fikr bildirish','Comparatives & superlatives','Agree / Disagree','Mini-debate — Kichik bahs','Haftalik test + o\u02bcqituvchi tasdig\u02bci'],
+ q:[{q:'Fikr bildirish iborasi qaysi?',vis:'💭',opts:[['','In my opinion…'],['','On my head…'],['','At my think…']],right:0},
+    {q:'\u00abbig\u00bb qiyosiy darajasi?',vis:'📏',opts:[['','bigger'],['','more big'],['','biggest']],right:0},
+    {q:'\u00abgood\u00bb orttirma darajasi?',vis:'🏆',opts:[['','the best'],['','the goodest'],['','most good']],right:0}]},
+9:{theme:'Kelajak rejalari 🎯',days:['will / going to','First conditional','Professions — Kasblar','My plan — Reja taqdimoti','Haftalik test + o\u02bcqituvchi tasdig\u02bci'],
+ q:[{q:'Aniq reja: \u00abI ___ study IT\u00bb',vis:'💻',opts:[['','am going to'],['','will to'],['','going']],right:0},
+    {q:'\u00abIf it rains, I ___ stay home\u00bb',vis:'🌧️',opts:[['','will'],['','would'],['','am']],right:0},
+    {q:'\u00abDasturchi\u00bb inglizcha?',vis:'👨‍💻',opts:[['','programmer'],['','programist'],['','programchi']],right:0}]},
+10:{theme:'Akademik yozuv ✍️',days:['Essay structure — Esse tuzilishi','Formal vs informal','Opinion essay — Kirish qismi','Linking devices','Haftalik test + o\u02bcqituvchi tasdig\u02bci'],
+ q:[{q:'Esse qaysi qismdan boshlanadi?',vis:'📝',opts:[['','Introduction'],['','Conclusion'],['','Body 2']],right:0},
+    {q:'Rasmiy uslub qaysi?',vis:'📮',opts:[['','Dear Sir or Madam'],['','Hey bro'],['','Yo!']],right:0},
+    {q:'Qarama-qarshilik bog\u02bclovchisi?',vis:'⚖️',opts:[['','However'],['','And'],['','So']],right:0}]},
+11:{theme:'IELTS sprint 🏁',days:['Speaking Part 1 strategiyasi','Listening strategiyalari','Writing Task 2 tuzilishi','Mock mini-test','Haftalik test + o\u02bcqituvchi tasdig\u02bci'],
+ q:[{q:'Speaking Part 1 nima haqida?',vis:'🎤',opts:[['','O\u02bczing haqingda'],['','Grafik tahlili'],['','Ilmiy maqola']],right:0},
+    {q:'Writing Task 2 — bu…',vis:'✍️',opts:[['','Esse'],['','Xat'],['','Diagramma']],right:0},
+    {q:'Band 6 nimani bildiradi?',vis:'📊',opts:[['','Competent user'],['','Beginner'],['','Expert user']],right:0}]}
+};
+
+/* ================== STATE (in-memory) ================== */
+let MODE='student';
+let S={id:null,name:'',grade:1,profile:null,top:'aql',dayDone:false,stars:0};
+let D={name:'',grade:0,phone:''};
+let diagLog=[];
+
+/* ================== HELPERS ================== */
+const $=id=>document.getElementById(id);
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+function go(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');window.scrollTo({top:0});}
+function nav(on){$('nav').classList.toggle('on',on)}
+function navSel(n){document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on',a.dataset.n===n))}
+function openSheet(kind){
+  const b=$('sheet-body');
+  if(kind==='staff'){b.innerHTML=`<h2>Xodimlar uchun 🔐</h2><p class="mut sm" style="margin-bottom:16px">Bu tugma joriy platformadagi xodimlar kirishiga ulanadi (admin / marketolog / operator).</p><button class="btn ghost" onclick="closeSheet()">Yopish</button>`;}
+  else{b.innerHTML=`<h2>${S.name||'O\u02bcquvchi'}</h2><p class="mut sm" style="margin-bottom:16px">${S.grade}-sinf · Ingliz tili yo\u02bcnalishi</p><button class="btn ghost" onclick="logout()">Chiqish</button>`;}
+  $('modal').classList.add('on');
+}
+function closeSheet(){$('modal').classList.remove('on')}
+function logout(){location.reload()}
+
+/* ================== LOGIN ================== */
+function doLogin(){
+  const l=($('in-login').value||'').trim().toLowerCase(), p=($('in-pass').value||'').trim();
+  if(l===DIAG_LOGIN && p===PASS){ MODE='diag'; buildGradeChips(); go('s-intake'); return; }
+  alert("Iltimos, asosiy sahifa orqali kiring.");
+  location.href='academy.html';
+}
+
+/* ================== REAL SESSIYADAN O'QUVCHINI YUKLASH ================== */
+async function bootFromSession(){
+  let s=null;
+  try{s=JSON.parse(localStorage.getItem('edu_session'));}catch(e){}
+  if(!s || s.type!=='student' || !s.data || !s.data.id){ go('s-login'); return; }
+  try{
+    const {data:stu}=await sb.from('students').select('*').eq('id',s.data.id).eq('is_active',1).maybeSingle();
+    if(!stu){ go('s-login'); return; }
+    if(stu.track!=='maktab'){ location.href='academy.html'; return; }
+    MODE='student';
+    S.id=stu.id;
+    S.name=(stu.full_name||'').split(' ')[0]||"O'quvchi";
+    S.grade=stu.maktab_grade || guessGrade(stu) || 1;
+    const {data:prof}=await sb.from('maktab_profiles').select('*').eq('student_id',stu.id).maybeSingle();
+    if(prof){
+      S.profile={aql:prof.aql||60,nutq:prof.nutq||60,xotira:prof.xotira||60,fantaziya:prof.fantaziya||60,yurak:prof.yurak||60};
+      S.top=prof.top_power || topOf(S.profile);
+    }else{
+      S.profile={aql:65,nutq:65,xotira:65,fantaziya:65,yurak:65};
+      S.top='aql';
+    }
+    const {data:pr}=await sb.from('maktab_progress').select('*').eq('student_id',stu.id).eq('subject','english').maybeSingle();
+    if(pr){ S.dayDone=!!pr.day_done; S.stars=pr.stars||0; }
+    prepStudent(); go('s-home'); nav(true); navSel('home');
+  }catch(e){ console.error(e); go('s-login'); }
+}
+function guessGrade(stu){ const m=(stu.full_name||'').match(/(\d{1,2})-?sinf/i); return m?+m[1]:0; }
+function topOf(p){ return Object.keys(p).sort((a,b)=>p[b]-p[a])[0]; }
+
+/* ================== INTAKE ================== */
+function buildGradeChips(){
+  $('d-grades').innerHTML=[...Array(11)].map((_,i)=>`<div class="gchip" data-g="${i+1}" onclick="pickGrade(this)">${i+1}</div>`).join('');
+  D={name:'',grade:0,phone:''};
+  $('d-name').value='';$('d-phone').value='';
+  renderLog();
+}
+function pickGrade(el){
+  document.querySelectorAll('.gchip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on'); D.grade=+el.dataset.g;
+}
+function renderLog(){
+  if(!diagLog.length){$('d-log-card').style.display='none';return;}
+  $('d-log-card').style.display='block';
+  $('d-count').textContent=diagLog.length+' ta';
+  $('d-log').innerHTML=diagLog.slice(-4).reverse().map(r=>
+    `<div class="tl-row"><span class="dotp"></span><b>${r.name}</b><span class="mut xs">${r.grade}-sinf</span><span class="r">${LEADERS[r.top].name}</span></div>`).join('');
+}
+function startDiagChild(){
+  const n=($('d-name').value||'').trim();
+  if(!n){alert('Bolaning ismini kiriting');return;}
+  if(!D.grade){alert('Sinfni tanlang');return;}
+  D.name=cap(n); D.phone=($('d-phone').value||'').trim();
+  dq=0;dscore={aql:0,nutq:0,xotira:0,fantaziya:0,yurak:0};
+  DIAG.forEach(x=>delete x._shown);
+  $('dg-who').textContent=`Kelajak Xaritasi · ${D.name} · ${D.grade}-sinf`;
+  go('s-diag');renderDiag();
+}
+
+/* ================== DIAGNOSTIC ================== */
+let dq=0,dscore={aql:0,nutq:0,xotira:0,fantaziya:0,yurak:0};
+function renderDiag(){
+  const dots=$('dg-dots').children;[...dots].forEach((d,i)=>d.classList.toggle('on',i<=dq));
+  const d=DIAG[dq],b=$('dg-body');
+  if(d.mem&&!d._shown){
+    b.innerHTML=`<div class="lg dq"><span class="pw">${d.pw}</span><h2>${d.q}</h2>
+      <div class="big-emoji">${d.vis}</div>
+      <div class="opts"><button class="opt" onclick="DIAG[${dq}]._shown=true;renderDiag()"><span class="em">👀</span> Yodladim!</button></div></div>`;
+    return;
+  }
+  const question=d.mem?d.q2:d.q;
+  b.innerHTML=`<div class="lg dq"><span class="pw">${d.pw}</span><h2>${question}</h2>
+    ${d.vis&&!d.mem?`<div class="big-emoji">${d.vis}</div>`:''}
+    <div class="opts">${d.opts.map((o,i)=>`<button class="opt" onclick="ansDiag(${i},this)"><span class="em">${o[0]}</span>${o[1]}</button>`).join('')}</div></div>`;
+}
+function ansDiag(i,el){
+  const d=DIAG[dq];
+  document.querySelectorAll('#dg-body .opt').forEach(o=>o.style.pointerEvents='none');
+  const ok=(d.right===-1)||(i===d.right);
+  el.classList.add(ok?'right':'wrong');
+  dscore[d.p]+= ok?22:8;
+  setTimeout(()=>{dq++; dq<DIAG.length?renderDiag():computeDiag();},480);
+}
+function computeDiag(){
+  $('dg-body').innerHTML=`<div class="lg compute"><div class="brainwave">🧠</div>
+    <h2>Superkuchlar hisoblanmoqda…</h2><p class="mut sm" style="margin-top:6px">AI-psixolog tahlil qilyapti</p></div>`;
+  const prof={};POWERS.forEach(p=>{prof[p.k]=Math.min(96,50+Math.floor(Math.random()*14)+dscore[p.k]);});
+  D.profile=prof;
+  D.top=Object.keys(prof).sort((a,b)=>prof[b]-prof[a])[0];
+  D.aiP=fetchAI();
+  setTimeout(showDiagResult,1700);
+}
+function powersHTML(prof){
+  return POWERS.map(p=>`<div class="pw-row"><div class="ic">${p.e}</div><div class="nm">${p.n}</div>
+    <div class="tr"><i data-w="${prof[p.k]}"></i></div><div class="vl">${prof[p.k]}%</div></div>`).join('');
+}
+function leaderHTML(k){
+  const L=LEADERS[k];
+  return `<div class="ava">${L.ini}</div><div class="who"><span class="tag">Senga o\u02bcxshagan lider</span>
+    <h2>${L.name}</h2><p class="sm mut">${L.tag}</p><p class="sm" style="margin-top:6px">${L.t}</p></div>`;
+}
+function showDiagResult(){
+  $('res-name').textContent=`Zo\u02bcr, ${D.name}!`;
+  $('res-powers').innerHTML=powersHTML(D.profile);
+  $('res-leader').innerHTML=leaderHTML(D.top);
+  $('res-profs').innerHTML=PROFS[D.top].map(p=>`<span class="pchip">${p}</span>`).join('');
+  $('res-ai-txt').textContent='Yozilmoqda…';
+  (D.aiP||Promise.resolve(null)).then(c=>{$('res-ai-txt').textContent=c||fallbackComment();});
+  go('s-res');confetti();
+  setTimeout(()=>{document.querySelectorAll('#res-powers .tr i').forEach(i=>i.style.width=i.dataset.w+'%');},150);
+}
+async function nextChild(){
+  /* diagnostika natijasini bazaga saqlaymiz — admin panel «Akaunt yaratish» uchun ko'radi */
+  try{
+    await sb.from('diagnostics').insert({
+      child_name:D.name, grade:D.grade, parent_phone:D.phone||null,
+      aql:D.profile.aql, nutq:D.profile.nutq, xotira:D.profile.xotira,
+      fantaziya:D.profile.fantaziya, yurak:D.profile.yurak,
+      top_power:D.top, leader:LEADERS[D.top].name, status:'new'
+    });
+  }catch(e){ console.error('diagnostics insert', e); }
+  diagLog.push({name:D.name,grade:D.grade,top:D.top});
+  buildGradeChips(); go('s-intake');
+}
+
+/* ================== O'QUVCHI PROGRESSINI SAQLASH ================== */
+async function saveProgress(){
+  if(!S.id) return; // diagnostika rejimida id yo'q — saqlamaymiz
+  try{
+    await sb.from('maktab_progress').upsert({
+      student_id:S.id, subject:'english', week:1,
+      day_done:S.dayDone, stars:S.stars, updated_at:new Date().toISOString()
+    }, { onConflict:'student_id,subject' });
+  }catch(e){ console.error('progress save', e); }
+}
+
+/* ================== AI XULOSA (DeepSeek orqali Edge Function) ================== */
+async function fetchAI(){
+  if(!AI_CFG.fnUrl) return null;
+  try{
+    const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),9000);
+    const r=await fetch(AI_CFG.fnUrl,{method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+AI_CFG.anonKey},
+      body:JSON.stringify({name:D.name,grade:D.grade,powers:D.profile,top:D.top,leader:LEADERS[D.top].name}),
+      signal:ctl.signal});
+    clearTimeout(t);
+    if(!r.ok) return null;
+    const j=await r.json();
+    return (j.comment||'').trim()||null;
+  }catch(e){return null;}
+}
+function fallbackComment(){
+  const L=LEADERS[D.top];
+  const P={aql:'mantiqiy fikrlash',nutq:'so\u02bcz boyligi va muloqot',xotira:'diqqat va xotira',fantaziya:'tasavvur va ijodkorlik',yurak:'odamlarni his qilish'}[D.top];
+  return `${D.name}ning eng yorqin tomoni — ${P}. Bu kuch to\u02bcg\u02bcri yo\u02bcnaltirilsa, ${L.name} kabi katta natijalarga olib boradi. Har hafta kichik qadamlar — testlar va uy vazifalari orqali bu qobiliyatni birga o\u02bcstiramiz!`;
+}
+
+/* ================== STUDENT ================== */
+function prepStudent(){
+  $('h-name').textContent=`Salom, ${S.name}!`;
+  $('h-ava').textContent=S.name[0];
+  $('h-grade').textContent=`${S.grade}-sinf · Maktab yo\u02bcnalishi`;
+  $('e-grade').textContent=`${S.grade}-sinf · 1-hafta`;
+  $('b-powers').innerHTML=powersHTML(S.profile);
+  $('b-leader').innerHTML=leaderHTML(S.top);
+  setTimeout(()=>{document.querySelectorAll('#b-powers .tr i').forEach(i=>i.style.width=i.dataset.w+'%');},400);
+  renderWeek();
+}
+
+/* ================== WEEK ================== */
+const WD=['Dushanba','Seshanba','Chorshanba','Payshanba','Juma'];
+function renderWeek(){
+  const G=GRADES[S.grade];
+  $('e-theme').textContent=G.theme;
+  const pct=S.dayDone?20:0;
+  $('e-pct').textContent=pct+'%';
+  $('e-mark').style.left=`calc(${pct}% - 8px)`;
+  const segs=$('e-seg').querySelectorAll('i');
+  segs.forEach((s,i)=>{s.className='';if(S.dayDone&&i===0)s.classList.add('lit');if((!S.dayDone&&i===0))s.classList.add('today');});
+  let html='';
+  G.days.forEach((t,i)=>{
+    const isFri=i===4;
+    if(i===0){
+      if(S.dayDone){
+        html+=`<div class="lg day dn"><div class="ic">✅</div><div class="mid"><div class="wd">${WD[0]}</div><div class="tp">${t}</div></div>
+          <div><div class="stars">${'★'.repeat(S.stars)}<span class="off">${'★'.repeat(3-S.stars)}</span></div><div class="xs mut">Bajarildi</div></div></div>`;
+      }else{
+        html+=`<div class="lg warm day tdy"><div class="ic">⏰</div><div class="mid"><div class="wd">${WD[0]} · Bugun</div><div class="tp">${t}</div></div>
+          <button class="cta" onclick="startTest()">Testni yechish</button></div>`;
+      }
+    }else if(isFri){
+      html+=`<div class="lg day lk fri"><div class="ic">🎓</div><div class="mid"><div class="wd">${WD[4]} · Yakunlash</div><div class="tp">${t}</div></div><div class="xs mut">🔒 100%</div></div>`;
+    }else{
+      html+=`<div class="lg day lk"><div class="ic">🔒</div><div class="mid"><div class="wd">${WD[i]}</div><div class="tp">${t}</div></div><div class="xs mut">${S.dayDone&&i===1?'Ertaga ochiladi':'Yopiq'}</div></div>`;
+    }
+  });
+  $('e-days').innerHTML=html;
+  $('h-pct').textContent=pct+'%';
+  $('h-ring').style.strokeDashoffset=195-(195*pct/100);
+  $('h-wk').textContent=S.dayDone?'1-hafta · 20% · zo\u02bcr ketyapsan!':'1-hafta · bugungi test kutmoqda';
+  if(S.dayDone)$('e-coach').innerHTML=`Ajoyib, <b>${S.name}</b>! Birinchi qadam qo\u02bcyildi — ertaga davom etamiz. <span class="f">Juma kuni o\u02bcqituvching tasdiqlasa, «${GRADES[S.grade].theme}» ko\u02bcnikmasi «Men bilaman»ga qo\u02bcshiladi.</span>`;
+}
+
+/* ================== TEST ================== */
+let tq=0,tright=0;
+function startTest(){tq=0;tright=0;$('t-sub').textContent=GRADES[S.grade].days[0];go('s-test');renderTest();}
+function renderTest(){
+  const dots=$('t-dots').children;[...dots].forEach((d,i)=>d.classList.toggle('on',i<=tq));
+  const Q=GRADES[S.grade].q[tq];
+  $('t-body').innerHTML=`<div class="lg t-q"><div class="n">Savol ${tq+1} / 3</div><h2>${Q.q}</h2>
+    ${Q.vis?`<div class="vis">${Q.vis}</div>`:''}
+    <div class="opts">${Q.opts.map((o,i)=>`<button class="opt" onclick="ansTest(${i},this)">${o[0]?`<span class="em">${o[0]}</span>`:''}${o[1]}</button>`).join('')}</div></div>`;
+}
+function ansTest(i,el){
+  const Q=GRADES[S.grade].q[tq];
+  document.querySelectorAll('#t-body .opt').forEach(o=>o.style.pointerEvents='none');
+  const ok=i===Q.right;
+  el.classList.add(ok?'right':'wrong');
+  if(!ok){[...document.querySelectorAll('#t-body .opt')][Q.right].classList.add('right');}
+  if(ok)tright++;
+  setTimeout(()=>{tq++;tq<3?renderTest():finishTest();},650);
+}
+function finishTest(){
+  S.dayDone=true;S.stars=Math.max(1,tright);
+  saveProgress();
+  $('t-body').innerHTML=`<div class="lg warm done-card">
+    <div class="big">+20%</div>
+    <div class="stars-lg">${'★'.repeat(S.stars)}<span class="off">${'★'.repeat(3-S.stars)}</span></div>
+    <h2 style="margin-top:6px">Birinchi qadam qo\u02bcyildi! 🎉</h2>
+    <p class="mut sm" style="margin:8px 0 20px">${tright}/3 to\u02bcg\u02bcri · Utkonos yo\u02bclda oldinga siljidi</p>
+    <button class="btn" onclick="renderWeek();go('s-eng')">Yo\u02bclni ko\u02bcrish</button></div>`;
+  confetti();
+}
+
+/* ================== AI CHAT (o'quvchi repetitor) ================== */
+let chatBusy=false;
+function openChat(){
+  go('s-chat');navSel('chat');
+  $('nav').classList.add('on');
+  $('chat-bar').classList.add('on');
+  refreshLimitPill();
+}
+/* boshqa ekranga o'tganda input barni yashirish */
+const _go=go;
+go=function(id){_go(id);$('chat-bar').classList.toggle('on',id==='s-chat');};
+
+function refreshLimitPill(){
+  const left=Math.max(0,5-chatUsedToday());
+  const pill=$('c-limit');
+  pill.textContent=left+' / 5';
+  pill.classList.toggle('out',left<=0);
+  $('c-input').disabled=left<=0;
+  $('c-send').disabled=left<=0||chatBusy;
+  if(left<=0)$('c-input').placeholder='Bugungi savollar tugadi — ertaga davom!';
+}
+/* mahalliy zaxira hisob (server hisobi bilan sinxron) */
+function chatUsedToday(){
+  const t=new Date().toISOString().slice(0,10);
+  try{const o=JSON.parse(localStorage.getItem('eduChat')||'{}');return o.day===t?(o.n||0):0;}catch(e){return 0;}
+}
+function chatBumpLocal(n){
+  const t=new Date().toISOString().slice(0,10);
+  try{localStorage.setItem('eduChat',JSON.stringify({day:t,n:n}));}catch(e){}
+}
+function addMsg(text,cls){
+  const d=document.createElement('div');d.className='msg '+cls;d.textContent=text;
+  $('c-box').appendChild(d);d.scrollIntoView({behavior:'smooth',block:'end'});return d;
+}
+function chatQuick(el){$('c-input').value=el.textContent;chatSend();}
+async function chatSend(){
+  if(chatBusy)return;
+  const inp=$('c-input');const q=(inp.value||'').trim();
+  if(!q)return;
+  if(chatUsedToday()>=5){addMsg('Bugungi 5 ta savol tugadi 🙌 Ertaga yana yozishing mumkin.','bot');return;}
+  inp.value='';$('c-suggest').style.display='none';
+  addMsg(q,'me');
+  chatBusy=true;$('c-send').disabled=true;
+  const think=addMsg('yozmoqda…','think bot');
+
+  let reply=null,serverUsed=null;
+  if(AI_CFG.chatUrl){
+    try{
+      const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),15000);
+      const r=await fetch(AI_CFG.chatUrl,{method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+AI_CFG.anonKey},
+        body:JSON.stringify({student:(S.id?('stu'+S.id):S.name.toLowerCase()),grade:S.grade,message:q}),signal:ctl.signal});
+      clearTimeout(tm);
+      if(r.ok){const j=await r.json();reply=j.reply||null;if(typeof j.used==='number')serverUsed=j.used;}
+    }catch(e){}
+  }
+  think.remove();
+  if(reply){
+    addMsg(reply,'bot');
+    chatBumpLocal(serverUsed!=null?serverUsed:chatUsedToday()+1);
+  }else{
+    addMsg('Kechirasan, hozir javob bera olmadim 🙏 Internetni tekshirib, birozdan keyin qayta yozib ko\u02bcr.','bot');
+    chatBumpLocal(chatUsedToday()+1);
+  }
+  chatBusy=false;refreshLimitPill();
+}
+
+/* ================== CONFETTI ================== */
+function confetti(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const c=$('fx'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;
+  const P=[...Array(90)].map(()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.4,
+    v:2+Math.random()*3.5,r:3+Math.random()*5,a:Math.random()*6.28,
+    col:['#FF7A1A','#FFC94D','#4DA3FF','#3DE8A0','#FFA24F'][Math.floor(Math.random()*5)]}));
+  let t=0;
+  (function fr(){
+    x.clearRect(0,0,c.width,c.height);
+    P.forEach(p=>{p.y+=p.v;p.x+=Math.sin(p.a+=.06)*1.4;
+      x.fillStyle=p.col;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillRect(-p.r/2,-p.r/2,p.r,p.r*.6);x.restore();});
+    if(++t<130)requestAnimationFrame(fr);else x.clearRect(0,0,c.width,c.height);
+  })();
+}
+
+/* ================== SAHIFA YUKLANGANDA ================== */
+window.addEventListener('DOMContentLoaded', bootFromSession);
+</script>
+</body>
+</html>
