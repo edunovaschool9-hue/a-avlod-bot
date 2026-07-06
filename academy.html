@@ -2584,7 +2584,7 @@ async function doUnifiedLogin(){
       try{sb.from('student_visits').insert({student_id:stu.id,visited_at:new Date().toISOString()}).then(()=>{});}catch(e){}
       btn.disabled=false;btn.textContent='Kirish →';
       const fname=(stu.full_name||'').split(' ')[0];
-      runSplash(fname, async()=>{await loadStudentApp();showPage('p-student');});
+      runSplash(fname, async()=>{ if(currentUser.track==='maktab'){await loadMaktabApp();}else{await loadStudentApp();showPage('p-student');} });
       return;
     }
   }catch(e){}
@@ -3042,6 +3042,10 @@ function calfSVG(){return `<defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2
 <ellipse cx="100" cy="94" rx="20" ry="14" fill="#f4c9b8"/><ellipse cx="93" cy="93" rx="2.5" ry="3.5" fill="#b5705f"/><ellipse cx="107" cy="93" rx="2.5" ry="3.5" fill="#b5705f"/></g>`;}
 
 // ── STUDENT APP ──
+async function loadMaktabApp(){
+  alert("Maktab oqimi ishladi!");
+  showPage('p-student');
+}
 async function loadStudentApp(){
   const s=currentUser;
   document.getElementById('stu-name-h').textContent=s.full_name;
