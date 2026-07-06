@@ -3042,10 +3042,7 @@ function calfSVG(){return `<defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2
 <ellipse cx="100" cy="94" rx="20" ry="14" fill="#f4c9b8"/><ellipse cx="93" cy="93" rx="2.5" ry="3.5" fill="#b5705f"/><ellipse cx="107" cy="93" rx="2.5" ry="3.5" fill="#b5705f"/></g>`;}
 
 // ── STUDENT APP ──
-async function loadMaktabApp(){
-  alert("Maktab oqimi ishladi!");
-  showPage('p-student');
-}
+async function loadMaktabApp(){ location.href = 'maktab.html'; }
 async function loadStudentApp(){
   const s=currentUser;
   document.getElementById('stu-name-h').textContent=s.full_name;
