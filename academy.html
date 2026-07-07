@@ -8,14 +8,14 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <!-- ══ PWA (устанавливается как приложение) ══ -->
-<meta name="theme-color" content="#7c5cff">
+<meta name="theme-color" content="#FF6B1A">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="EduNova">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/edunovaschool9-hue/a-avlod-bot/main/icon-192.png">
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/edunovaschool9-hue/a-avlod-bot/main/icon-192.png">
-<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22EduNova%20Platform%22%2C%22short_name%22%3A%22EduNova%22%2C%22description%22%3A%22EduNova%20Iqtidor%20markazi%20%5Cu2014%20boshqaruv%20paneli%22%2C%22id%22%3A%22com.edunova.app%22%2C%22start_url%22%3A%22https%3A//www.edunovaschool.uz/academy.html%22%2C%22scope%22%3A%22https%3A//www.edunovaschool.uz/%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%231a1d2e%22%2C%22theme_color%22%3A%22%237c5cff%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A//raw.githubusercontent.com/edunovaschool9-hue/a-avlod-bot/main/icon-192.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image/png%22%2C%22purpose%22%3A%22any%22%7D%2C%7B%22src%22%3A%22https%3A//raw.githubusercontent.com/edunovaschool9-hue/a-avlod-bot/main/icon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image/png%22%2C%22purpose%22%3A%22any%22%7D%2C%7B%22src%22%3A%22https%3A//raw.githubusercontent.com/edunovaschool9-hue/a-avlod-bot/main/icon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image/png%22%2C%22purpose%22%3A%22maskable%22%7D%5D%7D">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22EduNova%20Platform%22%2C%22short_name%22%3A%22EduNova%22%2C%22description%22%3A%22EduNova%20Iqtidor%20markazi%20%5Cu2014%20boshqaruv%20paneli%22%2C%22id%22%3A%22com.edunova.app%22%2C%22start_url%22%3A%22https%3A//www.edunovaschool.uz/academy.html%22%2C%22scope%22%3A%22https%3A//www.edunovaschool.uz/%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%23F2EFE9%22%2C%22theme_color%22%3A%22%23FF6B1A%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A//raw.githubusercontent.com/edunovaschool9-hue/a-avlod-bot/main/icon-192.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image/png%22%2C%22purpose%22%3A%22any%22%7D%2C%7B%22src%22%3A%22https%3A//raw.githubusercontent.com/edunovaschool9-hue/a-avlod-bot/main/icon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image/png%22%2C%22purpose%22%3A%22any%22%7D%2C%7B%22src%22%3A%22https%3A//raw.githubusercontent.com/edunovaschool9-hue/a-avlod-bot/main/icon-512.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image/png%22%2C%22purpose%22%3A%22maskable%22%7D%5D%7D">
 <script>
 // Service worker (offline кэш) — встроен как blob
 (function(){
@@ -47,27 +47,27 @@
 :root{
   --bg:#070810;--s:#10121c;--s2:#171a26;--s3:#1f2330;--brd:#262b3a;--brd2:#333a4d;
   --tx:#f0f2f8;--mu:#646b80;--mu2:#a0a8bd;
-  --ac:#7c5cff;--ac2:#a78bff;--acd:#5b3fd6;
-  --cy:#22d3ee;--gn:#34d399;--rd:#fb7185;--go:#fbbf24;--bl:#60a5fa;--pk:#f472b6;
+  --ac:#FF6B1A;--ac2:#FF8A47;--acd:#E85400;
+  --cy:#E85400;--gn:#34d399;--rd:#fb7185;--go:#fbbf24;--bl:#60a5fa;--pk:#f472b6;
   --r:18px;--rs:12px;
   --ff:'DM Sans',-apple-system,sans-serif;--fd:'Space Grotesk',sans-serif;--fm:'DM Mono',monospace;
-  --glow:0 0 40px rgba(124,92,255,.45);
+  --glow:0 0 40px rgba(255,107,26,.45);
   /* glass tokens (2026 trend) */
-  --glass:rgba(255,255,255,.045);
-  --glass-brd:rgba(255,255,255,.09);
-  --glass-hi:rgba(255,255,255,.14);
+  --glass:rgba(28,28,28,.045);
+  --glass-brd:rgba(28,28,28,.09);
+  --glass-hi:rgba(28,28,28,.14);
   --shadow-sm:0 2px 12px rgba(0,0,0,.3);
   --shadow:0 12px 40px rgba(0,0,0,.4);
   --shadow-lg:0 24px 70px rgba(0,0,0,.55);
-  --grad-ac:linear-gradient(135deg,#7c5cff,#a78bff);
-  --grad-cy:linear-gradient(135deg,#22d3ee,#3b82f6);
+  --grad-ac:linear-gradient(135deg,#FF6B1A,#FF8A47);
+  --grad-cy:linear-gradient(135deg,#E85400,#3b82f6);
 }
 body{font-family:var(--ff);background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
 /* aurora mesh background (2026 trend) */
 body::before{content:"";position:fixed;inset:0;z-index:-2;background:
-  radial-gradient(ellipse 80% 50% at 10% 0%,rgba(124,92,255,.16),transparent 60%),
-  radial-gradient(ellipse 60% 50% at 90% 10%,rgba(34,211,238,.1),transparent 55%),
-  radial-gradient(ellipse 70% 60% at 50% 100%,rgba(167,139,255,.1),transparent 60%);
+  radial-gradient(ellipse 80% 50% at 10% 0%,rgba(255,107,26,.16),transparent 60%),
+  radial-gradient(ellipse 60% 50% at 90% 10%,rgba(232,84,0,.1),transparent 55%),
+  radial-gradient(ellipse 70% 60% at 50% 100%,rgba(255,138,71,.1),transparent 60%);
   pointer-events:none}
 body::after{content:"";position:fixed;inset:0;z-index:-1;opacity:.025;pointer-events:none;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
@@ -82,9 +82,9 @@ input,select,textarea{font-family:var(--ff)}
 
 /* ambient bg */
 body::before{content:"";position:fixed;inset:0;z-index:-2;
-  background:radial-gradient(60% 50% at 20% 0%,rgba(124,92,255,.13),transparent 60%),
-  radial-gradient(50% 40% at 100% 10%,rgba(34,211,238,.08),transparent 55%),
-  radial-gradient(50% 50% at 50% 100%,rgba(124,92,255,.1),transparent 60%),var(--bg)}
+  background:radial-gradient(60% 50% at 20% 0%,rgba(255,107,26,.13),transparent 60%),
+  radial-gradient(50% 40% at 100% 10%,rgba(232,84,0,.08),transparent 55%),
+  radial-gradient(50% 50% at 50% 100%,rgba(255,107,26,.1),transparent 60%),var(--bg)}
 
 /* ══ COURSE SELECT / LANDING ══ */
 #p-land{flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:30px}
@@ -134,16 +134,16 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .ul-orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.22;pointer-events:none}
 .ul-brand-inner{position:relative;z-index:1;max-width:460px;width:100%;max-height:100%;overflow-y:auto;padding-right:8px}
 .ul-watch-platy{width:130px;margin:0 auto 18px;display:block}
-.ul-watch-platy svg{width:100%;height:auto;filter:drop-shadow(0 8px 24px rgba(124,92,255,.25));animation:ulwBob 3.5s ease-in-out infinite}
+.ul-watch-platy svg{width:100%;height:auto;filter:drop-shadow(0 8px 24px rgba(255,107,26,.25));animation:ulwBob 3.5s ease-in-out infinite}
 @keyframes ulwBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 #ulwPupilL,#ulwPupilR{transition:cx .08s ease-out,cy .08s ease-out}
 .ul-brand-inner::-webkit-scrollbar{width:6px}
 .ul-brand-inner::-webkit-scrollbar-track{background:transparent}
-.ul-brand-inner::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px}
-.ul-brand-inner::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.2)}
+.ul-brand-inner::-webkit-scrollbar-thumb{background:rgba(28,28,28,.12);border-radius:3px}
+.ul-brand-inner::-webkit-scrollbar-thumb:hover{background:rgba(28,28,28,.2)}
 .ul-logo-row{display:flex;align-items:center;gap:18px;margin-bottom:8px;opacity:0;transform:translateY(20px);animation:ulRise .8s .1s forwards}
-.ul-logo-badge{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,rgba(124,92,255,.35),rgba(34,211,238,.2));display:flex;align-items:center;justify-content:center;font-size:38px;border:1px solid rgba(255,255,255,.18);box-shadow:0 8px 28px rgba(124,92,255,.3),inset 0 1px 0 rgba(255,255,255,.2);flex-shrink:0}
-.ul-platypus{width:90px;height:auto;filter:drop-shadow(0 6px 18px rgba(124,92,255,.25))}
+.ul-logo-badge{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,rgba(255,107,26,.35),rgba(232,84,0,.2));display:flex;align-items:center;justify-content:center;font-size:38px;border:1px solid rgba(28,28,28,.18);box-shadow:0 8px 28px rgba(255,107,26,.3),inset 0 1px 0 rgba(28,28,28,.2);flex-shrink:0}
+.ul-platypus{width:90px;height:auto;filter:drop-shadow(0 6px 18px rgba(255,107,26,.25))}
 .ul-platypus.swim{animation:ulSwim 4s ease-in-out infinite}
 .ul-name{font-family:var(--fd);font-size:40px;font-weight:800;letter-spacing:4px;line-height:1;color:#fff}
 .ul-sub{font-family:var(--fm);font-size:11px;letter-spacing:6px;color:var(--mu);margin-top:6px}
@@ -156,7 +156,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .ul-info-icon{font-size:26px;margin-bottom:8px}
 .ul-info-title{font-family:var(--fd);font-size:17px;font-weight:700;color:#fff;margin-bottom:6px}
 .ul-info-text{font-size:13.5px;line-height:1.55;color:var(--mu2)}
-.ul-info-cta{background:linear-gradient(135deg,rgba(124,92,255,.25),rgba(124,92,255,.08));border:1px solid rgba(124,92,255,.35);border-radius:16px;padding:20px;margin-top:4px}
+.ul-info-cta{background:linear-gradient(135deg,rgba(255,107,26,.25),rgba(255,107,26,.08));border:1px solid rgba(255,107,26,.35);border-radius:16px;padding:20px;margin-top:4px}
 .ul-info-cta-title{font-family:var(--fd);font-size:17px;font-weight:800;color:#fff;margin-bottom:6px}
 .ul-info-cta-text{font-size:13.5px;line-height:1.55;color:#d8dae0}
 .ul-login{width:440px;background:#0d0e13;border-left:1px solid var(--brd);display:flex;flex-direction:column;justify-content:center;padding:0 48px;position:relative}
@@ -179,7 +179,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
   .ul-brand-inner{text-align:center;max-height:none;overflow-y:visible;padding-right:0}
   .ul-logo-row{flex-direction:column;gap:14px}
   .ul-logo-badge{width:66px;height:66px;font-size:34px}
-  .ul-platypus{width:78px;filter:drop-shadow(0 4px 20px rgba(255,255,255,.12))}
+  .ul-platypus{width:78px;filter:drop-shadow(0 4px 20px rgba(28,28,28,.12))}
   .ul-name{font-size:32px;letter-spacing:5px}
   .ul-sub{letter-spacing:7px}
   .ul-tagline{font-size:18px;margin-top:20px;color:#aab1c2}
@@ -193,14 +193,14 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 #splash.on{display:flex}
 .sp-orb{position:absolute;border-radius:50%;filter:blur(100px);pointer-events:none;animation:spFloat 6s ease-in-out infinite}
 @keyframes spFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.1)}}
-.sp-platypus{width:120px;height:auto;position:relative;z-index:1;animation:ulSwim 3s ease-in-out infinite;filter:drop-shadow(0 8px 24px rgba(124,92,255,.4))}
+.sp-platypus{width:120px;height:auto;position:relative;z-index:1;animation:ulSwim 3s ease-in-out infinite;filter:drop-shadow(0 8px 24px rgba(255,107,26,.4))}
 .sp-welcome{position:relative;z-index:1;font-family:var(--fd);font-size:clamp(28px,5vw,42px);font-weight:800;margin-top:24px;text-align:center;
   background:linear-gradient(120deg,#fff 30%,var(--ac2) 70%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
   opacity:0;animation:spFade .8s .3s forwards}
 .sp-name{position:relative;z-index:1;font-family:var(--fd);font-size:clamp(22px,4vw,32px);font-weight:700;color:var(--ac2);margin-top:2px;text-align:center;opacity:0;animation:spFade .8s .5s forwards}
 .sp-status{position:relative;z-index:1;font-size:15px;color:var(--mu2);margin-top:28px;height:22px;text-align:center;transition:.3s;font-family:var(--fm)}
 .sp-bar-wrap{position:relative;z-index:1;width:min(420px,80vw);height:8px;background:var(--s2);border-radius:10px;margin-top:16px;overflow:hidden}
-.sp-bar{height:100%;width:0%;border-radius:10px;background:linear-gradient(90deg,var(--ac),var(--cy));transition:width .25s linear;box-shadow:0 0 16px rgba(124,92,255,.6)}
+.sp-bar{height:100%;width:0%;border-radius:10px;background:linear-gradient(90deg,var(--ac),var(--cy));transition:width .25s linear;box-shadow:0 0 16px rgba(255,107,26,.6)}
 .sp-pct{position:relative;z-index:1;font-family:var(--fd);font-size:13px;color:var(--mu2);margin-top:10px;font-weight:600}
 @keyframes spFade{to{opacity:1}}
 
@@ -225,18 +225,18 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .night .pin-star{opacity:.8}
 @keyframes twinkle{0%,100%{opacity:.3}50%{opacity:.9}}
 /* cloud (morning/day) minimal */
-.pin-cloud{position:absolute;background:rgba(255,255,255,.12);border-radius:40px;filter:blur(2px)}
-.pin-card{position:relative;z-index:2;background:rgba(16,18,27,.62);backdrop-filter:blur(28px) saturate(140%);-webkit-backdrop-filter:blur(28px) saturate(140%);border:1px solid rgba(255,255,255,.14);border-radius:32px;padding:40px 34px 34px;width:min(370px,90vw);text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1)}
+.pin-cloud{position:absolute;background:rgba(28,28,28,.12);border-radius:40px;filter:blur(2px)}
+.pin-card{position:relative;z-index:2;background:rgba(16,18,27,.62);backdrop-filter:blur(28px) saturate(140%);-webkit-backdrop-filter:blur(28px) saturate(140%);border:1px solid rgba(28,28,28,.14);border-radius:32px;padding:40px 34px 34px;width:min(370px,90vw);text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(28,28,28,.1)}
 .pin-greet{font-family:var(--fd);font-size:27px;font-weight:800;color:#fff;margin-bottom:4px;letter-spacing:-.3px}
-.pin-greet-name{font-family:var(--fd);font-size:16px;font-weight:600;color:rgba(255,255,255,.6);margin-bottom:26px}
-.pin-lock-ic{width:64px;height:64px;margin:0 auto 18px;border-radius:20px;background:linear-gradient(135deg,rgba(124,92,255,.35),rgba(34,211,238,.2));display:flex;align-items:center;justify-content:center;font-size:30px;border:1px solid rgba(255,255,255,.18);box-shadow:0 8px 24px rgba(124,92,255,.25),inset 0 1px 0 rgba(255,255,255,.2)}
+.pin-greet-name{font-family:var(--fd);font-size:16px;font-weight:600;color:rgba(28,28,28,.6);margin-bottom:26px}
+.pin-lock-ic{width:64px;height:64px;margin:0 auto 18px;border-radius:20px;background:linear-gradient(135deg,rgba(255,107,26,.35),rgba(232,84,0,.2));display:flex;align-items:center;justify-content:center;font-size:30px;border:1px solid rgba(28,28,28,.18);box-shadow:0 8px 24px rgba(255,107,26,.25),inset 0 1px 0 rgba(28,28,28,.2)}
 .pin-dots{display:flex;gap:16px;justify-content:center;margin:6px 0 30px}
-.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.3);transition:.25s cubic-bezier(.34,1.56,.64,1)}
-.pin-dot.filled{background:linear-gradient(135deg,#7c5cff,#22d3ee);border-color:transparent;box-shadow:0 0 18px rgba(124,92,255,.7);transform:scale(1.15)}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(28,28,28,.3);transition:.25s cubic-bezier(.34,1.56,.64,1)}
+.pin-dot.filled{background:linear-gradient(135deg,#FF6B1A,#E85400);border-color:transparent;box-shadow:0 0 18px rgba(255,107,26,.7);transform:scale(1.15)}
 .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:280px;margin:0 auto}
-.pin-key{aspect-ratio:1.25;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.03));border-radius:18px;color:#fff;font-family:var(--fd);font-size:26px;font-weight:700;cursor:pointer;transition:.15s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-tap-highlight-color:transparent}
-.pin-key:hover{background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.06));border-color:rgba(255,255,255,.2)}
-.pin-key:active{background:linear-gradient(135deg,rgba(124,92,255,.5),rgba(34,211,238,.35));transform:scale(.92);box-shadow:0 0 30px rgba(124,92,255,.5)}
+.pin-key{aspect-ratio:1.25;border:1px solid rgba(28,28,28,.1);background:linear-gradient(135deg,rgba(28,28,28,.08),rgba(28,28,28,.03));border-radius:18px;color:#fff;font-family:var(--fd);font-size:26px;font-weight:700;cursor:pointer;transition:.15s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-tap-highlight-color:transparent}
+.pin-key:hover{background:linear-gradient(135deg,rgba(28,28,28,.14),rgba(28,28,28,.06));border-color:rgba(28,28,28,.2)}
+.pin-key:active{background:linear-gradient(135deg,rgba(255,107,26,.5),rgba(232,84,0,.35));transform:scale(.92);box-shadow:0 0 30px rgba(255,107,26,.5)}
 .pin-key.wide{grid-column:span 1}
 .pin-err{color:#fb7185;font-size:14px;margin-top:16px;height:18px;font-weight:600}
 @media(max-width:880px){.pin-greet{font-size:23px}.pin-pad{max-width:250px}.pin-card{padding:34px 28px 30px}}
@@ -246,13 +246,13 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 #greetscene.on{display:block}
 .gs-layer{position:absolute;inset:0}
 .gs-particles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.gs-particle{position:absolute;border-radius:50%;background:rgba(255,255,255,.6);animation:gsFloat linear infinite}
+.gs-particle{position:absolute;border-radius:50%;background:rgba(28,28,28,.6);animation:gsFloat linear infinite}
 @keyframes gsFloat{0%{transform:translateY(110vh) scale(0);opacity:0}10%{opacity:.8}90%{opacity:.8}100%{transform:translateY(-10vh) scale(1);opacity:0}}
 .gs-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:24px}
 .gs-greet{text-align:center;margin-bottom:40px;animation:gsFadeDown .8s ease-out}
 @keyframes gsFadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
 .gs-greet-h{font-family:var(--fd);font-size:clamp(26px,6vw,36px);font-weight:800;color:#fff;text-shadow:0 2px 30px rgba(0,0,0,.45);letter-spacing:-.5px}
-.gs-greet-n{font-family:var(--fd);font-size:clamp(18px,4.5vw,24px);font-weight:600;color:rgba(255,255,255,.85);margin-top:4px;text-shadow:0 2px 20px rgba(0,0,0,.45)}
+.gs-greet-n{font-family:var(--fd);font-size:clamp(18px,4.5vw,24px);font-weight:600;color:rgba(28,28,28,.85);margin-top:4px;text-shadow:0 2px 20px rgba(0,0,0,.45)}
 /* circular progress */
 .gs-scene{position:relative;display:flex;flex-direction:column;align-items:center;animation:gsScaleIn .9s cubic-bezier(.34,1.56,.64,1)}
 @keyframes gsScaleIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
@@ -264,7 +264,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .gs-platypus.sipping #gs-arm{transform:rotate(-22deg) translate(-18px,12px)}
 /* steam */
 .gs-steam{position:absolute;top:48%;right:18%;z-index:3;width:40px;height:60px;pointer-events:none}
-.gs-steam-p{position:absolute;bottom:0;width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.5);opacity:0}
+.gs-steam-p{position:absolute;bottom:0;width:8px;height:8px;border-radius:50%;background:rgba(28,28,28,.5);opacity:0}
 .gs-steam-1{left:6px;animation:gsSteam 2.4s ease-out infinite}
 .gs-steam-2{left:16px;animation:gsSteam 2.4s ease-out .8s infinite}
 .gs-steam-3{left:26px;animation:gsSteam 2.4s ease-out 1.6s infinite}
@@ -274,9 +274,9 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .gs-pct-big{display:flex;align-items:baseline;color:#fff;text-shadow:0 2px 24px rgba(0,0,0,.4);animation:gsScaleIn 1s cubic-bezier(.34,1.56,.64,1)}
 .gs-pct-big span:first-child{font-family:var(--fd);font-size:52px;font-weight:800;line-height:1;letter-spacing:-2px}
 .gs-pct-pc{font-family:var(--fd);font-size:24px;font-weight:700;opacity:.8;margin-left:2px}
-.gs-bar2{width:200px;height:8px;background:rgba(255,255,255,.18);border-radius:8px;overflow:hidden;backdrop-filter:blur(4px)}
-.gs-bar2-fill{height:100%;width:0%;border-radius:8px;background:linear-gradient(90deg,#fff,rgba(255,255,255,.85));box-shadow:0 0 20px rgba(255,255,255,.8);transition:width .15s linear}
-.gs-status{margin-top:34px;font-family:var(--fm);font-size:14px;color:rgba(255,255,255,.85);letter-spacing:2px;text-transform:uppercase;text-shadow:0 1px 12px rgba(0,0,0,.4);animation:gsPulse 1.8s ease-in-out infinite}
+.gs-bar2{width:200px;height:8px;background:rgba(28,28,28,.18);border-radius:8px;overflow:hidden;backdrop-filter:blur(4px)}
+.gs-bar2-fill{height:100%;width:0%;border-radius:8px;background:linear-gradient(90deg,#fff,rgba(28,28,28,.85));box-shadow:0 0 20px rgba(28,28,28,.8);transition:width .15s linear}
+.gs-status{margin-top:34px;font-family:var(--fm);font-size:14px;color:rgba(28,28,28,.85);letter-spacing:2px;text-transform:uppercase;text-shadow:0 1px 12px rgba(0,0,0,.4);animation:gsPulse 1.8s ease-in-out infinite}
 @keyframes gsPulse{0%,100%{opacity:.6}50%{opacity:1}}
 /* backgrounds */
 .gs-morning{background:linear-gradient(180deg,#1a2540 0%,#3a4a6e 45%,#6a7a9e 100%)}
@@ -287,222 +287,8 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .gs-orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.5;animation:gsOrbFloat 8s ease-in-out infinite}
 @keyframes gsOrbFloat{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-20px) scale(1.1)}}
 
-/* ═══ DIAGNOSTIKA TEST ═══ */
-.diag-card:hover{border-color:var(--ac)!important;transform:translateY(-3px)}
-.diag-soon{cursor:not-allowed}
-.dt-wrap{max-width:600px;margin:0 auto}
-.dt-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.dt-back{background:var(--s2);border:1px solid var(--brd);color:var(--mu2);border-radius:10px;padding:8px 16px;font-size:13px;cursor:pointer;font-weight:600}
-.dt-back:hover{border-color:var(--ac)}
-.dt-prog{flex:1;margin:0 16px;height:8px;background:var(--s2);border-radius:6px;overflow:hidden}
-.dt-prog-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--cy));border-radius:6px;transition:width .4s}
-.dt-q{background:var(--s);border:1px solid var(--brd);border-radius:20px;padding:32px 26px;text-align:center}
-.dt-skill-badge{display:inline-block;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:18px}
-.dt-q-text{font-family:var(--fd);font-size:22px;font-weight:700;color:var(--tx);line-height:1.3;margin-bottom:8px}
-.dt-q-hint{font-size:14px;color:var(--mu);margin-bottom:24px}
-.dt-opts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.dt-opt{background:var(--s2);border:2px solid var(--brd);border-radius:16px;padding:22px 14px;cursor:pointer;transition:.2s;font-family:var(--fd);font-size:16px;font-weight:600;color:var(--tx);display:flex;flex-direction:column;align-items:center;gap:10px}
-.dt-opt:hover{border-color:var(--ac);transform:scale(1.03)}
-.dt-opt:active{transform:scale(.97)}
-.dt-opt-emoji{font-size:42px}
-.dt-imgs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
-.dt-img-cell{aspect-ratio:1;background:var(--s2);border:2px solid var(--brd);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:44px;transition:.3s}
-.dt-img-cell.hidden-card{background:var(--ac);color:transparent}
-.dt-speaker{background:var(--s2);border:1px solid var(--brd);border-radius:50%;width:48px;height:48px;display:inline-flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;margin-bottom:14px}
-.dt-speaker:active{transform:scale(.9)}
-/* result screens */
-.dt-result-kid{text-align:center;padding:30px 20px}
-.dt-stars{font-size:50px;margin:14px 0;letter-spacing:6px}
-.dt-powers{display:grid;grid-template-columns:1fr;gap:12px;margin:24px 0}
-.dt-power-row{display:flex;align-items:center;gap:12px}
-.dt-power-ic{font-size:24px;width:36px;text-align:center;flex-shrink:0}
-.dt-power-name{font-size:14px;font-weight:600;color:var(--tx);width:90px;flex-shrink:0}
-.dt-power-bar{flex:1;height:14px;background:var(--s2);border-radius:8px;overflow:hidden}
-.dt-power-fill{height:100%;border-radius:8px;transition:width 1s}
-.dt-power-pct{font-family:var(--fm);font-size:13px;color:var(--ac2);width:42px;text-align:right;flex-shrink:0}
-.dt-rec{background:linear-gradient(135deg,rgba(52,211,153,.12),rgba(34,211,238,.08));border:1px solid rgba(52,211,153,.3);border-radius:16px;padding:22px;margin-top:20px;text-align:center}
-
-/* professions block (job market) */
-.dc-professions{background:var(--s);border:1px solid var(--brd);border-radius:16px;padding:20px;margin-top:14px}
-.dc-prof-head{margin-bottom:14px}
-.dc-prof-title{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--tx)}
-.dc-prof-sub{font-size:12px;color:var(--mu2);margin-top:2px}
-.dc-prof-list{display:flex;flex-direction:column;gap:8px}
-.dc-prof-row{display:flex;align-items:center;justify-content:space-between;background:var(--s2);border-radius:10px;padding:12px 14px}
-.dc-prof-name{font-size:13.5px;font-weight:600;color:var(--tx)}
-.dc-prof-demand{font-size:18px;flex-shrink:0;margin-left:10px}
-.dc-prof-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--brd)}
-.dc-prof-leg-item{font-size:11px;color:var(--mu);white-space:nowrap}
-
-/* ═══ DIAGNOSTIKA MARKAZI (center model) ═══ */
-.dc-screen{max-width:600px;margin:0 auto}
-.dc-center{text-align:center;padding:30px 20px}
-.dc-logo-ic{font-size:60px;margin-bottom:16px}
-.dc-title{font-family:var(--fd);font-size:26px;font-weight:800;color:var(--tx);margin-bottom:6px}
-.dc-sub{font-size:14px;color:var(--mu2);margin-bottom:26px;line-height:1.5}
-/* language picker */
-.dc-langs{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-.dc-lang{background:var(--s);border:2px solid var(--brd);border-radius:18px;padding:24px 36px;cursor:pointer;transition:.2s;font-family:var(--fd);font-size:18px;font-weight:700;color:var(--tx);display:flex;flex-direction:column;align-items:center;gap:10px;min-width:140px}
-.dc-lang:hover{border-color:var(--ac);transform:translateY(-4px)}
-.dc-lang-flag{font-size:42px}
-/* registration form */
-.dc-field{margin-bottom:18px;text-align:left}
-.dc-field label{display:block;font-size:13px;color:var(--mu2);margin-bottom:8px;font-weight:600}
-.dc-input{width:100%;padding:16px 18px;background:var(--s2);border:1px solid var(--brd);border-radius:12px;color:var(--tx);font-size:16px;outline:none;transition:.2s}
-.dc-input:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(124,92,255,.15)}
-.dc-age-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.dc-class-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
-.dc-class{background:var(--s2);border:2px solid var(--brd);border-radius:10px;padding:12px 0;text-align:center;cursor:pointer;font-family:var(--fd);font-size:17px;font-weight:700;color:var(--tx);transition:.15s}
-.dc-class:hover{border-color:var(--ac)}
-.dc-class.sel{background:var(--ac);border-color:var(--ac);color:#fff;transform:scale(1.05)}
-@media(max-width:520px){.dc-class-grid{grid-template-columns:repeat(4,1fr)}}
-.dc-age{background:var(--s2);border:2px solid var(--brd);border-radius:12px;padding:14px 0;text-align:center;cursor:pointer;font-family:var(--fd);font-size:18px;font-weight:700;color:var(--tx);transition:.15s}
-.dc-age:hover{border-color:var(--ac)}
-.dc-age.sel{background:var(--ac);border-color:var(--ac);color:#fff}
-.dc-btn{width:100%;padding:16px;border:none;border-radius:14px;font-family:var(--fd);font-size:17px;font-weight:700;color:#fff;cursor:pointer;background:linear-gradient(90deg,var(--ac),var(--cy));box-shadow:0 8px 24px rgba(124,92,255,.35);transition:.2s;margin-top:6px}
-.dc-btn:active{transform:scale(.97)}
-.dc-btn:disabled{opacity:.4;cursor:not-allowed}
-/* patient card */
-.dc-patient{background:linear-gradient(135deg,rgba(124,92,255,.12),rgba(34,211,238,.07));border:1px solid rgba(124,92,255,.3);border-radius:16px;padding:18px;margin-bottom:20px;display:flex;align-items:center;gap:14px}
-.dc-patient-av{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--acd));display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
-/* cabinet intro */
-.dc-intro{text-align:center;padding:50px 24px;animation:dcIntroIn .5s ease-out}
-@keyframes dcIntroIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
-.dc-intro-num{font-family:var(--fm);font-size:14px;letter-spacing:3px;color:var(--ac2);text-transform:uppercase;margin-bottom:14px}
-.dc-doc{width:110px;height:110px;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:56px;box-shadow:0 8px 30px rgba(124,92,255,.3)}
-.dc-intro-room{font-family:var(--fd);font-size:28px;font-weight:800;color:var(--tx);margin-bottom:6px}
-.dc-intro-spec{font-size:15px;color:var(--ac2);font-weight:600;margin-bottom:12px}
-.dc-intro-desc{font-size:14px;color:var(--mu2);line-height:1.6;max-width:380px;margin:0 auto 8px}
-.dc-intro-meta{display:inline-flex;gap:16px;margin-top:14px;font-size:13px;color:var(--mu);font-family:var(--fm)}
-/* timer bar */
-.dc-timer{display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:14px;font-weight:600}
-.dc-timer-ring{width:36px;height:36px;flex-shrink:0}
-/* progress dots for cabinets */
-.dc-cabinets-prog{display:flex;gap:6px;justify-content:center;margin-bottom:18px}
-.dc-cab-dot{width:30px;height:6px;border-radius:4px;background:var(--s3);transition:.3s}
-.dc-cab-dot.done{background:var(--gn)}
-.dc-cab-dot.current{background:var(--ac)}
-
-/* ═══ MED CARD (printable PNG result) ═══ */
-#medcard-stage{position:fixed;left:-9999px;top:0;width:794px;background:#fff} /* A4 width @96dpi, off-screen */
-.mc{width:794px;min-height:1123px;background:#ffffff;font-family:'DM Sans',sans-serif;color:#1a1f2e;position:relative;overflow:hidden}
-.mc-header{background:linear-gradient(135deg,#7c5cff,#5b3fd6);padding:36px 44px 30px;color:#fff;position:relative;overflow:hidden}
-.mc-header::after{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.08)}
-.mc-header::before{content:'';position:absolute;bottom:-60px;left:30%;width:140px;height:140px;border-radius:50%;background:rgba(34,211,238,.15)}
-.mc-clinic{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
-.mc-clinic-ic{width:56px;height:56px;background:#fff;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:30px}
-.mc-clinic-name{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:800;letter-spacing:1px}
-.mc-clinic-sub{font-size:13px;opacity:.85;margin-top:2px}
-.mc-doc-label{position:absolute;top:36px;right:44px;background:rgba(255,255,255,.2);border-radius:20px;padding:6px 16px;font-size:12px;font-weight:600;z-index:1}
-.mc-title-band{margin-top:24px;position:relative;z-index:1}
-.mc-title-band h1{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700}
-.mc-title-band p{font-size:13px;opacity:.85;margin-top:2px}
-/* patient row */
-.mc-patient{display:flex;gap:30px;padding:26px 44px;border-bottom:2px dashed #e2e6ef;background:#fafbff}
-.mc-pat-item{flex:1}
-.mc-pat-label{font-size:11px;color:#8891a8;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
-.mc-pat-val{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#1a1f2e}
-.mc-pat-av{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#7c5cff,#22d3ee);display:flex;align-items:center;justify-content:center;font-size:34px;flex-shrink:0}
-/* body */
-.mc-body{padding:30px 44px}
-.mc-section-title{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:#1a1f2e;margin-bottom:18px;display:flex;align-items:center;gap:8px}
-/* skills bars */
-.mc-skill{margin-bottom:16px}
-.mc-skill-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-.mc-skill-ic{font-size:20px;width:28px;text-align:center}
-.mc-skill-name{font-weight:600;font-size:14px;color:#1a1f2e;flex:1}
-.mc-skill-pct{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px}
-.mc-skill-track{height:16px;background:#eef1f7;border-radius:10px;overflow:hidden;margin-left:38px}
-.mc-skill-fill{height:100%;border-radius:10px}
-/* top skill highlight */
-.mc-diagnosis{margin-top:26px;background:linear-gradient(135deg,#f0ecff,#e6f9f3);border:2px solid #d4caff;border-radius:18px;padding:24px;text-align:center}
-.mc-diag-label{font-size:12px;color:#8891a8;text-transform:uppercase;letter-spacing:1px}
-.mc-diag-skill{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:800;color:#5b3fd6;margin:6px 0}
-.mc-diag-rec{font-size:15px;color:#3a4256;line-height:1.5;font-weight:500}
-/* prescription / next step */
-.mc-rx{margin-top:20px;background:#fafbff;border-left:4px solid #34d399;border-radius:10px;padding:20px 24px}
-.mc-rx-title{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#1a1f2e;margin-bottom:6px;display:flex;align-items:center;gap:8px}
-.mc-rx-text{font-size:13px;color:#3a4256;line-height:1.6}
-/* footer */
-.mc-footer{position:absolute;bottom:0;left:0;right:0;padding:20px 44px;border-top:2px solid #eef1f7;display:flex;justify-content:space-between;align-items:center;background:#fff}
-.mc-footer-left{font-size:11px;color:#8891a8}
-.mc-stamp{width:90px;height:90px;border:3px solid #34d399;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-12deg);opacity:.85}
-.mc-stamp-txt{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:800;color:#34d399;text-align:center;line-height:1.2;text-transform:uppercase}
-.mc-stamp-star{font-size:18px}
-/* decorative stars for kid feel */
-.mc-deco{position:absolute;font-size:20px;opacity:.12;pointer-events:none}
-/* download button styling in result */
-.dc-dl-btn{width:100%;padding:16px;border:none;border-radius:14px;font-family:var(--fd);font-size:16px;font-weight:700;color:#fff;cursor:pointer;background:linear-gradient(90deg,#34d399,#059669);box-shadow:0 8px 24px rgba(52,211,153,.3);transition:.2s;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px}
-.dc-dl-btn:active{transform:scale(.97)}
-.dc-dl-btn:disabled{opacity:.6;cursor:wait}
-
-/* ═══ SERIOUS / OFFICIAL MED CARD ═══ */
-.mc-serious{width:794px;min-height:1123px;background:#fff;font-family:'DM Sans',sans-serif;color:#1e2536;position:relative;padding:0;box-sizing:border-box}
-.mc-s-header{display:flex;justify-content:space-between;align-items:flex-start;padding:34px 46px 0}
-.mc-s-brand{display:flex;align-items:center;gap:14px}
-.mc-s-logo{width:54px;height:54px;background:linear-gradient(135deg,#7c5cff,#5b3fd6);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px}
-.mc-s-clinic{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:800;color:#1e2536;letter-spacing:.5px}
-.mc-s-clinic-sub{font-size:12px;color:#6b7488;margin-top:1px;letter-spacing:.3px}
-.mc-s-protocol{text-align:right}
-.mc-s-prot-no{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#1e3a8a}
-.mc-s-prot-date{font-size:12px;color:#6b7488;margin-top:2px}
-.mc-s-doctype{margin:22px 46px 0;padding:12px 0;text-align:center;font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:800;letter-spacing:2px;color:#1e2536;border-top:2px solid #1e3a8a;border-bottom:2px solid #1e3a8a}
-/* patient block */
-.mc-s-patient{margin:22px 46px 0}
-.mc-s-pat-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0;border:1px solid #d5dae6;border-radius:8px;overflow:hidden}
-.mc-s-pat-cell{padding:12px 16px;border-right:1px solid #d5dae6;border-bottom:1px solid #d5dae6;display:flex;flex-direction:column;gap:3px}
-.mc-s-pat-wide{grid-column:span 4;border-right:none}
-.mc-s-pat-grid .mc-s-pat-cell:nth-child(5){border-bottom:none}
-.mc-s-pat-grid .mc-s-pat-cell:nth-child(2),.mc-s-pat-grid .mc-s-pat-cell:nth-child(3),.mc-s-pat-grid .mc-s-pat-cell:nth-child(4){border-bottom:none}
-.mc-s-pat-grid .mc-s-pat-cell:last-child{border-right:none}
-.mc-s-pl{font-size:10px;color:#8891a8;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
-.mc-s-pv{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#1e2536}
-/* body */
-.mc-s-body{padding:24px 46px 0}
-.mc-s-sect{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:800;letter-spacing:1.5px;color:#1e3a8a;margin-bottom:12px}
-.mc-s-table-head{display:flex;justify-content:space-between;font-size:10px;color:#8891a8;text-transform:uppercase;letter-spacing:.5px;font-weight:600;padding-bottom:8px;border-bottom:1px solid #e2e6ef;margin-bottom:12px}
-/* reuse mc-skill but tweak */
-.mc-serious .mc-skill{margin-bottom:13px}
-.mc-serious .mc-skill-track{height:14px;background:#eef1f7;margin-left:36px}
-.mc-s-overall{display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding-top:12px;border-top:1px solid #e2e6ef;font-weight:700;font-size:14px;color:#1e2536}
-.mc-s-overall-val{font-family:'Space Grotesk',sans-serif;font-size:18px;color:#1e3a8a}
-/* diagnosis */
-.mc-s-diag{margin-top:22px;border:1px solid #c7d0e8;border-radius:10px;padding:18px 20px;background:#f7f9ff}
-.mc-s-diag-label{font-size:11px;color:#8891a8;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px}
-.mc-s-diag-skill{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:800;color:#1e3a8a;margin-bottom:8px}
-.mc-s-diag-dir{font-size:13px;color:#3a4256;line-height:1.5}
-/* medcard professions */
-.mc-s-profs{margin-top:18px;border:1px solid #d5dae6;border-radius:10px;padding:16px 20px;background:#fff}
-.mc-s-profs-title{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:800;letter-spacing:.5px;color:#1e3a8a;margin-bottom:12px}
-.mc-s-profs-list{display:flex;flex-direction:column;gap:7px}
-.mc-s-prof-row{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:#1e2536;padding-bottom:7px;border-bottom:1px dashed #e8ebf2}
-.mc-s-prof-row:last-child{border-bottom:none;padding-bottom:0}
-.mc-s-prof-dem{font-size:11px;color:#6b7488;white-space:nowrap;margin-left:12px}
-/* AI psychologist section */
-.mc-s-ai{margin-top:18px;border:1.5px solid #7c5cff;border-radius:10px;padding:0;overflow:hidden;background:#fbfaff}
-.mc-s-ai-head{display:flex;align-items:center;gap:12px;padding:14px 20px;background:linear-gradient(135deg,#7c5cff,#5b3fd6);color:#fff}
-.mc-s-ai-ic{font-size:26px}
-.mc-s-ai-title{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:800;letter-spacing:.5px}
-.mc-s-ai-spec{font-size:11px;opacity:.85;margin-top:1px}
-.mc-s-ai-text{padding:16px 20px;font-size:13px;color:#2a3142;line-height:1.7;text-align:justify}
-/* prescription */
-.mc-s-rx{margin-top:18px;border-left:4px solid #1e3a8a;background:#f7f9ff;border-radius:8px;padding:16px 20px}
-.mc-s-rx-title{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:800;color:#1e3a8a;margin-bottom:6px;letter-spacing:.5px}
-.mc-s-rx-text{font-size:12px;color:#3a4256;line-height:1.6}
-/* footer with signature + stamp */
-.mc-s-footer{display:flex;justify-content:space-between;align-items:flex-end;padding:30px 46px 0;margin-top:24px}
-.mc-s-sign{width:240px}
-.mc-s-sign-line{border-bottom:1.5px solid #1e2536;height:32px}
-.mc-s-sign-label{font-size:11px;color:#6b7488;margin-top:5px;text-align:center}
-.mc-s-stamp{width:120px;height:120px;display:flex;align-items:center;justify-content:center}
-.mc-s-stamp-inner{width:108px;height:108px;border:3px double #1e3a8a;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-14deg);color:#1e3a8a}
-.mc-s-stamp-star{font-size:18px;line-height:1}
-.mc-s-stamp-txt{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:800;letter-spacing:1px;margin:2px 0}
-.mc-s-stamp-clinic{font-size:9px;letter-spacing:1px;opacity:.8}
-.mc-s-footnote{position:absolute;bottom:18px;left:0;right:0;text-align:center;font-size:10px;color:#a0a8ba;letter-spacing:.3px}
-
 /* ═══ OPERATOR TRAINING ═══ */
-.opq-intro{background:linear-gradient(135deg,rgba(124,92,255,.12),rgba(34,211,238,.06));border:1px solid rgba(124,92,255,.25);border-radius:16px;padding:22px;margin-bottom:20px}
+.opq-intro{background:linear-gradient(135deg,rgba(255,107,26,.12),rgba(232,84,0,.06));border:1px solid rgba(255,107,26,.25);border-radius:16px;padding:22px;margin-bottom:20px}
 .opq-intro-title{font-family:var(--fd);font-size:17px;font-weight:800;color:var(--tx);margin-bottom:8px}
 .opq-intro-text{font-size:14px;color:var(--mu2);line-height:1.65}
 .opq-progress-wrap{display:flex;align-items:center;gap:12px;margin:18px 0 24px}
@@ -531,7 +317,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .opq-callout{background:var(--s2);border-left:3px solid var(--ac);border-radius:8px;padding:14px 16px;margin:12px 0;font-size:13px;color:var(--tx);line-height:1.6}
 .opq-callout.green{border-left-color:var(--gn)}
 .opq-callout.warn{border-left-color:#fbbf24}
-.opq-script{background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.2);border-radius:10px;padding:14px 16px;margin:10px 0;font-size:13.5px;color:var(--tx);line-height:1.7;font-style:italic}
+.opq-script{background:rgba(232,84,0,.06);border:1px solid rgba(232,84,0,.2);border-radius:10px;padding:14px 16px;margin:10px 0;font-size:13.5px;color:var(--tx);line-height:1.7;font-style:italic}
 .opq-script::before{content:'📞 ';font-style:normal}
 .opq-dialogue{margin:12px 0}
 .opq-dia-row{display:flex;gap:8px;margin-bottom:8px;font-size:13px;line-height:1.6}
@@ -555,7 +341,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .opq-complete-btn{width:100%;padding:14px;border:none;border-radius:12px;font-family:var(--fd);font-size:15px;font-weight:700;color:#fff;background:linear-gradient(90deg,var(--gn),#059669);cursor:pointer;margin-top:16px;transition:.2s}
 .opq-complete-btn:active{transform:scale(.98)}
 .opq-complete-btn:disabled{opacity:.5;cursor:not-allowed}
-.opq-final{background:linear-gradient(135deg,rgba(52,211,153,.12),rgba(34,211,238,.08));border:1px solid rgba(52,211,153,.3);border-radius:16px;padding:26px;text-align:center;margin-top:20px}
+.opq-final{background:linear-gradient(135deg,rgba(52,211,153,.12),rgba(232,84,0,.08));border:1px solid rgba(52,211,153,.3);border-radius:16px;padding:26px;text-align:center;margin-top:20px}
 .opq-final-ic{font-size:50px;margin-bottom:12px}
 
 /* ═══ HISOB-KITOB (accounting) ═══ */
@@ -618,10 +404,10 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .oo-step{margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--brd)}
 .oo-step:last-of-type{border-bottom:none}
 .oo-step-t{font-family:var(--fd);font-weight:700;font-size:14px;color:var(--tx);margin-bottom:10px}
-.oo-script-line{background:rgba(34,211,238,.08);border-left:3px solid var(--cy);border-radius:8px;padding:12px 14px;font-size:13.5px;line-height:1.5;color:var(--tx);font-style:italic}
+.oo-script-line{background:rgba(232,84,0,.08);border-left:3px solid var(--cy);border-radius:8px;padding:12px 14px;font-size:13.5px;line-height:1.5;color:var(--tx);font-style:italic}
 .oo-q{background:var(--s2);border-radius:8px;padding:10px 14px;font-size:13.5px;line-height:1.5;color:var(--mu2);margin-bottom:8px}
 .oo-tip{font-size:12.5px;color:var(--go);margin-top:8px;padding-left:4px}
-.oo-rules{background:rgba(124,92,255,.1);border:1px solid rgba(124,92,255,.3);border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.7;color:var(--mu2)}
+.oo-rules{background:rgba(255,107,26,.1);border:1px solid rgba(255,107,26,.3);border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.7;color:var(--mu2)}
 .oo-rules b{color:var(--ac2);display:block;margin-bottom:6px;font-size:14px}
 /* survey cards */
 .oo-stats{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
@@ -657,7 +443,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .btn-sm.red{background:rgba(251,113,133,.13);color:var(--rd)}.btn-sm.red:hover{background:rgba(251,113,133,.23)}
 .btn-sm.blue{background:rgba(96,165,250,.13);color:var(--bl)}.btn-sm.blue:hover{background:rgba(96,165,250,.23)}
 .btn-sm.yellow{background:rgba(251,191,36,.13);color:var(--go)}.btn-sm.yellow:hover{background:rgba(251,191,36,.23)}
-.btn-sm.purple{background:rgba(124,92,255,.15);color:var(--ac2)}.btn-sm.purple:hover{background:rgba(124,92,255,.25)}
+.btn-sm.purple{background:rgba(255,107,26,.15);color:var(--ac2)}.btn-sm.purple:hover{background:rgba(255,107,26,.25)}
 
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:600;font-family:var(--fm)}
 .badge.active{background:rgba(52,211,153,.13);color:var(--gn)}
@@ -677,7 +463,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .sb-item{display:flex;align-items:center;gap:12px;padding:11px 14px;font-size:14px;font-weight:500;margin-bottom:3px;border-radius:12px;
   color:var(--mu2);cursor:pointer;transition:.18s cubic-bezier(.4,0,.2,1);border:1px solid transparent;position:relative}
 .sb-item:hover{color:var(--tx);background:var(--glass);border-color:var(--glass-brd)}
-.sb-item.active{color:#fff;background:linear-gradient(135deg,rgba(124,92,255,.22),rgba(124,92,255,.08));border-color:rgba(124,92,255,.35);box-shadow:0 4px 20px rgba(124,92,255,.2)}
+.sb-item.active{color:#fff;background:linear-gradient(135deg,rgba(255,107,26,.22),rgba(255,107,26,.08));border-color:rgba(255,107,26,.35);box-shadow:0 4px 20px rgba(255,107,26,.2)}
 .sb-item.active::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--grad-ac);border-radius:0 3px 3px 0}
 .sb-item svg{width:18px;height:18px;flex-shrink:0}
 .sb-bottom{padding:16px 18px;border-top:1px solid var(--glass-brd)}
@@ -703,7 +489,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .stat-card{background:var(--glass);backdrop-filter:blur(20px) saturate(130%);-webkit-backdrop-filter:blur(20px) saturate(130%);border:1px solid var(--glass-brd);border-radius:var(--r);padding:22px;position:relative;overflow:hidden;transition:.25s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow-sm)}
 .stat-card:hover{transform:translateY(-3px);border-color:var(--glass-hi);box-shadow:var(--shadow)}
 .stat-card::before{content:"";position:absolute;inset:0;border-radius:var(--r);padding:1px;background:linear-gradient(135deg,var(--glass-hi),transparent 50%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:.6}
-.stat-card::after{content:"";position:absolute;top:-20px;right:-20px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(124,92,255,.22),transparent 70%);pointer-events:none}
+.stat-card::after{content:"";position:absolute;top:-20px;right:-20px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,26,.22),transparent 70%);pointer-events:none}
 .stat-val{font-family:var(--fd);font-size:34px;font-weight:800;letter-spacing:-.03em}
 .stat-val.purple{color:var(--ac2)}.stat-val.green{color:var(--gn)}.stat-val.red{color:var(--rd)}.stat-val.yellow{color:var(--go)}.stat-val.blue{color:var(--bl)}
 .stat-key{font-size:12px;color:var(--mu2);margin-top:6px;font-weight:500}
@@ -716,7 +502,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-2;
 .tbl-scroll{overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:520px}
 th{padding:13px 18px;text-align:left;font-size:11px;font-weight:600;color:var(--mu2);letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--glass-brd);white-space:nowrap}
-td{padding:14px 18px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+td{padding:14px 18px;font-size:13px;border-bottom:1px solid rgba(28,28,28,.04);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--glass)}
 .progress-bar{width:100%;height:4px;background:var(--s2);border-radius:2px;overflow:hidden;margin-top:5px}
@@ -758,7 +544,7 @@ audio{height:36px;border-radius:7px;max-width:240px}
 .leads-filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
 .lead-search{position:relative;margin-bottom:12px}
 .lead-search input{width:100%;padding:11px 14px 11px 40px;border-radius:10px;border:1px solid var(--brd);background:var(--s);color:var(--tx);font-size:14px;transition:.15s}
-.lead-search input:focus{border-color:var(--ac);outline:none;box-shadow:0 0 0 3px rgba(124,92,255,.12)}
+.lead-search input:focus{border-color:var(--ac);outline:none;box-shadow:0 0 0 3px rgba(255,107,26,.12)}
 .lead-search .ls-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:15px;opacity:.6;pointer-events:none}
 .lead-search .ls-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:var(--glass);border:1px solid var(--glass-brd);color:var(--mu);width:24px;height:24px;border-radius:6px;font-size:14px;cursor:pointer;display:none;align-items:center;justify-content:center}
 .lead-search.has-val .ls-clear{display:flex}
@@ -853,7 +639,7 @@ audio{height:36px;border-radius:7px;max-width:240px}
   .bsheet-it{display:flex;align-items:center;gap:10px;padding:13px 13px;border-radius:13px;background:var(--glass);
     border:1px solid var(--glass-brd);color:var(--tx);font-size:12.5px;font-weight:600;text-align:left}
   .bsheet-it .bi{font-size:19px}
-  .bsheet-it.active{border-color:rgba(124,92,255,.45);background:linear-gradient(135deg,rgba(124,92,255,.2),rgba(124,92,255,.06))}
+  .bsheet-it.active{border-color:rgba(255,107,26,.45);background:linear-gradient(135deg,rgba(255,107,26,.2),rgba(255,107,26,.06))}
   .bsheet-it:active{transform:scale(.96)}
   .bsheet-logout{margin-top:14px;width:100%;padding:14px;border-radius:13px;border:1px solid rgba(255,90,90,.3);
     background:rgba(255,90,90,.08);color:#ff7a7a;font-size:13px;font-weight:700}
@@ -897,7 +683,38 @@ audio{height:36px;border-radius:7px;max-width:240px}
 }
 
 </style>
+<style id="zavod-light-theme">
+/* ============ EDUNOVA "ZAVOD LIGHT ORANGE" THEME OVERRIDE ============
+   Yagona dizayn: landing / o'quvchi / xodim. Faqat ranglar — logika tegilmagan. */
+:root{
+  --bg:#E7E1D3; --s:#F6F1E6; --s2:#EFE9DC; --s3:#E2DBCC;
+  --brd:#CFC7B6; --brd2:#BDB4A0;
+  --tx:#1C1C1C; --mu:#8B8577; --mu2:#5C574B;
+  --ac:#FF6B1A; --ac2:#FF8A47; --acd:#E85400;
+  --cy:#E85400; --bl:#3A3A3A;
+  --glow:0 0 34px rgba(255,107,26,.35);
+  --glass:rgba(255,255,255,.55);
+  --glass-brd:#CFC7B6;
+  --glass-hi:rgba(255,255,255,.85);
+  --shadow-sm:0 2px 10px rgba(28,28,28,.08);
+  --shadow:0 12px 34px rgba(28,28,28,.12);
+  --shadow-lg:0 24px 60px rgba(28,28,28,.18);
+  --grad-ac:linear-gradient(135deg,#FF6B1A,#FF8A47);
+  --grad-cy:linear-gradient(135deg,#E85400,#FF6B1A);
+}
+body{background:
+  repeating-linear-gradient(90deg,transparent 0 119px,rgba(28,28,28,.03) 119px 120px),
+  repeating-linear-gradient(0deg,transparent 0 119px,rgba(28,28,28,.03) 119px 120px),
+  var(--bg)}
+body::before{background:
+  radial-gradient(60% 50% at 20% 0%,rgba(255,107,26,.10),transparent 60%),
+  radial-gradient(50% 40% at 100% 10%,rgba(232,84,0,.07),transparent 55%),
+  radial-gradient(50% 50% at 50% 100%,rgba(255,107,26,.07),transparent 60%),var(--bg)}
+body::after{opacity:.015}
+::-webkit-scrollbar-thumb{background:#C9C2B4}
+</style>
 </head>
+
 <body>
 <style>
 /* ══ STUDENT LAYOUT ══ */
@@ -915,13 +732,13 @@ audio{height:36px;border-radius:7px;max-width:240px}
 .stu-panel{display:none}.stu-panel.on{display:block}
 
 /* ── BRAIN ── */
-.brain-hero{background:radial-gradient(ellipse 90% 70% at 50% 30%,rgba(124,92,255,.18),transparent 70%);
+.brain-hero{background:radial-gradient(ellipse 90% 70% at 50% 30%,rgba(255,107,26,.18),transparent 70%);
   border:1px solid var(--brd);border-radius:20px;padding:24px;margin-bottom:16px;text-align:center;position:relative;overflow:hidden}
 .brain-hello{font-size:13px;color:var(--mu2);margin-bottom:2px}
 .brain-hello b{color:var(--tx)}
 .brain-title{font-family:var(--fd);font-size:19px;font-weight:700;margin-bottom:18px}
 .brain-svg-wrap{position:relative;width:220px;height:220px;margin:0 auto}
-#brain-svg{width:100%;height:100%;filter:drop-shadow(0 0 18px rgba(124,92,255,.5))}
+#brain-svg{width:100%;height:100%;filter:drop-shadow(0 0 18px rgba(255,107,26,.5))}
 .brain-core{animation:brainpulse 3s ease-in-out infinite}
 @keyframes brainpulse{0%,100%{opacity:.85}50%{opacity:1}}
 .skill-node{animation:nodefloat 4s ease-in-out infinite}
@@ -968,7 +785,7 @@ audio{height:36px;border-radius:7px;max-width:240px}
 .lesson-title,.tez-title-small{font-size:12px;font-weight:600;line-height:1.3}
 .lesson-badge,.tez-badge{position:absolute;top:8px;right:8px;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;font-family:var(--fm)}
 .lesson-badge.done,.tez-badge.done{background:rgba(52,211,153,.2);color:var(--gn)}
-.lesson-badge.open,.tez-badge.open{background:rgba(124,92,255,.18);color:var(--ac2)}
+.lesson-badge.open,.tez-badge.open{background:rgba(255,107,26,.18);color:var(--ac2)}
 .tez-badge.pending{background:rgba(251,191,36,.15);color:var(--go)}
 .lesson-badge.lock,.tez-badge.lock{background:rgba(107,107,107,.2);color:var(--mu)}
 
@@ -1016,9 +833,9 @@ audio{height:36px;border-radius:7px;max-width:240px}
 .reels-intro-text{font-family:var(--fd);font-size:clamp(24px,7vw,34px);font-weight:700;line-height:1.3;margin-bottom:14px;max-width:90%}
 .reels-sub{font-size:15px;color:var(--mu2);margin-bottom:36px;max-width:85%;line-height:1.5}
 .reels-big-btn{padding:20px 48px;border:none;border-radius:18px;font-family:var(--fd);font-size:20px;font-weight:700;
-  background:linear-gradient(135deg,var(--ac),var(--acd));color:#fff;box-shadow:0 8px 30px rgba(124,92,255,.45);transition:.2s;animation:btnPulse 2s infinite}
+  background:linear-gradient(135deg,var(--ac),var(--acd));color:#fff;box-shadow:0 8px 30px rgba(255,107,26,.45);transition:.2s;animation:btnPulse 2s infinite}
 .reels-big-btn:active{transform:scale(.96)}
-@keyframes btnPulse{0%,100%{box-shadow:0 8px 30px rgba(124,92,255,.45)}50%{box-shadow:0 8px 44px rgba(124,92,255,.7)}}
+@keyframes btnPulse{0%,100%{box-shadow:0 8px 30px rgba(255,107,26,.45)}50%{box-shadow:0 8px 44px rgba(255,107,26,.7)}}
 .reels-big-btn.green{background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 8px 30px rgba(16,185,129,.45)}
 .reels-big-btn.red{background:linear-gradient(135deg,#f43f5e,#e11d48);box-shadow:0 8px 30px rgba(244,63,94,.4);animation:none}
 .reels-emoji-big{font-size:80px;margin-bottom:24px;animation:floaty 3s ease-in-out infinite}
@@ -1038,7 +855,7 @@ audio{height:36px;border-radius:7px;max-width:240px}
 
 /* ═══ GROWING SNAIL 🐌 ═══ */
 .snail-wrap{position:relative;margin:0 auto 20px;display:flex;align-items:center;justify-content:center}
-#snail-svg{filter:drop-shadow(0 8px 24px rgba(124,92,255,.4));animation:snailBob 3s ease-in-out infinite}
+#snail-svg{filter:drop-shadow(0 8px 24px rgba(255,107,26,.4));animation:snailBob 3s ease-in-out infinite}
 @keyframes snailBob{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-8px) rotate(1deg)}}
 .snail-trail{position:absolute;bottom:6px;left:0;right:0;height:6px;background:linear-gradient(90deg,transparent,rgba(157,123,255,.3),transparent);border-radius:3px;animation:trailShine 2s infinite}
 @keyframes trailShine{0%,100%{opacity:.3}50%{opacity:.7}}
@@ -1055,13 +872,13 @@ audio{height:36px;border-radius:7px;max-width:240px}
 
 @keyframes dzFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-26px) scale(1.1)}}
 
-.dz-month-pill{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,rgba(124,92,255,.18),rgba(34,211,238,.12));border:1px solid rgba(124,92,255,.35);border-radius:30px;padding:7px 16px;font-family:var(--fm);font-size:12px;font-weight:600;letter-spacing:1px;color:var(--ac2);margin-bottom:20px;position:relative;z-index:1}
+.dz-month-pill{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,rgba(255,107,26,.18),rgba(232,84,0,.12));border:1px solid rgba(255,107,26,.35);border-radius:30px;padding:7px 16px;font-family:var(--fm);font-size:12px;font-weight:600;letter-spacing:1px;color:var(--ac2);margin-bottom:20px;position:relative;z-index:1}
 
 .dz-card{position:relative;z-index:1;background:linear-gradient(160deg,var(--s2),var(--s));border:1px solid var(--brd2);border-radius:26px;padding:32px 26px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)}
 
 .dz-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--ac),var(--cy),var(--gn));background-size:200% auto;animation:presShimmer 4s linear infinite}
 
-.dz-lesson-icon{font-size:72px;line-height:1;margin-bottom:18px;display:inline-block;animation:floaty 3s ease-in-out infinite;filter:drop-shadow(0 8px 20px rgba(124,92,255,.4))}
+.dz-lesson-icon{font-size:72px;line-height:1;margin-bottom:18px;display:inline-block;animation:floaty 3s ease-in-out infinite;filter:drop-shadow(0 8px 20px rgba(255,107,26,.4))}
 
 .dz-lesson-num{font-family:var(--fm);font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--cy);margin-bottom:8px}
 
@@ -1073,11 +890,11 @@ audio{height:36px;border-radius:7px;max-width:240px}
 
 .dz-tag{background:var(--s3);border:1px solid var(--brd);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--mu2);display:flex;align-items:center;gap:5px}
 
-.dz-start-btn{width:100%;max-width:300px;padding:19px 32px;border:none;border-radius:18px;font-family:var(--fd);font-size:19px;font-weight:700;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--ac),var(--acd));box-shadow:0 10px 30px rgba(124,92,255,.5);transition:.2s;position:relative;overflow:hidden}
+.dz-start-btn{width:100%;max-width:300px;padding:19px 32px;border:none;border-radius:18px;font-family:var(--fd);font-size:19px;font-weight:700;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--ac),var(--acd));box-shadow:0 10px 30px rgba(255,107,26,.5);transition:.2s;position:relative;overflow:hidden}
 
 .dz-start-btn:active{transform:scale(.96)}
 
-.dz-start-btn::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:dzShine 2.5s infinite}
+.dz-start-btn::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(28,28,28,.3),transparent);animation:dzShine 2.5s infinite}
 
 @keyframes dzShine{to{left:100%}}
 
@@ -1095,11 +912,11 @@ audio{height:36px;border-radius:7px;max-width:240px}
 
 .dz-dot{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;transition:.3s;position:relative}
 
-.dz-dot.done{background:linear-gradient(135deg,var(--gn),#22d3ee);color:#04140e;box-shadow:0 2px 8px rgba(52,211,153,.4)}
+.dz-dot.done{background:linear-gradient(135deg,var(--gn),#E85400);color:#04140e;box-shadow:0 2px 8px rgba(52,211,153,.4)}
 
-.dz-dot.current{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;box-shadow:0 0 0 3px rgba(124,92,255,.3);animation:dzPulse 1.6s infinite}
+.dz-dot.current{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;box-shadow:0 0 0 3px rgba(255,107,26,.3);animation:dzPulse 1.6s infinite}
 
-@keyframes dzPulse{0%,100%{box-shadow:0 0 0 3px rgba(124,92,255,.3)}50%{box-shadow:0 0 0 6px rgba(124,92,255,.15)}}
+@keyframes dzPulse{0%,100%{box-shadow:0 0 0 3px rgba(255,107,26,.3)}50%{box-shadow:0 0 0 6px rgba(255,107,26,.15)}}
 
 .dz-dot.locked{background:var(--s3);color:var(--mu)}
 
@@ -1129,7 +946,7 @@ audio{height:36px;border-radius:7px;max-width:240px}
 @keyframes hintBob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
 .pres-grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin-top:38px}
 .pres-card{background:var(--s);border:1px solid var(--brd);border-radius:18px;padding:26px;transition:.3s;position:relative;overflow:hidden}
-.pres-card:hover{border-color:var(--ac);transform:translateY(-5px);box-shadow:0 18px 40px rgba(124,92,255,.18)}
+.pres-card:hover{border-color:var(--ac);transform:translateY(-5px);box-shadow:0 18px 40px rgba(255,107,26,.18)}
 .pres-card-ic{font-size:30px;margin-bottom:14px}
 .pres-card-t{font-family:var(--fd);font-size:17px;font-weight:700;margin-bottom:8px}
 .pres-card-d{font-size:13.5px;color:var(--mu2);line-height:1.65}
@@ -1147,13 +964,13 @@ audio{height:36px;border-radius:7px;max-width:240px}
 .pres-team{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;margin-top:34px}
 .pres-tcard{background:var(--s);border:1px solid var(--brd);border-radius:18px;padding:24px;transition:.3s}
 .pres-tcard:hover{border-color:var(--ac);transform:translateY(-4px)}
-.pres-tava{width:64px;height:64px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;box-shadow:0 6px 18px rgba(124,92,255,.25)}
+.pres-tava{width:64px;height:64px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;box-shadow:0 6px 18px rgba(255,107,26,.25)}
 .pres-tname{font-family:var(--fd);font-size:15.5px;font-weight:700}
 .pres-trole{font-size:12px;color:var(--ac2);font-weight:600;margin-top:2px}
-.pres-badge{background:rgba(124,92,255,.13);color:var(--ac2);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700}
+.pres-badge{background:rgba(255,107,26,.13);color:var(--ac2);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700}
 .pres-tdesc{font-size:13px;color:var(--mu2);line-height:1.65;margin-top:12px}
-.pres-dircard{background:linear-gradient(135deg,rgba(124,92,255,.14),rgba(34,211,238,.07));border:1.5px solid rgba(124,92,255,.4);border-radius:22px;padding:32px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin-top:34px;position:relative;overflow:hidden}
-.pres-dircard::after{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(124,92,255,.25),transparent 70%);pointer-events:none}
+.pres-dircard{background:linear-gradient(135deg,rgba(255,107,26,.14),rgba(232,84,0,.07));border:1.5px solid rgba(255,107,26,.4);border-radius:22px;padding:32px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin-top:34px;position:relative;overflow:hidden}
+.pres-dircard::after{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,26,.25),transparent 70%);pointer-events:none}
 .pres-final{text-align:center;align-items:center}
 .pres-quote{font-family:var(--fd);font-size:clamp(24px,3.4vw,40px);font-weight:700;line-height:1.3;max-width:760px;margin:0 auto 18px;
   background:linear-gradient(120deg,#fff,var(--ac2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
@@ -1689,7 +1506,7 @@ audio{height:36px;border-radius:7px;max-width:240px}
 
       <!-- add form -->
       <div class="tbl-wrap" id="otaona-form" style="display:none;padding:18px;margin-top:16px">
-        <div style="font-size:13px;color:var(--mu2);margin-bottom:14px;padding:10px 14px;background:rgba(34,211,238,.08);border-radius:8px">💡 Faqat <b style="color:var(--cy)">telefon raqami</b> majburiy. Qolgan maydonlarni keyin — qo'ng'iroq qilganda to'ldirishingiz mumkin.</div>
+        <div style="font-size:13px;color:var(--mu2);margin-bottom:14px;padding:10px 14px;background:rgba(232,84,0,.08);border-radius:8px">💡 Faqat <b style="color:var(--cy)">telefon raqami</b> majburiy. Qolgan maydonlarni keyin — qo'ng'iroq qilganda to'ldirishingiz mumkin.</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
           <div class="field"><label>Ota-ona ismi</label><input id="oo-parent" type="text" placeholder="Gulnora opa"></div>
           <div class="field"><label>Bola ismi</label><input id="oo-child" type="text" placeholder="Aziz"></div>
@@ -1919,62 +1736,6 @@ audio{height:36px;border-radius:7px;max-width:240px}
       </div>
     </div>
 
-    <!-- DIAGNOSTIKA TEST -->
-    <div class="admin-panel" id="ap-diagnostika">
-      <div class="ap-head">
-        <div>
-          <div class="ap-title">🧪 Diagnostika test</div>
-          <div class="ap-sub">Bolaning qobiliyatlarini aniqlash · 99 000 so'm</div>
-        </div>
-      </div>
-
-      <!-- group selector -->
-      <div id="diag-groups">
-        <div style="background:linear-gradient(135deg,rgba(124,92,255,.1),rgba(34,211,238,.06));border:1px solid rgba(124,92,255,.25);border-radius:16px;padding:20px;margin-bottom:18px">
-          <div style="font-family:var(--fd);font-size:15px;font-weight:700;color:var(--tx);margin-bottom:6px">🎯 Bolaning iqtidorini aniqlash tizimi</div>
-          <div style="font-size:13px;color:var(--mu2);line-height:1.6">Bola testdan o'tadi → kuchli tomonlari aniqlanadi → mos guruh tavsiya etiladi → 3 kunlik bepul sinov darsiga taklif qilinadi.</div>
-        </div>
-        <div style="font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin:0 0 12px">Yosh guruhini tanlang</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px">
-          <div class="diag-card" onclick="startDiagTest('1-2')" style="cursor:pointer;background:var(--s);border:1px solid var(--brd);border-radius:14px;padding:20px;transition:.2s">
-            <div style="font-size:30px;margin-bottom:10px">🧸</div>
-            <div style="font-family:var(--fd);font-size:16px;font-weight:700;color:var(--tx)">1–2 sinf</div>
-            <div style="font-size:12px;color:var(--mu2);margin-top:4px;line-height:1.5">Og'zaki + rasmlar + o'yin. O'qishni endi o'rganayotganlar uchun.</div>
-            <div style="margin-top:10px"><span class="badge active">✅ Tayyor</span></div>
-          </div>
-          <div class="diag-card diag-soon" style="background:var(--s);border:1px solid var(--brd);border-radius:14px;padding:20px;opacity:.55">
-            <div style="font-size:30px;margin-bottom:10px">📖</div>
-            <div style="font-family:var(--fd);font-size:16px;font-weight:700;color:var(--tx)">3–4 sinf</div>
-            <div style="font-size:12px;color:var(--mu2);margin-top:4px;line-height:1.5">Mantiq, matnlar. O'qiy/yoza oladiganlar uchun.</div>
-            <div style="margin-top:10px"><span class="badge pending">🔜 Tez orada</span></div>
-          </div>
-          <div class="diag-card diag-soon" style="background:var(--s);border:1px solid var(--brd);border-radius:14px;padding:20px;opacity:.55">
-            <div style="font-size:30px;margin-bottom:10px">🧠</div>
-            <div style="font-family:var(--fd);font-size:16px;font-weight:700;color:var(--tx)">5–7 sinf</div>
-            <div style="font-size:12px;color:var(--mu2);margin-top:4px;line-height:1.5">Abstrakt fikrlash, yo'nalishga moyillik.</div>
-            <div style="margin-top:10px"><span class="badge pending">🔜 Tez orada</span></div>
-          </div>
-          <div class="diag-card diag-soon" style="background:var(--s);border:1px solid var(--brd);border-radius:14px;padding:20px;opacity:.55">
-            <div style="font-size:30px;margin-bottom:10px">🎯</div>
-            <div style="font-family:var(--fd);font-size:16px;font-weight:700;color:var(--tx)">8–9 sinf</div>
-            <div style="font-size:12px;color:var(--mu2);margin-top:4px;line-height:1.5">Kasb tanlash — proforientatsiya.</div>
-            <div style="margin-top:10px"><span class="badge pending">🔜 Tez orada</span></div>
-          </div>
-          <div class="diag-card diag-soon" style="background:var(--s);border:1px solid var(--brd);border-radius:14px;padding:20px;opacity:.55">
-            <div style="font-size:30px;margin-bottom:10px">🎓</div>
-            <div style="font-family:var(--fd);font-size:16px;font-weight:700;color:var(--tx)">10–11 sinf</div>
-            <div style="font-size:12px;color:var(--mu2);margin-top:4px;line-height:1.5">Oliygohga tayyorgarlik, sertifikatlar.</div>
-            <div style="margin-top:10px"><span class="badge pending">🔜 Tez orada</span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- test runner (hidden until a group is chosen) -->
-      <div id="diag-runner" style="display:none"></div>
-      <!-- off-screen stage for PNG med-card rendering -->
-      <div id="medcard-stage"></div>
-    </div>
-
     <!-- OPERATOR TRAINING (call-center onboarding) -->
     <div class="admin-panel" id="ap-operatorquv">
       <div class="ap-head">
@@ -2201,10 +1962,10 @@ audio{height:36px;border-radius:7px;max-width:240px}
         <div class="brain-svg-wrap">
           <svg id="brain-svg" viewBox="0 0 200 200">
             <defs>
-              <radialGradient id="brainGrad"><stop offset="0" stop-color="#9d7bff"/><stop offset="1" stop-color="#5b3fd6"/></radialGradient>
+              <radialGradient id="brainGrad"><stop offset="0" stop-color="#9d7bff"/><stop offset="1" stop-color="#E85400"/></radialGradient>
               <filter id="glow2"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
             </defs>
-            <g id="brain-links" stroke="#7c5cff" stroke-width="1" opacity=".35"></g>
+            <g id="brain-links" stroke="#FF6B1A" stroke-width="1" opacity=".35"></g>
             <g class="brain-core" filter="url(#glow2)">
               <path d="M100 55 C75 55 60 72 62 92 C50 96 48 118 62 126 C64 144 84 150 100 144 C116 150 136 144 138 126 C152 118 150 96 138 92 C140 72 125 55 100 55 Z" fill="url(#brainGrad)" opacity=".9"/>
               <path d="M100 60 L100 144" stroke="#4a2fc0" stroke-width="2" fill="none" opacity=".5"/>
@@ -2251,8 +2012,8 @@ const POSITIONS = {
 };
 
 // ── ROLE MENUS ── (Variant B: everyone sees ALL sections; only timer differs)
-const FULL_MENU=['svodka','qabul','dash','control','students','tez','notif','activate','leads','mleads','nolavoy','otaona','calls','meet','teachers','diagnostika','operatorquv'];
-const MARKETING_MENU=['svodka','qabul','dash','hisobkitob','control','students','tez','notif','activate','leads','mleads','nolavoy','otaona','calls','meet','teachers','diagnostika','operatorquv'];
+const FULL_MENU=['svodka','qabul','dash','control','students','tez','notif','activate','leads','mleads','nolavoy','otaona','calls','meet','teachers','operatorquv'];
+const MARKETING_MENU=['svodka','qabul','dash','hisobkitob','control','students','tez','notif','activate','leads','mleads','nolavoy','otaona','calls','meet','teachers','operatorquv'];
 const MENUS = {
   admin:     FULL_MENU,
   marketing: MARKETING_MENU,
@@ -2274,7 +2035,6 @@ const MENU_META = {
   calls:    {label:'📞 Qo\'ng\'iroqlar', fn:'loadPlannedCalls'},
   meet:     {label:'🤝 Uchrashuvlar',    fn:'loadMeetings'},
   teachers: {label:'👩‍🏫 O\'qituvchilar', fn:'loadTeachers'},
-  diagnostika:{label:'🧪 Diagnostika test', fn:'loadDiagnostika'},
   operatorquv:{label:'🎓 Operator o\'quvi', fn:'loadOperatorQuv'},
   staff:    {label:'🧑‍💼 Xodimlar',       fn:'loadStaffPanel'},
   qabul:    {label:'🎯 Qabul',           fn:'loadQabul'}
@@ -2290,7 +2050,7 @@ async function loadQabul(){
     if(!data||!data.length){ list.innerHTML='<div style="text-align:center;padding:40px;color:#8892b0">Hali diagnostika natijalari yoq</div>'; return; }
     list.innerHTML=data.map(function(d){
       var done=d.status==='created';
-      return '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">'
+      return '<div style="background:rgba(28,28,28,.03);border:1px solid rgba(28,28,28,.08);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">'
         +'<div style="flex:1;min-width:160px">'
         +'<div style="font-weight:700;font-size:15px">'+(d.child_name||'—')+' <span style="color:#8892b0;font-weight:500;font-size:13px">· '+(d.grade||'?')+'-sinf</span></div>'
         +'<div style="color:#8892b0;font-size:12.5px;margin-top:3px">📞 '+(d.parent_phone||'—')+' · 💪 '+(d.top_power||'—')+' · 🌟 '+(d.leader||'—')+'</div>'
@@ -2497,7 +2257,7 @@ const BOOK_QUOTES=[
 const WEEK_LESSONS={1:[1,2],2:[3,4],3:[5,6],4:[7,8],5:[9,10],6:[11,12],7:[13,14],8:[15,16],9:[17,18],10:[19,20],11:[21,22],12:[23,24]};
 const WEEK_TEZ={1:[1,2],2:[3,4],3:[5,6],4:[7,8],5:[9,10],6:[11,12],7:[13,14],8:[15,16],9:[17,18],10:[19,20],11:[21,22],12:[23,24]};
 const CALF_STAGES=[{min:0,max:45,label:"Yangi tug'ilgan"},{min:45,max:55,label:"1-hafta"},{min:55,max:70,label:"2-hafta"},{min:70,max:90,label:"3-hafta"},{min:90,max:120,label:"4-hafta"},{min:120,max:999,label:"Katta buzoq"}];
-const SKILLS={ai:{emoji:'🤖',name:'AI bilimi',color:'#7c5cff'},camera:{emoji:'📹',name:'Kamera',color:'#22d3ee'},speech:{emoji:'🎙',name:'Nutq',color:'#34d399'},blogging:{emoji:'✨',name:'Bloging',color:'#fbbf24'}};
+const SKILLS={ai:{emoji:'🤖',name:'AI bilimi',color:'#FF6B1A'},camera:{emoji:'📹',name:'Kamera',color:'#E85400'},speech:{emoji:'🎙',name:'Nutq',color:'#34d399'},blogging:{emoji:'✨',name:'Bloging',color:'#fbbf24'}};
 
 // ── STATE ──
 let currentUser=null, currentStaff=null;
@@ -3186,7 +2946,7 @@ function snailSVG(scale){
   const sc=scale||1;
   return `<svg id="snail-svg" width="${Math.round(150*sc)}" height="${Math.round(130*sc)}" viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <radialGradient id="shellG" cx="42%" cy="40%"><stop offset="0" stop-color="#a78bfa"/><stop offset="55%" stop-color="#7c5cff"/><stop offset="100%" stop-color="#5b3fd6"/></radialGradient>
+      <radialGradient id="shellG" cx="42%" cy="40%"><stop offset="0" stop-color="#a78bfa"/><stop offset="55%" stop-color="#FF6B1A"/><stop offset="100%" stop-color="#E85400"/></radialGradient>
       <linearGradient id="bodyG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c4b5fd"/><stop offset="1" stop-color="#9d7bff"/></linearGradient>
     </defs>
     <!-- body -->
@@ -3199,10 +2959,10 @@ function snailSVG(scale){
     <circle cx="25" cy="62" r="7" fill="#fff"/><circle cx="26" cy="63" r="3.5" fill="#2a2a3a"/>
     <circle cx="53" cy="60" r="7" fill="#fff"/><circle cx="54" cy="61" r="3.5" fill="#2a2a3a"/>
     <!-- smile -->
-    <path d="M30 116 Q40 124 52 116" fill="none" stroke="#5b3fd6" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M30 116 Q40 124 52 116" fill="none" stroke="#E85400" stroke-width="2.5" stroke-linecap="round"/>
     <!-- shell spiral -->
     <circle cx="118" cy="80" r="50" fill="url(#shellG)"/>
-    <path d="M118 80 m0 0 a14 14 0 1 1 -0.1 0 a26 26 0 1 0 0.2 0 a38 38 0 1 1 -0.1 0" fill="none" stroke="#5b3fd6" stroke-width="4" opacity=".55" stroke-linecap="round"/>
+    <path d="M118 80 m0 0 a14 14 0 1 1 -0.1 0 a26 26 0 1 0 0.2 0 a38 38 0 1 1 -0.1 0" fill="none" stroke="#E85400" stroke-width="4" opacity=".55" stroke-linecap="round"/>
     <circle cx="118" cy="80" r="50" fill="none" stroke="#c4b5fd" stroke-width="3" opacity=".6"/>
   </svg>`;
 }
@@ -3895,7 +3655,7 @@ function renderLeads(list){const c=document.getElementById('lead-cards');
   const unread=allLeads.filter(l=>l.status!=='enrolled'&&l.status!=='refused'&&!isCheckedToday(l)).length;
   const banner=document.getElementById('leads-unread-banner');
   if(banner){
-    if(unread>0)banner.innerHTML=`<div style="background:rgba(124,92,255,.12);border:1px solid var(--ac);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:22px">📨</span><div><b style="color:var(--ac2)">${unread} ta lid bugun tekshirilmagan</b><div style="font-size:12px;color:var(--mu)">Har bir lidni oching, hisobot yozing va "tekshirildi" deb belgilang</div></div></div>`;
+    if(unread>0)banner.innerHTML=`<div style="background:rgba(255,107,26,.12);border:1px solid var(--ac);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:22px">📨</span><div><b style="color:var(--ac2)">${unread} ta lid bugun tekshirilmagan</b><div style="font-size:12px;color:var(--mu)">Har bir lidni oching, hisobot yozing va "tekshirildi" deb belgilang</div></div></div>`;
     else banner.innerHTML=`<div style="background:rgba(52,211,153,.1);border:1px solid var(--gn);border-radius:10px;padding:12px 16px;margin-bottom:14px;color:var(--gn)">✅ Barcha lidlar bugun tekshirildi! Zo'r ish!</div>`;
   }
   // sort: unchecked first, then by activity date (direction toggle)
@@ -3997,7 +3757,7 @@ function renderMLeads(list){const c=document.getElementById('mlead-cards');
   const unread=allMLeads.filter(l=>l.status!=='enrolled'&&l.status!=='refused'&&!isCheckedToday(l)).length;
   const banner=document.getElementById('mleads-unread-banner');
   if(banner){
-    if(unread>0)banner.innerHTML=`<div style="background:rgba(124,92,255,.12);border:1px solid var(--ac);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:22px">📨</span><div><b style="color:var(--ac2)">${unread} ta maktab lidi bugun tekshirilmagan</b><div style="font-size:12px;color:var(--mu)">Har bir lidni oching, hisobot yozing</div></div></div>`;
+    if(unread>0)banner.innerHTML=`<div style="background:rgba(255,107,26,.12);border:1px solid var(--ac);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:22px">📨</span><div><b style="color:var(--ac2)">${unread} ta maktab lidi bugun tekshirilmagan</b><div style="font-size:12px;color:var(--mu)">Har bir lidni oching, hisobot yozing</div></div></div>`;
     else banner.innerHTML=`<div style="background:rgba(52,211,153,.1);border:1px solid var(--gn);border-radius:10px;padding:12px 16px;margin-bottom:14px;color:var(--gn)">✅ Barcha maktab lidlari bugun tekshirildi!</div>`;
   }
   const sorted=sortLeadsList(list,mleadsSortField,mleadsSortDir);
@@ -4060,7 +3820,7 @@ function renderNLeads(list){const c=document.getElementById('nlead-cards');
   const unread=allNLeads.filter(l=>l.status!=='enrolled'&&l.status!=='refused'&&!isCheckedToday(l)).length;
   const banner=document.getElementById('nleads-unread-banner');
   if(banner){
-    if(unread>0)banner.innerHTML=`<div style="background:rgba(124,92,255,.12);border:1px solid var(--ac);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:22px">📨</span><div><b style="color:var(--ac2)">${unread} ta nolavoy lidi bugun tekshirilmagan</b><div style="font-size:12px;color:var(--mu)">Har bir lidni oching, hisobot yozing</div></div></div>`;
+    if(unread>0)banner.innerHTML=`<div style="background:rgba(255,107,26,.12);border:1px solid var(--ac);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:22px">📨</span><div><b style="color:var(--ac2)">${unread} ta nolavoy lidi bugun tekshirilmagan</b><div style="font-size:12px;color:var(--mu)">Har bir lidni oching, hisobot yozing</div></div></div>`;
     else banner.innerHTML=`<div style="background:rgba(52,211,153,.1);border:1px solid var(--gn);border-radius:10px;padding:12px 16px;margin-bottom:14px;color:var(--gn)">✅ Barcha nolavoy lidlari bugun tekshirildi!</div>`;
   }
   const sorted=sortLeadsList(list,nleadsSortField,nleadsSortDir);
@@ -4382,1242 +4142,6 @@ async function loadTeachers(){
 }
 
 // ═══════════════════════════════════════════
-// DIAGNOSTIKA MARKAZI (medical-center model, bilingual)
-// ═══════════════════════════════════════════
-
-// ── i18n strings ──
-const DC_T={
-  uz:{
-    title:"EduNova Diagnostika Markazi",
-    sub:"Bolaning yashirin iqtidorini ochamiz — xuddi shifoxonadagidek, kabinetma-kabinet.",
-    chooseLang:"Tilni tanlang",
-    regTitle:"Ro'yxatga olish",
-    regSub:"Bemorning ma'lumotlarini kiriting",
-    nameLabel:"Bolaning ismi",
-    namePh:"Ism",
-    surnameLabel:"Familiyasi",
-    surnamePh:"Familiya",
-    ageLabel:"Yoshi",
-    classLabel:"Sinfi",
-    classWord:"sinf",
-    heightLabel:"Bo'yi (sm)",
-    weightLabel:"Vazni (kg)",
-    startBtn:"Diagnostikani boshlash →",
-    patient:"Bemor",
-    years:"yosh",
-    cabinet:"Kabinet",
-    next:"Keyingi kabinet",
-    enter:"Kirish →",
-    spec:"Mutaxassis",
-    questions:"savol",
-    timeLimit:"vaqt",
-    noLimit:"vaqtsiz",
-    sec:"soniya",
-    done:"Tayyor ✓",
-    finishTitle:"Tabriklaymiz, qahramon!",
-    finishSub:"Sen barcha kabinetlardan o'tding!",
-    consilium:"Konsilium — Iqtidor xaritasi",
-    consiliumSub:"5 ta mutaxassisning xulosasi",
-    topSkill:"Eng kuchli tomoni",
-    professionsTitle:"Mos keladigan kasblar",
-    professionsSub:"O'zbekiston bozoridagi talab bilan",
-    marketNote:"Bozordagi talab:",
-    nextStep:"Keyingi qadam",
-    nextStepDesc:"Farzandingizni <b>3 kunlik BEPUL sinov darsiga</b> taklif qilamiz. Bola maktabni o'zi ko'radi va to'g'ri xulosa qiladi.",
-    finishBtn:"✓ Yakunlash",
-    again:"🔄 Qaytadan",
-    timeUp:"Vaqt tugadi!",
-    downloadCard:"Natijani yuklab olish (PNG)",
-    cancel:"← Bekor"
-  },
-  ru:{
-    title:"Диагностический центр EduNova",
-    sub:"Раскрываем скрытый потенциал ребёнка — как в клинике, кабинет за кабинетом.",
-    chooseLang:"Выберите язык",
-    regTitle:"Регистратура",
-    regSub:"Введите данные пациента",
-    nameLabel:"Имя ребёнка",
-    namePh:"Имя",
-    surnameLabel:"Фамилия",
-    surnamePh:"Фамилия",
-    ageLabel:"Возраст",
-    classLabel:"Класс",
-    classWord:"класс",
-    heightLabel:"Рост (см)",
-    weightLabel:"Вес (кг)",
-    startBtn:"Начать диагностику →",
-    patient:"Пациент",
-    years:"лет",
-    cabinet:"Кабинет",
-    next:"Следующий кабинет",
-    enter:"Войти →",
-    spec:"Специалист",
-    questions:"вопросов",
-    timeLimit:"время",
-    noLimit:"без лимита",
-    sec:"секунд",
-    done:"Готово ✓",
-    finishTitle:"Поздравляем, герой!",
-    finishSub:"Ты прошёл все кабинеты!",
-    consilium:"Консилиум — Карта потенциала",
-    consiliumSub:"Заключение 5 специалистов",
-    topSkill:"Самая сильная сторона",
-    professionsTitle:"Подходящие профессии",
-    professionsSub:"со спросом на рынке Узбекистана",
-    marketNote:"Спрос на рынке:",
-    nextStep:"Следующий шаг",
-    nextStepDesc:"Приглашаем вашего ребёнка на <b>3 дня БЕСПЛАТНОГО пробного обучения</b>. Ребёнок сам увидит школу и сделает честный вывод.",
-    finishBtn:"✓ Завершить",
-    again:"🔄 Заново",
-    timeUp:"Время вышло!",
-    downloadCard:"Скачать результат (PNG)",
-    cancel:"← Отмена"
-  }
-};
-
-// 5 skills (bilingual names)
-const DC_SKILLS={
-  aql:    {ic:'🧩', color:'#7c5cff', uz:"Aql",      ru:"Ум"},
-  soz:    {ic:'💬', color:'#22d3ee', uz:"So'z",     ru:"Речь"},
-  xotira: {ic:'🧠', color:'#34d399', uz:"Xotira",   ru:"Память"},
-  fantaziya:{ic:'🎨', color:'#fbbf24', uz:"Fantaziya", ru:"Фантазия"},
-  yurak:  {ic:'❤️', color:'#fb7185', uz:"Yurak",    ru:"Сердце"}
-};
-
-// ── Professions linked to each skill, with Uzbekistan job-market demand ──
-// Markers: 🔥 high demand & growth, ✅ stable demand, 🌱 future prospect
-// (Based on hh.uz 2025-2026 data + WEF Future of Jobs adapted to Uzbekistan)
-const DC_PROFESSIONS={
-  aql:{
-    uz:[{p:"Dasturchi / IT mutaxassisi",d:"🔥"},{p:"Ma'lumotlar tahlilchisi",d:"🔥"},{p:"Muhandis",d:"✅"},{p:"Moliyachi / buxgalter",d:"✅"}],
-    ru:[{p:"Программист / IT-специалист",d:"🔥"},{p:"Аналитик данных",d:"🔥"},{p:"Инженер",d:"✅"},{p:"Финансист / бухгалтер",d:"✅"}]
-  },
-  soz:{
-    uz:[{p:"Marketolog / SMM mutaxassisi",d:"🔥"},{p:"Sotuv menejeri",d:"🔥"},{p:"O'qituvchi / pedagog",d:"✅"},{p:"Jurnalist / kontent-ijodkor",d:"🌱"}],
-    ru:[{p:"Маркетолог / SMM-специалист",d:"🔥"},{p:"Менеджер по продажам",d:"🔥"},{p:"Учитель / педагог",d:"✅"},{p:"Журналист / контент-мейкер",d:"🌱"}]
-  },
-  xotira:{
-    uz:[{p:"Shifokor / tibbiyot xodimi",d:"✅"},{p:"Huquqshunos / advokat",d:"✅"},{p:"Olim / tadqiqotchi",d:"🌱"},{p:"Farmatsevt",d:"✅"}],
-    ru:[{p:"Врач / медработник",d:"✅"},{p:"Юрист / адвокат",d:"✅"},{p:"Учёный / исследователь",d:"🌱"},{p:"Фармацевт",d:"✅"}]
-  },
-  fantaziya:{
-    uz:[{p:"Dizayner (grafik/UX)",d:"🔥"},{p:"Arxitektor",d:"✅"},{p:"Reklama ijodkori",d:"🔥"},{p:"Video / animatsiya ustasi",d:"🌱"}],
-    ru:[{p:"Дизайнер (графика/UX)",d:"🔥"},{p:"Архитектор",d:"✅"},{p:"Креатор в рекламе",d:"🔥"},{p:"Видео / анимация",d:"🌱"}]
-  },
-  yurak:{
-    uz:[{p:"Psixolog",d:"🌱"},{p:"HR mutaxassisi",d:"✅"},{p:"Sotuv / mijoz xizmati",d:"🔥"},{p:"Tadbirkor / loyiha rahbari",d:"🔥"}],
-    ru:[{p:"Психолог",d:"🌱"},{p:"HR-специалист",d:"✅"},{p:"Продажи / клиент-сервис",d:"🔥"},{p:"Предприниматель / руководитель",d:"🔥"}]
-  }
-};
-// demand legend (bilingual)
-const DC_DEMAND_LEGEND={
-  uz:{'🔥':"yuqori talab va o'sish",'✅':"barqaror talab",'🌱':"kelajak istiqboli"},
-  ru:{'🔥':"высокий спрос и рост",'✅':"стабильный спрос",'🌱':"перспектива будущего"}
-};
-
-// CABINETS for 1-2 class. Each = a specialist room with intro + questions + time limit.
-const DC_CABINETS_1_2=[
-  {
-    skill:'yurak', ic:'🧠', bg:'linear-gradient(135deg,#fb7185,#e11d48)', limit:60,
-    room:{uz:"Psixolog xonasi",ru:"Кабинет психолога"},
-    spec:{uz:"Bolalar psixologi",ru:"Детский психолог"},
-    desc:{uz:"Avval suhbat: bolaning his-tuyg'usi va xarakterini bilamiz.",ru:"Сначала беседа: узнаём эмоции и характер ребёнка."},
-    questions:[
-      {q:{uz:"Do'sting yiqilib tushdi. Nima qilasan?",ru:"Друг упал. Что ты сделаешь?"},hint:{uz:"Yuraging nima deydi?",ru:"Что говорит сердце?"},creative:true,
-       opts:[{e:'🤝',uz:"Yordam beraman",ru:"Помогу"},{e:'😊',uz:"Ko'ngil ko'taraman",ru:"Подбодрю"},{e:'🩹',uz:"Davolayman",ru:"Полечу"},{e:'🫂',uz:"Quchoqlayman",ru:"Обниму"}]},
-      {q:{uz:"Onangga nima sovg'a qilasan?",ru:"Что подаришь маме?"},hint:{uz:"Yuragingdan tanla!",ru:"Выбери от сердца!"},creative:true,
-       opts:[{e:'🌷',uz:"Gul",ru:"Цветок"},{e:'🎨',uz:"Rasm",ru:"Рисунок"},{e:'❤️',uz:"Mehr",ru:"Любовь"},{e:'🎁',uz:"Sovg'a",ru:"Подарок"}]},
-      {q:{uz:"Qaysi kayfiyat senga yoqadi?",ru:"Какое настроение тебе нравится?"},hint:{uz:"O'zingnikini tanla",ru:"Выбери своё"},creative:true,
-       opts:[{e:'😄',uz:"Quvnoq",ru:"Весёлое"},{e:'😌',uz:"Tinch",ru:"Спокойное"},{e:'🤩',uz:"Hayajonli",ru:"Восторг"},{e:'😎',uz:"Dadil",ru:"Уверенное"}]},
-      {q:{uz:"Birinchi marta maktabga borasan. Nima his qilasan?",ru:"Первый раз в школу. Что чувствуешь?"},hint:{uz:"Rostini tanla",ru:"Выбери честно"},creative:true,
-       opts:[{e:'😊',uz:"Xursandman",ru:"Радуюсь"},{e:'😲',uz:"Qiziq",ru:"Интересно"},{e:'🥹',uz:"Hayajon",ru:"Волнуюсь"},{e:'💪',uz:"Tayyorman",ru:"Готов"}]},
-      {q:{uz:"Yangi do'st topding. Nima deysan?",ru:"Нашёл нового друга. Что скажешь?"},hint:{uz:"Yuragingdan",ru:"От сердца"},creative:true,
-       opts:[{e:'👋',uz:"Salom!",ru:"Привет!"},{e:'🤝',uz:"Do'st bo'lamiz?",ru:"Дружим?"},{e:'😄',uz:"Birga o'ynaymiz!",ru:"Поиграем!"},{e:'🎉',uz:"Zo'r!",ru:"Класс!"}]}
-    ]
-  },
-  {
-    skill:'soz', ic:'💬', bg:'linear-gradient(135deg,#22d3ee,#0891b2)', limit:60,
-    room:{uz:"Lingvist xonasi",ru:"Кабинет лингвиста"},
-    spec:{uz:"Til mutaxassisi",ru:"Специалист по речи"},
-    desc:{uz:"So'zlar bilan ishlaymiz: bolaning nutqi va tili.",ru:"Работаем со словами: речь и язык ребёнка."},
-    questions:[
-      {q:{uz:"Qaysi rasm 'salom' degani?",ru:"Какая картинка значит 'привет'?"},hint:{uz:"To'g'risini top",ru:"Найди верную"},
-       opts:[{e:'👋',uz:"Salom",ru:"Привет",correct:true},{e:'🌙',uz:"Tun",ru:"Ночь"},{e:'🍞',uz:"Non",ru:"Хлеб"},{e:'🌞',uz:"Kun",ru:"День"}]},
-      {q:{uz:"It qanday ovoz chiqaradi?",ru:"Как говорит собака?"},hint:{uz:"Tovushni tanla",ru:"Выбери звук"},
-       opts:[{e:'🐶',uz:"Vov-vov",ru:"Гав-гав",correct:true},{e:'🐱',uz:"Miyov",ru:"Мяу"},{e:'🐮',uz:"Mu-mu",ru:"Му-му"},{e:'🐔',uz:"Qu-qu",ru:"Ко-ко"}]},
-      {q:{uz:"Qaysi biri meva?",ru:"Что из этого фрукт?"},hint:{uz:"To'g'risini tanla",ru:"Выбери верное"},
-       opts:[{e:'🍎',uz:"Olma",ru:"Яблоко",correct:true},{e:'🚗',uz:"Mashina",ru:"Машина"},{e:'🏠',uz:"Uy",ru:"Дом"},{e:'⚽',uz:"To'p",ru:"Мяч"}]},
-      {q:{uz:"'Katta' so'zining aksi nima?",ru:"Что противоположно 'большой'?"},hint:{uz:"O'ylab top",ru:"Подумай"},
-       opts:[{e:'🐭',uz:"Kichik",ru:"Маленький",correct:true},{e:'🐘',uz:"Katta",ru:"Большой"},{e:'🌊',uz:"Suv",ru:"Вода"},{e:'☀️',uz:"Issiq",ru:"Тёплый"}]},
-      {q:{uz:"Mushuk nima yeydi?",ru:"Что ест кошка?"},hint:{uz:"To'g'risini tanla",ru:"Выбери верное"},
-       opts:[{e:'🐟',uz:"Baliq",ru:"Рыба",correct:true},{e:'🍫',uz:"Shokolad",ru:"Шоколад"},{e:'🌵',uz:"Kaktus",ru:"Кактус"},{e:'🪨',uz:"Tosh",ru:"Камень"}]}
-    ]
-  },
-  {
-    skill:'aql', ic:'🧩', bg:'linear-gradient(135deg,#7c5cff,#5b3fd6)', limit:75,
-    room:{uz:"Mantiq xonasi",ru:"Кабинет логики"},
-    spec:{uz:"Mantiq mutaxassisi",ru:"Специалист по логике"},
-    desc:{uz:"Bolaning fikrlash va mantiqini tekshiramiz.",ru:"Проверяем мышление и логику ребёнка."},
-    questions:[
-      {q:{uz:"Qaysi biri boshqacha?",ru:"Что лишнее?"},hint:{uz:"O'ylab tanla",ru:"Подумай и выбери"},
-       opts:[{e:'🍎',uz:"Olma",ru:"Яблоко"},{e:'🍌',uz:"Banan",ru:"Банан"},{e:'⚽',uz:"To'p",ru:"Мяч",correct:true},{e:'🍓',uz:"Qulupnay",ru:"Клубника"}]},
-      {q:{uz:"Eng katta hayvon qaysi?",ru:"Какое животное самое большое?"},hint:{uz:"Kattasini tanla",ru:"Выбери большое"},
-       opts:[{e:'🐘',uz:"Fil",ru:"Слон",correct:true},{e:'🐭',uz:"Sichqon",ru:"Мышь"},{e:'🐱',uz:"Mushuk",ru:"Кошка"},{e:'🐰',uz:"Quyon",ru:"Заяц"}]},
-      {q:{uz:"2 + 2 = ?",ru:"2 + 2 = ?"},hint:{uz:"Sana",ru:"Посчитай"},
-       opts:[{e:'4️⃣',uz:"4",ru:"4",correct:true},{e:'3️⃣',uz:"3",ru:"3"},{e:'5️⃣',uz:"5",ru:"5"},{e:'6️⃣',uz:"6",ru:"6"}]},
-      {q:{uz:"Qaysi shakl yumaloq?",ru:"Какая фигура круглая?"},hint:{uz:"Yumaloqni tanla",ru:"Выбери круглую"},
-       opts:[{e:'⚪',uz:"Doira",ru:"Круг",correct:true},{e:'🔺',uz:"Uchburchak",ru:"Треугольник"},{e:'⬛',uz:"Kvadrat",ru:"Квадрат"},{e:'⭐',uz:"Yulduz",ru:"Звезда"}]},
-      {q:{uz:"Kun va tundan keyin nima keladi?",ru:"Что идёт после дня и ночи?"},hint:{uz:"Davom ettir",ru:"Продолжи"},
-       opts:[{e:'🌅',uz:"Yangi kun",ru:"Новый день",correct:true},{e:'🍎',uz:"Olma",ru:"Яблоко"},{e:'🚗',uz:"Mashina",ru:"Машина"},{e:'📚',uz:"Kitob",ru:"Книга"}]}
-    ]
-  },
-  {
-    skill:'xotira', ic:'🧠', bg:'linear-gradient(135deg,#34d399,#059669)', limit:45,
-    room:{uz:"Xotira xonasi",ru:"Кабинет памяти"},
-    spec:{uz:"Neyropsixolog",ru:"Нейропсихолог"},
-    desc:{uz:"Bolaning xotirasi va diqqatini sinaymiz.",ru:"Проверяем память и внимание ребёнка."},
-    questions:[
-      {type:'memory', q:{uz:"Eslab qol!",ru:"Запомни!"},hint:{uz:"Rasmlar 3 soniyada yashirinadi",ru:"Картинки спрячутся через 3 секунды"},
-       cards:['🌟','🎈','🍭'], options:[{e:'🎈',correct:true},{e:'🚗',correct:false},{e:'🌟',correct:true},{e:'🐸',correct:false},{e:'🍭',correct:true},{e:'⚽',correct:false}]},
-      {type:'memory', q:{uz:"Yana eslab qol!",ru:"Запомни ещё!"},hint:{uz:"Diqqat bilan qara",ru:"Смотри внимательно"},
-       cards:['🍎','🚀','🐱','🌈'], options:[{e:'🍎',correct:true},{e:'🚀',correct:true},{e:'🎸',correct:false},{e:'🐱',correct:true},{e:'🌈',correct:true},{e:'🦋',correct:false}]},
-      {q:{uz:"Qaysi rang osmonda?",ru:"Какой цвет у неба?"},hint:{uz:"Eslab tanla",ru:"Вспомни и выбери"},
-       opts:[{e:'🔵',uz:"Ko'k",ru:"Синий",correct:true},{e:'🔴',uz:"Qizil",ru:"Красный"},{e:'🟢',uz:"Yashil",ru:"Зелёный"},{e:'🟣',uz:"Siyoh",ru:"Фиолетовый"}]},
-      {q:{uz:"Quyosh qachon chiqadi?",ru:"Когда встаёт солнце?"},hint:{uz:"Eslab tanla",ru:"Вспомни"},
-       opts:[{e:'🌅',uz:"Ertalab",ru:"Утром",correct:true},{e:'🌙',uz:"Kechasi",ru:"Ночью"},{e:'⭐',uz:"Hech qachon",ru:"Никогда"},{e:'🌧',uz:"Yomg'irda",ru:"В дождь"}]}
-    ]
-  },
-  {
-    skill:'fantaziya', ic:'🎨', bg:'linear-gradient(135deg,#fbbf24,#f59e0b)', limit:0,
-    room:{uz:"Ijod studiyasi",ru:"Студия творчества"},
-    spec:{uz:"Art-terapevt",ru:"Арт-терапевт"},
-    desc:{uz:"Bu yerda vaqt yo'q — fantaziyangni erkin ko'rsat!",ru:"Здесь нет времени — покажи фантазию свободно!"},
-    questions:[
-      {q:{uz:"Bu bulut nimaga o'xshaydi?",ru:"На что похоже это облако?"},hint:{uz:"Hammasi to'g'ri!",ru:"Всё верно!"},creative:true,
-       opts:[{e:'☁️',uz:"Bulut",ru:"Облако"},{e:'🐑',uz:"Qo'y",ru:"Овечка"},{e:'🍦',uz:"Muzqaymoq",ru:"Мороженое"},{e:'🏰',uz:"Qasr",ru:"Замок"}]},
-      {q:{uz:"Sehrli tayoqcha bilan nima yaratasan?",ru:"Что создашь волшебной палочкой?"},hint:{uz:"Xohlaganingni!",ru:"Что захочешь!"},creative:true,
-       opts:[{e:'🌈',uz:"Kamalak",ru:"Радуга"},{e:'🦄',uz:"Yakkashox",ru:"Единорог"},{e:'🚀',uz:"Raketa",ru:"Ракета"},{e:'🎂',uz:"Tort",ru:"Торт"}]},
-      {q:{uz:"Agar ucha olsang qayerga uchasan?",ru:"Если бы умел летать — куда?"},hint:{uz:"O'zing tanla!",ru:"Выбери сам!"},creative:true,
-       opts:[{e:'🌙',uz:"Oyga",ru:"На луну"},{e:'🌊',uz:"Dengizga",ru:"К морю"},{e:'⛰️',uz:"Tog'ga",ru:"В горы"},{e:'🌸',uz:"Bog'ga",ru:"В сад"}]},
-      {q:{uz:"O'zing qanday robot yasaysan?",ru:"Какого робота ты построишь?"},hint:{uz:"Fantaziya!",ru:"Фантазируй!"},creative:true,
-       opts:[{e:'🤖',uz:"Yordamchi",ru:"Помощник"},{e:'🚀',uz:"Uchuvchi",ru:"Летающий"},{e:'🎨',uz:"Rassom",ru:"Художник"},{e:'🎵',uz:"Musiqachi",ru:"Музыкант"}]}
-    ]
-  }
-];
-
-// ═══ CABINETS for classes 3-5 (medium: verbal analogies, odd-one-out, sequences) ═══
-// Based on Zambacevichene/Amthauer methodology — verbal & logical subtests
-const DC_CABINETS_3_5=[
-  {
-    skill:'yurak', ic:'🧠', bg:'linear-gradient(135deg,#fb7185,#e11d48)', limit:50,
-    room:{uz:"Psixolog xonasi",ru:"Кабинет психолога"},
-    spec:{uz:"Bolalar psixologi",ru:"Детский психолог"},
-    desc:{uz:"Xulq-atvor va ijtimoiy vaziyatlarni tahlil qilamiz.",ru:"Анализируем поведение и социальные ситуации."},
-    questions:[
-      {q:{uz:"Sinfdoshing xafa bo'lib o'tiribdi. Eng to'g'ri yo'l qaysi?",ru:"Одноклассник сидит расстроенный. Как правильнее поступить?"},hint:{uz:"O'ylab tanla",ru:"Подумай"},
-       opts:[{e:'🗣️',uz:"Sababini so'rayman",ru:"Спрошу причину",correct:true},{e:'🙈',uz:"E'tibor bermayman",ru:"Не замечу"},{e:'😆',uz:"Kulaman",ru:"Посмеюсь"},{e:'🏃',uz:"Ketaman",ru:"Уйду"}]},
-      {q:{uz:"Jamoada ishlaganda eng muhimi nima?",ru:"Что важнее всего при работе в команде?"},hint:{uz:"Eng muhimini tanla",ru:"Выбери главное"},
-       opts:[{e:'🤝',uz:"Bir-birini tinglash",ru:"Слушать друг друга",correct:true},{e:'👑',uz:"Boshliq bo'lish",ru:"Быть главным"},{e:'🤐',uz:"Jim turish",ru:"Молчать"},{e:'🏆',uz:"Faqat g'alaba",ru:"Только победа"}]},
-      {q:{uz:"Va'da berding, lekin bajara olmadingiz. Nima qilasiz?",ru:"Дал обещание, но не смог выполнить. Что сделаешь?"},hint:{uz:"To'g'risini tanla",ru:"Выбери честное"},
-       opts:[{e:'🙇',uz:"Kechirim so'rayman",ru:"Извинюсь",correct:true},{e:'🤥',uz:"Yashiraman",ru:"Скрою"},{e:'😶',uz:"Indamayman",ru:"Промолчу"},{e:'👉',uz:"Boshqani ayblayman",ru:"Обвиню другого"}]},
-      {q:{uz:"Yangi narsa o'rganish uchun eng zarur sifat?",ru:"Какое качество важнее для обучения новому?"},hint:{uz:"Tanla",ru:"Выбери"},
-       opts:[{e:'🔁',uz:"Sabr-toqat",ru:"Терпение",correct:true},{e:'⚡',uz:"Shoshqaloqlik",ru:"Спешка"},{e:'😴',uz:"Dangasalik",ru:"Лень"},{e:'😤',uz:"Jahl",ru:"Злость"}]},
-      {q:{uz:"Do'sting xato qildi. Qanday aytasan?",ru:"Друг ошибся. Как скажешь?"},hint:{uz:"Eng yaxshisini tanla",ru:"Выбери лучшее"},
-       opts:[{e:'💬',uz:"Yumshoq tushuntiraman",ru:"Мягко объясню",correct:true},{e:'📢',uz:"Hammaga aytaman",ru:"Скажу всем"},{e:'😡',uz:"Urishaman",ru:"Поругаю"},{e:'🤷',uz:"Ahamiyat bermayman",ru:"Промолчу"}]}
-    ]
-  },
-  {
-    skill:'soz', ic:'💬', bg:'linear-gradient(135deg,#22d3ee,#0891b2)', limit:55,
-    room:{uz:"Lingvist xonasi",ru:"Кабинет лингвиста"},
-    spec:{uz:"Til mutaxassisi",ru:"Специалист по языку"},
-    desc:{uz:"So'z boyligi va til mantig'ini tekshiramiz.",ru:"Проверяем словарный запас и логику языка."},
-    questions:[
-      {q:{uz:"\"Qush — ucha oladi\". \"Baliq — ?\"",ru:"\"Птица — летает\". \"Рыба — ?\""},hint:{uz:"Analogiyani davom ettir",ru:"Продолжи аналогию"},
-       opts:[{e:'🏊',uz:"Suzadi",ru:"Плавает",correct:true},{e:'🏃',uz:"Yuguradi",ru:"Бегает"},{e:'🦅',uz:"Uchadi",ru:"Летает"},{e:'🛌',uz:"Uxlaydi",ru:"Спит"}]},
-      {q:{uz:"Qaysi so'z ortiqcha?",ru:"Какое слово лишнее?"},hint:{uz:"5-chi ortiqcha",ru:"Пятое лишнее"},
-       opts:[{e:'🌹',uz:"Atirgul",ru:"Роза"},{e:'🌷',uz:"Lola",ru:"Тюльпан"},{e:'🌳',uz:"Daraxt",ru:"Дерево",correct:true},{e:'🌼',uz:"Romashka",ru:"Ромашка"}]},
-      {q:{uz:"\"Issiq\" so'zining sinonimi (o'xshashi)?",ru:"Синоним (близкое) слова \"горячий\"?"},hint:{uz:"O'xshashini tanla",ru:"Выбери близкое"},
-       opts:[{e:'🔥',uz:"Qaynoq",ru:"Жаркий",correct:true},{e:'❄️',uz:"Sovuq",ru:"Холодный"},{e:'💧',uz:"Nam",ru:"Влажный"},{e:'🌑',uz:"Qorong'i",ru:"Тёмный"}]},
-      {q:{uz:"\"Kitob\" : \"o'qish\" = \"qo'shiq\" : ?",ru:"\"Книга\" : \"читать\" = \"песня\" : ?"},hint:{uz:"Mantiqiy juftlik",ru:"Логичная пара"},
-       opts:[{e:'🎤',uz:"Aytish",ru:"Петь",correct:true},{e:'✍️',uz:"Yozish",ru:"Писать"},{e:'🏃',uz:"Yugurish",ru:"Бегать"},{e:'👀',uz:"Ko'rish",ru:"Смотреть"}]},
-      {q:{uz:"Qaysi so'z \"katta\"ning aksi?",ru:"Какое слово противоположно \"большой\"?"},hint:{uz:"Antonimni tanla",ru:"Выбери антоним"},
-       opts:[{e:'🐜',uz:"Kichik",ru:"Маленький",correct:true},{e:'🐘',uz:"Ulkan",ru:"Огромный"},{e:'📏',uz:"Uzun",ru:"Длинный"},{e:'⚖️',uz:"Og'ir",ru:"Тяжёлый"}]}
-    ]
-  },
-  {
-    skill:'aql', ic:'🧩', bg:'linear-gradient(135deg,#7c5cff,#5b3fd6)', limit:70,
-    room:{uz:"Mantiq xonasi",ru:"Кабинет логики"},
-    spec:{uz:"Mantiq mutaxassisi",ru:"Специалист по логике"},
-    desc:{uz:"Mantiqiy fikrlash va ketma-ketlikni sinaymiz.",ru:"Проверяем логику и последовательности."},
-    questions:[
-      {q:{uz:"2, 4, 6, 8, ... keyingisi?",ru:"2, 4, 6, 8, ... следующее?"},hint:{uz:"Qonuniyatni top",ru:"Найди закономерность"},
-       opts:[{e:'🔟',uz:"10",ru:"10",correct:true},{e:'9️⃣',uz:"9",ru:"9"},{e:'7️⃣',uz:"7",ru:"7"},{e:'1️⃣2️⃣',uz:"12",ru:"12"}]},
-      {q:{uz:"Hamma mushuklar — hayvon. Mosi — mushuk. Mosi — ?",ru:"Все кошки — животные. Мося — кошка. Мося — ?"},hint:{uz:"Mantiqiy xulosa",ru:"Логичный вывод"},
-       opts:[{e:'🐾',uz:"Hayvon",ru:"Животное",correct:true},{e:'🌱',uz:"O'simlik",ru:"Растение"},{e:'🪨',uz:"Tosh",ru:"Камень"},{e:'🐟',uz:"Baliq",ru:"Рыба"}]},
-      {q:{uz:"5 + 7 = ?",ru:"5 + 7 = ?"},hint:{uz:"Hisobla",ru:"Посчитай"},
-       opts:[{e:'1️⃣2️⃣',uz:"12",ru:"12",correct:true},{e:'1️⃣1️⃣',uz:"11",ru:"11"},{e:'1️⃣3️⃣',uz:"13",ru:"13"},{e:'1️⃣0️⃣',uz:"10",ru:"10"}]},
-      {q:{uz:"🔺🔵🔺🔵🔺... keyingisi?",ru:"🔺🔵🔺🔵🔺... следующее?"},hint:{uz:"Naqshni davom ettir",ru:"Продолжи узор"},
-       opts:[{e:'🔵',uz:"Doira",ru:"Круг",correct:true},{e:'🔺',uz:"Uchburchak",ru:"Треугольник"},{e:'⬛',uz:"Kvadrat",ru:"Квадрат"},{e:'⭐',uz:"Yulduz",ru:"Звезда"}]},
-      {q:{uz:"Agar bugun seshanba bo'lsa, ertaga qaysi kun?",ru:"Если сегодня вторник, какой день завтра?"},hint:{uz:"O'ylab top",ru:"Подумай"},
-       opts:[{e:'📅',uz:"Chorshanba",ru:"Среда",correct:true},{e:'📆',uz:"Dushanba",ru:"Понедельник"},{e:'🗓️',uz:"Juma",ru:"Пятница"},{e:'📋',uz:"Yakshanba",ru:"Воскресенье"}]}
-    ]
-  },
-  {
-    skill:'xotira', ic:'🧠', bg:'linear-gradient(135deg,#34d399,#059669)', limit:50,
-    room:{uz:"Xotira xonasi",ru:"Кабинет памяти"},
-    spec:{uz:"Neyropsixolog",ru:"Нейропсихолог"},
-    desc:{uz:"Xotira hajmi va diqqatni tekshiramiz.",ru:"Проверяем объём памяти и внимание."},
-    questions:[
-      {type:'memory', q:{uz:"Eslab qol!",ru:"Запомни!"},hint:{uz:"4 ta rasm, 3 soniya",ru:"4 картинки, 3 секунды"},
-       cards:['🍎','🚲','🎸','🌙'], options:[{e:'🍎',correct:true},{e:'🚗',correct:false},{e:'🎸',correct:true},{e:'⭐',correct:false},{e:'🚲',correct:true},{e:'🌙',correct:true}]},
-      {type:'memory', q:{uz:"Yana eslab qol!",ru:"Запомни ещё!"},hint:{uz:"5 ta rasm, diqqat!",ru:"5 картинок, внимание!"},
-       cards:['🐱','📚','⚽','🎈','🍓'], options:[{e:'🐱',correct:true},{e:'📚',correct:true},{e:'🚀',correct:false},{e:'⚽',correct:true},{e:'🎈',correct:true},{e:'🍓',correct:true}]},
-      {q:{uz:"Hafta nechta kundan iborat?",ru:"Сколько дней в неделе?"},hint:{uz:"Eslab tanla",ru:"Вспомни"},
-       opts:[{e:'7️⃣',uz:"7",ru:"7",correct:true},{e:'5️⃣',uz:"5",ru:"5"},{e:'1️⃣0️⃣',uz:"10",ru:"10"},{e:'1️⃣2️⃣',uz:"12",ru:"12"}]},
-      {q:{uz:"Yilda nechta fasl bor?",ru:"Сколько времён года?"},hint:{uz:"Eslab tanla",ru:"Вспомни"},
-       opts:[{e:'4️⃣',uz:"4",ru:"4",correct:true},{e:'3️⃣',uz:"3",ru:"3"},{e:'5️⃣',uz:"5",ru:"5"},{e:'2️⃣',uz:"2",ru:"2"}]}
-    ]
-  },
-  {
-    skill:'fantaziya', ic:'🎨', bg:'linear-gradient(135deg,#fbbf24,#f59e0b)', limit:0,
-    room:{uz:"Ijod studiyasi",ru:"Студия творчества"},
-    spec:{uz:"Ijod ustasi",ru:"Мастер творчества"},
-    desc:{uz:"Vaqt yo'q — ijodiy fikrlashni ko'rsat!",ru:"Времени нет — покажи креативность!"},
-    questions:[
-      {q:{uz:"G'isht bilan nima qilish mumkin (g'ishtdan tashqari)?",ru:"Что можно сделать кирпичом (кроме стройки)?"},hint:{uz:"Ijodiy o'yla!",ru:"Думай креативно!"},creative:true,
-       opts:[{e:'🚪',uz:"Eshik ushlagich",ru:"Подпорка двери"},{e:'⚖️',uz:"Tarozi tosh",ru:"Гиря"},{e:'🎨',uz:"Bo'yoq",ru:"Краска"},{e:'🪑',uz:"Kursi",ru:"Стул"}]},
-      {q:{uz:"Yangi sayyora kashf qilsang, qanday nomlaysiz?",ru:"Если откроешь планету, как назовёшь?"},hint:{uz:"O'zing tanla!",ru:"Выбери сам!"},creative:true,
-       opts:[{e:'🌟',uz:"Yulduzcha",ru:"Звёздочка"},{e:'🌈',uz:"Kamalak",ru:"Радуга"},{e:'💎',uz:"Olmos",ru:"Алмаз"},{e:'🔮',uz:"Sirli",ru:"Загадка"}]},
-      {q:{uz:"Hayvonlar gapira olsa, kim eng qiziq bo'lardi?",ru:"Если бы животные говорили, кто был бы интереснее?"},hint:{uz:"Fantaziya!",ru:"Фантазируй!"},creative:true,
-       opts:[{e:'🦉',uz:"Boyqush",ru:"Сова"},{e:'🐬',uz:"Delfin",ru:"Дельфин"},{e:'🐈',uz:"Mushuk",ru:"Кошка"},{e:'🦜',uz:"To'tiqush",ru:"Попугай"}]},
-      {q:{uz:"Vaqt mashinasi bilan qayerga borasan?",ru:"На машине времени куда отправишься?"},hint:{uz:"O'zing tanla!",ru:"Выбери сам!"},creative:true,
-       opts:[{e:'🦕',uz:"Dinozavrlar davri",ru:"Эпоха динозавров"},{e:'🏰',uz:"O'rta asrlar",ru:"Средневековье"},{e:'🚀',uz:"Kelajak",ru:"Будущее"},{e:'🏛️',uz:"Qadimgi davr",ru:"Древность"}]}
-    ]
-  }
-];
-
-// ═══ CABINETS for classes 6-8 (harder: abstract reasoning, deeper analogies) ═══
-const DC_CABINETS_6_8=[
-  {
-    skill:'yurak', ic:'🧠', bg:'linear-gradient(135deg,#fb7185,#e11d48)', limit:45,
-    room:{uz:"Psixolog xonasi",ru:"Кабинет психолога"},
-    spec:{uz:"O'spirin psixologi",ru:"Психолог подростков"},
-    desc:{uz:"Hissiy yetuklik va o'zini boshqarishni baholaymiz.",ru:"Оцениваем эмоциональную зрелость и самоконтроль."},
-    questions:[
-      {q:{uz:"Imtihondan past baho olding. Eng foydali reaksiya?",ru:"Получил низкую оценку на экзамене. Самая полезная реакция?"},hint:{uz:"Yetuk yondashuv",ru:"Зрелый подход"},
-       opts:[{e:'📈',uz:"Xatolarni tahlil qilaman",ru:"Разберу ошибки",correct:true},{e:'😭',uz:"Tushkunlikka tushaman",ru:"Впаду в уныние"},{e:'😤',uz:"O'qituvchini ayblayman",ru:"Обвиню учителя"},{e:'🤷',uz:"Tashlab qo'yaman",ru:"Заброшу"}]},
-      {q:{uz:"Do'sting bilan kelishmovchilik. Eng to'g'ri yo'l?",ru:"Конфликт с другом. Самый верный путь?"},hint:{uz:"Yetuk tanlov",ru:"Зрелый выбор"},
-       opts:[{e:'💬',uz:"Ochiq suhbatlashaman",ru:"Открыто поговорю",correct:true},{e:'🔇',uz:"Gaplashmayman",ru:"Перестану общаться"},{e:'📱',uz:"Boshqalarga aytaman",ru:"Расскажу другим"},{e:'😡',uz:"Janjallashaman",ru:"Поругаюсь"}]},
-      {q:{uz:"Katta maqsadga erishish uchun eng muhimi?",ru:"Что важнее всего для большой цели?"},hint:{uz:"Tanla",ru:"Выбери"},
-       opts:[{e:'🎯',uz:"Izchillik va reja",ru:"Последовательность и план",correct:true},{e:'🍀',uz:"Faqat omad",ru:"Только удача"},{e:'⚡',uz:"Tezlik",ru:"Скорость"},{e:'💰',uz:"Faqat pul",ru:"Только деньги"}]},
-      {q:{uz:"Stress holatida o'zingni qanday tutasiz?",ru:"Как ведёшь себя в стрессе?"},hint:{uz:"Eng sog'lom usul",ru:"Самый здоровый способ"},
-       opts:[{e:'🧘',uz:"Tinchlanib o'ylayman",ru:"Успокоюсь и подумаю",correct:true},{e:'😱',uz:"Vahimaga tushaman",ru:"Паникую"},{e:'🏃',uz:"Qochaman",ru:"Убегаю"},{e:'💥',uz:"Portlab ketaman",ru:"Взрываюсь"}]},
-      {q:{uz:"Jamoaga rahbarlik qilganda asosiy fazilat?",ru:"Главное качество лидера команды?"},hint:{uz:"Tanla",ru:"Выбери"},
-       opts:[{e:'👂',uz:"Tinglash va qo'llab-quvvatlash",ru:"Слушать и поддерживать",correct:true},{e:'📢',uz:"Buyruq berish",ru:"Командовать"},{e:'🏆',uz:"O'zini ko'rsatish",ru:"Себя показывать"},{e:'🤐',uz:"Hech narsa demaslik",ru:"Молчать"}]}
-    ]
-  },
-  {
-    skill:'soz', ic:'💬', bg:'linear-gradient(135deg,#22d3ee,#0891b2)', limit:50,
-    room:{uz:"Lingvist xonasi",ru:"Кабинет лингвиста"},
-    spec:{uz:"Filolog",ru:"Филолог"},
-    desc:{uz:"Murakkab til mantig'i va so'z boyligi.",ru:"Сложная логика языка и словарный запас."},
-    questions:[
-      {q:{uz:"\"Shifokor\" : \"kasalxona\" = \"o'qituvchi\" : ?",ru:"\"Врач\" : \"больница\" = \"учитель\" : ?"},hint:{uz:"Mantiqiy juftlik",ru:"Логичная пара"},
-       opts:[{e:'🏫',uz:"Maktab",ru:"Школа",correct:true},{e:'🏠',uz:"Uy",ru:"Дом"},{e:'🏪',uz:"Do'kon",ru:"Магазин"},{e:'🏥',uz:"Kasalxona",ru:"Больница"}]},
-      {q:{uz:"Qaysi so'z ma'no jihatdan ortiqcha?",ru:"Какое слово лишнее по смыслу?"},hint:{uz:"Mantiqan ortiqcha",ru:"Логически лишнее"},
-       opts:[{e:'😊',uz:"Quvonch",ru:"Радость"},{e:'😢',uz:"G'am",ru:"Грусть"},{e:'😠',uz:"G'azab",ru:"Гнев"},{e:'🪑',uz:"Stul",ru:"Стул",correct:true}]},
-      {q:{uz:"\"Boshlanish\"ning antonimi?",ru:"Антоним слова \"начало\"?"},hint:{uz:"Aksini tanla",ru:"Выбери противоположное"},
-       opts:[{e:'🏁',uz:"Yakun",ru:"Конец",correct:true},{e:'▶️',uz:"Davom",ru:"Продолжение"},{e:'🔄',uz:"Takror",ru:"Повтор"},{e:'⏸️',uz:"To'xtash",ru:"Пауза"}]},
-      {q:{uz:"\"Suv\" : \"daryo\" = \"qum\" : ?",ru:"\"Вода\" : \"река\" = \"песок\" : ?"},hint:{uz:"Analogiyani top",ru:"Найди аналогию"},
-       opts:[{e:'🏜️',uz:"Cho'l",ru:"Пустыня",correct:true},{e:'🌊',uz:"Dengiz",ru:"Море"},{e:'⛰️',uz:"Tog'",ru:"Гора"},{e:'🌳',uz:"O'rmon",ru:"Лес"}]},
-      {q:{uz:"\"Kamtarin\" so'zi nimani anglatadi?",ru:"Что означает слово \"скромный\"?"},hint:{uz:"Ma'nosini tanla",ru:"Выбери значение"},
-       opts:[{e:'🙏',uz:"Maqtanmaydigan",ru:"Не хвастливый",correct:true},{e:'💪',uz:"Kuchli",ru:"Сильный"},{e:'😎',uz:"Dadil",ru:"Уверенный"},{e:'🤑',uz:"Boy",ru:"Богатый"}]}
-    ]
-  },
-  {
-    skill:'aql', ic:'🧩', bg:'linear-gradient(135deg,#7c5cff,#5b3fd6)', limit:65,
-    room:{uz:"Mantiq xonasi",ru:"Кабинет логики"},
-    spec:{uz:"Analitik",ru:"Аналитик"},
-    desc:{uz:"Abstrakt fikrlash va murakkab masalalar.",ru:"Абстрактное мышление и сложные задачи."},
-    questions:[
-      {q:{uz:"1, 1, 2, 3, 5, 8, ... keyingisi?",ru:"1, 1, 2, 3, 5, 8, ... следующее?"},hint:{uz:"Fibonachchi qonuniyati",ru:"Закономерность Фибоначчи"},
-       opts:[{e:'1️⃣3️⃣',uz:"13",ru:"13",correct:true},{e:'1️⃣0️⃣',uz:"10",ru:"10"},{e:'1️⃣1️⃣',uz:"11",ru:"11"},{e:'1️⃣6️⃣',uz:"16",ru:"16"}]},
-      {q:{uz:"Agar A>B va B>C bo'lsa, A va C qanday?",ru:"Если A>B и B>C, то A и C как соотносятся?"},hint:{uz:"Mantiqiy xulosa",ru:"Логический вывод"},
-       opts:[{e:'🔼',uz:"A>C",ru:"A>C",correct:true},{e:'🔽',uz:"A<C",ru:"A<C"},{e:'🟰',uz:"A=C",ru:"A=C"},{e:'❓',uz:"Noma'lum",ru:"Неизвестно"}]},
-      {q:{uz:"15 ning yarmi + 3 = ?",ru:"Половина 15 + 3 = ?"},hint:{uz:"Bosqichma-bosqich hisobla",ru:"Считай поэтапно"},
-       opts:[{e:'🔟',uz:"10.5",ru:"10.5",correct:true},{e:'9️⃣',uz:"9",ru:"9"},{e:'1️⃣2️⃣',uz:"12",ru:"12"},{e:'8️⃣',uz:"8",ru:"8"}]},
-      {q:{uz:"Hamma gullar — o'simlik. Ba'zi o'simliklar — daraxt. Demak:",ru:"Все цветы — растения. Некоторые растения — деревья. Значит:"},hint:{uz:"To'g'ri xulosani tanla",ru:"Выбери верный вывод"},
-       opts:[{e:'✅',uz:"Ba'zi gullar daraxt bo'lishi shart emas",ru:"Не все цветы — деревья",correct:true},{e:'🌳',uz:"Hamma gullar daraxt",ru:"Все цветы — деревья"},{e:'🚫',uz:"Gullar o'simlik emas",ru:"Цветы не растения"},{e:'❓',uz:"Daraxtlar gul",ru:"Деревья — цветы"}]},
-      {q:{uz:"Soat 14:45 da. 2 soat 30 daqiqadan keyin?",ru:"Сейчас 14:45. Через 2 часа 30 минут?"},hint:{uz:"Vaqtni hisobla",ru:"Посчитай время"},
-       opts:[{e:'🕔',uz:"17:15",ru:"17:15",correct:true},{e:'🕓',uz:"16:15",ru:"16:15"},{e:'🕖',uz:"18:15",ru:"18:15"},{e:'🕒',uz:"15:15",ru:"15:15"}]}
-    ]
-  },
-  {
-    skill:'xotira', ic:'🧠', bg:'linear-gradient(135deg,#34d399,#059669)', limit:45,
-    room:{uz:"Xotira xonasi",ru:"Кабинет памяти"},
-    spec:{uz:"Kognitiv mutaxassis",ru:"Когнитивный специалист"},
-    desc:{uz:"Ishchi xotira va konsentratsiyani sinaymiz.",ru:"Проверяем рабочую память и концентрацию."},
-    questions:[
-      {type:'memory', q:{uz:"Eslab qol!",ru:"Запомни!"},hint:{uz:"5 ta belgi, 3 soniya",ru:"5 символов, 3 секунды"},
-       cards:['🔑','📕','🎲','🧭','🔔'], options:[{e:'🔑',correct:true},{e:'📗',correct:false},{e:'🎲',correct:true},{e:'🧭',correct:true},{e:'🔕',correct:false},{e:'📕',correct:true},{e:'🔔',correct:true}]},
-      {type:'memory', q:{uz:"Yana eslab qol!",ru:"Запомни ещё!"},hint:{uz:"6 ta belgi, diqqat!",ru:"6 символов, внимание!"},
-       cards:['⚙️','🎯','🧲','📡','🔬','🛸'], options:[{e:'⚙️',correct:true},{e:'🎯',correct:true},{e:'🧲',correct:true},{e:'🎰',correct:false},{e:'📡',correct:true},{e:'🔬',correct:true},{e:'🛸',correct:true}]},
-      {q:{uz:"Bir yilda nechta oy 31 kundan iborat?",ru:"Сколько месяцев в году по 31 дню?"},hint:{uz:"Eslab hisobla",ru:"Вспомни и посчитай"},
-       opts:[{e:'7️⃣',uz:"7",ru:"7",correct:true},{e:'6️⃣',uz:"6",ru:"6"},{e:'5️⃣',uz:"5",ru:"5"},{e:'8️⃣',uz:"8",ru:"8"}]},
-      {q:{uz:"Quyosh tizimida nechta sayyora bor?",ru:"Сколько планет в Солнечной системе?"},hint:{uz:"Eslab tanla",ru:"Вспомни"},
-       opts:[{e:'8️⃣',uz:"8",ru:"8",correct:true},{e:'9️⃣',uz:"9",ru:"9"},{e:'7️⃣',uz:"7",ru:"7"},{e:'🔟',uz:"10",ru:"10"}]}
-    ]
-  },
-  {
-    skill:'fantaziya', ic:'🎨', bg:'linear-gradient(135deg,#fbbf24,#f59e0b)', limit:0,
-    room:{uz:"Ijod laboratoriyasi",ru:"Лаборатория творчества"},
-    spec:{uz:"Innovator",ru:"Новатор"},
-    desc:{uz:"Vaqt yo'q — noan'anaviy g'oyalarni ko'rsat!",ru:"Времени нет — покажи нестандартные идеи!"},
-    questions:[
-      {q:{uz:"Kelajak maktabi qanday bo'lishi kerak?",ru:"Какой должна быть школа будущего?"},hint:{uz:"O'z g'oyangni tanla!",ru:"Выбери свою идею!"},creative:true,
-       opts:[{e:'🤖',uz:"AI o'qituvchilar",ru:"AI-учителя"},{e:'🌐',uz:"Virtual sinflar",ru:"Виртуальные классы"},{e:'🎮',uz:"O'yin orqali",ru:"Через игры"},{e:'🚀',uz:"Kosmosda",ru:"В космосе"}]},
-      {q:{uz:"Dunyodagi bitta muammoni hal qilsang, qaysi?",ru:"Какую мировую проблему решил бы?"},hint:{uz:"O'zing tanla!",ru:"Выбери сам!"},creative:true,
-       opts:[{e:'🌍',uz:"Ekologiya",ru:"Экология"},{e:'🍞',uz:"Ochlik",ru:"Голод"},{e:'💊',uz:"Kasalliklar",ru:"Болезни"},{e:'📚',uz:"Ta'lim",ru:"Образование"}]},
-      {q:{uz:"O'z ixtironi yaratsang, nima bo'lardi?",ru:"Что бы ты изобрёл?"},hint:{uz:"Fantaziya!",ru:"Фантазируй!"},creative:true,
-       opts:[{e:'🛸',uz:"Uchar mashina",ru:"Летающая машина"},{e:'🧬',uz:"Davo vositasi",ru:"Лекарство"},{e:'🔋',uz:"Cheksiz energiya",ru:"Бесконечная энергия"},{e:'🤖',uz:"Aqlli robot",ru:"Умный робот"}]},
-      {q:{uz:"Bir kunga ko'rinmas bo'lsang, nima qilasan?",ru:"Стал бы невидимым на день — что сделал бы?"},hint:{uz:"O'zing tanla!",ru:"Выбери сам!"},creative:true,
-       opts:[{e:'🔍',uz:"Sirlarni bilaman",ru:"Узнаю секреты"},{e:'🦸',uz:"Yordam beraman",ru:"Помогаю людям"},{e:'🌎',uz:"Sayohat qilaman",ru:"Путешествую"},{e:'🎭',uz:"Hazillashaman",ru:"Шучу"}]}
-    ]
-  }
-];
-
-// ═══ CABINETS for classes 9-11 (hardest: Gardner profession orientation, abstract logic) ═══
-const DC_CABINETS_9_11=[
-  {
-    skill:'yurak', ic:'🧠', bg:'linear-gradient(135deg,#fb7185,#e11d48)', limit:45,
-    room:{uz:"Psixolog xonasi",ru:"Кабинет психолога"},
-    spec:{uz:"Proforientatsiya psixologi",ru:"Психолог-профориентолог"},
-    desc:{uz:"Shaxsiyat va kasbga moyillikni aniqlaymiz.",ru:"Определяем личность и склонность к профессии."},
-    questions:[
-      {q:{uz:"Loyihada eng qiziqarli rol qaysi?",ru:"Какая роль в проекте интереснее?"},hint:{uz:"O'zingnikini tanla",ru:"Выбери свою"},
-       opts:[{e:'🧠',uz:"G'oya o'ylab topish",ru:"Придумывать идеи"},{e:'📊',uz:"Tahlil qilish",ru:"Анализировать"},{e:'🤝',uz:"Odamlar bilan ishlash",ru:"Работать с людьми"},{e:'🔧',uz:"Amalga oshirish",ru:"Реализовывать"}]},
-      {q:{uz:"Qiyin qaror oldida nimaga tayanasiz?",ru:"На что опираешься в трудном решении?"},hint:{uz:"Tanla",ru:"Выбери"},
-       opts:[{e:'🧮',uz:"Mantiq va faktlar",ru:"Логика и факты"},{e:'❤️',uz:"His-tuyg'u",ru:"Чувства"},{e:'👥',uz:"Boshqalar fikri",ru:"Мнение других"},{e:'⚖️',uz:"Hammasini tarozida",ru:"Всё взвешиваю"}]},
-      {q:{uz:"Muvaffaqiyat sen uchun nima?",ru:"Что для тебя успех?"},hint:{uz:"O'z qadriyatingni tanla",ru:"Выбери свою ценность"},
-       opts:[{e:'🎯',uz:"Maqsadga yetish",ru:"Достичь цели"},{e:'🌟',uz:"O'zini namoyon qilish",ru:"Самореализация"},{e:'🤲',uz:"Foyda keltirish",ru:"Приносить пользу"},{e:'📈',uz:"Doimiy o'sish",ru:"Постоянный рост"}]},
-      {q:{uz:"Jamoada ziddiyat. Sening roling?",ru:"Конфликт в команде. Твоя роль?"},hint:{uz:"Tabiiy yo'lni tanla",ru:"Выбери естественный путь"},
-       opts:[{e:'🕊️',uz:"Murosaga keltiraman",ru:"Примиряю",correct:true},{e:'🧭',uz:"Yo'l ko'rsataman",ru:"Указываю путь"},{e:'👂',uz:"Tinglayman",ru:"Выслушиваю"},{e:'💡',uz:"Yechim taklif qilaman",ru:"Предлагаю решение"}]},
-      {q:{uz:"Eng qadrli mukofot qaysi?",ru:"Какая награда ценнее?"},hint:{uz:"O'zingnikini tanla",ru:"Выбери свою"},
-       opts:[{e:'🏆',uz:"Tan olinish",ru:"Признание"},{e:'💰',uz:"Moddiy",ru:"Материальная"},{e:'😊',uz:"Ichki qoniqish",ru:"Внутреннее удовлетворение"},{e:'🌍',uz:"Ta'sir o'tkazish",ru:"Влияние на мир"}]}
-    ]
-  },
-  {
-    skill:'soz', ic:'💬', bg:'linear-gradient(135deg,#22d3ee,#0891b2)', limit:50,
-    room:{uz:"Til va kommunikatsiya",ru:"Язык и коммуникация"},
-    spec:{uz:"Lingvist-ekspert",ru:"Лингвист-эксперт"},
-    desc:{uz:"Yuqori darajadagi til va mantiq.",ru:"Язык и логика высокого уровня."},
-    questions:[
-      {q:{uz:"\"Optimist\" so'zining ma'nosi?",ru:"Значение слова \"оптимист\"?"},hint:{uz:"To'g'ri ta'rifni tanla",ru:"Выбери определение"},
-       opts:[{e:'😊',uz:"Yaxshilikka ishonuvchi",ru:"Верящий в лучшее",correct:true},{e:'😞',uz:"Tushkun",ru:"Унылый"},{e:'😐',uz:"Befarq",ru:"Безразличный"},{e:'🤔',uz:"Shubhali",ru:"Сомневающийся"}]},
-      {q:{uz:"\"Muallif\" : \"kitob\" = \"bastakor\" : ?",ru:"\"Автор\" : \"книга\" = \"композитор\" : ?"},hint:{uz:"Murakkab analogiya",ru:"Сложная аналогия"},
-       opts:[{e:'🎵',uz:"Musiqa",ru:"Музыка",correct:true},{e:'🎨',uz:"Rasm",ru:"Картина"},{e:'🎬',uz:"Film",ru:"Фильм"},{e:'📖',uz:"Kitob",ru:"Книга"}]},
-      {q:{uz:"Qaysi tushuncha boshqalarini o'z ichiga oladi?",ru:"Какое понятие включает остальные?"},hint:{uz:"Eng umumiyni tanla",ru:"Выбери общее"},
-       opts:[{e:'🎨',uz:"San'at",ru:"Искусство",correct:true},{e:'🎵',uz:"Musiqa",ru:"Музыка"},{e:'🖼️',uz:"Rassomlik",ru:"Живопись"},{e:'💃',uz:"Raqs",ru:"Танец"}]},
-      {q:{uz:"\"Hamma jim bo'ldi\" — bu qanday gap?",ru:"\"Все замолчали\" — какое это предложение?"},hint:{uz:"Grammatik tahlil",ru:"Грамматический разбор"},
-       opts:[{e:'📝',uz:"Darak gap",ru:"Повествовательное",correct:true},{e:'❓',uz:"So'roq gap",ru:"Вопросительное"},{e:'❗',uz:"Undov gap",ru:"Восклицательное"},{e:'🔀',uz:"Buyruq gap",ru:"Побудительное"}]},
-      {q:{uz:"\"Mas'uliyat\" so'zi nimani bildiradi?",ru:"Что означает \"ответственность\"?"},hint:{uz:"To'g'ri ma'noni tanla",ru:"Выбери значение"},
-       opts:[{e:'🎯',uz:"Javobgarlikni his qilish",ru:"Чувство долга и отчётности",correct:true},{e:'💪',uz:"Kuch",ru:"Сила"},{e:'🏃',uz:"Tezlik",ru:"Скорость"},{e:'😎',uz:"Ishonch",ru:"Уверенность"}]}
-    ]
-  },
-  {
-    skill:'aql', ic:'🧩', bg:'linear-gradient(135deg,#7c5cff,#5b3fd6)', limit:65,
-    room:{uz:"Analitik markaz",ru:"Аналитический центр"},
-    spec:{uz:"Bosh analitik",ru:"Главный аналитик"},
-    desc:{uz:"Eng murakkab mantiqiy masalalar.",ru:"Самые сложные логические задачи."},
-    questions:[
-      {q:{uz:"2, 6, 12, 20, 30, ... keyingisi?",ru:"2, 6, 12, 20, 30, ... следующее?"},hint:{uz:"Farqlar qonuniyati (+4,+6,+8,+10)",ru:"Закономерность разностей (+4,+6,+8,+10)"},
-       opts:[{e:'4️⃣2️⃣',uz:"42",ru:"42",correct:true},{e:'4️⃣0️⃣',uz:"40",ru:"40"},{e:'3️⃣6️⃣',uz:"36",ru:"36"},{e:'4️⃣4️⃣',uz:"44",ru:"44"}]},
-      {q:{uz:"Poyezd 60 km/soat. 150 km masofani necha soatda bosadi?",ru:"Поезд 60 км/ч. За сколько часов пройдёт 150 км?"},hint:{uz:"Masofa / tezlik",ru:"Расстояние / скорость"},
-       opts:[{e:'⏱️',uz:"2.5 soat",ru:"2.5 часа",correct:true},{e:'⏰',uz:"2 soat",ru:"2 часа"},{e:'🕐',uz:"3 soat",ru:"3 часа"},{e:'⌚',uz:"1.5 soat",ru:"1.5 часа"}]},
-      {q:{uz:"Agar barcha A — B, va hech bir B — C bo'lsa:",ru:"Если все A — B, и ни один B — C, то:"},hint:{uz:"Sillogizm",ru:"Силлогизм"},
-       opts:[{e:'🚫',uz:"Hech bir A — C emas",ru:"Ни один A не C",correct:true},{e:'✅',uz:"Barcha A — C",ru:"Все A — C"},{e:'🤏',uz:"Ba'zi A — C",ru:"Некоторые A — C"},{e:'❓',uz:"Aniqlab bo'lmaydi",ru:"Нельзя определить"}]},
-      {q:{uz:"5 ta ishchi 5 soatda 5 ta detal yasaydi. 100 ta ishchi 100 ta detalni necha soatda?",ru:"5 рабочих за 5 часов делают 5 деталей. 100 рабочих 100 деталей за сколько часов?"},hint:{uz:"Diqqat — tuzoq!",ru:"Внимание — ловушка!"},
-       opts:[{e:'5️⃣',uz:"5 soat",ru:"5 часов",correct:true},{e:'💯',uz:"100 soat",ru:"100 часов"},{e:'1️⃣',uz:"1 soat",ru:"1 час"},{e:'2️⃣0️⃣',uz:"20 soat",ru:"20 часов"}]},
-      {q:{uz:"Kubning nechta qirrasi bor?",ru:"Сколько рёбер у куба?"},hint:{uz:"Fazoviy tasavvur",ru:"Пространственное мышление"},
-       opts:[{e:'1️⃣2️⃣',uz:"12",ru:"12",correct:true},{e:'8️⃣',uz:"8",ru:"8"},{e:'6️⃣',uz:"6",ru:"6"},{e:'2️⃣4️⃣',uz:"24",ru:"24"}]}
-    ]
-  },
-  {
-    skill:'xotira', ic:'🧠', bg:'linear-gradient(135deg,#34d399,#059669)', limit:40,
-    room:{uz:"Kognitiv markaz",ru:"Когнитивный центр"},
-    spec:{uz:"Neyrokognitiv ekspert",ru:"Нейрокогнитивный эксперт"},
-    desc:{uz:"Murakkab ishchi xotira sinovi.",ru:"Тест сложной рабочей памяти."},
-    questions:[
-      {type:'memory', q:{uz:"Eslab qol!",ru:"Запомни!"},hint:{uz:"6 ta belgi, 3 soniya",ru:"6 символов, 3 секунды"},
-       cards:['🔱','⚛️','♻️','🎴','🧿','📿'], options:[{e:'🔱',correct:true},{e:'⚛️',correct:true},{e:'☯️',correct:false},{e:'♻️',correct:true},{e:'🎴',correct:true},{e:'🔰',correct:false},{e:'🧿',correct:true},{e:'📿',correct:true}]},
-      {type:'memory', q:{uz:"Tartibni eslab qol!",ru:"Запомни порядок!"},hint:{uz:"7 ta belgi, diqqat!",ru:"7 символов, внимание!"},
-       cards:['🎼','⚗️','🔭','🧬','🛰️','⚖️'], options:[{e:'🎼',correct:true},{e:'⚗️',correct:true},{e:'🔭',correct:true},{e:'🧪',correct:false},{e:'🧬',correct:true},{e:'🛰️',correct:true},{e:'⚖️',correct:true}]},
-      {q:{uz:"Inson tanasida nechta suyak bor (taxminan)?",ru:"Сколько костей в теле человека (примерно)?"},hint:{uz:"Bilimni eslab",ru:"Вспомни знание"},
-       opts:[{e:'2️⃣0️⃣6️⃣',uz:"206",ru:"206",correct:true},{e:'1️⃣0️⃣0️⃣',uz:"100",ru:"100"},{e:'3️⃣0️⃣0️⃣',uz:"300",ru:"300"},{e:'5️⃣0️⃣',uz:"50",ru:"50"}]},
-      {q:{uz:"Bir hafta = necha soat?",ru:"Неделя = сколько часов?"},hint:{uz:"7 × 24 ni hisobla",ru:"Посчитай 7 × 24"},
-       opts:[{e:'1️⃣6️⃣8️⃣',uz:"168",ru:"168",correct:true},{e:'1️⃣4️⃣0️⃣',uz:"140",ru:"140"},{e:'1️⃣9️⃣2️⃣',uz:"192",ru:"192"},{e:'2️⃣4️⃣0️⃣',uz:"240",ru:"240"}]}
-    ]
-  },
-  {
-    skill:'fantaziya', ic:'🎨', bg:'linear-gradient(135deg,#fbbf24,#f59e0b)', limit:0,
-    room:{uz:"Innovatsiya markazi",ru:"Центр инноваций"},
-    spec:{uz:"Strateg-vizioner",ru:"Стратег-визионер"},
-    desc:{uz:"Vaqt yo'q — strategik va ijodiy fikrla!",ru:"Времени нет — мысли стратегически и креативно!"},
-    questions:[
-      {q:{uz:"O'z biznesingni ochsang, qaysi sohada?",ru:"Открыл бы свой бизнес — в какой сфере?"},hint:{uz:"O'z yo'nalishingni tanla!",ru:"Выбери своё направление!"},creative:true,
-       opts:[{e:'💻',uz:"Texnologiya",ru:"Технологии"},{e:'🎨',uz:"Ijod/dizayn",ru:"Творчество/дизайн"},{e:'🏥',uz:"Sog'liq",ru:"Здоровье"},{e:'📚',uz:"Ta'lim",ru:"Образование"}]},
-      {q:{uz:"10 yildan keyin o'zingni qanday ko'rasiz?",ru:"Каким видишь себя через 10 лет?"},hint:{uz:"O'z orzungni tanla!",ru:"Выбери свою мечту!"},creative:true,
-       opts:[{e:'🔬',uz:"Olim/ekspert",ru:"Учёный/эксперт"},{e:'🚀',uz:"Tadbirkor",ru:"Предприниматель"},{e:'🎭',uz:"Ijodkor",ru:"Творец"},{e:'🌍',uz:"Yetakchi",ru:"Лидер"}]},
-      {q:{uz:"Insoniyat uchun eng muhim ixtiro qaysi bo'lardi?",ru:"Какое изобретение важнее для человечества?"},hint:{uz:"O'z fikringni tanla!",ru:"Выбери своё мнение!"},creative:true,
-       opts:[{e:'🔋',uz:"Toza energiya",ru:"Чистая энергия"},{e:'🧬',uz:"Kasallik davosi",ru:"Лечение болезней"},{e:'🤖',uz:"Sun'iy intellekt",ru:"Искусственный интеллект"},{e:'🌱',uz:"Ekologik yechim",ru:"Эко-решение"}]},
-      {q:{uz:"Cheksiz resurs bo'lsa, dunyoda nimani o'zgartirasiz?",ru:"При бесконечных ресурсах что изменил бы в мире?"},hint:{uz:"O'z vizioningni tanla!",ru:"Выбери своё видение!"},creative:true,
-       opts:[{e:'📖',uz:"Hammaga ta'lim",ru:"Образование для всех"},{e:'🏠',uz:"Hammaga uy",ru:"Жильё для всех"},{e:'🌳',uz:"Tabiatni tiklash",ru:"Восстановить природу"},{e:'☮️',uz:"Tinchlik",ru:"Мир во всём мире"}]}
-    ]
-  }
-];
-
-// pick cabinet set by class (graded difficulty)
-function dcCabinetsForClass(cls){
-  if(cls<=2) return DC_CABINETS_1_2;
-  if(cls<=5) return DC_CABINETS_3_5;
-  if(cls<=8) return DC_CABINETS_6_8;
-  return DC_CABINETS_9_11;
-}
-
-let _dc=null; // diagnostic center state
-
-function loadDiagnostika(){
-  window._dcActive=true; // ⛔ pause auto-lock while in the diagnostic test
-  if(_pinLockTimer){clearTimeout(_pinLockTimer);_pinLockTimer=null;}
-  document.getElementById('diag-groups').style.display='none';
-  const runner=document.getElementById('diag-runner');
-  runner.style.display='block';
-  renderDcLang();
-}
-
-// helper: current language texts
-function dct(){ return DC_T[_dc&&_dc.lang?_dc.lang:'uz']; }
-
-// STEP 1: language picker
-function renderDcLang(){
-  _dc={lang:null, name:'', age:null, cabIdx:0, qIdx:0, scores:{}, counts:{}};
-  Object.keys(DC_SKILLS).forEach(k=>{_dc.scores[k]=0;_dc.counts[k]=0;});
-  const runner=document.getElementById('diag-runner');
-  runner.innerHTML=`<div class="dc-screen"><div class="dc-center">
-    <div class="dc-logo-ic">🎓</div>
-    <div class="dc-title">EduNova</div>
-    <div class="dc-sub">Iqtidor markazi<br>Talent Center</div>
-    <div style="font-size:13px;color:var(--mu);margin-bottom:18px;text-transform:uppercase;letter-spacing:1px">Tilni tanlang · Выберите язык</div>
-    <div class="dc-langs">
-      <div class="dc-lang" onclick="dcSetLang('uz')"><span class="dc-lang-flag">🇺🇿</span>O'zbekcha</div>
-      <div class="dc-lang" onclick="dcSetLang('ru')"><span class="dc-lang-flag">🇷🇺</span>Русский</div>
-    </div>
-  </div></div>`;
-}
-
-function dcSetLang(lang){
-  _dc.lang=lang;
-  renderDcRegister();
-}
-
-// STEP 2: registration (name + age)
-function renderDcRegister(){
-  const t=dct();
-  const runner=document.getElementById('diag-runner');
-  runner.innerHTML=`<div class="dc-screen">
-    <div class="dc-top" style="margin-bottom:18px"><button class="dt-back" onclick="loadDiagnostika()">${t.cancel}</button></div>
-    <div class="dc-center" style="padding-top:10px">
-      <div class="dc-logo-ic">📋</div>
-      <div class="dc-title">${t.regTitle}</div>
-      <div class="dc-sub">${t.regSub}</div>
-    </div>
-    <div style="max-width:440px;margin:0 auto">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="dc-field">
-          <label>${t.nameLabel}</label>
-          <input class="dc-input" id="dc-name" placeholder="${t.namePh}" oninput="dcCheckReg()" autocomplete="off">
-        </div>
-        <div class="dc-field">
-          <label>${t.surnameLabel}</label>
-          <input class="dc-input" id="dc-surname" placeholder="${t.surnamePh}" autocomplete="off">
-        </div>
-      </div>
-      <div class="dc-field">
-        <label>${t.classLabel}</label>
-        <div class="dc-class-grid">
-          ${[1,2,3,4,5,6,7,8,9,10,11].map(c=>`<div class="dc-class" data-class="${c}" onclick="dcSetClass(${c},this)">${c}</div>`).join('')}
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="dc-field">
-          <label>${t.heightLabel}</label>
-          <input class="dc-input" id="dc-height" type="number" placeholder="120" autocomplete="off" inputmode="numeric">
-        </div>
-        <div class="dc-field">
-          <label>${t.weightLabel}</label>
-          <input class="dc-input" id="dc-weight" type="number" placeholder="25" autocomplete="off" inputmode="numeric">
-        </div>
-      </div>
-      <button class="dc-btn" id="dc-start" disabled onclick="dcStartCabinets()">${t.startBtn}</button>
-    </div>
-  </div>`;
-}
-
-function dcSetClass(cls,el){
-  _dc.cls=cls;
-  // derive approximate age from class (class 1 ≈ 7 years)
-  _dc.age=cls+6;
-  document.querySelectorAll('.dc-class').forEach(a=>a.classList.remove('sel'));
-  el.classList.add('sel');
-  dcCheckReg();
-}
-function dcCheckReg(){
-  const name=document.getElementById('dc-name').value.trim();
-  _dc.name=name;
-  document.getElementById('dc-start').disabled=!(name.length>=2 && _dc.cls);
-}
-
-// STEP 3: start cabinets flow
-function dcStartCabinets(){
-  // capture all registration data
-  _dc.name=(document.getElementById('dc-name').value||'').trim();
-  _dc.surname=(document.getElementById('dc-surname').value||'').trim();
-  _dc.height=(document.getElementById('dc-height').value||'').trim();
-  _dc.weight=(document.getElementById('dc-weight').value||'').trim();
-  _dc.cabinets=dcCabinetsForClass(_dc.cls); // graded difficulty by class
-  _dc.cabIdx=0;
-  renderDcIntro();
-}
-
-// cabinet intro screen
-function renderDcIntro(){
-  const t=dct();
-  const cab=_dc.cabinets[_dc.cabIdx];
-  if(!cab){ renderDcResult(); return; }
-  const runner=document.getElementById('diag-runner');
-  const limitTxt = cab.limit>0 ? `⏱ ${cab.limit} ${t.sec}` : `♾ ${t.noLimit}`;
-  // cabinet progress dots
-  const dots=_dc.cabinets.map((c,i)=>`<div class="dc-cab-dot ${i<_dc.cabIdx?'done':i===_dc.cabIdx?'current':''}"></div>`).join('');
-  runner.innerHTML=`<div class="dc-screen">
-    <div class="dc-cabinets-prog">${dots}</div>
-    <div class="dc-intro">
-      <div class="dc-intro-num">${t.cabinet} ${_dc.cabIdx+1} / ${_dc.cabinets.length}</div>
-      <div class="dc-doc" style="background:${cab.bg}">${cab.ic}</div>
-      <div class="dc-intro-room">${cab.room[_dc.lang]}</div>
-      <div class="dc-intro-spec">👨‍⚕️ ${cab.spec[_dc.lang]}</div>
-      <div class="dc-intro-desc">${cab.desc[_dc.lang]}</div>
-      <div class="dc-intro-meta"><span>📝 ${cab.questions.length} ${t.questions}</span><span>${limitTxt}</span></div>
-      <button class="dc-btn" style="max-width:260px;margin:24px auto 0" onclick="dcEnterCabinet()">${t.enter}</button>
-    </div>
-  </div>`;
-}
-
-let _dcTimer=null, _dcTimeLeft=0;
-function dcEnterCabinet(){
-  _dc.qIdx=0;
-  renderDcQuestion();
-}
-
-function dcStartTimer(seconds){
-  if(_dcTimer){clearInterval(_dcTimer);_dcTimer=null;}
-  if(!seconds||seconds<=0){ // no limit
-    const el=document.getElementById('dc-timer-txt'); if(el)el.textContent='♾';
-    return;
-  }
-  _dcTimeLeft=seconds;
-  const update=()=>{
-    const el=document.getElementById('dc-timer-txt');
-    const ring=document.getElementById('dc-timer-ring-fill');
-    if(el)el.textContent=_dcTimeLeft+'s';
-    if(ring){
-      const cab=_dc.cabinets[_dc.cabIdx];
-      const frac=_dcTimeLeft/cab.limit;
-      const circ=2*Math.PI*15;
-      ring.style.strokeDashoffset=circ*(1-frac);
-      ring.style.stroke=_dcTimeLeft<=5?'#fb7185':'var(--ac)';
-    }
-    if(_dcTimeLeft<=0){
-      clearInterval(_dcTimer);_dcTimer=null;
-      dcTimeUp();
-      return;
-    }
-    _dcTimeLeft--;
-  };
-  update();
-  _dcTimer=setInterval(update,1000);
-}
-
-function dcTimeUp(){
-  // time ran out — count as no-answer (skip), move on
-  const cab=_dc.cabinets[_dc.cabIdx];
-  const q=cab.questions[_dc.qIdx];
-  _dc.counts[cab.skill]++; // counted but no score
-  _dc.qIdx++;
-  if(_dc.qIdx>=cab.questions.length){ dcFinishCabinet(); }
-  else renderDcQuestion();
-}
-
-function renderDcQuestion(){
-  const t=dct();
-  const cab=_dc.cabinets[_dc.cabIdx];
-  const q=cab.questions[_dc.qIdx];
-  const sk=DC_SKILLS[cab.skill];
-  const runner=document.getElementById('diag-runner');
-  const prog=Math.round((_dc.qIdx/cab.questions.length)*100);
-
-  // timer ring (only if limit)
-  const timerHtml = cab.limit>0 ? `
-    <div class="dc-timer">
-      <svg class="dc-timer-ring" viewBox="0 0 36 36">
-        <circle cx="18" cy="18" r="15" fill="none" stroke="var(--s3)" stroke-width="3"/>
-        <circle id="dc-timer-ring-fill" cx="18" cy="18" r="15" fill="none" stroke="var(--ac)" stroke-width="3" stroke-linecap="round" stroke-dasharray="${2*Math.PI*15}" stroke-dashoffset="0" transform="rotate(-90 18 18)"/>
-      </svg>
-      <span id="dc-timer-txt">${cab.limit}s</span>
-    </div>` : `<span class="dc-timer" id="dc-timer-txt">♾</span>`;
-
-  if(q.type==='memory'){
-    runner.innerHTML=`<div class="dc-screen">
-      <div class="dt-top">
-        <button class="dt-back" onclick="loadDiagnostika()">${t.cancel}</button>
-        <div class="dt-prog"><div class="dt-prog-fill" style="width:${prog}%"></div></div>
-        ${timerHtml}
-      </div>
-      <div class="dt-q">
-        <div class="dt-speaker" onclick="dcSpeak('${q.q[_dc.lang].replace(/'/g,"")}')">🔊</div>
-        <div class="dt-skill-badge" style="background:${sk.color}22;color:${sk.color}">${sk.ic} ${sk[_dc.lang]}</div>
-        <div class="dt-q-text">${q.q[_dc.lang]}</div>
-        <div class="dt-q-hint">${q.hint[_dc.lang]}</div>
-        <div class="dt-imgs" id="dc-mem-cards">${q.cards.map(c=>`<div class="dt-img-cell">${c}</div>`).join('')}</div>
-        <div id="dc-mem-opts" style="display:none"></div>
-      </div>
-    </div>`;
-    dcSpeak(q.q[_dc.lang]);
-    // memory: NO timer during showing; show 3s then options (timer starts on options)
-    setTimeout(()=>{
-      const cards=document.getElementById('dc-mem-cards');
-      const opts=document.getElementById('dc-mem-opts');
-      if(!cards||!opts)return;
-      cards.style.display='none';opts.style.display='block';
-      opts.innerHTML=`<div class="dt-q-hint" style="margin-bottom:14px">${_dc.lang==='uz'?"Qaysi rasmlar bor edi? Hammasini tanla 👆":"Какие картинки были? Выбери все 👆"}</div>
-        <div class="dt-imgs">${q.options.map(o=>`<div class="dt-img-cell" style="cursor:pointer" data-correct="${o.correct}" data-picked="0" onclick="dcMemPick(this)">${o.e}</div>`).join('')}</div>
-        <button class="dc-btn" style="max-width:220px;margin:16px auto 0" onclick="dcMemDone()">${t.done}</button>`;
-      if(cab.limit>0)dcStartTimer(cab.limit);
-    },3000);
-    return;
-  }
-
-  // choice
-  runner.innerHTML=`<div class="dc-screen">
-    <div class="dt-top">
-      <button class="dt-back" onclick="loadDiagnostika()">${t.cancel}</button>
-      <div class="dt-prog"><div class="dt-prog-fill" style="width:${prog}%"></div></div>
-      ${timerHtml}
-    </div>
-    <div class="dt-q">
-      <div class="dt-speaker" onclick="dcSpeak('${q.q[_dc.lang].replace(/'/g,"")}')">🔊</div>
-      <div class="dt-skill-badge" style="background:${sk.color}22;color:${sk.color}">${sk.ic} ${sk[_dc.lang]}</div>
-      <div class="dt-q-text">${q.q[_dc.lang]}</div>
-      <div class="dt-q-hint">${q.hint[_dc.lang]}</div>
-      <div class="dt-opts">
-        ${q.opts.map((o,i)=>`<div class="dt-opt" onclick="dcChoose(${i})"><span class="dt-opt-emoji">${o.e}</span>${o[_dc.lang]}</div>`).join('')}
-      </div>
-    </div>
-  </div>`;
-  dcSpeak(q.q[_dc.lang]);
-  if(cab.limit>0)dcStartTimer(cab.limit);
-}
-
-function dcSpeak(text){
-  try{
-    if(!window.speechSynthesis)return;
-    speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(text);
-    u.lang=_dc.lang==='ru'?'ru-RU':'ru-RU';
-    u.rate=0.85;
-    speechSynthesis.speak(u);
-  }catch(e){}
-}
-
-function dcChoose(i){
-  if(_dcTimer){clearInterval(_dcTimer);_dcTimer=null;}
-  const cab=_dc.cabinets[_dc.cabIdx];
-  const q=cab.questions[_dc.qIdx];
-  _dc.counts[cab.skill]++;
-  if(q.creative || q.opts[i].correct){ _dc.scores[cab.skill]++; }
-  _dc.qIdx++;
-  if(_dc.qIdx>=cab.questions.length){ dcFinishCabinet(); }
-  else renderDcQuestion();
-}
-
-function dcMemPick(el){
-  const picked=el.dataset.picked==='1';
-  el.dataset.picked=picked?'0':'1';
-  el.style.borderColor=picked?'var(--brd)':'var(--ac)';
-  el.style.transform=picked?'scale(1)':'scale(0.92)';
-}
-function dcMemDone(){
-  if(_dcTimer){clearInterval(_dcTimer);_dcTimer=null;}
-  const cab=_dc.cabinets[_dc.cabIdx];
-  _dc.counts[cab.skill]++;
-  const cells=document.querySelectorAll('#dc-mem-opts .dt-img-cell');
-  let right=0,totalCorrect=0;
-  cells.forEach(c=>{
-    const isC=c.dataset.correct==='true', picked=c.dataset.picked==='1';
-    if(isC)totalCorrect++;
-    if(isC&&picked)right++;
-    if(!isC&&picked)right-=0.5;
-  });
-  const ratio=Math.max(0,right/(totalCorrect||1));
-  if(ratio>=0.6)_dc.scores[cab.skill]++;
-  _dc.qIdx++;
-  if(_dc.qIdx>=cab.questions.length){ dcFinishCabinet(); }
-  else renderDcQuestion();
-}
-
-function dcFinishCabinet(){
-  if(_dcTimer){clearInterval(_dcTimer);_dcTimer=null;}
-  _dc.cabIdx++;
-  renderDcIntro(); // next cabinet intro (or result if done)
-}
-
-// build professions block from top-2 skills (with Uzbekistan market demand)
-function dcProfessionsBlock(pcts, t){
-  const lang=_dc.lang;
-  // top 2 skills
-  const sorted=Object.keys(pcts).sort((a,b)=>pcts[b]-pcts[a]);
-  const top2=[sorted[0], sorted[1]];
-  // collect professions (dedupe), max 5
-  let profs=[];
-  top2.forEach(k=>{
-    (DC_PROFESSIONS[k][lang]||[]).forEach(pr=>{
-      if(!profs.find(x=>x.p===pr.p)) profs.push(pr);
-    });
-  });
-  profs=profs.slice(0,5);
-  const rows=profs.map(pr=>`<div class="dc-prof-row">
-    <span class="dc-prof-name">${pr.p}</span>
-    <span class="dc-prof-demand" title="${(DC_DEMAND_LEGEND[lang][pr.d]||'')}">${pr.d}</span>
-  </div>`).join('');
-  // legend
-  const legend=Object.keys(DC_DEMAND_LEGEND[lang]).map(k=>`<span class="dc-prof-leg-item">${k} ${DC_DEMAND_LEGEND[lang][k]}</span>`).join('');
-  return `<div class="dc-professions">
-    <div class="dc-prof-head">
-      <div class="dc-prof-title">💼 ${t.professionsTitle}</div>
-      <div class="dc-prof-sub">${t.professionsSub}</div>
-    </div>
-    <div class="dc-prof-list">${rows}</div>
-    <div class="dc-prof-legend">${legend}</div>
-  </div>`;
-}
-
-// FINAL: consilium result
-function renderDcResult(){
-  const t=dct();
-  const runner=document.getElementById('diag-runner');
-  const pcts={};
-  Object.keys(DC_SKILLS).forEach(k=>{
-    const c=_dc.counts[k]||1;
-    pcts[k]=Math.round((_dc.scores[k]/c)*100);
-  });
-  let topSkill='aql',topVal=-1;
-  Object.keys(pcts).forEach(k=>{ if(pcts[k]>topVal){topVal=pcts[k];topSkill=k;} });
-  const sk=DC_SKILLS[topSkill];
-  const REC={
-    uz:{aql:"Mantiq va matematika yo'nalishi — kuchli tahliliy fikrlash.",soz:"Til va notiqlik yo'nalishi — so'zlar bilan zo'r ishlaydi.",xotira:"Akademik yo'nalish — ajoyib xotira, tez o'rganadi.",fantaziya:"Ijod va dizayn yo'nalishi — boy tasavvur kuchi.",yurak:"Liderlik va muloqot — his-tuyg'uni yaxshi tushunadi."},
-    ru:{aql:"Логика и математика — сильное аналитическое мышление.",soz:"Язык и речь — отлично работает со словами.",xotira:"Академическое направление — прекрасная память.",fantaziya:"Творчество и дизайн — богатое воображение.",yurak:"Лидерство и общение — хорошо понимает эмоции."}
-  };
-  const powerRows=Object.keys(DC_SKILLS).map(k=>{
-    const s=DC_SKILLS[k];
-    return `<div class="dt-power-row">
-      <div class="dt-power-ic">${s.ic}</div>
-      <div class="dt-power-name">${s[_dc.lang]}</div>
-      <div class="dt-power-bar"><div class="dt-power-fill" style="width:0%;background:${s.color}" data-w="${pcts[k]}"></div></div>
-      <div class="dt-power-pct">${pcts[k]}%</div>
-    </div>`;
-  }).join('');
-
-  runner.innerHTML=`<div class="dc-screen">
-    <div class="dc-patient">
-      <div class="dc-patient-av">🧒</div>
-      <div><div style="font-family:var(--fd);font-size:16px;font-weight:700;color:var(--tx)">${_dc.name}</div>
-      <div style="font-size:13px;color:var(--mu2)">${_dc.cls}-${t.classWord}</div></div>
-    </div>
-    <div class="dt-q dt-result-kid">
-      <div style="font-size:64px">🎉</div>
-      <div class="dt-stars">⭐⭐⭐⭐⭐</div>
-      <div class="dt-q-text">${t.finishTitle}</div>
-      <div class="dt-q-hint">${t.finishSub}</div>
-    </div>
-    <div class="dt-q" style="margin-top:18px;text-align:left">
-      <div style="font-family:var(--fd);font-size:17px;font-weight:700;color:var(--tx);margin-bottom:4px">🩺 ${t.consilium}</div>
-      <div style="font-size:13px;color:var(--mu2);margin-bottom:18px">${t.consiliumSub}</div>
-      <div class="dt-powers">${powerRows}</div>
-      <div class="dt-rec">
-        <div style="font-size:13px;color:var(--mu2);margin-bottom:6px">🏆 ${t.topSkill}: <b style="color:var(--ac2)">${sk.ic} ${sk[_dc.lang]}</b></div>
-        <div style="font-family:var(--fd);font-size:15px;font-weight:600;color:var(--tx);line-height:1.5">${REC[_dc.lang][topSkill]}</div>
-      </div>
-      ${dcProfessionsBlock(pcts, t)}
-      <div style="background:linear-gradient(135deg,rgba(124,92,255,.1),rgba(34,211,238,.06));border:1px solid rgba(124,92,255,.25);border-radius:14px;padding:18px;margin-top:14px;text-align:center">
-        <div style="font-family:var(--fd);font-size:16px;font-weight:700;color:var(--tx);margin-bottom:6px">🎓 ${t.nextStep}</div>
-        <div style="font-size:13px;color:var(--mu2);line-height:1.6">${t.nextStepDesc}</div>
-      </div>
-      <button class="dc-dl-btn" id="dc-dl-btn" onclick="dcDownloadCard()">📄 ${t.downloadCard}</button>
-      <div style="display:flex;gap:10px;margin-top:16px;justify-content:center">
-        <button class="dc-btn" style="max-width:180px;background:var(--gn);color:#04140e" onclick="loadDiagnostika()">${t.finishBtn}</button>
-        <button class="dt-back" onclick="renderDcLang()">${t.again}</button>
-      </div>
-    </div>
-  </div>`;
-  // store computed data for the PNG card
-  _dc._result={pcts, topSkill};
-  setTimeout(()=>{
-    runner.querySelectorAll('.dt-power-fill').forEach(el=>{ el.style.width=el.dataset.w+'%'; });
-  },200);
-}
-
-// ── DOWNLOAD MED-CARD as PNG ──
-// ═══ AI PSYCHOLOG — generates varied professional commentary ═══
-// Not a real LLM, but a rich template engine that produces unique, natural-sounding
-// analysis based on the child's actual scores. Dozens of fragments → millions of combos.
-function dcAiComment(){
-  const r=_dc._result;
-  const lang=_dc.lang;
-  const name=_dc.name||(lang==='uz'?"Bola":"Ребёнок");
-  // sort skills by score
-  const sorted=Object.keys(r.pcts).sort((a,b)=>r.pcts[b]-r.pcts[a]);
-  const top=sorted[0], second=sorted[1], low=sorted[sorted.length-1];
-  const topPct=r.pcts[top], lowPct=r.pcts[low];
-  const avg=Math.round(Object.values(r.pcts).reduce((a,b)=>a+b,0)/5);
-  const rnd=(arr)=>arr[Math.floor(Math.random()*arr.length)];
-
-  // skill descriptors (bilingual, multiple per skill)
-  const SK={
-    aql:{uz:["mantiqiy fikrlash","tahliliy aql","muammoni yechish qobiliyati","mantiqiy bog'lanishlarni ko'rish"],ru:["логическое мышление","аналитический ум","способность решать задачи","умение видеть закономерности"]},
-    soz:{uz:["nutq boyligi","til sezgisi","so'z bilan ishlash","muloqot ko'nikmasi"],ru:["богатство речи","чувство языка","работа со словом","коммуникативные навыки"]},
-    xotira:{uz:["xotira kuchi","diqqat jamlash","ma'lumotni eslab qolish","tez o'rganish"],ru:["сила памяти","концентрация внимания","запоминание","быстрое обучение"]},
-    fantaziya:{uz:["ijodiy tasavvur","badiiy fantaziya","noan'anaviy fikrlash","tasavvur boyligi"],ru:["творческое воображение","художественная фантазия","нестандартное мышление","богатство фантазии"]},
-    yurak:{uz:["hissiy intellekt","empatiya","odamlarni tushunish","yetakchilik mayli"],ru:["эмоциональный интеллект","эмпатия","понимание людей","лидерские задатки"]}
-  };
-  const skName=(k)=> lang==='uz'?DC_SKILLS[k].uz:DC_SKILLS[k].ru;
-  const skDesc=(k)=> rnd(SK[k][lang]);
-
-  // ── opening lines (varied) ──
-  const OPEN={
-    uz:[
-      `${name}ning diagnostika natijalari uning yorqin va o'ziga xos shaxsiyatini ko'rsatadi.`,
-      `Tekshiruv davomida ${name}da bir qancha kuchli tomonlar aniqlandi.`,
-      `${name} bilan ishlash jarayonida qiziqarli psixologik manzara ochildi.`,
-      `Diagnostika ${name}ning ichki salohiyatini yaxshi ochib berdi.`,
-      `${name}ning javoblari uning rivojlanish yo'nalishini aniq ko'rsatadi.`
-    ],
-    ru:[
-      `Результаты диагностики ${name} раскрывают яркую и самобытную личность.`,
-      `В ходе обследования у ${name} выявлен ряд сильных сторон.`,
-      `В процессе работы с ${name} открылась интересная психологическая картина.`,
-      `Диагностика хорошо раскрыла внутренний потенциал ${name}.`,
-      `Ответы ${name} чётко указывают на направление развития.`
-    ]
-  };
-
-  // ── strength sentence (uses top skill) ──
-  const STRONG={
-    uz:[
-      `Eng yorqin tomoni — ${skDesc(top)} (${topPct}%). Bu kelajakda katta imkoniyatlar ochadi.`,
-      `Ayniqsa ${skDesc(top)} yuqori darajada rivojlangan (${topPct}%).`,
-      `Bolaning kuchli jihati — ${skDesc(top)}, bu sohada u tengdoshlaridan ajralib turadi.`,
-      `${skDesc(top)} bo'yicha natija juda yuqori (${topPct}%) — bu tabiiy iste'dod belgisi.`
-    ],
-    ru:[
-      `Самая яркая сторона — ${skDesc(top)} (${topPct}%). Это открывает большие возможности в будущем.`,
-      `Особенно развит ${skDesc(top)} на высоком уровне (${topPct}%).`,
-      `Сильная сторона ребёнка — ${skDesc(top)}, в этой области он выделяется среди сверстников.`,
-      `Результат по ${skDesc(top)} очень высокий (${topPct}%) — признак природного таланта.`
-    ]
-  };
-
-  // ── second strength / combo ──
-  const SECOND={
-    uz:[
-      `Bundan tashqari, ${skDesc(second)} ham yaxshi rivojlangan — bu kombinatsiya kamdan-kam uchraydi.`,
-      `${skName(top)} va ${skName(second)}ning uyg'unligi bolaga ko'p qirrali rivojlanish imkonini beradi.`,
-      `Ikkinchi kuchli yo'nalish — ${skDesc(second)}, bu birinchisini to'ldiradi.`
-    ],
-    ru:[
-      `Кроме того, хорошо развит ${skDesc(second)} — такое сочетание встречается нечасто.`,
-      `Гармония ${skName(top)} и ${skName(second)} даёт ребёнку возможность разностороннего развития.`,
-      `Второе сильное направление — ${skDesc(second)}, оно дополняет первое.`
-    ]
-  };
-
-  // ── growth area (low skill, framed positively) ──
-  const GROWTH={
-    uz:[
-      `${skName(low)} yo'nalishini biroz mustahkamlash tavsiya etiladi — bu tabiiy o'sish nuqtasi.`,
-      `Rivojlantirish uchun ${skDesc(low)}ga e'tibor qaratish foydali bo'ladi.`,
-      `${skName(low)} hozircha shakllanish bosqichida — to'g'ri yondashuv bilan u ham kuchayadi.`,
-      `Kelajakda ${skDesc(low)} ustida ishlash bolaning umumiy salohiyatini oshiradi.`
-    ],
-    ru:[
-      `Рекомендуется немного укрепить направление ${skName(low)} — это естественная точка роста.`,
-      `Для развития будет полезно уделить внимание ${skDesc(low)}.`,
-      `${skName(low)} пока в стадии формирования — при правильном подходе тоже усилится.`,
-      `В будущем работа над ${skDesc(low)} повысит общий потенциал ребёнка.`
-    ]
-  };
-
-  // ── recommendation by profile ──
-  const ADVICE={
-    uz:[
-      `Bolaning iste'dodini rivojlantirish uchun amaliy va interaktiv mashg'ulotlar eng samarali bo'ladi.`,
-      `Tavsiya: bolaga o'z kuchli tomonini erkin namoyon qilish imkonini bering.`,
-      `Eng yaxshi natija — bolaning tabiiy qiziqishlariga tayangan holda o'qitish.`,
-      `Bola ijodiy muhitda, qo'llab-quvvatlash bilan tez rivojlanadi.`
-    ],
-    ru:[
-      `Для развития таланта ребёнка наиболее эффективны практические и интерактивные занятия.`,
-      `Рекомендация: дайте ребёнку возможность свободно проявлять свою сильную сторону.`,
-      `Лучший результат — обучение с опорой на естественные интересы ребёнка.`,
-      `Ребёнок быстро развивается в творческой среде при поддержке.`
-    ]
-  };
-
-  // ── closing (varied, warm but professional) ──
-  const CLOSE={
-    uz:[
-      `Umumiy baho: ${avg}%. Bola yaxshi salohiyatga ega va to'g'ri yo'nalishda rivojlanmoqda.`,
-      `Xulosa: ${name}da kuchli poydevor mavjud, kelajak istiqbollari yorqin.`,
-      `Yakuniy fikr: bolaning rivojlanish dinamikasi ijobiy, salohiyati yuqori.`
-    ],
-    ru:[
-      `Общая оценка: ${avg}%. Ребёнок обладает хорошим потенциалом и развивается в правильном направлении.`,
-      `Вывод: у ${name} есть прочный фундамент, перспективы развития яркие.`,
-      `Итоговое мнение: динамика развития положительная, потенциал высокий.`
-    ]
-  };
-
-  // assemble — pick one from each, sometimes skip second-strength for variety
-  // ── market/profession sentence (ties top skill to real Uzbekistan professions) ──
-  const topProfs=(DC_PROFESSIONS[top] && DC_PROFESSIONS[top][lang]) || [];
-  const hotProf=topProfs.find(p=>p.d==='🔥')||topProfs[0];
-  const profName=hotProf?hotProf.p:'';
-  const MARKET={
-    uz:[
-      `Bu yo'nalish O'zbekiston bozorida talab yuqori — masalan, "${profName}" kabi kasblar kelajakda istiqbolli.`,
-      `Mehnat bozori nuqtai nazaridan bu kuchli tomon foydali: "${profName}" sohasi rivojlanmoqda.`,
-      `Bola ulg'aygach, "${profName}" kabi yo'nalishlarda o'zini topishi mumkin — bozorda bunga talab bor.`
-    ],
-    ru:[
-      `Это направление востребовано на рынке Узбекистана — например, профессии вроде "${profName}" перспективны.`,
-      `С точки зрения рынка труда эта сильная сторона выгодна: сфера "${profName}" растёт.`,
-      `Когда ребёнок вырастет, он может реализоваться в направлениях вроде "${profName}" — спрос на рынке есть.`
-    ]
-  };
-
-  const parts=[rnd(OPEN[lang]), rnd(STRONG[lang])];
-  if(r.pcts[second]>=70) parts.push(rnd(SECOND[lang]));
-  if(profName) parts.push(rnd(MARKET[lang]));
-  parts.push(rnd(GROWTH[lang]));
-  parts.push(rnd(ADVICE[lang]));
-  parts.push(rnd(CLOSE[lang]));
-  return parts.join(' ');
-}
-
-function dcDownloadCard(){
-  const t=dct();
-  const btn=document.getElementById('dc-dl-btn');
-  if(btn){btn.disabled=true;btn.textContent='⏳ '+(_dc.lang==='uz'?"Tayyorlanmoqda...":"Готовится...");}
-  buildMedCard();
-  const stage=document.getElementById('medcard-stage');
-  const card=stage.querySelector('.mc');
-  // wait a tick for fonts/layout
-  setTimeout(()=>{
-    if(typeof html2canvas==='undefined'){
-      // fallback: open print dialog
-      if(btn){btn.disabled=false;btn.textContent='📄 '+t.downloadCard;}
-      toast(_dc.lang==='uz'?"Yuklab bo'lmadi, qayta urinib ko'ring":"Не удалось, попробуйте снова",'err');
-      return;
-    }
-    html2canvas(card,{scale:2,backgroundColor:'#ffffff',logging:false,useCORS:true}).then(canvas=>{
-      const link=document.createElement('a');
-      const safeName=(_dc.name||'natija').replace(/[^a-zA-Zа-яА-Я0-9]/g,'_');
-      link.download='EduNova_'+safeName+'.png';
-      link.href=canvas.toDataURL('image/png');
-      link.click();
-      if(btn){btn.disabled=false;btn.textContent='✓ '+t.downloadCard;}
-    }).catch(e=>{
-      console.error('PNG error',e);
-      if(btn){btn.disabled=false;btn.textContent='📄 '+t.downloadCard;}
-    });
-  },300);
-}
-
-// professions for the printed med-card (top-2 skills, with market demand)
-function dcMedCardProfessions(r, L){
-  const lang=_dc.lang;
-  const sorted=Object.keys(r.pcts).sort((a,b)=>r.pcts[b]-r.pcts[a]);
-  const top2=[sorted[0], sorted[1]];
-  let profs=[];
-  top2.forEach(k=>{
-    (DC_PROFESSIONS[k][lang]||[]).forEach(pr=>{ if(!profs.find(x=>x.p===pr.p)) profs.push(pr); });
-  });
-  profs=profs.slice(0,5);
-  const rows=profs.map(pr=>`<div class="mc-s-prof-row"><span>${pr.p}</span><span class="mc-s-prof-dem">${pr.d} ${DC_DEMAND_LEGEND[lang][pr.d]||''}</span></div>`).join('');
-  return `<div class="mc-s-profs">
-    <div class="mc-s-profs-title">💼 ${L.profsTitle}</div>
-    <div class="mc-s-profs-list">${rows}</div>
-  </div>`;
-}
-
-function buildMedCard(){
-  const t=dct();
-  const r=_dc._result;
-  const sk=DC_SKILLS[r.topSkill];
-  const REC={
-    uz:{aql:"Mantiq va matematika yo'nalishi",soz:"Til va notiqlik yo'nalishi",xotira:"Akademik yo'nalish",fantaziya:"Ijod va dizayn yo'nalishi",yurak:"Liderlik va muloqot yo'nalishi"},
-    ru:{aql:"Логика и математика",soz:"Язык и речь",xotira:"Академическое направление",fantaziya:"Творчество и дизайн",yurak:"Лидерство и общение"}
-  };
-  // skill bars
-  const skillRows=Object.keys(DC_SKILLS).map(k=>{
-    const s=DC_SKILLS[k];
-    return `<div class="mc-skill">
-      <div class="mc-skill-top">
-        <span class="mc-skill-ic">${s.ic}</span>
-        <span class="mc-skill-name">${s[_dc.lang]}</span>
-        <span class="mc-skill-pct" style="color:${s.color}">${r.pcts[k]}%</span>
-      </div>
-      <div class="mc-skill-track"><div class="mc-skill-fill" style="width:${r.pcts[k]}%;background:${s.color}"></div></div>
-    </div>`;
-  }).join('');
-
-  const today=new Date();
-  const dateStr=`${String(today.getDate()).padStart(2,'0')}.${String(today.getMonth()+1).padStart(2,'0')}.${today.getFullYear()}`;
-  const avg=Math.round(Object.values(r.pcts).reduce((a,b)=>a+b,0)/5);
-  // protocol number — looks official
-  const protocolNo=`№ ${today.getFullYear()}-${String(Math.floor(Math.random()*9000)+1000)}`;
-  const fullName=((_dc.surname||'')+' '+(_dc.name||'')).trim()||(_dc.lang==='uz'?"Bemor":"Пациент");
-  const aiText=dcAiComment();
-
-  const L={
-    uz:{
-      docType:"DIAGNOSTIK XULOSA",
-      protocol:"Bayonnoma",
-      fio:"F.I.O.",age:"Yoshi",clss:"Sinf",height:"Bo'yi",weight:"Vazni",date:"Sana",years:"yosh",clsWord:"sinf",cm:"sm",kg:"kg",
-      map:"QOBILIYATLAR TAHLILI",
-      indicator:"Ko'rsatkich",result:"Natija",
-      overall:"Umumiy ko'rsatkich",
-      diag:"ASOSIY XULOSA",
-      direction:"Tavsiya etilgan yo'nalish",
-      profsTitle:"MOS KASBLAR (O'zbekiston bozori)",
-      aiTitle:"PSIXOLOG-AI SHARHI",
-      aiSpec:"Sun'iy intellekt psixolog tahlili",
-      rx:"TAVSIYANOMA",
-      rxText:"Bola 3 kunlik bepul sinov darsiga taklif etiladi. Yakuniy qaror ota-ona va metodist bilan birgalikda qabul qilinadi.",
-      stamp:"TASDIQLANDI",
-      sign:"Mutaxassis imzosi",
-      foot:"EduNova Diagnostika Markazi"
-    },
-    ru:{
-      docType:"ДИАГНОСТИЧЕСКОЕ ЗАКЛЮЧЕНИЕ",
-      protocol:"Протокол",
-      fio:"Ф.И.О.",age:"Возраст",clss:"Класс",height:"Рост",weight:"Вес",date:"Дата",years:"лет",clsWord:"класс",cm:"см",kg:"кг",
-      map:"АНАЛИЗ СПОСОБНОСТЕЙ",
-      indicator:"Показатель",result:"Результат",
-      overall:"Общий показатель",
-      diag:"ОСНОВНОЕ ЗАКЛЮЧЕНИЕ",
-      direction:"Рекомендованное направление",
-      profsTitle:"ПОДХОДЯЩИЕ ПРОФЕССИИ (рынок Узбекистана)",
-      aiTitle:"КОММЕНТАРИЙ AI-ПСИХОЛОГА",
-      aiSpec:"Анализ психолога на базе искусственного интеллекта",
-      rx:"РЕКОМЕНДАЦИЯ",
-      rxText:"Ребёнок приглашается на 3 дня бесплатного пробного обучения. Итоговое решение принимается совместно с родителем и методистом.",
-      stamp:"ОДОБРЕНО",
-      sign:"Подпись специалиста",
-      foot:"Диагностический центр EduNova"
-    }
-  }[_dc.lang];
-
-  const heightStr = _dc.height ? `${_dc.height} ${L.cm}` : '—';
-  const weightStr = _dc.weight ? `${_dc.weight} ${L.kg}` : '—';
-
-  const stage=document.getElementById('medcard-stage');
-  stage.innerHTML=`<div class="mc mc-serious">
-    <div class="mc-s-header">
-      <div class="mc-s-brand">
-        <div class="mc-s-logo">🎓</div>
-        <div>
-          <div class="mc-s-clinic">EduNova</div>
-          <div class="mc-s-clinic-sub">${_dc.lang==='uz'?"Iqtidor markazi":"Центр развития талантов"}</div>
-        </div>
-      </div>
-      <div class="mc-s-protocol">
-        <div class="mc-s-prot-no">${protocolNo}</div>
-        <div class="mc-s-prot-date">${dateStr}</div>
-      </div>
-    </div>
-    <div class="mc-s-doctype">${L.docType}</div>
-
-    <div class="mc-s-patient">
-      <div class="mc-s-pat-grid">
-        <div class="mc-s-pat-cell mc-s-pat-wide"><span class="mc-s-pl">${L.fio}</span><span class="mc-s-pv">${fullName}</span></div>
-        <div class="mc-s-pat-cell"><span class="mc-s-pl">${L.clss}</span><span class="mc-s-pv">${_dc.cls}-${L.clsWord}</span></div>
-        <div class="mc-s-pat-cell"><span class="mc-s-pl">${L.height}</span><span class="mc-s-pv">${heightStr}</span></div>
-        <div class="mc-s-pat-cell"><span class="mc-s-pl">${L.weight}</span><span class="mc-s-pv">${weightStr}</span></div>
-        <div class="mc-s-pat-cell"><span class="mc-s-pl">${L.date}</span><span class="mc-s-pv">${dateStr}</span></div>
-      </div>
-    </div>
-
-    <div class="mc-s-body">
-      <div class="mc-s-sect">${L.map}</div>
-      <div class="mc-s-table-head"><span>${L.indicator}</span><span>${L.result}</span></div>
-      ${skillRows}
-      <div class="mc-s-overall"><span>${L.overall}</span><span class="mc-s-overall-val">${avg}%</span></div>
-
-      <div class="mc-s-diag">
-        <div class="mc-s-diag-label">${L.diag}</div>
-        <div class="mc-s-diag-row">
-          <div class="mc-s-diag-skill">${sk.ic} ${sk[_dc.lang]} — ${r.pcts[r.topSkill]}%</div>
-        </div>
-        <div class="mc-s-diag-dir"><b>${L.direction}:</b> ${REC[_dc.lang][r.topSkill]}</div>
-      </div>
-
-      ${dcMedCardProfessions(r, L)}
-
-      <div class="mc-s-ai">
-        <div class="mc-s-ai-head">
-          <span class="mc-s-ai-ic">🤖</span>
-          <div>
-            <div class="mc-s-ai-title">${L.aiTitle}</div>
-            <div class="mc-s-ai-spec">${L.aiSpec}</div>
-          </div>
-        </div>
-        <div class="mc-s-ai-text">${aiText}</div>
-      </div>
-
-      <div class="mc-s-rx">
-        <div class="mc-s-rx-title">℞ ${L.rx}</div>
-        <div class="mc-s-rx-text">${L.rxText}</div>
-      </div>
-    </div>
-
-    <div class="mc-s-footer">
-      <div class="mc-s-sign">
-        <div class="mc-s-sign-line"></div>
-        <div class="mc-s-sign-label">${L.sign}</div>
-      </div>
-      <div class="mc-s-stamp">
-        <div class="mc-s-stamp-inner">
-          <span class="mc-s-stamp-star">★</span>
-          <span class="mc-s-stamp-txt">${L.stamp}</span>
-          <span class="mc-s-stamp-clinic">EduNova</span>
-        </div>
-      </div>
-    </div>
-    <div class="mc-s-footnote">${L.foot} · ${protocolNo} · ${dateStr}</div>
-  </div>`;
-}
-
-
-// ═══════════════════════════════════════════
 // OPERATOR TRAINING — call-center onboarding (Uzbek)
 // Teaches the diagnostic-test concept + Uzbekistan job market so a new
 // operator can confidently sell the 99k diagnostic consultation by phone.
@@ -5894,7 +4418,7 @@ function opqComplete(id){
 const HK_CATEGORIES={
   income:[
     {id:'diagnostika', uz:"Diagnostika testi", color:'#34d399'},
-    {id:'oquv', uz:"O'quv to'lovi", color:'#22d3ee'},
+    {id:'oquv', uz:"O'quv to'lovi", color:'#E85400'},
     {id:'mahsulot', uz:"Mahsulot sotuvi", color:'#a78bfa'},
     {id:'boshqa_in', uz:"Boshqa kirim", color:'#60a5fa'}
   ],
