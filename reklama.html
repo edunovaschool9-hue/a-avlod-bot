@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>EDUNOVA School — Farg'ona | 2026 Qabul</title>
+<meta name="description" content="Farg'onadagi xususiy maktab. Repetitorsiz to'liq tayyorlov, C1 ingliz tili, 4 yo'nalish. Bepul konsultatsiya va sinov darsiga yoziling.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@500;600;700&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --orange:#FF6B1A; --orange-deep:#E85400; --orange-soft:#FF8A47;
+  --steel:#1C1C1C; --iron:#3A3A3A;
+  --concrete:#E7E1D3; --cream:#FAF6EC; --card:#F4EFE4;
+  --line:#CFC7B6; --mut:#6B6558;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:'Rubik',sans-serif;background:var(--concrete);color:var(--steel);line-height:1.5;overflow-x:hidden;
+  padding-bottom:76px} /* space for sticky bar */
+
+/* ---------- shared ---------- */
+.wrap{max-width:540px;margin:0 auto;padding:0 18px}
+.hazard{height:9px;background:repeating-linear-gradient(-45deg,var(--orange) 0 14px,var(--steel) 14px 28px)}
+.hazard.thin{height:6px}
+.tag{display:inline-block;font-family:'Oswald',sans-serif;font-weight:600;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#fff;background:var(--steel);padding:6px 13px;clip-path:polygon(0 0,100% 0,calc(100% - 9px) 100%,0 100%)}
+.tag.orange{background:var(--orange);color:var(--steel)}
+.eyebrow{font-family:'Oswald',sans-serif;font-weight:600;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--orange-deep)}
+h2.sec{font-family:'Archivo Black',sans-serif;font-size:clamp(23px,7vw,30px);text-transform:uppercase;line-height:1.1;margin:12px 0 18px}
+h2.sec em{font-style:normal;color:var(--orange)}
+
+/* ---------- topbar ---------- */
+.topbar{background:var(--steel);color:var(--orange);font-family:'Oswald',sans-serif;font-weight:600;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;text-align:center;padding:8px 12px}
+
+/* ---------- brand row ---------- */
+.brand{display:flex;justify-content:space-between;align-items:center;padding:14px 0}
+.brand b{font-family:'Archivo Black',sans-serif;font-size:19px;letter-spacing:.5px}
+.brand b span{color:var(--orange)}
+.brand small{display:block;font-family:'Oswald',sans-serif;font-weight:500;font-size:9px;letter-spacing:3px;color:var(--mut)}
+.brand a.call{font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;letter-spacing:.5px;color:var(--steel);text-decoration:none;border:2px solid var(--steel);padding:8px 12px;border-radius:2px}
+
+/* ---------- hero ---------- */
+.hero{padding:14px 0 30px;
+  background:repeating-linear-gradient(90deg,transparent 0 79px,rgba(28,28,28,.03) 79px 80px),var(--concrete)}
+.hero h1{font-family:'Archivo Black',sans-serif;font-size:clamp(30px,9vw,44px);line-height:1.02;text-transform:uppercase;margin:14px 0 12px}
+.hero h1 .stroke{color:transparent;-webkit-text-stroke:1.8px var(--orange)}
+.hero .lead{font-size:15.5px;color:var(--iron);margin-bottom:18px}
+.offer{display:flex;align-items:center;gap:10px;background:var(--steel);color:#fff;padding:12px 15px;border-radius:3px;margin-bottom:18px}
+.offer .gift{font-size:24px;flex:none}
+.offer b{font-family:'Oswald',sans-serif;font-weight:600;font-size:14.5px;line-height:1.3;text-transform:uppercase;letter-spacing:.3px}
+.offer b span{color:var(--orange-soft)}
+
+/* ---------- form card ---------- */
+.formcard{background:var(--cream);border:2px solid var(--steel);box-shadow:8px 8px 0 var(--orange)}
+.formcard .in{padding:20px 18px 18px}
+.formcard h3{font-family:'Oswald',sans-serif;font-weight:700;font-size:19px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.formcard p.h{font-size:13px;color:var(--mut);margin-bottom:14px}
+.formcard label{display:block;font-family:'Oswald',sans-serif;font-weight:600;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;margin:12px 0 5px}
+.formcard input{width:100%;padding:14px;border:2px solid var(--steel);background:#fff;font-family:'Rubik',sans-serif;font-size:16px;outline:none;border-radius:2px}
+.formcard input:focus{border-color:var(--orange)}
+.formcard .go{width:100%;margin-top:16px;padding:16px;border:none;cursor:pointer;background:var(--orange);color:var(--steel);font-family:'Oswald',sans-serif;font-weight:700;font-size:16px;letter-spacing:.8px;text-transform:uppercase;border-radius:2px;transition:background .15s,color .15s}
+.formcard .go:hover{background:var(--steel);color:#fff}
+.formcard .go:disabled{opacity:.6}
+.formcard .note{font-size:11.5px;color:var(--mut);text-align:center;margin-top:10px}
+.thanks{display:none;padding:38px 20px;text-align:center}
+.thanks .ok{font-family:'Archivo Black',sans-serif;font-size:40px;color:var(--orange)}
+.thanks h3{font-family:'Oswald',sans-serif;font-weight:700;font-size:20px;text-transform:uppercase;margin:6px 0 5px}
+.thanks p{font-size:14px;color:var(--iron)}
+
+/* ---------- sections ---------- */
+section{padding:34px 0}
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{font-family:'Oswald',sans-serif;font-weight:500;font-size:13.5px;letter-spacing:.3px;border:2px solid var(--steel);background:#fff;padding:9px 14px;border-radius:2px}
+.chip.on{background:var(--orange);border-color:var(--orange)}
+
+.why{display:flex;flex-direction:column;gap:12px}
+.wrow{display:flex;gap:13px;align-items:flex-start;background:var(--card);border:1.5px solid var(--line);border-left:5px solid var(--orange);padding:14px 15px;border-radius:2px}
+.wrow .ic{font-size:24px;flex:none;line-height:1.1}
+.wrow h4{font-family:'Oswald',sans-serif;font-weight:600;font-size:15.5px;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px}
+.wrow p{font-size:13.5px;color:var(--iron)}
+
+/* steps */
+.steps{display:flex;flex-direction:column;gap:2px;background:var(--steel);border:2px solid var(--steel)}
+.step{background:var(--cream);padding:15px 16px;display:flex;gap:14px;align-items:center}
+.step .n{font-family:'Archivo Black',sans-serif;font-size:30px;line-height:1;color:transparent;-webkit-text-stroke:1.5px var(--orange);flex:none;min-width:34px}
+.step h4{font-family:'Oswald',sans-serif;font-weight:600;font-size:15px;text-transform:uppercase;letter-spacing:.3px}
+.step p{font-size:13px;color:var(--iron)}
+
+/* price note */
+.pricebox{background:var(--steel);color:var(--cream);padding:20px 18px;border-radius:3px;text-align:center}
+.pricebox .big{font-family:'Oswald',sans-serif;font-weight:700;font-size:18px;text-transform:uppercase;line-height:1.3;margin-bottom:6px}
+.pricebox .big span{color:var(--orange-soft)}
+.pricebox p{font-size:13.5px;color:#c9c2b4}
+
+/* final cta */
+.final{background:var(--orange);padding:30px 0}
+.final h2{font-family:'Archivo Black',sans-serif;font-size:clamp(22px,7vw,30px);text-transform:uppercase;text-align:center;line-height:1.1;color:var(--steel);margin-bottom:6px}
+.final p.s{text-align:center;font-size:14.5px;color:#3a2a12;margin-bottom:18px}
+.final .callbig{display:block;text-align:center;margin-top:14px;font-family:'Archivo Black',sans-serif;font-size:22px;color:var(--steel);text-decoration:none;letter-spacing:.5px}
+.final .callbig small{display:block;font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#5a4526}
+
+/* footer */
+footer{background:var(--steel);color:#b9b5ac;padding:28px 0 34px}
+footer .fb b{font-family:'Archivo Black',sans-serif;font-size:17px;color:#fff}
+footer .fb b span{color:var(--orange)}
+footer p,footer a{font-size:14px;color:#b9b5ac;text-decoration:none;display:block;margin-top:7px}
+footer a:hover{color:var(--orange)}
+
+/* sticky mobile CTA */
+.sticky{position:fixed;left:0;right:0;bottom:0;z-index:80;background:rgba(28,28,28,.97);backdrop-filter:blur(6px);padding:10px 14px;display:flex;gap:10px;border-top:2px solid var(--orange)}
+.sticky button{flex:1;border:none;cursor:pointer;background:var(--orange);color:var(--steel);font-family:'Oswald',sans-serif;font-weight:700;font-size:15px;letter-spacing:.6px;text-transform:uppercase;padding:14px;border-radius:2px}
+.sticky a{flex:none;display:flex;align-items:center;justify-content:center;width:52px;background:transparent;border:2px solid var(--orange);border-radius:2px;font-size:20px;text-decoration:none}
+
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+
+.pricebox .plabel{font-family:'Oswald',sans-serif;font-weight:600;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--orange-soft);margin-bottom:6px}
+.pricebox .pamount{font-family:'Archivo Black',sans-serif;font-size:clamp(34px,11vw,46px);line-height:1;color:#fff}
+.pricebox .pamount span{color:var(--orange-soft);font-size:.5em;-webkit-text-fill-color:var(--orange-soft)}
+.pricebox .pmonth{font-family:'Oswald',sans-serif;font-weight:500;font-size:14px;letter-spacing:1px;text-transform:uppercase;color:#c9c2b4;margin-top:2px}
+.pricebox .pincl{font-size:13px;color:#d8d2c6;margin:14px auto 0;max-width:340px;line-height:1.5}
+.pricebox .pdisc{font-size:13px;color:var(--orange-soft);margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.15)}
+.pricebox .pdisc b{color:#fff}
+
+.howto{display:flex;align-items:center;flex-wrap:wrap;gap:8px;background:var(--cream);border:2px dashed var(--orange);padding:12px 14px;border-radius:3px;margin-bottom:18px;font-family:'Oswald',sans-serif;font-weight:500;font-size:13.5px;text-transform:uppercase;letter-spacing:.3px;color:var(--steel)}
+.howto .hstep{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--orange);color:var(--steel);font-weight:700;font-size:13px;flex:none}
+.howto .harrow{color:var(--orange-deep);font-weight:700;font-size:18px;margin:0 2px}
+</style>
+</head>
+<body>
+
+<div class="topbar">⚡ 2026 QABUL OCHIQ · JOYLAR CHEKLANGAN</div>
+<div class="hazard thin"></div>
+
+<div class="wrap">
+  <div class="brand">
+    <div><b>EDU<span>NOVA</span></b><small>SCHOOL · FARG'ONA</small></div>
+    <a class="call" href="tel:+998901818788">📞 Qo'ng'iroq</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="wrap">
+    <span class="tag orange">Xususiy maktab · 1–11 sinf · UZ / RU</span>
+    <h1>Repetitorsiz <span class="stroke">kuchli</span> ta'lim</h1>
+    <p class="lead">Farg'onadagi xususiy maktab. Chuqurlashtirilgan matematika, ingliz va koreys tillari. 8-sinfdan yo'nalish bo'yicha to'liq tayyorlov — farzandingiz repetitorga bormaydi.</p>
+    <div class="offer">
+      <span class="gift">🎁</span>
+      <b>Bepul <span>konsultatsiya</span> + 1 kunlik <span>sinov darsi</span></b>
+    </div>
+    <div class="howto">
+      <span class="hstep">1</span> Pastga raqamingizni yozing
+      <span class="harrow">↓</span>
+      <span class="hstep">2</span> Biz sizga qo'ng'iroq qilamiz
+    </div>
+
+    <div class="formcard" id="top">
+      <div class="hazard"></div>
+      <div class="in" id="topForm">
+        <h3>Raqamingizni qoldiring</h3>
+        <p class="h">Faqat ism va telefon — boshqa hech narsa kerak emas. Biz o'zimiz qo'ng'iroq qilamiz. 👇</p>
+        <label for="n1">O'quvchining F.I.Sh</label>
+        <input id="n1" type="text" placeholder="Masalan: Aliyev Ali" autocomplete="name">
+        <label for="p1">Telefon raqami</label>
+        <input id="p1" type="tel" placeholder="+998 __ ___ __ __" inputmode="tel" autocomplete="tel">
+        <button class="go" onclick="submitLead('n1','p1',this)">Yozilish →</button>
+        <div class="note">Ma'lumotlaringiz faqat qabul uchun ishlatiladi.</div>
+      </div>
+      <div class="thanks" id="topThanks">
+        <div class="ok">✓</div>
+        <h3>Rahmat!</h3>
+        <p>Arizangiz qabul qilindi. Tez orada siz bilan bog'lanamiz.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="hazard"></div>
+
+<!-- WHAT WE TEACH -->
+<section>
+  <div class="wrap reveal">
+    <span class="eyebrow">Ta'lim yo'nalishlari</span>
+    <h2 class="sec">Nima <em>o'rgatamiz</em></h2>
+    <div class="chips">
+      <span class="chip on">Matematika (chuqur)</span>
+      <span class="chip on">Ingliz tili (chuqur)</span>
+      <span class="chip on">Koreys tili</span>
+      <span class="chip">Aniq fanlar</span>
+      <span class="chip">Tabiiy fanlar</span>
+      <span class="chip">Ijtimoiy-gumanitar</span>
+      <span class="chip">Yuridik yo'nalish</span>
+      <span class="chip">C1 ingliz tili</span>
+      <span class="chip">Xalqaro sertifikatlar</span>
+      <span class="chip">Shaxmat · Robototexnika</span>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section style="padding-top:4px">
+  <div class="wrap reveal">
+    <span class="eyebrow">Nega biz</span>
+    <h2 class="sec">Ota-onalar <em>bizni tanlaydi</em></h2>
+    <div class="why">
+      <div class="wrow"><span class="ic">🎯</span><div><h4>Repetitor kerak emas</h4><p>8-sinfdan test fanlariga to'liq tayyorlov. Repetitorga pul to'lash tugaydi.</p></div></div>
+      <div class="wrow"><span class="ic">👥</span><div><h4>Sinfda 24 o'quvchi</h4><p>Har bir bolaga individual e'tibor. To'lib ketgan sinflar yo'q.</p></div></div>
+      <div class="wrow"><span class="ic">🏆</span><div><h4>Muddatidan oldin oliygohga</h4><p>O'quvchilarimiz sertifikat olib, muddatidan oldin o'qishga kirishmoqda.</p></div></div>
+      <div class="wrow"><span class="ic">🍽️</span><div><h4>To'liq sharoit</h4><p>3 mahal ovqat, bepul avtobus, yotoqxona (4 mahal ovqat bilan).</p></div></div>
+      <div class="wrow"><span class="ic">🧠</span><div><h4>Psixologiya va to'garaklar</h4><p>1-sinfdan psixologiya. Shaxmat, robototexnika, gimnastika, arab tili.</p></div></div>
+      <div class="wrow"><span class="ic">🛡️</span><div><h4>Xavfsizlik</h4><p>Video kuzatuv, qo'riqlash xizmati — farzandingiz nazorat ostida.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- STEPS -->
+<section style="padding-top:4px">
+  <div class="wrap reveal">
+    <span class="eyebrow">Qanday boshlanadi</span>
+    <h2 class="sec">4 ta oddiy <em>qadam</em></h2>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><div><h4>Ariza qoldiring</h4><p>Ism va telefon — shu sahifada.</p></div></div>
+      <div class="step"><span class="n">2</span><div><h4>Qo'ng'iroq qilamiz</h4><p>Savollaringizga javob beramiz, narxlarni aytamiz.</p></div></div>
+      <div class="step"><span class="n">3</span><div><h4>Tanishuv va diagnostika</h4><p>Farzandingizning kuchli tomonlarini aniqlaymiz.</p></div></div>
+      <div class="step"><span class="n">4</span><div><h4>1 kun bepul sinov</h4><p>Bola maktabni bir kun o'zi ko'radi. Keyin qaror — sizniki.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICE NOTE -->
+<section style="padding-top:4px">
+  <div class="wrap reveal">
+    <div class="pricebox">
+      <div class="plabel">Oylik to'lov</div>
+      <div class="pamount">2 100 000 <span>so'mdan</span></div>
+      <div class="pmonth">/ oyiga</div>
+      <div class="pincl">Ichida: 3 mahal ovqat · bepul avtobus · barcha to'garaklar · o'quv materiallari</div>
+      <div class="pdisc">👨‍👩‍👧 2 va undan ortiq farzandga <b>chegirma</b> · bo'lib to'lash mumkin</div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<div class="final">
+  <div class="wrap reveal">
+    <h2>Farzandingiz kelajagini bugun boshlang</h2>
+    <p class="s">Joylar cheklangan — kechikmang!</p>
+    <div class="formcard" id="bottom">
+      <div class="hazard"></div>
+      <div class="in" id="botForm">
+        <h3>Bepul konsultatsiya + sinov</h3>
+        <p class="h">Raqamingizni qoldiring — biz o'zimiz bog'lanamiz.</p>
+        <label for="n2">O'quvchining F.I.Sh</label>
+        <input id="n2" type="text" placeholder="Masalan: Aliyev Ali" autocomplete="name">
+        <label for="p2">Telefon raqami</label>
+        <input id="p2" type="tel" placeholder="+998 __ ___ __ __" inputmode="tel" autocomplete="tel">
+        <button class="go" onclick="submitLead('n2','p2',this)">Yozilish →</button>
+        <div class="note">Ma'lumotlaringiz faqat qabul uchun ishlatiladi.</div>
+      </div>
+      <div class="thanks" id="botThanks">
+        <div class="ok">✓</div>
+        <h3>Rahmat!</h3>
+        <p>Arizangiz qabul qilindi. Tez orada siz bilan bog'lanamiz.</p>
+      </div>
+    </div>
+    <a class="callbig" href="tel:+998901818788">📞 +998 90 181 87 88<small>To'g'ridan-to'g'ri qo'ng'iroq</small></a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap fb">
+    <b>EDU<span>NOVA</span> SCHOOL</b>
+    <p>📍 Mustaqillik shoh ko'chasi, 340/4-uy, Farg'ona shahri</p>
+    <a href="tel:+998901818788">📞 +998 90 181 87 88</a>
+    <a href="https://instagram.com/edunova_start" target="_blank" rel="noopener">📸 Instagram: @edunova_start</a>
+  </div>
+</footer>
+
+<!-- STICKY CTA (mobile) -->
+<div class="sticky">
+  <button onclick="document.getElementById('top').scrollIntoView({behavior:'smooth'});setTimeout(function(){var e=document.getElementById('n1');if(e)e.focus();},500)">📝 Raqam qoldirish — BEPUL</button>
+  <a href="tel:+998901818788" aria-label="Qo'ng'iroq">📞</a>
+</div>
+
+<script>
+var _sb=(window.supabase?window.supabase.createClient('https://unaodltahuevrfnarfha.supabase.co','sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP'):null);
+async function submitLead(nId,pId,btn){
+  var nEl=document.getElementById(nId), pEl=document.getElementById(pId);
+  var n=nEl.value.trim(), p=pEl.value.trim();
+  if(n.length<3){nEl.style.borderColor='#D00000';nEl.focus();return}
+  if(p.length<7){pEl.style.borderColor='#D00000';pEl.focus();return}
+  btn.disabled=true; var t=btn.textContent; btn.textContent='Yuborilmoqda...';
+  try{
+    if(_sb){
+      var r=await _sb.from('leads').insert({name:n,phone:p,note:'🎯 REKLAMA (target) — konsultatsiya + sinov',status:'cold',lead_type:'sayt',created_at:new Date().toISOString()});
+      if(r&&r.error)console.warn('lead:',r.error.message);
+    }
+  }catch(e){console.warn('lead err',e);}
+  // swap the correct card to thank-you
+  if(nId==='n1'){document.getElementById('topForm').style.display='none';document.getElementById('topThanks').style.display='block';}
+  else{document.getElementById('botForm').style.display='none';document.getElementById('botThanks').style.display='block';}
+}
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target)}})},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
+</script>
+</body>
+</html>
