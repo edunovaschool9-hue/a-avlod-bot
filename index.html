@@ -2,22 +2,337 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url=academy.html">
-<title>A Avlod Academy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qabul 2026 | EDUNOVA SCHOOL — Farg'ona</title>
+<meta name="description" content="Edunova School — Farg'onadagi xususiy maktab. 1–11 sinflar, o'zbek va rus sektorlari. 2026-yil qabuliga hoziroq yoziling.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@500;600;700&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-body{margin:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:Arial,sans-serif;}
-.loader{text-align:center;color:#fff;}
-.loader h1{font-size:2rem;color:#c8f000;margin-bottom:10px;}
-.loader p{color:#888;}
+/* =====================================================
+   EDUNOVA DESIGN TOKENS — "Zavod Light Orange"
+   Bu palitra platformaning barcha sahifalari uchun yagona:
+   landing / o'quvchi profili / xodim profili
+   ===================================================== */
+:root{
+  --orange:#FF6B1A;         /* asosiy aksent */
+  --orange-deep:#E85400;    /* hover/bosim */
+  --orange-tint:#FFE8D8;    /* yumshoq fon plashkalar */
+  --steel:#1C1C1C;          /* qora po'lat — matn/tugma */
+  --iron:#3A3A3A;           /* ikkilamchi matn */
+  --concrete:#E7E1D3;       /* asosiy och fon (svetliy beton) */
+  --concrete-2:#DED7C7;     /* kartochka foni */
+  --line:#CFC7B6;           /* chiziqlar */
+  --white:#FAF6EC;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:'Rubik',sans-serif;background:var(--concrete);color:var(--steel);line-height:1.55;overflow-x:hidden}
+
+/* ---------- HAZARD STRIPES ---------- */
+.hazard{height:12px;background:repeating-linear-gradient(-45deg,var(--orange) 0 16px,var(--steel) 16px 32px)}
+.hazard.thin{height:7px}
+
+/* ---------- TAG ---------- */
+.tag{display:inline-block;font-family:'Oswald',sans-serif;font-weight:600;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--white);background:var(--steel);padding:6px 15px;clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%)}
+.tag.orange{background:var(--orange)}
+
+/* ---------- TOPBAR ---------- */
+.topbar{background:var(--steel);color:var(--orange);font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;letter-spacing:1.8px;text-transform:uppercase;text-align:center;padding:8px 12px}
+
+/* ---------- HEADER ---------- */
+header{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 5%;position:sticky;top:0;z-index:60;background:rgba(231,225,211,.92);backdrop-filter:blur(10px);border-bottom:1.5px solid var(--line)}
+.logo b{font-family:'Archivo Black',sans-serif;font-size:21px;color:var(--steel);letter-spacing:.5px}
+.logo b span{color:var(--orange)}
+.logo small{display:block;font-family:'Oswald',sans-serif;font-weight:500;font-size:9.5px;letter-spacing:3.5px;color:#8b8577}
+.header-actions{display:flex;gap:10px;align-items:center}
+.btn{font-family:'Oswald',sans-serif;font-weight:600;font-size:14px;letter-spacing:1.2px;text-transform:uppercase;text-decoration:none;padding:11px 22px;transition:transform .12s,background .15s,color .15s;display:inline-block;cursor:pointer;border:none}
+.btn-orange{background:var(--orange);color:var(--steel)}
+.btn-orange:hover{background:var(--orange-deep);color:var(--white);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--steel);border:2px solid var(--steel)}
+.btn-outline:hover{background:var(--steel);color:var(--white);transform:translateY(-1px)}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;padding:66px 5% 90px;overflow:hidden;
+  background:
+    repeating-linear-gradient(90deg,transparent 0 119px,rgba(28,28,28,.035) 119px 120px),
+    repeating-linear-gradient(0deg,transparent 0 119px,rgba(28,28,28,.035) 119px 120px),
+    var(--concrete)}
+.hero-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.25fr 1fr;gap:52px;align-items:start;position:relative;z-index:2}
+.hero h1{font-family:'Archivo Black',sans-serif;font-size:clamp(36px,5.4vw,66px);line-height:1.02;text-transform:uppercase;color:var(--steel);margin:22px 0 18px}
+.hero h1 .stroke{color:transparent;-webkit-text-stroke:2px var(--orange)}
+.hero p.lead{font-size:17px;color:var(--iron);max-width:520px;margin-bottom:28px}
+.hero-stats{display:flex;border:2px solid var(--steel);max-width:540px;background:var(--white)}
+.hstat{flex:1;padding:15px 10px;border-right:2px solid var(--steel);text-align:center}
+.hstat:last-child{border-right:none}
+.hstat b{display:block;font-family:'Oswald',sans-serif;font-weight:700;font-size:25px;color:var(--orange)}
+.hstat span{font-size:11px;color:var(--iron);text-transform:uppercase;letter-spacing:1px}
+
+/* ---------- HOLOGRAM OBJECT (moving bg) ---------- */
+.holo{position:absolute;right:-40px;top:40px;width:min(46vw,560px);height:min(46vw,560px);z-index:1;perspective:900px;pointer-events:none;opacity:.9}
+.holo .ring{position:absolute;inset:0;margin:auto;border:1.5px solid rgba(255,107,26,.5);border-radius:50%;animation:spinA 14s linear infinite;box-shadow:0 0 40px rgba(255,107,26,.12) inset}
+.holo .ring.r2{inset:9%;border-color:rgba(28,28,28,.35);animation:spinB 18s linear infinite}
+.holo .ring.r3{inset:20%;border-color:rgba(255,107,26,.7);border-style:dashed;animation:spinA 10s linear infinite reverse}
+.holo .core{position:absolute;inset:34%;margin:auto;transform-style:preserve-3d;animation:coreSpin 12s linear infinite}
+.holo .face{position:absolute;inset:0;border:2px solid var(--orange);background:rgba(255,107,26,.07)}
+.holo .face:nth-child(1){transform:rotateY(0deg) translateZ(60px)}
+.holo .face:nth-child(2){transform:rotateY(90deg) translateZ(60px)}
+.holo .face:nth-child(3){transform:rotateY(180deg) translateZ(60px)}
+.holo .face:nth-child(4){transform:rotateY(270deg) translateZ(60px)}
+.holo .face:nth-child(5){transform:rotateX(90deg) translateZ(60px)}
+.holo .face:nth-child(6){transform:rotateX(-90deg) translateZ(60px)}
+.holo .dot{position:absolute;width:9px;height:9px;border-radius:50%;background:var(--orange);box-shadow:0 0 14px rgba(255,107,26,.8);animation:orbit 9s linear infinite;top:50%;left:50%}
+.holo .dot.d2{animation-duration:13s;animation-delay:-4s;background:var(--steel);box-shadow:none}
+.holo .dot.d3{animation-duration:17s;animation-delay:-8s}
+@keyframes spinA{from{transform:rotateX(62deg) rotateZ(0)}to{transform:rotateX(62deg) rotateZ(360deg)}}
+@keyframes spinB{from{transform:rotateX(-55deg) rotateZ(0)}to{transform:rotateX(-55deg) rotateZ(-360deg)}}
+@keyframes coreSpin{from{transform:rotateX(-18deg) rotateY(0)}to{transform:rotateX(-18deg) rotateY(360deg)}}
+@keyframes orbit{from{transform:rotate(0) translateX(min(21vw,255px)) rotate(0)}to{transform:rotate(360deg) translateX(min(21vw,255px)) rotate(-360deg)}}
+@media (prefers-reduced-motion:reduce){.holo *{animation:none!important}}
+
+/* ---------- FORM CARD ---------- */
+.form-card{background:var(--white);position:relative;box-shadow:12px 12px 0 var(--orange);border:2px solid var(--steel)}
+.form-body{padding:28px 26px 26px}
+.form-body h2{font-family:'Oswald',sans-serif;font-weight:700;font-size:23px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.form-body>p{font-size:14px;color:#5c5a52;margin-bottom:18px}
+.form-body label{display:block;font-family:'Oswald',sans-serif;font-weight:600;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;margin:14px 0 6px}
+.form-body input{width:100%;padding:14px 14px;border:2px solid var(--steel);background:var(--white);font-family:'Rubik',sans-serif;font-size:16px;outline:none}
+.form-body input:focus{border-color:var(--orange)}
+.submit{width:100%;margin-top:22px;padding:17px;border:none;cursor:pointer;background:var(--orange);color:var(--steel);font-family:'Oswald',sans-serif;font-weight:700;font-size:17px;letter-spacing:1.5px;text-transform:uppercase;transition:background .15s,color .15s}
+.submit:hover{background:var(--steel);color:var(--white)}
+.form-note{font-size:12px;color:#8b8577;margin-top:12px;text-align:center}
+.thanks{display:none;padding:46px 26px;text-align:center}
+.thanks .ok{font-family:'Archivo Black',sans-serif;font-size:44px;color:var(--orange)}
+.thanks h3{font-family:'Oswald',sans-serif;font-weight:700;font-size:22px;text-transform:uppercase;margin:8px 0 6px}
+.thanks p{font-size:14px;color:#5c5a52}
+
+/* ---------- SECTIONS ---------- */
+section{padding:78px 5%}
+.wrap{max-width:1180px;margin:0 auto}
+.sec-head{margin-bottom:42px}
+.sec-head h2{font-family:'Archivo Black',sans-serif;font-size:clamp(27px,3.7vw,43px);text-transform:uppercase;color:var(--steel);margin-top:16px;line-height:1.08}
+.sec-head h2 em{font-style:normal;color:var(--orange)}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--steel);border:2px solid var(--steel)}
+.step{background:var(--white);padding:26px 22px}
+.step .num{font-family:'Archivo Black',sans-serif;font-size:48px;color:transparent;-webkit-text-stroke:1.5px var(--orange);line-height:1}
+.step h3{font-family:'Oswald',sans-serif;font-weight:600;font-size:17px;text-transform:uppercase;letter-spacing:.5px;margin:13px 0 7px;color:var(--steel)}
+.step p{font-size:13.5px;color:var(--iron)}
+
+/* features */
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat{border:2px solid var(--steel);padding:25px 23px;background:var(--white);position:relative}
+.feat::before{content:"";position:absolute;top:-2px;left:-2px;width:38px;height:6px;background:var(--orange)}
+.feat h3{font-family:'Oswald',sans-serif;font-weight:600;font-size:17px;text-transform:uppercase;color:var(--steel);margin-bottom:7px}
+.feat p{font-size:14px;color:var(--iron)}
+
+/* results */
+.results{display:flex;flex-wrap:wrap;gap:12px}
+.chip{font-family:'Oswald',sans-serif;font-weight:500;font-size:14px;letter-spacing:.5px;border:2px solid var(--orange);color:var(--steel);background:var(--orange-tint);padding:10px 18px;text-transform:uppercase}
+
+/* footer */
+footer{background:var(--steel);color:var(--concrete);padding:54px 5% 38px}
+.foot{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:34px}
+.foot h4{font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:13px}
+.foot p,.foot a{font-size:14.5px;color:#B9B5AC;text-decoration:none;display:block;margin-bottom:8px}
+.foot a:hover{color:var(--orange)}
+.copyright{max-width:1180px;margin:32px auto 0;padding-top:18px;border-top:1px solid #333;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#7c7c7c;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+
+@media(max-width:960px){
+  .hero-inner{grid-template-columns:1fr;gap:42px}
+  .holo{right:-90px;top:-30px;opacity:.35}
+  .steps{grid-template-columns:1fr 1fr}
+  .features{grid-template-columns:1fr 1fr}
+  .foot{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .steps{grid-template-columns:1fr}
+  .features{grid-template-columns:1fr}
+  .hero{padding-top:44px}
+  .hero-stats{flex-wrap:wrap}
+  .hstat{min-width:46%;border-bottom:2px solid var(--steel)}
+  .form-card{box-shadow:7px 7px 0 var(--orange)}
+  .header-actions .btn{padding:10px 14px;font-size:12.5px}
+  .logo small{display:none}
+}
 </style>
 </head>
 <body>
-<div class="loader">
-<h1>A AVLOD ACADEMY</h1>
-<p>Yuklanmoqda...</p>
+
+<div class="topbar">⚠ Joylar soni cheklangan — 2026-yil qabuli boshlandi</div>
+<div class="hazard thin"></div>
+
+<header>
+  <div class="logo"><b>EDU<span>NOVA</span></b><small>SCHOOL · FARG'ONA</small></div>
+  <div class="header-actions">
+    <a class="btn btn-orange" href="#ariza">Ariza qoldirish</a>
+    <a class="btn btn-outline" href="/academy.html">Login · Kirish</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <!-- hologram object -->
+  <div class="holo" aria-hidden="true">
+    <div class="ring"></div>
+    <div class="ring r2"></div>
+    <div class="ring r3"></div>
+    <div class="core">
+      <div class="face"></div><div class="face"></div><div class="face"></div>
+      <div class="face"></div><div class="face"></div><div class="face"></div>
+    </div>
+    <div class="dot"></div>
+    <div class="dot d2"></div>
+    <div class="dot d3"></div>
+  </div>
+
+  <div class="hero-inner">
+    <div>
+      <span class="tag orange">Xususiy maktab · 1–11 sinflar · UZ / RU</span>
+      <h1>Farzandingiz <span class="stroke">kelajagini</span> shu yerda quramiz</h1>
+      <p class="lead">O'zbek va rus sektorlari. Chuqurlashtirilgan matematika, ingliz va koreys tillari. 8-sinfdan yo'nalishlar bo'yicha tayyorlov — repetitorga ehtiyoj qolmaydi.</p>
+      <div class="hero-stats">
+        <div class="hstat"><b>1–11</b><span>sinflar</span></div>
+        <div class="hstat"><b>24</b><span>o'quvchi max</span></div>
+        <div class="hstat"><b>C1</b><span>ingliz tili</span></div>
+        <div class="hstat"><b>3+1</b><span>mahal ovqat</span></div>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <div class="form-card" id="ariza">
+      <div class="hazard"></div>
+      <div class="form-body" id="formBody">
+        <h2>Qabulga yozilish</h2>
+        <p>Ism va telefon raqamingizni qoldiring — administratorimiz tez orada bog'lanadi.</p>
+        <label for="fname">O'quvchining F.I.Sh *</label>
+        <input id="fname" type="text" placeholder="Masalan: Aliyev Ali" autocomplete="name">
+        <label for="fphone">Telefon raqami *</label>
+        <input id="fphone" type="tel" placeholder="+998 __ ___ __ __" inputmode="tel" autocomplete="tel">
+        <button class="submit" onclick="sendForm()">Qabulga yozilish →</button>
+        <div class="form-note">Ma'lumotlaringiz faqat qabul uchun ishlatiladi.</div>
+      </div>
+      <div class="thanks" id="thanksBody">
+        <div class="ok">✓</div>
+        <h3>Rahmat!</h3>
+        <p>Arizangiz qabul qilindi. Administratorimiz tez orada siz bilan bog'lanadi.</p>
+      </div>
+      <div class="hazard"></div>
+    </div>
+  </div>
 </div>
+
+<div class="hazard"></div>
+
+<!-- STEPS -->
+<section>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">Qabul jarayoni</span>
+      <h2>4 ta oddiy <em>bosqich</em></h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal"><div class="num">01</div><h3>Ariza qoldiring</h3><p>Shu sahifadagi shaklga ism va telefon raqamingizni kiriting.</p></div>
+      <div class="step reveal"><div class="num">02</div><h3>Qo'ng'iroq qilamiz</h3><p>Administratorimiz bog'lanib, savollaringizga javob beradi.</p></div>
+      <div class="step reveal"><div class="num">03</div><h3>Tanishuv va suhbat</h3><p>Maktabga kelasiz, farzandingizning qobiliyatlari aniqlanadi.</p></div>
+      <div class="step reveal"><div class="num">04</div><h3>3 kun bepul sinov</h3><p>Bola maktabni o'z ko'zi bilan ko'radi. Keyin qaror — sizniki.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">Nega Edunova</span>
+      <h2>Maktabda <em>hammasi</em> bor</h2>
+    </div>
+    <div class="features">
+      <div class="feat reveal"><h3>📐 Chuqur dastur</h3><p>1-sinfdan matematika va ingliz tili chuqurlashtirilgan. Koreys tili — qo'shimcha fan sifatida.</p></div>
+      <div class="feat reveal"><h3>🎯 4 yo'nalish</h3><p>8-sinfdan: aniq, tabiiy, ijtimoiy-gumanitar va yuridik yo'nalishlar. Repetitorga ehtiyoj qolmaydi.</p></div>
+      <div class="feat reveal"><h3>🇬🇧 C1 ingliz tili</h3><p>Xalqaro sertifikatlarga maxsus tayyorgarlik. O'quvchilarimiz muddatidan oldin o'qishga kirishmoqda.</p></div>
+      <div class="feat reveal"><h3>🍽️ To'liq sharoit</h3><p>3 mahal ovqat, bepul avtobus, yotoqxona (4 mahal ovqat bilan). Uzoq hududlardan kelganlarga qulay.</p></div>
+      <div class="feat reveal"><h3>♟️ To'garaklar</h3><p>Shaxmat, robototexnika, gimnastika, arab tili. Muhandislik guruhlari tashkil etilmoqda.</p></div>
+      <div class="feat reveal"><h3>🛡️ Xavfsizlik</h3><p>Video kuzatuv, qo'riqlash xizmati, sinfda ko'pi bilan 24 o'quvchi. Psixologiya darslari 1-sinfdan.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">Natijalar</span>
+      <h2>Gapirmaymiz — <em>ko'rsatamiz</em></h2>
+    </div>
+    <div class="results reveal">
+      <span class="chip">✓ Sertifikat olgan o'quvchilar</span>
+      <span class="chip">✓ Muddatidan oldin o'qishga kirganlar</span>
+      <span class="chip">✓ Prezident maktablariga tayyorlov</span>
+      <span class="chip">✓ Ixtisoslashtirilgan maktablarga qabul</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- DIAGNOSTIKA CTA -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="reveal" style="border:2px solid var(--steel);background:var(--white);padding:34px 30px;display:flex;flex-wrap:wrap;gap:22px;align-items:center;justify-content:space-between;position:relative">
+      <div style="position:absolute;top:-2px;left:-2px;width:52px;height:7px;background:var(--orange)"></div>
+      <div style="max-width:640px">
+        <span class="tag orange">Diagnostika Markazi</span>
+        <h2 style="font-family:'Archivo Black',sans-serif;font-size:clamp(22px,3vw,34px);text-transform:uppercase;line-height:1.1;margin:14px 0 8px">Farzandingizning <em style="font-style:normal;color:var(--orange)">iqtidorini</em> hoziroq aniqlang</h2>
+        <p style="font-size:15px;color:var(--iron)">Onlayn diagnostika: bola kabinetma-kabinet testdan o'tadi — kuchli tomonlari, mos kasblar va yo'nalish aniqlanadi. Natija — bir necha daqiqada.</p>
+      </div>
+      <a class="btn btn-orange" style="font-size:16px;padding:16px 30px" href="/diagnostika.html">Diagnostikadan o'tish →</a>
+    </div>
+  </div>
+</section>
+
+<div class="hazard"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot">
+    <div>
+      <div class="logo" style="margin-bottom:14px"><b style="color:#fff">EDU<span>NOVA</span></b><small>SCHOOL · FARG'ONA</small></div>
+      <p>Farg'ona shahridagi xususiy maktab. 1–11 sinflar, o'zbek va rus sektorlari.</p>
+    </div>
+    <div>
+      <h4>Aloqa</h4>
+      <a href="tel:+998908499300">+998 90 849 93 00</a>
+      <p>Mustaqillik shoh ko'chasi, 340/4-uy</p>
+    </div>
+    <div>
+      <h4>Onlayn</h4>
+      <a href="/academy.html">Platformaga kirish (o'quvchi / xodim)</a>
+      <a href="https://instagram.com/edunova_start" target="_blank" rel="noopener">Instagram: @edunova_start</a>
+    </div>
+  </div>
+  <div class="copyright">
+    <span>© 2026 Edunova School</span>
+    <span>Joylar soni cheklangan</span>
+  </div>
+</footer>
+
 <script>
-window.location.replace('academy.html');
+function sendForm(){
+  var n=document.getElementById('fname').value.trim();
+  var p=document.getElementById('fphone').value.trim();
+  if(n.length<3){document.getElementById('fname').style.borderColor='#D00000';return}
+  if(p.length<7){document.getElementById('fphone').style.borderColor='#D00000';return}
+  /* TODO: Supabase leads jadvaliga yozish yoki Telegram-bot webhook */
+  document.getElementById('formBody').style.display='none';
+  document.getElementById('thanksBody').style.display='block';
+}
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target)}})},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
 </script>
 </body>
 </html>
