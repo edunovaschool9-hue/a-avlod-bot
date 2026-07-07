@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>UTKONOS Platform</title>
+<title>EduNova Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -712,6 +712,27 @@ body::before{background:
   radial-gradient(50% 50% at 50% 100%,rgba(255,107,26,.07),transparent 60%),var(--bg)}
 body::after{opacity:.015}
 ::-webkit-scrollbar-thumb{background:#C9C2B4}
+
+/* ---- READABILITY FIXES (light theme) ---- */
+/* gradient panel titles were white->accent = invisible on light bg */
+.ap-title{background:none!important;-webkit-text-fill-color:currentColor!important;color:var(--tx)!important}
+.brand-title span{background:none!important;-webkit-text-fill-color:currentColor!important;color:var(--ac)!important}
+/* any element hardcoded to white text -> dark ink */
+[style*="color:#fff"]{color:var(--tx)!important}
+[style*="color:#ffffff"]{color:var(--tx)!important}
+[style*="color:#FFF"]{color:var(--tx)!important}
+/* placeholders darker */
+input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
+/* keep white text ONLY where background is a solid accent/dark button */
+.btn-primary,.btn-primary *,button.btn-primary,
+.dg-back:hover,.dc-btn,.dc-btn *,
+[style*="background:var(--ac)"],[style*="background:#FF6B1A"],[style*="background:#1C1C1C"],
+[style*="background:var(--tx)"]{ }
+
+
+/* lead number badge */
+.lead-num{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 8px;border-radius:9px;background:var(--ac);color:#1C1C1C;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:15px;margin-right:12px;flex:none;box-shadow:0 2px 8px rgba(255,107,26,.3)}
+.lead-top>div:first-child{display:flex;align-items:center;flex:1;min-width:0}
 </style>
 </head>
 
@@ -1253,9 +1274,9 @@ body::after{opacity:.015}
   <div class="sidebar">
     <div>
       <div class="sb-logo">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding-bottom:4px">
-          <svg viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg" style="width:54px;height:auto"><defs><linearGradient id="sbwb" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d8dae0"/></linearGradient></defs><path d="M150 50 Q188 38 200 56 Q204 65 200 74 Q188 92 150 80 Q144 65 150 50 Z" fill="url(#sbwb)"/><ellipse cx="95" cy="65" rx="62" ry="38" fill="url(#sbwb)"/><ellipse cx="48" cy="63" rx="28" ry="26" fill="url(#sbwb)"/><path d="M48 56 Q14 50 0 60 Q-4 65 0 70 Q14 80 50 74 Q56 65 52 58 Z" fill="#b8bac2"/><ellipse cx="12" cy="65" rx="2.5" ry="2" fill="#0a0b0f" opacity="0.4"/><circle cx="42" cy="54" r="4.5" fill="#0a0b0f"/></svg>
-          <div style="font-family:var(--fd);font-size:15px;font-weight:800;letter-spacing:3px;color:#fff">UTKONOS</div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding-bottom:4px">
+          <div style="font-family:'Archivo Black','Space Grotesk',sans-serif;font-size:22px;font-weight:800;letter-spacing:.5px;color:var(--tx);line-height:1">EDU<span style="color:var(--ac)">NOVA</span></div>
+          <div style="font-family:var(--fd);font-size:9px;font-weight:700;letter-spacing:3px;color:var(--mu)">SCHOOL · PANEL</div>
         </div>
         <div class="sb-role" id="sb-role" style="text-align:center">ADMIN</div>
       </div>
@@ -3660,14 +3681,14 @@ function renderLeads(list){const c=document.getElementById('lead-cards');
   }
   // sort: unchecked first, then by activity date (direction toggle)
   const sorted=sortLeadsList(list,leadsSortField,leadsSortDir);
-  c.innerHTML=sorted.map(l=>{const rem=l.reminder_at?`<div class="lead-reminder">⏰ Qayta qo'ng'iroq: ${dtFmt(l.reminder_at)}</div>`:'';
+  c.innerHTML=sorted.map((l,_i)=>{const rem=l.reminder_at?`<div class="lead-reminder">⏰ Qayta qo'ng'iroq: ${dtFmt(l.reminder_at)}</div>`:'';
     const com=l.last_comment?`<div class="lead-comment">"${l.last_comment}"</div>`:'';
     const closed=l.status==='enrolled'||l.status==='refused';
     const checked=isCheckedToday(l);
     // unread indicator (like unread SMS)
     const unreadDot=(!closed&&!checked)?'<span style="display:inline-block;width:9px;height:9px;background:var(--ac);border-radius:50%;margin-right:6px;vertical-align:middle"></span>':'';
     const readMark=checked?'<span style="color:var(--gn);font-size:12px">✓✓ bugun tekshirildi</span>':(!closed?'<span style="color:var(--ac2);font-size:12px;font-weight:600">● yangi / tekshirilmagan</span>':'');
-    return `<div class="lead-card ${l.status||'cold'}" style="${(!closed&&!checked)?'border-left-width:4px':''}"><div class="lead-top"><div><div class="lead-name">${unreadDot}${l.name}</div><div class="lead-phone">📱 ${l.phone}</div></div>
+    return `<div class="lead-card ${l.status||'cold'}" style="${(!closed&&!checked)?'border-left-width:4px':''}"><div class="lead-top"><div><div class="lead-name"><span class="lead-num">${_i+1}</span>${unreadDot}${l.name}</div><div class="lead-phone">📱 ${l.phone}</div></div>
       <div style="text-align:right"><span class="badge ${l.status==='hot'?'warn':l.status==='enrolled'?'active':l.status==='thinking'?'pending':'blue'}">${LSTAT[l.status]||'Sovuq'}</span>
       <div class="lead-date">${new Date(l.created_at).toLocaleDateString('ru')}</div></div></div>
       ${l.note?`<div style="font-size:12px;color:var(--mu);margin:4px 0">${l.note}</div>`:''}${com}${rem}
@@ -3761,13 +3782,13 @@ function renderMLeads(list){const c=document.getElementById('mlead-cards');
     else banner.innerHTML=`<div style="background:rgba(52,211,153,.1);border:1px solid var(--gn);border-radius:10px;padding:12px 16px;margin-bottom:14px;color:var(--gn)">✅ Barcha maktab lidlari bugun tekshirildi!</div>`;
   }
   const sorted=sortLeadsList(list,mleadsSortField,mleadsSortDir);
-  c.innerHTML=sorted.map(l=>{const rem=l.reminder_at?`<div class="lead-reminder">⏰ Qayta qo'ng'iroq: ${dtFmt(l.reminder_at)}</div>`:'';
+  c.innerHTML=sorted.map((l,_i)=>{const rem=l.reminder_at?`<div class="lead-reminder">⏰ Qayta qo'ng'iroq: ${dtFmt(l.reminder_at)}</div>`:'';
     const com=l.last_comment?`<div class="lead-comment">"${l.last_comment}"</div>`:'';
     const closed=l.status==='enrolled'||l.status==='refused';
     const checked=isCheckedToday(l);
     const unreadDot=(!closed&&!checked)?'<span style="display:inline-block;width:9px;height:9px;background:var(--ac);border-radius:50%;margin-right:6px;vertical-align:middle"></span>':'';
     const readMark=checked?'<span style="color:var(--gn);font-size:12px">✓✓ bugun tekshirildi</span>':(!closed?'<span style="color:var(--ac2);font-size:12px;font-weight:600">● yangi / tekshirilmagan</span>':'');
-    return `<div class="lead-card ${l.status||'cold'}" style="${(!closed&&!checked)?'border-left-width:4px':''}"><div class="lead-top"><div><div class="lead-name">${unreadDot}${l.name}</div><div class="lead-phone">📱 ${l.phone}</div></div>
+    return `<div class="lead-card ${l.status||'cold'}" style="${(!closed&&!checked)?'border-left-width:4px':''}"><div class="lead-top"><div><div class="lead-name"><span class="lead-num">${_i+1}</span>${unreadDot}${l.name}</div><div class="lead-phone">📱 ${l.phone}</div></div>
       <div style="text-align:right"><span class="badge ${l.status==='hot'?'warn':l.status==='enrolled'?'active':l.status==='thinking'?'pending':'blue'}">${LSTAT[l.status]||'Sovuq'}</span>
       <div class="lead-date">${new Date(l.created_at).toLocaleDateString('ru')}</div></div></div>
       ${l.note?`<div style="font-size:12px;color:var(--mu);margin:4px 0">${l.note}</div>`:''}
@@ -3824,13 +3845,13 @@ function renderNLeads(list){const c=document.getElementById('nlead-cards');
     else banner.innerHTML=`<div style="background:rgba(52,211,153,.1);border:1px solid var(--gn);border-radius:10px;padding:12px 16px;margin-bottom:14px;color:var(--gn)">✅ Barcha nolavoy lidlari bugun tekshirildi!</div>`;
   }
   const sorted=sortLeadsList(list,nleadsSortField,nleadsSortDir);
-  c.innerHTML=sorted.map(l=>{const rem=l.reminder_at?`<div class="lead-reminder">⏰ Qayta qo'ng'iroq: ${dtFmt(l.reminder_at)}</div>`:'';
+  c.innerHTML=sorted.map((l,_i)=>{const rem=l.reminder_at?`<div class="lead-reminder">⏰ Qayta qo'ng'iroq: ${dtFmt(l.reminder_at)}</div>`:'';
     const com=l.last_comment?`<div class="lead-comment">"${l.last_comment}"</div>`:'';
     const closed=l.status==='enrolled'||l.status==='refused';
     const checked=isCheckedToday(l);
     const unreadDot=(!closed&&!checked)?'<span style="display:inline-block;width:9px;height:9px;background:var(--ac);border-radius:50%;margin-right:6px;vertical-align:middle"></span>':'';
     const readMark=checked?'<span style="color:var(--gn);font-size:12px">✓✓ bugun tekshirildi</span>':(!closed?'<span style="color:var(--ac2);font-size:12px;font-weight:600">● yangi / tekshirilmagan</span>':'');
-    return `<div class="lead-card ${l.status||'cold'}" style="${(!closed&&!checked)?'border-left-width:4px':''}"><div class="lead-top"><div><div class="lead-name">${unreadDot}${l.name}</div><div class="lead-phone">📱 ${l.phone}</div></div>
+    return `<div class="lead-card ${l.status||'cold'}" style="${(!closed&&!checked)?'border-left-width:4px':''}"><div class="lead-top"><div><div class="lead-name"><span class="lead-num">${_i+1}</span>${unreadDot}${l.name}</div><div class="lead-phone">📱 ${l.phone}</div></div>
       <div style="text-align:right"><span class="badge ${l.status==='hot'?'warn':l.status==='enrolled'?'active':l.status==='thinking'?'pending':'blue'}">${LSTAT[l.status]||'Sovuq'}</span>
       <div class="lead-date">${new Date(l.created_at).toLocaleDateString('ru')}</div></div></div>
       ${l.note?`<div style="font-size:12px;color:var(--mu);margin:4px 0">${l.note}</div>`:''}
