@@ -733,6 +733,48 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
 /* lead number badge */
 .lead-num{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 8px;border-radius:9px;background:var(--ac);color:#1C1C1C;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:15px;margin-right:12px;flex:none;box-shadow:0 2px 8px rgba(255,107,26,.3)}
 .lead-top>div:first-child{display:flex;align-items:center;flex:1;min-width:0}
+
+/* ===== CENTERED LOGIN + HOLOGRAM (override) ===== */
+#p-ulogin{padding:0 !important;flex-direction:column !important;align-items:center !important;justify-content:center !important;min-height:100vh;position:relative;overflow:hidden;
+  background:radial-gradient(120% 120% at 50% -10%,#241a12 0%,#15100a 55%,#0d0a06 100%)}
+.lg-card{position:relative;z-index:3;width:100%;max-width:380px;margin:0 20px;background:rgba(28,22,14,.72);
+  border:1.5px solid rgba(255,107,26,.35);border-radius:20px;padding:34px 30px 28px;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 30px 70px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);
+  animation:lgRise .6s cubic-bezier(.2,.9,.3,1) both}
+@keyframes lgRise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.lg-logo{text-align:center;font-family:'Archivo Black','Space Grotesk',sans-serif;font-size:30px;font-weight:800;letter-spacing:.5px;color:#F4EFE7;line-height:1}
+.lg-logo span{color:var(--ac)}
+.lg-logo-sub{text-align:center;font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:4px;color:#9a8f7d;margin-top:5px}
+.lg-card .login-title{color:#F4EFE7}
+.lg-card .field label{color:#b8ad99}
+.lg-card .field input{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.16);color:#F4EFE7;border-radius:11px;padding:13px 14px;font-size:15px}
+.lg-card .field input::placeholder{color:#8a8070}
+.lg-card .field input:focus{border-color:var(--ac);background:rgba(255,255,255,.09)}
+.lg-card .btn-full{background:linear-gradient(90deg,#FF6B1A,#FF8A47);color:#1C1C1C;border-radius:12px;padding:15px;font-weight:800;font-size:16px;margin-top:6px}
+.lg-card .btn-full:hover{filter:brightness(1.05)}
+.lg-foot{text-align:center;font-size:12.5px;color:#9a8f7d;margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1)}
+/* hologram object */
+.lg-holo{position:absolute;z-index:1;width:min(80vw,560px);height:min(80vw,560px);top:50%;left:50%;transform:translate(-50%,-50%);perspective:900px;pointer-events:none;opacity:.5}
+.lg-ring{position:absolute;inset:0;margin:auto;border:1.5px solid rgba(255,107,26,.5);border-radius:50%;animation:lgSpinA 15s linear infinite}
+.lg-ring.r2{inset:10%;border-color:rgba(255,180,120,.28);animation:lgSpinB 19s linear infinite}
+.lg-ring.r3{inset:22%;border-color:rgba(255,107,26,.65);border-style:dashed;animation:lgSpinA 11s linear infinite reverse}
+.lg-core{position:absolute;inset:36%;margin:auto;transform-style:preserve-3d;animation:lgCore 13s linear infinite}
+.lg-face{position:absolute;inset:0;border:2px solid rgba(255,107,26,.7);background:rgba(255,107,26,.06)}
+.lg-face:nth-child(1){transform:rotateY(0deg) translateZ(58px)}
+.lg-face:nth-child(2){transform:rotateY(90deg) translateZ(58px)}
+.lg-face:nth-child(3){transform:rotateY(180deg) translateZ(58px)}
+.lg-face:nth-child(4){transform:rotateY(270deg) translateZ(58px)}
+.lg-face:nth-child(5){transform:rotateX(90deg) translateZ(58px)}
+.lg-face:nth-child(6){transform:rotateX(-90deg) translateZ(58px)}
+.lg-dot{position:absolute;width:9px;height:9px;border-radius:50%;background:var(--ac);box-shadow:0 0 14px rgba(255,107,26,.8);top:50%;left:50%;animation:lgOrbit 10s linear infinite}
+.lg-dot.d2{animation-duration:14s;animation-delay:-5s;background:#FFB37A;box-shadow:none}
+.lg-dot.d3{animation-duration:18s;animation-delay:-9s}
+@keyframes lgSpinA{from{transform:rotateX(62deg) rotateZ(0)}to{transform:rotateX(62deg) rotateZ(360deg)}}
+@keyframes lgSpinB{from{transform:rotateX(-55deg) rotateZ(0)}to{transform:rotateX(-55deg) rotateZ(-360deg)}}
+@keyframes lgCore{from{transform:rotateX(-18deg) rotateY(0)}to{transform:rotateX(-18deg) rotateY(360deg)}}
+@keyframes lgOrbit{from{transform:rotate(0) translateX(min(24vw,240px)) rotate(0)}to{transform:rotate(360deg) translateX(min(24vw,240px)) rotate(-360deg)}}
+@media (prefers-reduced-motion:reduce){.lg-holo *{animation:none !important}}
+
 </style>
 </head>
 
@@ -1000,113 +1042,33 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
 <!-- ══ LANDING / COURSE SELECT ══ -->
 <!-- ══ UNIFIED LOGIN (single entry for students + staff) ══ -->
 <div class="page on" id="p-ulogin">
-  <div class="ul-wrap">
-    <!-- LEFT: brand + school info (scrollable) -->
-    <div class="ul-brand">
-      <div class="ul-orb" style="width:420px;height:420px;background:var(--ac);top:10%;left:5%"></div>
-      <div class="ul-brand-inner">
-        <div class="ul-logo-row">
-          <div class="ul-logo-badge">🎓</div>
-          <div>
-            <div class="ul-name">EDUNOVA</div>
-            <div class="ul-sub">SCHOOL</div>
-          </div>
-        </div>
-        <div class="ul-tagline">Iste'dod kashf etiladigan<br><span class="ac">yangi avlod maktabi.</span></div>
-
-        <!-- scrollable school info -->
-        <div class="ul-info">
-          <div class="ul-info-block">
-            <div class="ul-info-icon">🎯</div>
-            <div class="ul-info-title">Biz kim?</div>
-            <div class="ul-info-text">EduNova — Farg'onadagi yangi avlod maktabi. Biz bolalarni faqat "baho" uchun emas, balki hayotga, ijodga va tadbirkorlikka tayyorlaymiz.</div>
-          </div>
-
-          <div class="ul-info-block">
-            <div class="ul-info-icon">🧪</div>
-            <div class="ul-info-title">Iqtidor diagnostikasi</div>
-            <div class="ul-info-text">Maxsus test farzandingizning tabiiy iste'dodini ochadi — u mantiqqami, ijodgami yoki muloqotga moyilmi. Va kelajakda qaysi kasb mos kelishini ko'rsatadi. Farg'onada birinchi marta!</div>
-          </div>
-
-          <div class="ul-info-block">
-            <div class="ul-info-icon">🏺</div>
-            <div class="ul-info-title">Hunar ustaxonalari</div>
-            <div class="ul-info-text">Bolalar o'z qo'li bilan yaratadi: kulolchilik (loydan buyumlar) va qandolatchilik (shirinliklar). Ular zerikmaydi — ijod qiladi va natijani ko'radi.</div>
-          </div>
-
-          <div class="ul-info-block">
-            <div class="ul-info-icon">🎨</div>
-            <div class="ul-info-title">Bloging va prezentatsiya</div>
-            <div class="ul-info-text">O'quvchilar o'z mahsulotini chiroyli qadoqlash, suratga olish va sotishni o'rganadi. Bu — bozorga kerakli zamonaviy ko'nikma.</div>
-          </div>
-
-          <div class="ul-info-block">
-            <div class="ul-info-icon">💰</div>
-            <div class="ul-info-title">O'z mahsulotini sotadi</div>
-            <div class="ul-info-text">Maktab do'koni va yarmarkalarda bolalar yaratgan buyumlarini sotadi. Sotuvdan tushgan pulning bir qismi bolaga beriladi — u birinchi daromadini topadi!</div>
-          </div>
-
-          <div class="ul-info-block">
-            <div class="ul-info-icon">🏆</div>
-            <div class="ul-info-title">Natija</div>
-            <div class="ul-info-text">Bir yildan keyin farzandingiz: noldan mahsulot yarata oladi, gapirish va taqdim etishdan qo'rqmaydi, pul qadrini biladi va o'ziga ishonadi — "Men qila olaman!"</div>
-          </div>
-
-          <div class="ul-info-cta">
-            <div class="ul-info-cta-title">📲 Batafsil ma'lumot</div>
-            <div class="ul-info-cta-text">Farzandingizning iste'dodini bilib olishni xohlaysizmi? Direktga yozing — biz bog'lanamiz. Joylar cheklangan!</div>
-          </div>
-        </div>
-      </div>
+  <!-- moving hologram background -->
+  <div class="lg-holo" aria-hidden="true">
+    <div class="lg-ring"></div>
+    <div class="lg-ring r2"></div>
+    <div class="lg-ring r3"></div>
+    <div class="lg-core">
+      <div class="lg-face"></div><div class="lg-face"></div><div class="lg-face"></div>
+      <div class="lg-face"></div><div class="lg-face"></div><div class="lg-face"></div>
     </div>
-    <!-- RIGHT: login -->
-    <div class="ul-login">
-      <div class="ul-login-orb"></div>
-      <div class="ul-box">
-        <div class="ul-watch-platy">
-          <svg id="ulWatchPlaty" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="ulwFur" x1="0.2" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#6b5640"/><stop offset="0.5" stop-color="#4f3f2d"/><stop offset="1" stop-color="#3a2d1f"/></linearGradient>
-              <radialGradient id="ulwFurHi" cx="35%" cy="25%" r="70%"><stop offset="0" stop-color="#7d6650"/><stop offset="1" stop-color="#4f3f2d" stop-opacity="0"/></radialGradient>
-              <linearGradient id="ulwBill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a3528"/><stop offset="0.5" stop-color="#3a2820"/><stop offset="1" stop-color="#2a1c16"/></linearGradient>
-              <linearGradient id="ulwTail" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3a2d1f"/><stop offset="1" stop-color="#2a2017"/></linearGradient>
-            </defs>
-            <ellipse cx="56" cy="158" rx="50" ry="30" fill="url(#ulwTail)" transform="rotate(-12 56 158)"/>
-            <path d="M30 150 Q56 138 82 150 M28 162 Q56 152 84 162 M32 174 Q56 166 80 174" stroke="#241a12" stroke-width="1.2" fill="none" opacity="0.5" transform="rotate(-12 56 158)"/>
-            <path d="M150 196 Q150 220 138 224 Q150 222 158 224 Q168 222 166 210 Z" fill="#3a2820"/>
-            <ellipse cx="170" cy="150" rx="92" ry="58" fill="url(#ulwFur)"/>
-            <ellipse cx="170" cy="150" rx="92" ry="58" fill="url(#ulwFurHi)"/>
-            <ellipse cx="178" cy="172" rx="62" ry="32" fill="#5a4734" opacity="0.55"/>
-            <path d="M150 188 Q146 214 130 220 Q138 216 148 220 Q160 222 162 208 Q160 196 156 188 Z" fill="#33241b"/>
-            <ellipse cx="232" cy="120" rx="50" ry="44" fill="url(#ulwFur)"/>
-            <ellipse cx="232" cy="112" rx="44" ry="36" fill="url(#ulwFurHi)"/>
-            <g><ellipse cx="218" cy="104" rx="11" ry="12" fill="#fff"/><circle id="ulwPupilL" cx="218" cy="104" r="5.5" fill="#1a120c"/></g>
-            <g><ellipse cx="246" cy="104" rx="11" ry="12" fill="#fff"/><circle id="ulwPupilR" cx="246" cy="104" r="5.5" fill="#1a120c"/></g>
-            <path d="M258 116 Q300 108 312 122 Q316 130 312 138 Q300 152 258 142 Q250 130 258 116 Z" fill="url(#ulwBill)"/>
-            <path d="M258 116 Q300 108 312 122 Q304 124 296 124 Q276 122 258 124 Z" fill="#5a4234" opacity="0.6"/>
-            <ellipse cx="300" cy="124" rx="2.5" ry="2" fill="#1a120c"/>
-            <ellipse cx="300" cy="134" rx="2.5" ry="2" fill="#1a120c"/>
-          </svg>
-        </div>
-        <div class="login-title">Platformaga kirish</div>
-        <div class="field">
-          <label>Ism / Login</label>
-          <input id="ul-name" type="text" placeholder="Ism yoki login" autocomplete="off">
-        </div>
-        <div class="field">
-          <label>Kod / Parol</label>
-          <input id="ul-pass" type="password" placeholder="Kod yoki parol" autocomplete="off" onkeydown="if(event.key==='Enter')doUnifiedLogin()">
-        </div>
-        <button class="btn-full" id="ul-btn" onclick="doUnifiedLogin()">Kirish →</button>
-        <div class="err" id="ul-err">Noto'g'ri ma'lumot</div>
-        <div class="ul-divider"></div>
-        <div class="login-sub" style="text-align:center;margin:0">O'quvchilar va xodimlar uchun yagona kirish</div>
-        <div class="ul-mini">
-          <span style="font-size:18px">🎓</span>
-          <span>EDUNOVA SCHOOL</span>
-        </div>
-      </div>
+    <div class="lg-dot"></div><div class="lg-dot d2"></div><div class="lg-dot d3"></div>
+  </div>
+
+  <div class="lg-card">
+    <div class="lg-logo">EDU<span>NOVA</span></div>
+    <div class="lg-logo-sub">SCHOOL · PLATFORMA</div>
+    <div class="login-title" style="text-align:center;margin:18px 0 20px">Platformaga kirish</div>
+    <div class="field">
+      <label>Ism / Login</label>
+      <input id="ul-name" type="text" placeholder="Ism yoki login" autocomplete="off">
     </div>
+    <div class="field">
+      <label>Kod / Parol</label>
+      <input id="ul-pass" type="password" placeholder="Kod yoki parol" autocomplete="off" onkeydown="if(event.key==='Enter')doUnifiedLogin()">
+    </div>
+    <button class="btn-full" id="ul-btn" onclick="doUnifiedLogin()">Kirish →</button>
+    <div class="err" id="ul-err">Noto'g'ri ma'lumot</div>
+    <div class="lg-foot">O'quvchilar va xodimlar uchun yagona kirish</div>
   </div>
 </div>
 
