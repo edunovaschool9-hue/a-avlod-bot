@@ -161,6 +161,7 @@ footer{background:var(--steel);color:var(--concrete);padding:54px 5% 38px}
   .logo small{display:none}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -322,12 +323,19 @@ footer{background:var(--steel);color:var(--concrete);padding:54px 5% 38px}
 </footer>
 
 <script>
-function sendForm(){
-  var n=document.getElementById('fname').value.trim();
-  var p=document.getElementById('fphone').value.trim();
-  if(n.length<3){document.getElementById('fname').style.borderColor='#D00000';return}
-  if(p.length<7){document.getElementById('fphone').style.borderColor='#D00000';return}
-  /* TODO: Supabase leads jadvaliga yozish yoki Telegram-bot webhook */
+var _sbLead=(window.supabase?window.supabase.createClient('https://unaodltahuevrfnarfha.supabase.co','sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP'):null);
+async function sendForm(){
+  var nEl=document.getElementById('fname'), pEl=document.getElementById('fphone');
+  var n=nEl.value.trim(), p=pEl.value.trim();
+  if(n.length<3){nEl.style.borderColor='#D00000';return}
+  if(p.length<7){pEl.style.borderColor='#D00000';return}
+  var btn=document.querySelector('.submit'); if(btn){btn.disabled=true;btn.textContent='Yuborilmoqda...';}
+  try{
+    if(_sbLead){
+      var r=await _sbLead.from('leads').insert({name:n,phone:p,note:'Sayt formasi (qabul lending)',status:'cold',lead_type:'sayt',created_at:new Date().toISOString()});
+      if(r&&r.error){console.warn('lead insert:',r.error.message);}
+    }
+  }catch(e){console.warn('lead err',e);}
   document.getElementById('formBody').style.display='none';
   document.getElementById('thanksBody').style.display='block';
 }
