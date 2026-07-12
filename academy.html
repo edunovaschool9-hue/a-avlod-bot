@@ -1358,7 +1358,17 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
       <div class="ap-head"><div><div class="ap-title">🎯 Qabul bo'limi</div><div class="ap-sub">Diagnostikadan o'tgan bolalar</div></div></div>
       <div id="qabul-list" style="padding:10px 0"></div>
     </div>
-    <div class="admin-panel" id="ap-leads">
+    <!-- TEST NATIJALARI -->
+    <div class="admin-panel" id="ap-testnat">
+      <div class="ap-head"><div><div class="ap-title">📊 Test natijalari</div><div class="ap-sub">O'quvchilar test natijalari va karantin</div></div></div>
+      <div style="display:flex;gap:10px;margin:16px 0;flex-wrap:wrap">
+        <button id="tn-tab-res" class="btn-sm" style="background:#FF6B1A;color:#fff;border:none" onclick="tnTab('res')">👥 Natijalar</button>
+        <button id="tn-tab-kar" class="btn-sm" style="background:rgba(28,28,28,.08);color:#1C1C1C;border:none" onclick="tnTab('kar')">🚨 Karantin</button>
+      </div>
+      <div id="tn-res-box"></div>
+      <div id="tn-kar-box" style="display:none"></div>
+    </div>
+
       <div class="ap-head"><div><div class="ap-title">🔥 Lidlar</div><div class="ap-sub">Mijozlar va qo'ng'iroqlar</div></div>
         <div class="lead-export-btns"><button class="btn-sm yellow" onclick="toggleLeadForm()">+ Yangi lid</button>
         <button class="btn-sm exp-x" onclick="exportLeadsExcel('blog')">📊 Excel</button>
@@ -2017,7 +2027,7 @@ const POSITIONS = {
 
 // ── ROLE MENUS ── (Variant B: everyone sees ALL sections; only timer differs)
 const FULL_MENU=['svodka','qabul','dash','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
-const MARKETING_MENU=['svodka','qabul','dash','hisobkitob','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
+const MARKETING_MENU=['svodka','qabul','testnat','dash','hisobkitob','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
 const MENUS = {
   admin:     FULL_MENU,
   marketing: MARKETING_MENU,
@@ -2042,7 +2052,8 @@ const MENU_META = {
   teachers: {label:'👩‍🏫 O\'qituvchilar', fn:'loadTeachers'},
   operatorquv:{label:'🎓 Operator o\'quvi', fn:'loadOperatorQuv'},
   staff:    {label:'🧑‍💼 Xodimlar',       fn:'loadStaffPanel'},
-  qabul:    {label:'🎯 Qabul',           fn:'loadQabul'}
+  qabul:    {label:'🎯 Qabul',           fn:'loadQabul'},
+  testnat:  {label:'📊 Test natijalari', fn:'loadTestNatijalari'}
 };
 
 // ══════════ QABUL (diagnostikadan o'tganlar) ══════════
@@ -2098,6 +2109,101 @@ function toLatin(str){
   }).join('');
 }
 
+// ══════════ TEST NATIJALARI + KARANTIN ══════════
+const SUBJ_LABEL={math:'📐 Matematika',english:'🇬🇧 Ingliz tili',ai:'🤖 AI va Prompt'};
+let _tnResults=[], _tnStudents=[];
+
+function tnTab(t){
+  document.getElementById('tn-res-box').style.display = t==='res'?'block':'none';
+  document.getElementById('tn-kar-box').style.display = t==='kar'?'block':'none';
+  const rb=document.getElementById('tn-tab-res'), kb=document.getElementById('tn-tab-kar');
+  rb.style.background = t==='res'?'#FF6B1A':'rgba(28,28,28,.08)';
+  rb.style.color = t==='res'?'#fff':'#1C1C1C';
+  kb.style.background = t==='kar'?'#C0392B':'rgba(28,28,28,.08)';
+  kb.style.color = t==='kar'?'#fff':'#1C1C1C';
+  if(t==='kar') renderKarantin();
+}
+
+async function loadTestNatijalari(){
+  const box=document.getElementById('tn-res-box');
+  box.innerHTML='<div style="text-align:center;padding:40px;color:#8892b0">Yuklanmoqda…</div>';
+  try{
+    const [{data:results},{data:students}] = await Promise.all([
+      sb.from('test_results').select('*').order('created_at',{ascending:false}),
+      sb.from('students').select('id,full_name,grade,track,access_code')
+    ]);
+    _tnResults=results||[];
+    _tnStudents=students||[];
+    renderStudentList();
+  }catch(e){
+    box.innerHTML='<div style="text-align:center;padding:40px;color:#ff6b6b">Xatolik: '+e.message+'</div>';
+  }
+}
+
+function renderStudentList(){
+  const box=document.getElementById('tn-res-box');
+  // faqat test topshirgan yoki mavjud o'quvchilar
+  if(!_tnStudents.length){ box.innerHTML='<div style="text-align:center;padding:40px;color:#8892b0">O\'quvchilar yo\'q</div>'; return; }
+  box.innerHTML=_tnStudents.map(function(st){
+    var cnt=_tnResults.filter(r=>r.student_id===st.id).length;
+    return '<div onclick="showStudentTests('+st.id+')" style="background:#fff;border:1px solid rgba(28,28,28,.1);border-radius:12px;padding:14px 16px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 6px rgba(0,0,0,.04)" onmouseover="this.style.borderColor=\'#FF6B1A\'" onmouseout="this.style.borderColor=\'rgba(28,28,28,.1)\'">'
+      +'<div style="flex:1"><div style="font-weight:700;font-size:15px">'+(st.full_name||'—')+' <span style="color:#8892b0;font-size:12px;font-weight:500">· '+(st.grade!=null?st.grade+'-sinf':'?')+'</span></div>'
+      +'<div style="color:#8892b0;font-size:12px;margin-top:2px">🔑 '+(st.access_code||'—')+'</div></div>'
+      +'<div style="background:#FF6B1A22;color:#E85400;font-weight:700;font-size:13px;padding:5px 12px;border-radius:20px">'+cnt+' test</div>'
+      +'<div style="color:#FF6B1A;font-size:20px">→</div>'
+      +'</div>';
+  }).join('');
+}
+
+function showStudentTests(sid){
+  const st=_tnStudents.find(s=>s.id===sid);
+  const rows=_tnResults.filter(r=>r.student_id===sid);
+  const box=document.getElementById('tn-res-box');
+  var html='<button class="btn-sm" style="background:rgba(28,28,28,.08);color:#1C1C1C;border:none;margin-bottom:14px" onclick="renderStudentList()">← Orqaga</button>'
+    +'<div style="background:#1A2238;color:#fff;border-radius:14px;padding:16px 18px;margin-bottom:14px">'
+    +'<div style="font-size:18px;font-weight:700">'+(st.full_name||'—')+'</div>'
+    +'<div style="color:#9fb0d0;font-size:13px;margin-top:2px">'+(st.grade!=null?st.grade+'-sinf':'?')+' · Jami: '+rows.length+' ta test</div></div>';
+  if(!rows.length){
+    html+='<div style="text-align:center;padding:30px;color:#8892b0">Hali test topshirmagan</div>';
+  }else{
+    html+=rows.map(function(r){
+      var col=r.percent>=70?'#1E8E4E':r.percent>=40?'#C98A1B':'#C0392B';
+      var d=r.created_at?new Date(r.created_at):null;
+      var dstr=d?d.toLocaleDateString('ru')+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'}):'—';
+      return '<div style="background:#fff;border:1px solid rgba(28,28,28,.1);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px">'
+        +'<div style="flex:1"><div style="font-weight:600;font-size:15px">'+(SUBJ_LABEL[r.subject]||r.subject)+'</div>'
+        +'<div style="color:#8892b0;font-size:12px;margin-top:2px">📅 '+dstr+'</div></div>'
+        +'<div style="text-align:right"><div style="font-weight:800;font-size:20px;color:'+col+'">'+r.percent+'%</div>'
+        +'<div style="color:#8892b0;font-size:12px">'+r.score+'/'+r.total+' to\'g\'ri</div></div>'
+        +'</div>';
+    }).join('');
+  }
+  box.innerHTML=html;
+}
+
+function renderKarantin(){
+  const box=document.getElementById('tn-kar-box');
+  const today=new Date().toISOString().slice(0,10);
+  // bugun test topshirganlar ID lari
+  const doneToday=new Set(_tnResults.filter(r=>(r.created_at||'').slice(0,10)===today).map(r=>r.student_id));
+  // karantin = bugun test topshirmaganlar
+  const kar=_tnStudents.filter(st=>!doneToday.has(st.id));
+  if(!kar.length){
+    box.innerHTML='<div style="text-align:center;padding:40px;color:#1E8E4E;font-weight:600">✓ Hamma o\'quvchi bugun test topshirgan!</div>';
+    return;
+  }
+  box.innerHTML='<div style="background:#fbeceb;border:1px solid #f0c0bc;border-radius:12px;padding:12px 16px;margin-bottom:14px;color:#C0392B;font-weight:600;font-size:14px">🚨 Bugun test topshirmagan: '+kar.length+' o\'quvchi</div>'
+    +kar.map(function(st){
+      // oxirgi test sanasi
+      var last=_tnResults.filter(r=>r.student_id===st.id).sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||''))[0];
+      var lastStr=last?new Date(last.created_at).toLocaleDateString('ru'):'Hech qachon';
+      return '<div style="background:#fff;border:1px solid rgba(192,57,43,.2);border-left:4px solid #C0392B;border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px">'
+        +'<div style="flex:1"><div style="font-weight:700;font-size:15px">'+(st.full_name||'—')+' <span style="color:#8892b0;font-size:12px;font-weight:500">· '+(st.grade!=null?st.grade+'-sinf':'?')+'</span></div>'
+        +'<div style="color:#8892b0;font-size:12px;margin-top:2px">Oxirgi test: '+lastStr+'</div></div>'
+        +'</div>';
+    }).join('');
+}
+
 // ── Qabuldan akaunt yaratish (maktab yoki blog) ──
 async function createAccountFromDiag(diagId, track, btn){
   try{
@@ -2137,10 +2243,16 @@ async function createAccountFromDiag(diagId, track, btn){
       created_at:new Date().toISOString()
     };
     if(track==='blog'){ base.course='bolalar'; base.calf_kg=40; }
-    if(track==='maktab'){ base.grade=d.grade||null; }
+    // maktab uchun ham xuddi shu asosiy maydonlar (grade ustuni students'da yo'q bo'lishi mumkin — qo'shmaymiz)
+    if(track==='maktab'){ base.course='maktab'; }
 
     const{data:stu,error:se}=await sb.from('students').insert(base).select().single();
-    if(se){toast('Xatolik: '+se.message,'err');loadQabul();return;}
+    if(se){
+      toast('Xatolik: '+se.message,'err');
+      alert('❌ Akaunt yaratilmadi.\n\nSabab: '+se.message+'\n\n(Bu xatolikni Jamshidga ko\'rsating)');
+      loadQabul();
+      return;
+    }
 
     // 4) blog uchun — 1-hafta darslarini ochamiz
     if(track==='blog'){
