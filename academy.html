@@ -2081,8 +2081,8 @@ async function loadQabul(){
                 +'</div>'
               +'</div>'
             : '<div style="display:flex;gap:10px;flex-wrap:wrap">'
-                +'<button onclick=\'createAccountFromDiag('+d.id+',"maktab",this)\' style="background:#1A2238;color:#fff;border:none;border-radius:11px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:7px;box-shadow:0 2px 6px rgba(26,34,56,.25)"><span style="font-size:16px">🏫</span> Maktab</button>'
-                +'<button onclick=\'createAccountFromDiag('+d.id+',"blog",this)\' style="background:#FF6B1A;color:#fff;border:none;border-radius:11px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:7px;box-shadow:0 2px 6px rgba(255,107,26,.3)"><span style="font-size:16px">🎬</span> Bloging</button>'
+                +'<button onclick=\'startCreate('+d.id+',"maktab",'+(d.grade!=null?d.grade:'null')+',this)\' style="background:#1A2238;color:#fff;border:none;border-radius:11px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:7px;box-shadow:0 2px 6px rgba(26,34,56,.25)"><span style="font-size:16px">🏫</span> Maktab</button>'
+                +'<button onclick=\'startCreate('+d.id+',"blog",'+(d.grade!=null?d.grade:'null')+',this)\' style="background:#FF6B1A;color:#fff;border:none;border-radius:11px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:7px;box-shadow:0 2px 6px rgba(255,107,26,.3)"><span style="font-size:16px">🎬</span> Bloging</button>'
               +'</div>')
         +'</div>';
     }).join('');
@@ -2149,6 +2149,7 @@ function renderStudentList(){
     return '<div onclick="showStudentTests('+st.id+')" style="background:#fff;border:1px solid rgba(28,28,28,.1);border-radius:12px;padding:14px 16px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 6px rgba(0,0,0,.04)" onmouseover="this.style.borderColor=\'#FF6B1A\'" onmouseout="this.style.borderColor=\'rgba(28,28,28,.1)\'">'
       +'<div style="flex:1"><div style="font-weight:700;font-size:15px">'+(st.full_name||'—')+' <span style="color:#8892b0;font-size:12px;font-weight:500">· '+(st.grade!=null?st.grade+'-sinf':'?')+'</span></div>'
       +'<div style="color:#8892b0;font-size:12px;margin-top:2px">🔑 '+(st.access_code||'—')+'</div></div>'
+      +(st.grade==null?'<button onclick="event.stopPropagation();assignGrade('+st.id+',null)" style="background:#C0392B;color:#fff;border:none;border-radius:9px;padding:7px 11px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">⚠ Sinf</button>':'')
       +'<div style="background:#FF6B1A22;color:#E85400;font-weight:700;font-size:13px;padding:5px 12px;border-radius:20px">'+cnt+' test</div>'
       +'<div style="color:#FF6B1A;font-size:20px">→</div>'
       +'</div>';
@@ -2205,14 +2206,18 @@ function renderKarantin(){
 }
 
 // ── Qabuldan akaunt yaratish (maktab yoki blog) ──
-async function createAccountFromDiag(diagId, track, btn){
+async function createAccountFromDiag(diagId, track, grade, btn){
   try{
     // 1) diagnostika ma'lumotini olamiz
     const{data:d,error:de}=await sb.from('diagnostics').select('*').eq('id',diagId).single();
     if(de||!d){toast('Diagnostika topilmadi','err');return;}
 
-    const wrap=btn.parentElement;
-    wrap.innerHTML='<span style="color:#8892b0;font-size:13px">Yaratilmoqda…</span>';
+    // tanlangan sinf (butun songa aylantiramiz)
+    const _g=parseInt(grade,10);
+
+    if(btn&&btn.parentElement){
+      btn.parentElement.innerHTML='<span style="color:#8892b0;font-size:13px">Yaratilmoqda…</span>';
+    }
 
     // ismni lotinga o'giramiz, keyin login uchun: kичик harf, probelsiz
     const latinName=toLatin(d.child_name||'').trim()||"oquvchi";
@@ -2243,8 +2248,9 @@ async function createAccountFromDiag(diagId, track, btn){
       created_at:new Date().toISOString()
     };
     if(track==='blog'){ base.course='bolalar'; base.calf_kg=40; }
-    // maktab uchun ham xuddi shu asosiy maydonlar (grade ustuni students'da yo'q bo'lishi mumkin — qo'shmaymiz)
     if(track==='maktab'){ base.course='maktab'; }
+    // tanlangan sinfni saqlaymiz (students.grade) — endi bola "sinfingiz belgilanmagan" xatosini ko'rmaydi
+    if(!isNaN(_g)) base.grade=_g;
 
     const{data:stu,error:se}=await sb.from('students').insert(base).select().single();
     if(se){
@@ -2262,19 +2268,22 @@ async function createAccountFromDiag(diagId, track, btn){
       }catch(e){/* darslar ochilmasa ham akaunt bor */}
     }
 
-    // 5) diagnostika statusini 'created' qilamiz + login/kod/yo'nalishni saqlaymiz
-    await sb.from('diagnostics').update({
+    // 5) diagnostika statusini 'created' qilamiz + login/kod/yo'nalish/sinfni saqlaymiz
+    const diagUpd={
       status:'created',
       created_login:login,
       created_code:code,
       created_track:track
-    }).eq('id',diagId);
+    };
+    if(!isNaN(_g)) diagUpd.grade=_g;
+    await sb.from('diagnostics').update(diagUpd).eq('id',diagId);
 
     // 6) adminga kodni ko'rsatamiz — qisqa va aniq
     const label=track==='maktab'?'🏫 Maktab':'🎬 Bloging';
     toast(`✅ ${login} — ${label} akaunti yaratildi!`);
     alert(
       `✅ AKAUNT TAYYOR — ${label}\n\n`+
+      (!isNaN(_g)?`Sinf:   ${_g}-sinf\n`:'')+
       `Login:  ${login}\n`+
       `Parol:  ${code}\n\n`+
       `Shu ma'lumotni ota-onaga bering.`
@@ -2285,6 +2294,67 @@ async function createAccountFromDiag(diagId, track, btn){
     loadQabul();
   }
 }
+
+// ══════════ SINF TANLASH (grade picker) — umumiy modal ══════════
+function openGradePicker(opts){
+  opts=opts||{};
+  var cur=parseInt(opts.current,10); if(isNaN(cur)) cur=null;
+  var ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(10,15,30,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px';
+  function close(){ if(ov&&ov.parentNode) ov.parentNode.removeChild(ov); }
+  ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
+  var btns='';
+  for(var i=1;i<=11;i++){
+    var on=(i===cur);
+    btns+='<button data-g="'+i+'" style="border:1.5px solid '+(on?'#FF6B1A':'rgba(28,28,28,.15)')+';background:'+(on?'#FF6B1A':'#fff')+';color:'+(on?'#fff':'#1C1C1C')+';border-radius:12px;padding:14px 0;font-size:16px;font-weight:700;cursor:pointer;transition:all .12s">'+i+'</button>';
+  }
+  ov.innerHTML='<div style="background:#fff;border-radius:18px;padding:22px 20px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.35);text-align:center">'
+    +'<div style="font-size:17px;font-weight:800;color:#1A2238">'+(opts.title||'Sinfni tanlang')+'</div>'
+    +(opts.subtitle?'<div style="font-size:13px;color:#8892b0;margin-top:5px">'+opts.subtitle+'</div>':'')
+    +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px">'+btns+'</div>'
+    +'<button id="__gp_cancel" style="margin-top:16px;background:rgba(28,28,28,.06);color:#6B6558;border:none;border-radius:11px;padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;width:100%">Bekor qilish</button>'
+    +'</div>';
+  document.body.appendChild(ov);
+  ov.querySelectorAll('button[data-g]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var g=parseInt(b.getAttribute('data-g'),10);
+      close();
+      if(typeof opts.onPick==='function') opts.onPick(g);
+    });
+    b.addEventListener('mouseover',function(){ if(parseInt(b.getAttribute('data-g'),10)!==cur){ b.style.borderColor='#FF6B1A'; b.style.color='#FF6B1A'; } });
+    b.addEventListener('mouseout',function(){ if(parseInt(b.getAttribute('data-g'),10)!==cur){ b.style.borderColor='rgba(28,28,28,.15)'; b.style.color='#1C1C1C'; } });
+  });
+  var cb=ov.querySelector('#__gp_cancel'); if(cb) cb.addEventListener('click',close);
+}
+
+// Qabuldan akaunt yaratishdan oldin — sinfni so'raymiz (diagnostikadagi sinf oldindan tanlanadi)
+function startCreate(diagId, track, curGrade, btn){
+  openGradePicker({
+    title:(track==='maktab'?'🏫 Maktab':'🎬 Bloging')+' akaunti',
+    subtitle:"O'quvchi nechanchi sinfda?",
+    current:curGrade,
+    onPick:function(g){ createAccountFromDiag(diagId, track, g, btn); }
+  });
+}
+
+// Test natijalari panelida — sinfi bo'sh o'quvchiga sinf belgilash
+function assignGrade(studentId, cur){
+  openGradePicker({
+    title:'⚠️ Sinfni belgilang',
+    subtitle:"Bu o'quvchi qaysi sinfda?",
+    current:cur,
+    onPick:async function(g){
+      try{
+        const{error}=await sb.from('students').update({grade:g}).eq('id',studentId);
+        if(error){ toast('Xatolik: '+error.message,'err'); return; }
+        toast('✅ '+g+'-sinf belgilandi');
+        var s=_tnStudents.find(function(x){return x.id===studentId;}); if(s) s.grade=g;
+        renderStudentList();
+      }catch(e){ toast('Xatolik: '+e.message,'err'); }
+    }
+  });
+}
+
 const LESSONS=[
   {id:1,title:"AI do'stlarim",week:1,icon:'🤖',skill:'ai',tests:[
     {q:"ChatGPT ni kim yaratgan?",opts:["Google","OpenAI","Apple","Microsoft"],c:1},
