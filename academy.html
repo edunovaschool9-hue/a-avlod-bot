@@ -776,6 +776,7 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
 @media (prefers-reduced-motion:reduce){.lg-holo *{animation:none !important}}
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 
 <body>
@@ -1359,7 +1360,9 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
     </div>
     <div class="admin-panel" id="ap-leads">
       <div class="ap-head"><div><div class="ap-title">🔥 Lidlar</div><div class="ap-sub">Mijozlar va qo'ng'iroqlar</div></div>
-        <button class="btn-sm yellow" onclick="toggleLeadForm()">+ Yangi lid</button></div>
+        <div class="lead-export-btns"><button class="btn-sm yellow" onclick="toggleLeadForm()">+ Yangi lid</button>
+        <button class="btn-sm exp-x" onclick="exportLeadsExcel('blog')">📊 Excel</button>
+        <button class="btn-sm exp-p" onclick="printLeadsJournal('blog')">🖨 Chop etish</button></div></div>
       <div class="tbl-wrap" id="lead-form" style="display:none;padding:18px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           <div class="field"><label>Ism</label><input id="ld-name" type="text" placeholder="Aziza"></div>
@@ -1388,7 +1391,7 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
 
     <!-- MAKTAB LEADS (separate stream) -->
     <div class="admin-panel" id="ap-mleads">
-      <div class="ap-head"><div><div class="ap-title">🏫 Maktab lidlari</div><div class="ap-sub">Maktab kursi mijozlari (Yangi yil)</div></div>
+      <div class="ap-head"><div><div class="ap-title">🏫 Maktab lidlari</div><div class="ap-sub">Maktab kursi mijozlari (Yangi yil)</div></div><div class="lead-export-btns"><button class="btn-sm exp-x" onclick="exportLeadsExcel('maktab')">📊 Excel</button><button class="btn-sm exp-p" onclick="printLeadsJournal('maktab')">🖨 Chop etish</button></div>
         <button class="btn-sm yellow" onclick="toggleMLeadForm()">+ Yangi lid</button></div>
       <div class="tbl-wrap" id="mlead-form" style="display:none;padding:18px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -1417,7 +1420,7 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
 
     <!-- SAYT LEADS (from landing form) -->
     <div class="admin-panel" id="ap-saytlead">
-      <div class="ap-head"><div><div class="ap-title">🌐 Saytdan kelgan arizalar</div><div class="ap-sub">Lending formasidan qoldirilgan raqamlar</div></div></div>
+      <div class="ap-head"><div><div class="ap-title">🌐 Saytdan kelgan arizalar</div><div class="ap-sub">Lending formasidan qoldirilgan raqamlar</div></div><div class="lead-export-btns"><button class="btn-sm exp-x" onclick="exportLeadsExcel('sayt')">📊 Excel</button><button class="btn-sm exp-p" onclick="printLeadsJournal('sayt')">🖨 Chop etish</button></div></div>
       <div id="sleads-unread-banner"></div>
       <div class="lead-search">
         <span class="ls-ico">🔍</span>
@@ -1435,7 +1438,7 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
 
     <!-- NOLAVOY (PRESCHOOL) LEADS -->
     <div class="admin-panel" id="ap-nolavoy">
-      <div class="ap-head"><div><div class="ap-title">🧸 Nolavoy lidlari</div><div class="ap-sub">Maktabgacha tayyorlov mijozlari</div></div>
+      <div class="ap-head"><div><div class="ap-title">🧸 Nolavoy lidlari</div><div class="ap-sub">Maktabgacha tayyorlov mijozlari</div></div><div class="lead-export-btns"><button class="btn-sm exp-x" onclick="exportLeadsExcel('nolavoy')">📊 Excel</button><button class="btn-sm exp-p" onclick="printLeadsJournal('nolavoy')">🖨 Chop etish</button></div>
         <button class="btn-sm yellow" onclick="toggleNLeadForm()">+ Yangi lid</button></div>
       <div class="tbl-wrap" id="nlead-form" style="display:none;padding:18px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -2052,12 +2055,24 @@ async function loadQabul(){
     if(!data||!data.length){ list.innerHTML='<div style="text-align:center;padding:40px;color:#8892b0">Hali diagnostika natijalari yoq</div>'; return; }
     list.innerHTML=data.map(function(d){
       var done=d.status==='created';
-      return '<div style="background:rgba(28,28,28,.03);border:1px solid rgba(28,28,28,.08);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">'
-        +'<div style="flex:1;min-width:160px">'
-        +'<div style="font-weight:700;font-size:15px">'+(d.child_name||'—')+' <span style="color:#8892b0;font-weight:500;font-size:13px">· '+(d.grade||'?')+'-sinf</span></div>'
-        +'<div style="color:#8892b0;font-size:12.5px;margin-top:3px">📞 '+(d.parent_phone||'—')+' · 💪 '+(d.top_power||'—')+' · 🌟 '+(d.leader||'—')+'</div>'
+      var trackLabel = d.created_track==='maktab' ? '🏫 Maktab' : (d.created_track==='blog' ? '🎬 Bloging' : '');
+      return '<div style="background:#fff;border:1px solid rgba(28,28,28,.1);border-radius:14px;padding:16px 18px;margin-bottom:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,.04)">'
+        +'<div style="flex:1;min-width:200px">'
+        +'<div style="font-weight:700;font-size:16px;color:#1C1C1C">'+(d.child_name||'—')+' <span style="color:#8892b0;font-weight:500;font-size:13px">· '+(d.grade||'?')+'-sinf</span></div>'
+        +'<div style="color:#6B6558;font-size:13px;margin-top:4px">📞 '+(d.parent_phone||'—')+' &nbsp;·&nbsp; 💪 '+(d.top_power||'—')+' &nbsp;·&nbsp; 🌟 '+(d.leader||'—')+'</div>'
         +'</div>'
-        +(done?'<span style="color:#3DE8A0;font-weight:700;font-size:13px">✓ Akaunt yaratilgan</span>':'<span style="color:#8892b0;font-size:13px">Akaunt yaratish — 2-bosqichda</span>')
+        +(done
+            ? '<div style="text-align:right;min-width:180px">'
+                +'<div style="color:#1E8E4E;font-weight:700;font-size:13px;margin-bottom:6px">✓ Akaunt yaratilgan '+(trackLabel?('· '+trackLabel):'')+'</div>'
+                +'<div style="background:#F6F1E6;border:1px solid #E7E1D3;border-radius:10px;padding:8px 12px;display:inline-block;text-align:left">'
+                  +'<div style="font-size:12px;color:#6B6558">Login: <b style="color:#1C1C1C;font-family:monospace;font-size:13px">'+(d.created_login||'—')+'</b></div>'
+                  +'<div style="font-size:12px;color:#6B6558;margin-top:2px">Parol: <b style="color:#FF6B1A;font-family:monospace;font-size:14px">'+(d.created_code||'—')+'</b></div>'
+                +'</div>'
+              +'</div>'
+            : '<div style="display:flex;gap:10px;flex-wrap:wrap">'
+                +'<button onclick=\'createAccountFromDiag('+d.id+',"maktab",this)\' style="background:#1A2238;color:#fff;border:none;border-radius:11px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:7px;box-shadow:0 2px 6px rgba(26,34,56,.25)"><span style="font-size:16px">🏫</span> Maktab</button>'
+                +'<button onclick=\'createAccountFromDiag('+d.id+',"blog",this)\' style="background:#FF6B1A;color:#fff;border:none;border-radius:11px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:7px;box-shadow:0 2px 6px rgba(255,107,26,.3)"><span style="font-size:16px">🎬</span> Bloging</button>'
+              +'</div>')
         +'</div>';
     }).join('');
   }catch(e){
@@ -2065,7 +2080,99 @@ async function loadQabul(){
   }
 }
 
-// ── LESSONS ──
+// ── Kirill → Lotin (o'zbekcha) ──
+function toLatin(str){
+  if(!str) return '';
+  const map={
+    'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'yo','ж':'j','з':'z','и':'i',
+    'й':'y','к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r','с':'s','т':'t',
+    'у':'u','ф':'f','х':'x','ц':'ts','ч':'ch','ш':'sh','щ':'sh','ъ':"'",'ы':'i','ь':'',
+    'э':'e','ю':'yu','я':'ya','ў':"o'",'қ':'q','ғ':"g'",'ҳ':'h'
+  };
+  return str.split('').map(ch=>{
+    const low=ch.toLowerCase();
+    const rep=map[low];
+    if(rep===undefined) return ch; // lotin harflari o'zgarmaydi
+    // bosh harfni saqlaymiz
+    return ch===low ? rep : (rep.charAt(0).toUpperCase()+rep.slice(1));
+  }).join('');
+}
+
+// ── Qabuldan akaunt yaratish (maktab yoki blog) ──
+async function createAccountFromDiag(diagId, track, btn){
+  try{
+    // 1) diagnostika ma'lumotini olamiz
+    const{data:d,error:de}=await sb.from('diagnostics').select('*').eq('id',diagId).single();
+    if(de||!d){toast('Diagnostika topilmadi','err');return;}
+
+    const wrap=btn.parentElement;
+    wrap.innerHTML='<span style="color:#8892b0;font-size:13px">Yaratilmoqda…</span>';
+
+    // ismni lotinga o'giramiz, keyin login uchun: kичик harf, probelsiz
+    const latinName=toLatin(d.child_name||'').trim()||"oquvchi";
+    const login=latinName.toLowerCase().replace(/[^a-z0-9']/g,'');
+
+    // 2) noyob kirish kodi generatsiya (band bo'lmaganini topamiz)
+    let code='';
+    for(let tries=0;tries<20;tries++){
+      const c=String(Math.floor(1000+Math.random()*9000));
+      const{data:ex}=await sb.from('students').select('id').eq('access_code',c).maybeSingle();
+      if(!ex){code=c;break;}
+    }
+    if(!code){toast('Kod generatsiya qilinmadi, qayta urinib ko\'ring','err');loadQabul();return;}
+
+    // 3) students jadvaliga qo'shamiz — track bilan
+    const base={
+      full_name:login,
+      access_code:code,
+      track:track,                 // 'maktab' yoki 'blog'
+      is_active:1,
+      bytes_balance:0,
+      som_balance:0,
+      level:1,
+      rank:'Junior',
+      streak_days:0,
+      warnings:0,
+      current_week:1,
+      created_at:new Date().toISOString()
+    };
+    if(track==='blog'){ base.course='bolalar'; base.calf_kg=40; }
+    if(track==='maktab'){ base.grade=d.grade||null; }
+
+    const{data:stu,error:se}=await sb.from('students').insert(base).select().single();
+    if(se){toast('Xatolik: '+se.message,'err');loadQabul();return;}
+
+    // 4) blog uchun — 1-hafta darslarini ochamiz
+    if(track==='blog'){
+      try{
+        for(const lid of WEEK_LESSONS[1])await sb.from('lesson_access').insert({student_id:stu.id,lesson_id:lid,test_passed:0});
+        for(const tid of WEEK_TEZ[1])await sb.from('tez_aytish_access').insert({student_id:stu.id,lesson_id:tid,status:'open'});
+      }catch(e){/* darslar ochilmasa ham akaunt bor */}
+    }
+
+    // 5) diagnostika statusini 'created' qilamiz + login/kod/yo'nalishni saqlaymiz
+    await sb.from('diagnostics').update({
+      status:'created',
+      created_login:login,
+      created_code:code,
+      created_track:track
+    }).eq('id',diagId);
+
+    // 6) adminga kodni ko'rsatamiz — qisqa va aniq
+    const label=track==='maktab'?'🏫 Maktab':'🎬 Bloging';
+    toast(`✅ ${login} — ${label} akaunti yaratildi!`);
+    alert(
+      `✅ AKAUNT TAYYOR — ${label}\n\n`+
+      `Login:  ${login}\n`+
+      `Parol:  ${code}\n\n`+
+      `Shu ma'lumotni ota-onaga bering.`
+    );
+    loadQabul();
+  }catch(e){
+    toast('Xatolik: '+e.message,'err');
+    loadQabul();
+  }
+}
 const LESSONS=[
   {id:1,title:"AI do'stlarim",week:1,icon:'🤖',skill:'ai',tests:[
     {q:"ChatGPT ni kim yaratgan?",opts:["Google","OpenAI","Apple","Microsoft"],c:1},
@@ -2342,6 +2449,28 @@ async function doUnifiedLogin(){
   err.style.display='none';
   if(!name||!pass){err.textContent='Ism va kodni kiriting';err.style.display='block';return;}
   btn.disabled=true;btn.textContent='Tekshirilmoqda...';
+
+  // 0) DEMO: ko'rish uchun soxta o'quvchi (blogging)
+  if(name.toLowerCase()==='demo' && pass==='demo'){
+    currentUser={
+      id:'demo', full_name:'Ali Demo', track:'blog',
+      access_code:'demo', is_active:1,
+      bytes_balance:1250, som_balance:85000,
+      lesson_days:'1,4', is_test:1
+    };
+    lessonAccess=[
+      {student_id:'demo',lesson_id:1,test_passed:1},
+      {student_id:'demo',lesson_id:2,test_passed:1}
+    ];
+    tezAccess=[
+      {student_id:'demo',lesson_id:1,status:'done'},
+      {student_id:'demo',lesson_id:2,status:'done'}
+    ];
+    saveSession('student',{id:'demo'});
+    btn.disabled=false;btn.textContent='Kirish →';
+    runSplash('Ali', async()=>{ await loadStudentAppDemo(); showPage('p-student'); });
+    return;
+  }
 
   // 1) Marketer master password (login can be anything, pass matches master)
   if(pass===STAFF.marketing.pass){
@@ -2852,7 +2981,20 @@ async function loadStudentApp(){
   stuTab('today');
 }
 
-// how many full lessons completed (test passed AND tez done for that lesson id)
+// DEMO versiya — Supabase'siz, soxta ma'lumot bilan
+async function loadStudentAppDemo(){
+  const s=currentUser;
+  document.getElementById('stu-name-h').textContent=s.full_name;
+  document.getElementById('stu-bal-h').textContent=fmt(s.bytes_balance)+' bayt';
+  document.getElementById('brain-name').textContent=(s.full_name||'').split(' ')[0]||"do'stim";
+  document.getElementById('stu-som').textContent=fmt(s.som_balance);
+  document.getElementById('stu-bayt').textContent=fmt(s.bytes_balance);
+  // lessonAccess va tezAccess allaqachon doUnifiedLogin'da o'rnatilgan
+  renderBrain();
+  renderSnailMini();
+  renderToday();
+  stuTab('today');
+}
 function lessonsCompleted(){
   let n=0;
   for(let id=1;id<=LESSONS.length;id++){
@@ -3780,6 +3922,79 @@ function renderMLeads(list){const c=document.getElementById('mlead-cards');
       <button class="btn-sm red" onclick="deleteMLead(${l.id})">🗑</button></div></div>`;}).join('');}
 
 async function deleteMLead(id){if(!confirm('O\'chirilsinmi?'))return;await sb.from('leads').delete().eq('id',id);toast('🗑 O\'chirildi');loadMaktabLeads();}
+
+// ══════════ LEAD EXPORT (Excel + Print journal) ══════════
+function _leadsFor(kind){
+  if(kind==='blog')    return (typeof allLeads!=="undefined"?allLeads:[]);
+  if(kind==='maktab')  return (typeof allMLeads!=="undefined"?allMLeads:[]);
+  if(kind==='sayt')    return (typeof allSLeads!=="undefined"?allSLeads:[]);
+  if(kind==='nolavoy') return (typeof allNLeads!=="undefined"?allNLeads:[]);
+  return [];
+}
+function _kindTitle(kind){
+  return kind==='blog'?'Blog lidlari':kind==='maktab'?'Maktab lidlari':kind==='sayt'?'Saytdan arizalar':kind==='nolavoy'?'Nolavoy lidlari':'Lidlar';
+}
+function _statUz(st){return (typeof LSTAT!=="undefined"&&LSTAT[st])?LSTAT[st]:(st||'Sovuq');}
+function exportLeadsExcel(kind){
+  var list=_leadsFor(kind);
+  if(!list.length){alert("Bu bo'limda lid yo'q");return;}
+  var rows=list.map(function(l,i){return {
+    "N": i+1,
+    "F.I.Sh": l.name||'',
+    "Telefon": l.phone||'',
+    "Holati": _statUz(l.status),
+    "Izoh": l.last_comment||l.note||'',
+    "Sana": l.created_at?new Date(l.created_at).toLocaleDateString('ru'):''
+  };});
+  var ws=XLSX.utils.json_to_sheet(rows);
+  ws['!cols']=[{wch:5},{wch:26},{wch:18},{wch:14},{wch:40},{wch:12}];
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,_kindTitle(kind));
+  var d=new Date().toLocaleDateString('ru').replace(/\./g,'-');
+  XLSX.writeFile(wb,"EduNova_"+kind+"_"+d+".xlsx");
+}
+function printLeadsJournal(kind){
+  var list=_leadsFor(kind);
+  if(!list.length){alert("Bu bo'limda lid yo'q");return;}
+  var d=new Date().toLocaleDateString('ru');
+  var rowsHtml=list.map(function(l,i){
+    return '<tr>'+
+      '<td style="border:1px solid #333;padding:6px 7px;text-align:center">'+(i+1)+'</td>'+
+      '<td style="border:1px solid #333;padding:6px 7px">'+(l.name||'')+'</td>'+
+      '<td style="border:1px solid #333;padding:6px 7px">'+(l.phone||'')+'</td>'+
+      '<td style="border:1px solid #333;padding:6px 7px">'+_statUz(l.status)+'</td>'+
+      '<td style="border:1px solid #333;padding:6px 7px">'+(l.last_comment||l.note||'')+'</td>'+
+      '<td style="border:1px solid #333;padding:6px 7px;text-align:center">'+(l.created_at?new Date(l.created_at).toLocaleDateString('ru'):'')+'</td>'+
+      '<td style="border:1px solid #333;padding:6px 7px"></td>'+
+    '</tr>';
+  }).join('');
+  var html='<div id="print-journal">'+
+    '<div style="text-align:center;margin-bottom:14px">'+
+      '<div style="font-size:22px;font-weight:800;letter-spacing:1px">EDUNOVA SCHOOL</div>'+
+      '<div style="font-size:16px;margin-top:4px">'+_kindTitle(kind)+' \u2014 jurnal</div>'+
+      '<div style="font-size:12px;color:#555;margin-top:2px">Chop etilgan sana: '+d+' \u00b7 Jami: '+list.length+' ta</div>'+
+    '</div>'+
+    '<table style="width:100%;border-collapse:collapse;font-size:13px">'+
+      '<thead><tr style="background:#FF6B1A;color:#111">'+
+        '<th style="border:1px solid #333;padding:7px">N</th>'+
+        '<th style="border:1px solid #333;padding:7px;text-align:left">F.I.Sh</th>'+
+        '<th style="border:1px solid #333;padding:7px;text-align:left">Telefon</th>'+
+        '<th style="border:1px solid #333;padding:7px">Holati</th>'+
+        '<th style="border:1px solid #333;padding:7px;text-align:left">Izoh</th>'+
+        '<th style="border:1px solid #333;padding:7px">Sana</th>'+
+        '<th style="border:1px solid #333;padding:7px;width:120px">Belgi</th>'+
+      '</tr></thead><tbody>'+rowsHtml+'</tbody>'+
+    '</table>'+
+    '<div style="margin-top:24px;font-size:12px;color:#555">Mas\'ul: ____________________     Imzo: ____________________</div>'+
+  '</div>';
+  var old=document.getElementById('print-journal');
+  if(old)old.remove();
+  var wrap=document.createElement('div');
+  wrap.innerHTML=html;
+  document.body.appendChild(wrap.firstChild);
+  window.print();
+  setTimeout(function(){var pj=document.getElementById('print-journal');if(pj)pj.remove();},600);
+}
 
 // ══════════ SAYT LEADS (landing form) ══════════
 let allSLeads=[], sleadsFilter='all', sleadsSearch='', sleadsSortField='activity', sleadsSortDir='new';
