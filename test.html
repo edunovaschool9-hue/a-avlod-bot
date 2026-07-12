@@ -136,6 +136,12 @@ body{font-family:'Rubik',sans-serif;background:var(--concrete);color:var(--steel
 <script>
 const sb = supabase.createClient('https://unaodltahuevrfnarfha.supabase.co','sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP');
 
+// AI test generatsiya (Edge Function ai-test)
+const AI_TEST_CFG={
+  url:'https://unaodltahuevrfnarfha.supabase.co/functions/v1/ai-test',
+  anonKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVuYW9kbHRhaHVldnJmbmFyZmhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNDE0NDEsImV4cCI6MjA5NDkxNzQ0MX0.e6vf7eMkihzmGlBidSb5WtKtDu9FYn-C1C_EOLhByeQ'
+};
+
 let LANG='uz';
 let student=null;      // {id, full_name, grade, access_code}
 let curSubject=null;
@@ -227,6 +233,8 @@ const T = {
   wrongCode:{uz:"Kod noto'g'ri. Qaytadan urinib ko'ring.",ru:"Неверный код. Попробуйте снова."},
   emptyCode:{uz:"Kodni kiriting",ru:"Введите код"},
   noTest:{uz:"Bu sinf uchun test hali tayyor emas.",ru:"Тест для этого класса ещё не готов."},
+  noGrade:{uz:"Sizning sinfingiz belgilanmagan. Administratorga murojaat qiling.",ru:"Ваш класс не указан. Обратитесь к администратору."},
+  aiThinking:{uz:"AI savollar tayyorlamoqda… 🤖",ru:"ИИ готовит вопросы… 🤖"},
   grade:{uz:"-sinf",ru:" класс"},
   correctW:{uz:"to'g'ri",ru:"правильно"},
   saving:{uz:"Natija saqlanmoqda…",ru:"Результат сохраняется…"},
@@ -290,17 +298,60 @@ function renderSubjects(){
 }
 
 // ======= TEST =======
-function startTest(subjKey){
+async function startTest(subjKey){
   curSubject=subjKey;
   const grade=student.grade;
-  const bank=(TESTS[subjKey]||{})[grade];
-  if(!bank||!bank.length){
+  if(grade==null){ alert(tr(T.noGrade)); return; }
+
+  // Loading ekrani
+  show('sc-test');
+  document.getElementById('q-count').textContent='';
+  document.getElementById('prog-fill').style.width='0%';
+  document.getElementById('q-text').textContent = tr(T.aiThinking);
+  document.getElementById('opts').innerHTML='<div class="spinner"></div>';
+
+  let qs=null;
+
+  // 1) AI orqali generatsiya
+  try{
+    const ctl=new AbortController();
+    const tm=setTimeout(()=>ctl.abort(),20000);
+    const r=await fetch(AI_TEST_CFG.url,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+AI_TEST_CFG.anonKey},
+      body:JSON.stringify({subject:subjKey,grade:grade,lang:LANG}),
+      signal:ctl.signal
+    });
+    clearTimeout(tm);
+    if(r.ok){
+      const j=await r.json();
+      if(j.questions && Array.isArray(j.questions) && j.questions.length){
+        // AI format: {q, opts, c} — bitta tilda
+        qs=j.questions.map(x=>({q:x.q, opts:x.opts, c:x.c}));
+      }
+    }
+  }catch(e){ console.warn('AI test error, fallback ishlatiladi', e); }
+
+  // 2) Fallback — tayyor namunalar (AI ishlamasa)
+  if(!qs || !qs.length){
+    const bank=(TESTS[subjKey]||{})[grade];
+    if(bank && bank.length){
+      qs=bank.map(x=>({
+        q: LANG==='uz'?x.q_uz:x.q_ru,
+        opts: LANG==='uz'?x.opts_uz:x.opts_ru,
+        c: x.c
+      }));
+    }
+  }
+
+  if(!qs || !qs.length){
     alert(tr(T.noTest));
+    show('sc-subj');
     return;
   }
-  curQuestions=bank;
+
+  curQuestions=qs;
   qIdx=0;correct=0;
-  show('sc-test');
   renderQuestion();
 }
 
@@ -308,10 +359,9 @@ function renderQuestion(){
   const q=curQuestions[qIdx];
   document.getElementById('q-count').textContent=(qIdx+1)+' / '+curQuestions.length;
   document.getElementById('prog-fill').style.width=((qIdx)/curQuestions.length*100)+'%';
-  document.getElementById('q-text').textContent=LANG==='uz'?q.q_uz:q.q_ru;
-  const opts=LANG==='uz'?q.opts_uz:q.opts_ru;
+  document.getElementById('q-text').textContent=q.q;
   const box=document.getElementById('opts');
-  box.innerHTML=opts.map((o,i)=>'<button class="opt" onclick="answer('+i+')">'+o+'</button>').join('');
+  box.innerHTML=q.opts.map((o,i)=>'<button class="opt" onclick="answer('+i+')">'+o+'</button>').join('');
 }
 
 function answer(i){
