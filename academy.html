@@ -1375,6 +1375,7 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
         <div class="lead-export-btns"><button class="btn-sm yellow" onclick="toggleHujjatForm()">+ Yangi</button>
         <button class="btn-sm exp-x" onclick="exportHujjatExcel()">📊 Excel</button></div></div>
       <div class="tbl-wrap" id="hujjat-form" style="display:none;padding:18px">
+        <div id="hj-form-title" style="font-weight:800;font-size:15px;color:var(--ac2);margin-bottom:12px">➕ Yangi hujjat topshirgan</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           <div class="field"><label>Ota-ona ismi *</label><input id="hj-parent" type="text" placeholder="Karimova Nodira"></div>
           <div class="field"><label>Telefon</label><input id="hj-phone" type="tel" placeholder="+998901234567"></div>
@@ -1385,8 +1386,8 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
           <div class="field"><label>Sinf</label><input id="hj-grade" type="number" min="1" max="11" placeholder="5"></div>
         </div>
         <div class="field"><label>Qaysi hujjatlar / izoh</label><textarea id="hj-note" placeholder="Metrika nusxasi, 086-spravka, 3x4 rasm..."></textarea></div>
-        <div style="display:flex;gap:8px"><button class="btn-sm green" style="padding:10px 18px" onclick="saveHujjat()">Saqlash</button>
-          <button class="btn-sm red" style="padding:10px 18px" onclick="toggleHujjatForm()">Bekor</button></div>
+        <div style="display:flex;gap:8px"><button id="hj-save-btn" class="btn-sm green" style="padding:10px 18px" onclick="saveHujjat()">Saqlash</button>
+          <button class="btn-sm red" style="padding:10px 18px" onclick="closeHujjatForm()">Bekor</button></div>
       </div>
       <div id="hujjat-count"></div>
       <div class="lead-search">
@@ -4246,11 +4247,45 @@ function renderSLeads(list){const c=document.getElementById('slead-cards');
 
 
 // ══════════ HUJJAT TOPSHIRGANLAR (ism + aniq manzil reestri) ══════════
-let allHujjat=[], hujjatSearch='', _hujjatShown=[];
+let allHujjat=[], hujjatSearch='', _hujjatShown=[], _hujjatEditId=null;
 
 function hjEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 
-function toggleHujjatForm(){const f=document.getElementById('hujjat-form');f.style.display=f.style.display==='none'?'block':'none';}
+function clearHujjatForm(){
+  ['hj-parent','hj-addr','hj-phone','hj-child','hj-grade','hj-note'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  _hujjatEditId=null;
+  var t=document.getElementById('hj-form-title'); if(t)t.textContent='➕ Yangi hujjat topshirgan';
+  var b=document.getElementById('hj-save-btn'); if(b)b.textContent='Saqlash';
+}
+function closeHujjatForm(){
+  var f=document.getElementById('hujjat-form');
+  if(f)f.style.display='none';
+  clearHujjatForm();
+}
+function toggleHujjatForm(){
+  var f=document.getElementById('hujjat-form');
+  if(!f)return;
+  if(f.style.display==='none'){ clearHujjatForm(); f.style.display='block'; }
+  else { closeHujjatForm(); }
+}
+
+// Tahrirlash — mavjud yozuvni shu formaga yuklaymiz
+function editHujjat(id){
+  var rec=allHujjat.filter(function(h){return h.id===id;})[0];
+  if(!rec){toast('Yozuv topilmadi','err');return;}
+  _hujjatEditId=id;
+  document.getElementById('hj-parent').value=rec.parent_name||'';
+  document.getElementById('hj-phone').value=rec.phone||'';
+  document.getElementById('hj-addr').value=rec.address||'';
+  document.getElementById('hj-child').value=rec.child_name||'';
+  document.getElementById('hj-grade').value=(rec.grade!=null?rec.grade:'');
+  document.getElementById('hj-note').value=rec.note||'';
+  var t=document.getElementById('hj-form-title'); if(t)t.textContent='✏️ Tahrirlash — '+(rec.parent_name||'');
+  var b=document.getElementById('hj-save-btn'); if(b)b.textContent='💾 Yangilash';
+  var f=document.getElementById('hujjat-form');
+  f.style.display='block';
+  try{ f.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){ f.scrollIntoView(); }
+}
 
 async function loadHujjat(){
   const box=document.getElementById('hujjat-cards');
@@ -4294,6 +4329,7 @@ function renderHujjat(list){
       +(h.note?'<div style="font-size:12px;color:var(--mu);margin:4px 0">📎 '+hjEsc(h.note)+'</div>':'')
       +'<div class="lead-actions">'
       +(h.phone?'<a href="tel:'+hjEsc(h.phone)+'" class="btn-sm blue" style="text-decoration:none">📞 Qo\'ng\'iroq</a>':'')
+      +'<button class="btn-sm yellow" onclick="editHujjat('+h.id+')">✏️ Tahrirlash</button>'
       +'<button class="btn-sm red" onclick="deleteHujjat('+h.id+')">🗑</button></div></div>';
   }).join('');
 }
@@ -4306,18 +4342,30 @@ async function saveHujjat(){
   const note=document.getElementById('hj-note').value.trim();
   const g=parseInt(document.getElementById('hj-grade').value,10);
   if(!parent||!addr){toast('Ism va aniq manzilni kiriting','err');return;}
-  const row={parent_name:parent,address:addr,created_at:new Date().toISOString()};
-  if(phone)row.phone=phone;
-  if(child)row.child_name=child;
-  if(note)row.note=note;
-  if(!isNaN(g))row.grade=g;
-  if(currentStaff&&currentStaff.name)row.added_by=currentStaff.name;
-  const{error}=await sb.from('hujjat_topshirganlar').insert(row);
-  if(error){toast(error.message,'err');return;}
-  ['hj-parent','hj-addr','hj-phone','hj-child','hj-grade','hj-note'].forEach(function(id){document.getElementById(id).value='';});
-  toggleHujjatForm();
-  toast('✅ Hujjat topshirgan qo\'shildi');
-  logActivity('📄 Hujjat topshirgan qo\'shdi: '+parent);
+  const row={
+    parent_name:parent,
+    address:addr,
+    phone:phone||null,
+    child_name:child||null,
+    note:note||null,
+    grade:isNaN(g)?null:g
+  };
+  if(_hujjatEditId){
+    // TAHRIRLASH — created_at va added_by o'zgarmaydi
+    const{error}=await sb.from('hujjat_topshirganlar').update(row).eq('id',_hujjatEditId);
+    if(error){toast(error.message,'err');return;}
+    toast('✅ Yangilandi');
+    logActivity('✏️ Hujjat yozuvini tahrirladi: '+parent);
+  }else{
+    // YANGI
+    row.created_at=new Date().toISOString();
+    if(currentStaff&&currentStaff.name)row.added_by=currentStaff.name;
+    const{error}=await sb.from('hujjat_topshirganlar').insert(row);
+    if(error){toast(error.message,'err');return;}
+    toast('✅ Hujjat topshirgan qo\'shildi');
+    logActivity('📄 Hujjat topshirgan qo\'shdi: '+parent);
+  }
+  closeHujjatForm();
   loadHujjat();
 }
 
