@@ -1369,6 +1369,34 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
       <div id="tn-kar-box" style="display:none"></div>
     </div>
 
+    <!-- HUJJAT TOPSHIRGANLAR (hujjat topshirgan ota-onalar reestri) -->
+    <div class="admin-panel" id="ap-hujjat">
+      <div class="ap-head"><div><div class="ap-title">📄 Hujjat topshirganlar</div><div class="ap-sub">Hujjat topshirgan ota-onalar — ism va aniq manzil</div></div>
+        <div class="lead-export-btns"><button class="btn-sm yellow" onclick="toggleHujjatForm()">+ Yangi</button>
+        <button class="btn-sm exp-x" onclick="exportHujjatExcel()">📊 Excel</button></div></div>
+      <div class="tbl-wrap" id="hujjat-form" style="display:none;padding:18px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field"><label>Ota-ona ismi *</label><input id="hj-parent" type="text" placeholder="Karimova Nodira"></div>
+          <div class="field"><label>Telefon</label><input id="hj-phone" type="tel" placeholder="+998901234567"></div>
+        </div>
+        <div class="field"><label>Aniq manzil *</label><input id="hj-addr" type="text" placeholder="Farg'ona sh., Mustaqillik ko'chasi 42, 12-uy"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field"><label>Farzand ismi</label><input id="hj-child" type="text" placeholder="Karimov Aziz"></div>
+          <div class="field"><label>Sinf</label><input id="hj-grade" type="number" min="1" max="11" placeholder="5"></div>
+        </div>
+        <div class="field"><label>Qaysi hujjatlar / izoh</label><textarea id="hj-note" placeholder="Metrika nusxasi, 086-spravka, 3x4 rasm..."></textarea></div>
+        <div style="display:flex;gap:8px"><button class="btn-sm green" style="padding:10px 18px" onclick="saveHujjat()">Saqlash</button>
+          <button class="btn-sm red" style="padding:10px 18px" onclick="toggleHujjatForm()">Bekor</button></div>
+      </div>
+      <div id="hujjat-count"></div>
+      <div class="lead-search">
+        <span class="ls-ico">🔍</span>
+        <input type="text" placeholder="Ism, manzil yoki raqam bo'yicha qidirish..." oninput="searchHujjat(this.value);this.parentElement.classList.toggle('has-val',!!this.value)">
+        <button class="ls-clear" onclick="const i=this.parentElement.querySelector('input');i.value='';searchHujjat('');this.parentElement.classList.remove('has-val')">✕</button>
+      </div>
+      <div class="lead-cards" id="hujjat-cards"><div class="loading-center"><div class="spin"></div></div></div>
+    </div>
+
     <!-- BLOG LEADS (asosiy oqim) — yo'qolgan "admin-panel" konteyneri tiklandi -->
     <div class="admin-panel" id="ap-leads">
       <div class="ap-head"><div><div class="ap-title">🔥 Lidlar</div><div class="ap-sub">Mijozlar va qo'ng'iroqlar</div></div>
@@ -2028,8 +2056,8 @@ const POSITIONS = {
 };
 
 // ── ROLE MENUS ── (Variant B: everyone sees ALL sections; only timer differs)
-const FULL_MENU=['svodka','qabul','dash','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
-const MARKETING_MENU=['svodka','qabul','testnat','dash','hisobkitob','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
+const FULL_MENU=['svodka','qabul','hujjat','dash','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
+const MARKETING_MENU=['svodka','qabul','testnat','hujjat','dash','hisobkitob','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
 const MENUS = {
   admin:     FULL_MENU,
   marketing: MARKETING_MENU,
@@ -2055,7 +2083,8 @@ const MENU_META = {
   operatorquv:{label:'🎓 Operator o\'quvi', fn:'loadOperatorQuv'},
   staff:    {label:'🧑‍💼 Xodimlar',       fn:'loadStaffPanel'},
   qabul:    {label:'🎯 Qabul',           fn:'loadQabul'},
-  testnat:  {label:'📊 Test natijalari', fn:'loadTestNatijalari'}
+  testnat:  {label:'📊 Test natijalari', fn:'loadTestNatijalari'},
+  hujjat:   {label:'📄 Hujjat topshirganlar', fn:'loadHujjat'}
 };
 
 // ══════════ QABUL (diagnostikadan o'tganlar) ══════════
@@ -4215,6 +4244,114 @@ function renderSLeads(list){const c=document.getElementById('slead-cards');
       <button class="btn-sm ${(!closed&&!checked)?'green':'yellow'}" onclick="openLeadComment(${l.id})">${(!closed&&!checked)?'📋 Hisobot yozish':'✏️ Natija'}</button>
       <button class="btn-sm red" onclick="deleteSLead(${l.id})">🗑</button></div></div>`;}).join('');}
 
+
+// ══════════ HUJJAT TOPSHIRGANLAR (ism + aniq manzil reestri) ══════════
+let allHujjat=[], hujjatSearch='', _hujjatShown=[];
+
+function hjEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+function toggleHujjatForm(){const f=document.getElementById('hujjat-form');f.style.display=f.style.display==='none'?'block':'none';}
+
+async function loadHujjat(){
+  const box=document.getElementById('hujjat-cards');
+  box.innerHTML='<div class="loading-center"><div class="spin"></div></div>';
+  const{data,error}=await sb.from('hujjat_topshirganlar').select('*').order('created_at',{ascending:false});
+  if(error){
+    document.getElementById('hujjat-count').innerHTML='';
+    box.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><b>hujjat_topshirganlar</b> jadvali topilmadi<div style="font-size:12px;color:var(--mu);margin-top:6px">Supabase SQL Editor orqali jadvalni yarating</div></div>';
+    return;
+  }
+  allHujjat=data||[];
+  applyHujjat();
+}
+
+function applyHujjat(){
+  let list=allHujjat;
+  if(hujjatSearch){
+    const q=hujjatSearch.toLowerCase();
+    list=list.filter(h=>((h.parent_name||'')+' '+(h.address||'')+' '+(h.child_name||'')+' '+(h.phone||'')).toLowerCase().includes(q));
+  }
+  renderHujjat(list);
+}
+function searchHujjat(v){hujjatSearch=v;applyHujjat();}
+
+function renderHujjat(list){
+  _hujjatShown=list||[];
+  const c=document.getElementById('hujjat-cards');
+  const cnt=document.getElementById('hujjat-count');
+  if(cnt)cnt.innerHTML='<div style="background:rgba(255,107,26,.12);border:1px solid var(--ac);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:22px">📄</span><div><b style="color:var(--ac2)">'+allHujjat.length+' ta ota-ona hujjat topshirgan</b><div style="font-size:12px;color:var(--mu)">Ism va aniq manzil — qabul va transport uchun</div></div></div>';
+  if(!list.length){c.innerHTML='<div class="empty"><div class="empty-icon">📄</div>Hozircha hujjat topshirganlar yo\'q</div>';return;}
+  c.innerHTML=list.map(function(h,i){
+    const d=h.created_at?new Date(h.created_at).toLocaleDateString('ru'):'';
+    return '<div class="lead-card enrolled">'
+      +'<div class="lead-top"><div><div class="lead-name"><span class="lead-num">'+(i+1)+'</span>'+hjEsc(h.parent_name)+'</div>'
+      +(h.phone?'<div class="lead-phone">📱 '+hjEsc(h.phone)+'</div>':'')
+      +'</div><div style="text-align:right">'
+      +(h.grade?'<span class="badge active">'+hjEsc(h.grade)+'-sinf</span>':'')
+      +'<div class="lead-date">'+d+'</div></div></div>'
+      +'<div style="margin:8px 0;font-size:13px;background:rgba(255,107,26,.08);border-left:3px solid var(--ac);border-radius:8px;padding:9px 11px"><b>📍 Manzil:</b> '+hjEsc(h.address)+'</div>'
+      +(h.child_name?'<div style="font-size:12px;color:var(--mu);margin:4px 0">👦 Farzand: '+hjEsc(h.child_name)+'</div>':'')
+      +(h.note?'<div style="font-size:12px;color:var(--mu);margin:4px 0">📎 '+hjEsc(h.note)+'</div>':'')
+      +'<div class="lead-actions">'
+      +(h.phone?'<a href="tel:'+hjEsc(h.phone)+'" class="btn-sm blue" style="text-decoration:none">📞 Qo\'ng\'iroq</a>':'')
+      +'<button class="btn-sm red" onclick="deleteHujjat('+h.id+')">🗑</button></div></div>';
+  }).join('');
+}
+
+async function saveHujjat(){
+  const parent=document.getElementById('hj-parent').value.trim();
+  const addr=document.getElementById('hj-addr').value.trim();
+  const phone=document.getElementById('hj-phone').value.trim();
+  const child=document.getElementById('hj-child').value.trim();
+  const note=document.getElementById('hj-note').value.trim();
+  const g=parseInt(document.getElementById('hj-grade').value,10);
+  if(!parent||!addr){toast('Ism va aniq manzilni kiriting','err');return;}
+  const row={parent_name:parent,address:addr,created_at:new Date().toISOString()};
+  if(phone)row.phone=phone;
+  if(child)row.child_name=child;
+  if(note)row.note=note;
+  if(!isNaN(g))row.grade=g;
+  if(currentStaff&&currentStaff.name)row.added_by=currentStaff.name;
+  const{error}=await sb.from('hujjat_topshirganlar').insert(row);
+  if(error){toast(error.message,'err');return;}
+  ['hj-parent','hj-addr','hj-phone','hj-child','hj-grade','hj-note'].forEach(function(id){document.getElementById(id).value='';});
+  toggleHujjatForm();
+  toast('✅ Hujjat topshirgan qo\'shildi');
+  logActivity('📄 Hujjat topshirgan qo\'shdi: '+parent);
+  loadHujjat();
+}
+
+async function deleteHujjat(id){
+  if(!confirm("O'chirilsinmi?"))return;
+  const{error}=await sb.from('hujjat_topshirganlar').delete().eq('id',id);
+  if(error){toast(error.message,'err');return;}
+  toast("🗑 O'chirildi");
+  loadHujjat();
+}
+
+// Excel — ekranda ko'rinib turgan ro'yxatni yuklab beradi (qidiruv ishlatilsa — faqat topilganlar)
+function exportHujjatExcel(){
+  var list=(_hujjatShown&&_hujjatShown.length)?_hujjatShown:allHujjat;
+  if(!list||!list.length){alert("Hujjat topshirganlar ro'yxati bo'sh");return;}
+  var rows=list.map(function(h,i){return {
+    "N": i+1,
+    "Ota-ona F.I.Sh": h.parent_name||'',
+    "Telefon": h.phone||'',
+    "Aniq manzil": h.address||'',
+    "Farzand": h.child_name||'',
+    "Sinf": (h.grade!=null&&h.grade!=='')?h.grade:'',
+    "Hujjatlar / izoh": h.note||'',
+    "Kim kiritdi": h.added_by||'',
+    "Sana": h.created_at?new Date(h.created_at).toLocaleDateString('ru'):''
+  };});
+  var ws=XLSX.utils.json_to_sheet(rows);
+  ws['!cols']=[{wch:5},{wch:26},{wch:18},{wch:45},{wch:22},{wch:7},{wch:30},{wch:16},{wch:12}];
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Hujjat topshirganlar');
+  var d=new Date().toLocaleDateString('ru').replace(/\./g,'-');
+  XLSX.writeFile(wb,"EduNova_hujjat_"+d+".xlsx");
+  if(typeof logActivity==='function')logActivity('📊 Hujjat topshirganlar Excel yuklab oldi');
+}
 
 // ── NOLAVOY (PRESCHOOL) LEADS ──
 let allNLeads=[], nleadsFilter='all';
