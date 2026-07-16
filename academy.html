@@ -2632,9 +2632,9 @@ function clearSession(){try{localStorage.removeItem('edu_session')}catch(e){}}
 // Staff roles that get AUTO PIN-LOCK (marketer + admin are exempt — no lock)
 function isStaffPinLocked(staff){
   if(!staff)return false;
-  return true;  // ALL staff (incl. marketer, director, admin) get PIN-lock every 15s
+  return true;  // ALL staff (incl. marketer, director, admin) get PIN-lock after 1 min idle
 }
-const PIN_LOCK_MS=15*1000;   // auto-lock after 15 seconds of INACTIVITY (no mouse/keyboard)
+const PIN_LOCK_MS=60*1000;   // auto-lock after 1 MINUTE of INACTIVITY (no mouse/keyboard)
 const STAFF_PIN='8888';      // standard PIN for all staff
 
 async function restoreSession(){
@@ -2849,13 +2849,13 @@ function enterStaffPanel(){
   showPage('p-admin');
   // Admin work-timer bar
   setupWorkTimer();
-  startPinLockTimer(); // auto PIN-lock after 15s for non-exempt staff
+  startPinLockTimer(); // auto PIN-lock after 1 min idle for non-exempt staff
   // auto-log: logged in (once per fresh login, not on PIN re-entry)
   if(!window._loggedInThisSession){ window._loggedInThisSession=true; logActivity('🔑 Tizimga kirdi'); }
   navTo(items[0],nav.querySelector('.sb-item'));
 }
 
-// ═══ AUTO PIN-LOCK (every 15s, time-of-day greeting) ═══
+// ═══ AUTO PIN-LOCK (1 min inactivity, time-of-day greeting) ═══
 let _pinLockTimer=null;
 let _pinBuffer='';
 let _pinGreetTimer=null;
@@ -2878,7 +2878,7 @@ function resetInactivityTimer(){
 function startPinLockTimer(){
   if(_pinLockTimer){clearTimeout(_pinLockTimer);_pinLockTimer=null;}
   if(!isStaffPinLocked(currentStaff))return; // marketer + admin not locked
-  // Bind activity listeners once — any of these resets the 15s inactivity countdown
+  // Bind activity listeners once — any of these resets the 1 min inactivity countdown
   if(!_activityHandlersBound){
     _activityHandlersBound=true;
     ['mousemove','mousedown','keydown','touchstart','touchmove','scroll','wheel','click'].forEach(ev=>{
