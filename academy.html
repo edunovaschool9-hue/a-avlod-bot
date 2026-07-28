@@ -5732,26 +5732,26 @@ async function shConfirm(){
   const btn=document.getElementById('sh-confirm-btn');
   btn.disabled=true;btn.textContent='⏳ Saqlanmoqda…';
   try{
-    const t=shState.type,d=shState.d,year=new Date().getFullYear(),prefix=SH_TYPES[t].prefix;
-    const{count,error:cErr}=await sb.from('shartnomalar').select('*',{count:'exact',head:true}).eq('turi',t).like('raqam',prefix+'-'+year+'-%');
-    if(cErr)throw cErr;
-    const raqam=prefix+'-'+year+'-'+String((count||0)+1).padStart(3,'0');
+    const t=shState.type,d=shState.d,year=new Date().getFullYear();
     let faylPath=null;
     if(shState.fileBlob){
       try{
         const ext=shState.fileKind==='imzo'?'png':((shState.fileBlob.name||'jpg').split('.').pop()||'jpg');
-        faylPath=year+'/'+raqam+'_'+shState.fileKind+'.'+ext;
-        const{error:upErr}=await sb.storage.from('hujjatlar').upload(faylPath,shState.fileBlob,{contentType:shState.fileBlob.type||'image/png',upsert:true});
+        const uid=Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
+        faylPath=year+'/'+uid+'_'+shState.fileKind+'.'+ext;
+        const{error:upErr}=await sb.storage.from('hujjatlar').upload(faylPath,shState.fileBlob,{contentType:shState.fileBlob.type||'image/png',upsert:false});
         if(upErr){console.warn('storage:',upErr);faylPath=null;}
       }catch(se){console.warn('storage:',se);faylPath=null;}
     }
-    const{error:insErr}=await sb.from('shartnomalar').insert({
-      turi:t,raqam:raqam,fio:d.fio,pasport:d.pseriya+' '+d.praqam,berilgan:d.berilgan||null,
-      manzil:d.manzil||null,telefon:d.tel||null,farzand_fio:d.child||null,farzand_yil:d.childyil||null,
-      oylik_summa:d.summa||null,tasdiq_turi:shState.fileKind,fayl_path:faylPath,
-      created_by:(typeof currentStaff!=='undefined'&&currentStaff)?currentStaff.name:null
+    const{data:rpcRaqam,error:rpcErr}=await sb.rpc('shartnoma_yarat',{
+      p_turi:t,p_fio:d.fio,p_pasport:d.pseriya+' '+d.praqam,p_berilgan:d.berilgan||null,
+      p_manzil:d.manzil||null,p_telefon:d.tel||null,p_farzand_fio:d.child||null,
+      p_farzand_yil:d.childyil||null,p_oylik_summa:d.summa||null,
+      p_tasdiq_turi:shState.fileKind,p_fayl_path:faylPath,
+      p_created_by:(typeof currentStaff!=='undefined'&&currentStaff)?currentStaff.name:null
     });
-    if(insErr)throw insErr;
+    if(rpcErr)throw rpcErr;
+    const raqam=rpcRaqam;
     shState.raqam=raqam;
     if(typeof logActivity==='function')logActivity('📄 Shartnoma: '+raqam);
     shRenderDoc(t,d,raqam,new Date(),shState.imzoData);
@@ -5942,34 +5942,20 @@ async function shDownloadPNG(){
 async function shLoadHistory(){
   const box=document.getElementById('sh-history');if(!box)return;
   try{
-    const{data,error}=await sb.from('shartnomalar').select('*').order('created_at',{ascending:false}).limit(15);
+    const{data,error}=await sb.from('shartnomalar_royxat').select('*').limit(15);
     if(error)throw error;
     if(!data||!data.length){box.innerHTML='<div style="color:var(--mu);font-size:13px;padding:8px 2px">Hali shartnomalar yoʻq</div>';return;}
     box.innerHTML=data.map(r=>{
       const tl=SH_TYPES[r.turi]?SH_TYPES[r.turi].label:r.turi;
       const dt=r.created_at?new Date(r.created_at).toLocaleDateString('uz-UZ'):'';
-      return '<div style="background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:11px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
-        +'<div style="flex:1;min-width:160px"><b style="color:var(--gn)">'+shEsc(r.raqam)+'</b> · <span style="color:var(--tx)">'+shEsc(r.fio)+'</span>'
-        +'<div style="font-size:12px;color:var(--mu);margin-top:2px">'+tl+' · '+dt+' · '+(r.tasdiq_turi==='imzo'?'✍️ imzo':'📷 foto')+'</div></div>'
-        +'<button class="btn-sm" onclick=\'shReopen('+r.id+')\'>🖼 Ochish</button>'
+      return '<div style="background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:11px 14px;margin-bottom:8px">'
+        +'<b style="color:var(--gn)">'+shEsc(r.raqam)+'</b>'
+        +'<div style="font-size:12px;color:var(--mu);margin-top:3px">'+tl+' · '+dt+(r.created_by?(' · '+shEsc(r.created_by)):'')+'</div>'
         +'</div>';
     }).join('');
-    window._shRows=data;
   }catch(e){
-    box.innerHTML='<div style="color:var(--rd);font-size:13px">Jadval topilmadi — Supabase SQL bajarilganini tekshiring</div>';
+    box.innerHTML='<div style="color:var(--rd);font-size:13px">Roʻyxat yuklanmadi — Supabase SQL bajarilganini tekshiring</div>';
   }
-}
-async function shReopen(id){
-  const r=(window._shRows||[]).find(x=>x.id===id);if(!r)return;
-  const ps=(r.pasport||'').split(' ');
-  shState.type=r.turi;shState.raqam=r.raqam;
-  shState.d={fio:r.fio,pseriya:ps[0]||'',praqam:ps[1]||'',berilgan:r.berilgan,manzil:r.manzil,tel:r.telefon,child:r.farzand_fio,childyil:r.farzand_yil,summa:r.oylik_summa};
-  let imzo=null;
-  if(r.tasdiq_turi==='imzo'&&r.fayl_path){
-    try{const{data:s}=await sb.storage.from('hujjatlar').createSignedUrl(r.fayl_path,120);if(s&&s.signedUrl)imzo=s.signedUrl;}catch(e){}
-  }
-  shRenderDoc(r.turi,shState.d,r.raqam,new Date(r.created_at||Date.now()),imzo);
-  shShow(5);
 }
 
 </script>
