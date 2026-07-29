@@ -1877,6 +1877,7 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
         <div class="field" style="grid-column:1/-1"><label>Kim tomonidan berilgan</label><input id="sh-berilgan" type="text" placeholder="Fargʻona sh. IIB"></div>
         <div class="field" style="grid-column:1/-1"><label>Manzil</label><input id="sh-manzil" type="text" placeholder="Fargʻona sh., ..."></div>
         <div class="field" style="grid-column:1/-1"><label>Telefon</label><input id="sh-tel" type="tel" placeholder="+998 90 123 45 67"></div>
+        <div class="field" style="grid-column:1/-1"><label>Shartnoma sanasi</label><input id="sh-sana" type="date"></div>
       </div>
       <div id="sh-bola-extra" style="display:none">
         <div class="sh-step-title" style="margin-top:14px">🧒 Farzand va toʻlov</div>
@@ -5630,7 +5631,7 @@ function shShow(step){
 }
 function shReset(){
   shState={type:null,d:{},fileBlob:null,fileKind:null,imzoData:null,raqam:null};
-  ['sh-fio','sh-pseriya','sh-praqam','sh-berilgan','sh-manzil','sh-tel','sh-child','sh-childyil','sh-summa'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['sh-fio','sh-pseriya','sh-praqam','sh-berilgan','sh-manzil','sh-tel','sh-sana','sh-child','sh-childyil','sh-summa'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   const fp=document.getElementById('sh-file-preview');if(fp)fp.innerHTML='';
   const fb=document.getElementById('sh-btn-foto'),ib=document.getElementById('sh-btn-imzo');
   if(fb)fb.classList.remove('sel');if(ib)ib.classList.remove('sel');
@@ -5642,15 +5643,18 @@ function shPickType(t){
   document.getElementById('sh-type-label').textContent=SH_TYPES[t].label;
   document.getElementById('sh-bola-extra').style.display=(t==='bola')?'':'none';
   document.getElementById('sh-fio-label').textContent=(t==='bola')?'Ota-ona F.I.Sh. (Buyurtmachi)':'F.I.Sh.';
+  const sn=document.getElementById('sh-sana');
+  if(sn&&!sn.value){const n=new Date();sn.value=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
   shShow(2);
 }
 function shToStep3(){
   const v=id=>document.getElementById(id).value.trim();
-  const d={fio:v('sh-fio'),pseriya:v('sh-pseriya').toUpperCase(),praqam:v('sh-praqam'),berilgan:v('sh-berilgan'),manzil:v('sh-manzil'),tel:v('sh-tel')};
+  const d={fio:v('sh-fio'),pseriya:v('sh-pseriya').toUpperCase(),praqam:v('sh-praqam'),berilgan:v('sh-berilgan'),manzil:v('sh-manzil'),tel:v('sh-tel'),sana:v('sh-sana')};
   if(shState.type==='bola'){d.child=v('sh-child');d.childyil=v('sh-childyil');d.summa=shFmtSum(v('sh-summa'));}
   if(!d.fio){alert('F.I.Sh. kiritilmadi');return;}
   if(!d.pseriya||!d.praqam){alert('Pasport maʼlumotlari toʻliq emas');return;}
   if(!d.tel){alert('Telefon kiritilmadi');return;}
+  if(!d.sana){alert('Shartnoma sanasi tanlanmadi');return;}
   if(shState.type==='bola'&&(!d.child||!d.summa)){alert('Farzand ismi va oylik toʻlov summasi kerak');return;}
   shState.d=d;shShow(3);
 }
@@ -5721,7 +5725,8 @@ function shToStep4(){
     +row('Pasport',d.pseriya+' '+d.praqam)
     +row('Kim bergan',d.berilgan)
     +row('Manzil',d.manzil)
-    +row('Telefon',d.tel);
+    +row('Telefon',d.tel)
+    +row('Shartnoma sanasi',d.sana?d.sana.split('-').reverse().join('.'):'');
   if(t==='bola')html+=row('Farzand',d.child+(d.childyil?(' ('+d.childyil+' y.)'):''))+row('Oylik toʻlov',d.summa+' soʻm');
   if(t==='bw')html+=row('Kurs narxi','oyiga 1 200 000 soʻm · 3 oy');
   html+=row('Tasdiqlash',shState.fileKind==='foto'?'📷 Pasport bilan foto':'✍️ Imzo');
@@ -5748,7 +5753,7 @@ async function shConfirm(){
       p_turi:t,p_fio:d.fio,p_pasport:d.pseriya+' '+d.praqam,p_berilgan:d.berilgan||null,
       p_manzil:d.manzil||null,p_telefon:d.tel||null,p_farzand_fio:d.child||null,
       p_farzand_yil:d.childyil||null,p_oylik_summa:d.summa||null,
-      p_tasdiq_turi:shState.fileKind,p_fayl_path:faylPath,p_imzo_data:shState.imzoData||null,
+      p_tasdiq_turi:shState.fileKind,p_fayl_path:faylPath,p_sana:d.sana||null,p_imzo_data:shState.imzoData||null,
       p_created_by:(typeof currentStaff!=='undefined'&&currentStaff)?currentStaff.name:null
     });
     if(rpcErr)throw rpcErr;
@@ -5793,7 +5798,7 @@ function shHead(numTxt,subtitle,sanaTxt){
 
 function shRenderDoc(t,d,raqam,dt,imzoData){
   const B=v=>v?'<b><u>&nbsp;'+shEsc(v)+'&nbsp;</u></b>':'________________';
-  const sana=shSana(dt);
+  const sana=shSana(d.sana?new Date(d.sana+'T12:00:00'):dt);
   const pasport='seriya '+ (d.pseriya?B(d.pseriya):'____') +' № '+ (d.praqam?B(d.praqam):'____________');
   const YATT='Yakka tartibdagi tadbirkor TILLAVOLDIYEV JAMSHID ALISHER OʻGʻLI (brend: UTKANOS), yakka tartibdagi tadbirkor sifatida davlat roʻyxatidan oʻtganligi toʻgʻrisidagi guvohnoma asosida oʻz nomidan ish yurituvchi, keyingi oʻrinlarda ';
   let html='';
@@ -5967,7 +5972,7 @@ async function shOlish(raqam){
   const r=Array.isArray(data)?data[0]:data;
   if(!r)throw new Error('Shartnoma topilmadi');
   const ps=(r.pasport||'').split(' ');
-  return{r:r,d:{fio:r.fio,pseriya:ps[0]||'',praqam:ps.slice(1).join(' ')||'',berilgan:r.berilgan,manzil:r.manzil,tel:r.telefon,child:r.farzand_fio,childyil:r.farzand_yil,summa:r.oylik_summa}};
+  return{r:r,d:{fio:r.fio,pseriya:ps[0]||'',praqam:ps.slice(1).join(' ')||'',berilgan:r.berilgan,manzil:r.manzil,tel:r.telefon,sana:r.sana||'',child:r.farzand_fio,childyil:r.farzand_yil,summa:r.oylik_summa}};
 }
 async function shOchish(raqam){
   try{
@@ -5984,6 +5989,7 @@ async function shNusxa(raqam){
     const set=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v||'';};
     set('sh-fio',d.fio);set('sh-pseriya',d.pseriya);set('sh-praqam',d.praqam);
     set('sh-berilgan',d.berilgan);set('sh-manzil',d.manzil);set('sh-tel',d.tel);
+    set('sh-sana',d.sana);
     set('sh-child',d.child);set('sh-childyil',d.childyil);set('sh-summa',d.summa);
     shState.fileBlob=null;shState.fileKind=null;shState.imzoData=null;
     const fp=document.getElementById('sh-file-preview');if(fp)fp.innerHTML='';
