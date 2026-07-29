@@ -1942,6 +1942,85 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
   </div>
 </div>
 
+<style>
+/* ══ OʻQITUVCHILAR ══ */
+.oq-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.oq-tab{padding:9px 18px;border-radius:10px;background:var(--s2);border:1px solid var(--brd);color:var(--mu2);font-weight:700;font-size:13.5px;cursor:pointer}
+.oq-tab.active{background:var(--ac);border-color:var(--ac);color:#fff}
+.oq-row{background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:11px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.oq-ph{width:44px;height:44px;border-radius:9px;object-fit:cover;border:1px solid var(--brd2);cursor:pointer;background:var(--s3)}
+/* kiosk */
+#oq-kiosk{display:none;position:fixed;inset:0;z-index:9999;background:#0b0d15;color:#fff;overflow:auto}
+.kio-wrap{max-width:900px;margin:0 auto;padding:20px 16px 40px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.kio-cam{width:100%;max-width:420px;aspect-ratio:4/3;border-radius:18px;overflow:hidden;background:#000;border:2px solid #2a3350;position:relative}
+.kio-cam video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.kio-dots{display:flex;gap:14px;justify-content:center;margin:4px 0}
+.kio-dot{width:20px;height:20px;border-radius:50%;border:2px solid #4a5578;background:transparent}
+.kio-dot.f{background:#FF6B1A;border-color:#FF6B1A}
+.kio-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:340px}
+.kio-key{background:#1a1f30;border:1px solid #2e3650;color:#fff;font-size:27px;font-weight:700;border-radius:16px;padding:18px 0;cursor:pointer;font-family:var(--fm)}
+.kio-key:active{background:#FF6B1A}
+.kio-msg{min-height:74px;text-align:center;font-size:19px;font-weight:800;padding:8px 12px}
+</style>
+
+<!-- ═══════ OʻQITUVCHILAR ═══════ -->
+<div class="admin-panel" id="ap-davomat">
+  <div class="ap-head"><div><div class="ap-title">👨‍🏫 Oʻqituvchilar va davomat</div><div class="ap-sub">Roʻyxatga olish va davomat (kelish–ketish)</div></div>
+    <button class="btn-sm green" style="padding:10px 18px" onclick="oqKioskOpen()">🖥 Dejur rejimi</button></div>
+
+  <div class="oq-tabs">
+    <div class="oq-tab active" id="oq-tab-list" onclick="oqTab('list')">📋 Roʻyxat</div>
+    <div class="oq-tab" id="oq-tab-dav" onclick="oqTab('dav')">🕘 Davomat</div>
+  </div>
+
+  <!-- ROʻYXAT -->
+  <div id="oq-pane-list">
+    <button class="btn-sm green" style="padding:10px 18px;margin-bottom:12px" onclick="oqToggleForm()">➕ Yangi oʻqituvchi</button>
+    <div class="tbl-wrap" id="oq-form" style="display:none;padding:16px;margin-bottom:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field" style="grid-column:1/-1"><label>F.I.Sh.</label><input id="oq-fio" type="text" placeholder="Familiya Ism Sharif"></div>
+        <div class="field"><label>Fan</label><input id="oq-fan" type="text" placeholder="Matematika"></div>
+        <div class="field"><label>Telefon</label><input id="oq-tel" type="tel" placeholder="+998 90 123 45 67"></div>
+        <div class="field"><label>PIN (4 raqam)</label><input id="oq-pin" type="text" inputmode="numeric" maxlength="4" placeholder="1234"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn-sm" onclick="oqToggleForm()">Bekor</button>
+        <button class="btn-sm green" style="padding:10px 20px" onclick="oqSave()">💾 Saqlash</button>
+      </div>
+    </div>
+    <div id="oq-list"><div class="loading-center"><div class="spin"></div></div></div>
+  </div>
+
+  <!-- DAVOMAT -->
+  <div id="oq-pane-dav" style="display:none">
+    <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px">
+      <div class="field" style="margin:0"><label>Sana</label><input id="oq-dav-sana" type="date" onchange="oqLoadDavomat()"></div>
+      <button class="btn-sm" onclick="oqLoadDavomat()">🔄 Yangilash</button>
+    </div>
+    <div id="oq-dav"><div class="loading-center"><div class="spin"></div></div></div>
+  </div>
+</div>
+
+<!-- KIOSK -->
+<div id="oq-kiosk">
+  <div class="kio-wrap">
+    <div style="width:100%;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:800;font-size:17px">🖥 Davomat — PIN kodingizni kiriting</div>
+      <button onclick="oqKioskClose()" style="background:#1a1f30;border:1px solid #2e3650;color:#fff;border-radius:10px;padding:9px 15px;font-weight:700;cursor:pointer">✕ Chiqish</button>
+    </div>
+    <div class="kio-cam"><video id="kio-video" autoplay playsinline muted></video></div>
+    <div class="kio-dots"><div class="kio-dot" id="kd0"></div><div class="kio-dot" id="kd1"></div><div class="kio-dot" id="kd2"></div><div class="kio-dot" id="kd3"></div></div>
+    <div class="kio-msg" id="kio-msg" style="color:#a0a8bd">Kamera tayyorlanmoqda…</div>
+    <div class="kio-pad">
+      <div class="kio-key" onclick="oqKey('1')">1</div><div class="kio-key" onclick="oqKey('2')">2</div><div class="kio-key" onclick="oqKey('3')">3</div>
+      <div class="kio-key" onclick="oqKey('4')">4</div><div class="kio-key" onclick="oqKey('5')">5</div><div class="kio-key" onclick="oqKey('6')">6</div>
+      <div class="kio-key" onclick="oqKey('7')">7</div><div class="kio-key" onclick="oqKey('8')">8</div><div class="kio-key" onclick="oqKey('9')">9</div>
+      <div class="kio-key" style="font-size:19px" onclick="oqKey('C')">C</div><div class="kio-key" onclick="oqKey('0')">0</div><div class="kio-key" style="font-size:19px" onclick="oqKey('B')">⌫</div>
+    </div>
+  </div>
+</div>
+
+
 <!-- IMZO OVERLAY -->
 <div id="imzo-overlay">
   <div class="imzo-hint">✍️ Barmoq bilan imzo chizing (telefonni yonboshlatsangiz qulayroq)</div>
@@ -2185,8 +2264,8 @@ const POSITIONS = {
 };
 
 // ── ROLE MENUS ── (Variant B: everyone sees ALL sections; only timer differs)
-const FULL_MENU=['svodka','qabul','hujjat','dash','shartnoma','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
-const MARKETING_MENU=['svodka','qabul','testnat','hujjat','dash','shartnoma','hisobkitob','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
+const FULL_MENU=['svodka','qabul','hujjat','dash','shartnoma','davomat','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
+const MARKETING_MENU=['svodka','qabul','testnat','hujjat','dash','shartnoma','davomat','hisobkitob','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
 const MENUS = {
   admin:     FULL_MENU,
   marketing: MARKETING_MENU,
@@ -2213,6 +2292,7 @@ const MENU_META = {
   staff:    {label:'🧑‍💼 Xodimlar',       fn:'loadStaffPanel'},
   qabul:    {label:'🎯 Qabul',           fn:'loadQabul'},
   shartnoma:{label:'📄 Shartnoma tuzish', fn:'loadShartnoma'},
+  davomat:  {label:'🕘 Davomat',          fn:'loadOqituvchi'},
   testnat:  {label:'📊 Test natijalari', fn:'loadTestNatijalari'},
   hujjat:   {label:'📄 Hujjat topshirganlar', fn:'loadHujjat'}
 };
@@ -5996,6 +6076,181 @@ async function shNusxa(raqam){
     document.getElementById('sh-btn-foto').classList.remove('sel');
     document.getElementById('sh-btn-imzo').classList.remove('sel');
   }catch(e){alert('Xatolik: '+(e.message||e));}
+}
+
+
+/* ══════════ OʻQITUVCHILAR + DAVOMAT ══════════ */
+function oqEsc(s){return String(s==null?'':s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));}
+function oqVaqt(ts){if(!ts)return null;try{return new Date(ts).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Tashkent'});}catch(e){return '';}}
+function oqBugun(){const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
+
+function loadOqituvchi(){
+  const s=document.getElementById('oq-dav-sana');if(s&&!s.value)s.value=oqBugun();
+  oqTab('list');
+}
+function oqTab(t){
+  document.getElementById('oq-tab-list').classList.toggle('active',t==='list');
+  document.getElementById('oq-tab-dav').classList.toggle('active',t==='dav');
+  document.getElementById('oq-pane-list').style.display=(t==='list')?'':'none';
+  document.getElementById('oq-pane-dav').style.display=(t==='dav')?'':'none';
+  if(t==='list')oqLoadList();else oqLoadDavomat();
+}
+function oqToggleForm(){const f=document.getElementById('oq-form');f.style.display=(f.style.display==='none')?'block':'none';}
+
+async function oqSave(){
+  const v=id=>document.getElementById(id).value.trim();
+  const fio=v('oq-fio'),fan=v('oq-fan'),tel=v('oq-tel'),pin=v('oq-pin');
+  if(!fio){alert('F.I.Sh. kiritilmadi');return;}
+  if(!/^\d{4}$/.test(pin)){alert('PIN 4 ta raqamdan iborat boʻlishi kerak');return;}
+  try{
+    const{error}=await sb.rpc('oqituvchi_qoshish',{p_fio:fio,p_fan:fan||null,p_telefon:tel||null,p_pin:pin});
+    if(error)throw error;
+    ['oq-fio','oq-fan','oq-tel','oq-pin'].forEach(i=>document.getElementById(i).value='');
+    oqToggleForm();
+    if(typeof toast==='function')toast('✅ Oʻqituvchi qoʻshildi: '+fio);
+    oqLoadList();
+  }catch(e){alert('Xatolik: '+(e.message||e));}
+}
+
+async function oqLoadList(){
+  const box=document.getElementById('oq-list');if(!box)return;
+  try{
+    const{data,error}=await sb.rpc('oqituvchi_royxat');
+    if(error)throw error;
+    if(!data||!data.length){box.innerHTML='<div style="color:var(--mu);font-size:13px;padding:8px 2px">Hali oʻqituvchi yoʻq</div>';return;}
+    box.innerHTML=data.map(r=>'<div class="oq-row">'
+      +'<div style="flex:1;min-width:170px"><b style="color:var(--tx)">'+oqEsc(r.fio)+'</b>'
+      +(r.faol?'':' <span style="color:var(--rd);font-size:12px">(faol emas)</span>')
+      +'<div style="font-size:12px;color:var(--mu);margin-top:2px">'+(r.fan?oqEsc(r.fan):'—')+(r.telefon?(' · '+oqEsc(r.telefon)):'')+' · PIN ••••</div></div>'
+      +'<button class="btn-sm" onclick="oqPinChange('+r.id+')">🔑 PIN</button>'
+      +'<button class="btn-sm" onclick="oqFaol('+r.id+','+(r.faol?'false':'true')+')">'+(r.faol?'⏸ Toʻxtatish':'▶️ Faollashtirish')+'</button>'
+      +'<button class="btn-sm red" onclick="oqDelete('+r.id+',\''+oqEsc(r.fio).replace(/'/g,"\\'")+'\')">🗑</button>'
+      +'</div>').join('');
+  }catch(e){
+    box.innerHTML='<div style="color:var(--rd);font-size:13px">Yuklanmadi — Supabase SQL bajarilganini tekshiring</div>';
+  }
+}
+async function oqPinChange(id){
+  const pin=prompt('Yangi PIN (4 raqam):');
+  if(pin===null)return;
+  if(!/^\d{4}$/.test(pin.trim())){alert('PIN 4 ta raqam boʻlishi kerak');return;}
+  try{
+    const{error}=await sb.rpc('oqituvchi_pin_yangilash',{p_id:id,p_pin:pin.trim()});
+    if(error)throw error;
+    if(typeof toast==='function')toast('🔑 PIN yangilandi');
+  }catch(e){alert('Xatolik: '+(e.message||e));}
+}
+async function oqFaol(id,holat){
+  try{
+    const{error}=await sb.rpc('oqituvchi_holat',{p_id:id,p_faol:holat});
+    if(error)throw error;oqLoadList();
+  }catch(e){alert('Xatolik: '+(e.message||e));}
+}
+async function oqDelete(id,fio){
+  if(!confirm(fio+' oʻchirilsinmi? Davomat yozuvlari ham oʻchadi.'))return;
+  try{
+    const{error}=await sb.rpc('oqituvchi_ochirish',{p_id:id});
+    if(error)throw error;
+    if(typeof toast==='function')toast('🗑 Oʻchirildi');
+    oqLoadList();
+  }catch(e){alert('Xatolik: '+(e.message||e));}
+}
+
+async function oqLoadDavomat(){
+  const box=document.getElementById('oq-dav');if(!box)return;
+  const sana=document.getElementById('oq-dav-sana').value||oqBugun();
+  box.innerHTML='<div class="loading-center"><div class="spin"></div></div>';
+  try{
+    const{data,error}=await sb.rpc('davomat_royxat',{p_sana:sana});
+    if(error)throw error;
+    if(!data||!data.length){box.innerHTML='<div style="color:var(--mu);font-size:13px;padding:8px 2px">Bu kunda belgilanish yoʻq</div>';return;}
+    box.innerHTML=data.map(r=>{
+      const ph=(src,lbl)=>src?('<img class="oq-ph" src="'+src+'" title="'+lbl+'" onclick="oqFoto(this.src)">'):'';
+      return '<div class="oq-row">'
+        +ph(r.kelish_foto,'Kelish')+ph(r.ketish_foto,'Ketish')
+        +'<div style="flex:1;min-width:150px"><b style="color:var(--tx)">'+oqEsc(r.fio)+'</b>'
+        +'<div style="font-size:12px;color:var(--mu);margin-top:2px">'+(r.fan?oqEsc(r.fan):'—')+'</div></div>'
+        +'<div style="font-size:13px;text-align:right"><span style="color:var(--gn)">▶ '+(oqVaqt(r.kelish_vaqt)||'—')+'</span><br>'
+        +'<span style="color:var(--go)">■ '+(oqVaqt(r.ketish_vaqt)||'—')+'</span></div>'
+        +'</div>';
+    }).join('');
+  }catch(e){
+    box.innerHTML='<div style="color:var(--rd);font-size:13px">Yuklanmadi — Supabase SQL bajarilganini tekshiring</div>';
+  }
+}
+function oqFoto(src){
+  const w=window.open('','_blank');
+  if(w)w.document.write('<body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;height:100vh"><img src="'+src+'" style="max-width:100%;max-height:100%"></body>');
+}
+
+/* ── KIOSK ── */
+let _kioStream=null,_kioPin='',_kioBusy=false;
+async function oqKioskOpen(){
+  document.getElementById('oq-kiosk').style.display='block';
+  document.body.style.overflow='hidden';
+  _kioPin='';oqDots();
+  const msg=document.getElementById('kio-msg');
+  msg.style.color='#a0a8bd';msg.textContent='Kamera tayyorlanmoqda…';
+  try{
+    _kioStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:640},height:{ideal:480},facingMode:'user'},audio:false});
+    document.getElementById('kio-video').srcObject=_kioStream;
+    msg.textContent='PIN kodingizni kiriting';
+  }catch(e){
+    msg.style.color='#fb7185';
+    msg.textContent='Kamera ochilmadi. Brauzerda ruxsat bering (🔒 belgisi → Camera → Allow). PIN baribir ishlaydi.';
+  }
+}
+function oqKioskClose(){
+  document.getElementById('oq-kiosk').style.display='none';
+  document.body.style.overflow='';
+  if(_kioStream){_kioStream.getTracks().forEach(t=>t.stop());_kioStream=null;}
+  _kioPin='';oqDots();
+}
+function oqDots(){for(let i=0;i<4;i++){const d=document.getElementById('kd'+i);if(d)d.classList.toggle('f',i<_kioPin.length);}}
+function oqKey(k){
+  if(_kioBusy)return;
+  if(k==='C'){_kioPin='';oqDots();return;}
+  if(k==='B'){_kioPin=_kioPin.slice(0,-1);oqDots();return;}
+  if(_kioPin.length>=4)return;
+  _kioPin+=k;oqDots();
+  if(_kioPin.length===4)oqSubmit();
+}
+function oqSnap(){
+  const v=document.getElementById('kio-video');
+  if(!v||!v.videoWidth)return null;
+  const w=320,h=Math.round(v.videoHeight*(320/v.videoWidth));
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const x=c.getContext('2d');
+  x.translate(w,0);x.scale(-1,1);           // зеркалим как в превью
+  x.drawImage(v,0,0,w,h);
+  return c.toDataURL('image/jpeg',0.55);
+}
+async function oqSubmit(){
+  _kioBusy=true;
+  const msg=document.getElementById('kio-msg');
+  msg.style.color='#a0a8bd';msg.textContent='Tekshirilmoqda…';
+  const pin=_kioPin;
+  try{
+    const foto=oqSnap();
+    const{data,error}=await sb.rpc('davomat_belgilash',{p_pin:pin,p_foto:foto});
+    if(error)throw error;
+    const r=(typeof data==='string')?JSON.parse(data):data;
+    if(r&&r.ok){
+      const amal=r.amal==='kelish'?'✅ Kelish':'👋 Ketish';
+      msg.style.color=r.amal==='kelish'?'#34d399':'#fbbf24';
+      msg.innerHTML=amal+' — '+oqEsc(r.fio)+'<br><span style="font-size:15px;color:#a0a8bd">'+(oqVaqt(r.vaqt)||'')+'</span>';
+    }else{
+      msg.style.color='#fb7185';
+      msg.textContent=(r&&r.xato)?r.xato:'PIN notoʻgʻri';
+    }
+  }catch(e){
+    msg.style.color='#fb7185';msg.textContent='Xatolik: '+(e.message||e);
+  }
+  setTimeout(()=>{
+    _kioPin='';oqDots();_kioBusy=false;
+    const m=document.getElementById('kio-msg');
+    if(document.getElementById('oq-kiosk').style.display==='block'){m.style.color='#a0a8bd';m.textContent='PIN kodingizni kiriting';}
+  },3500);
 }
 
 </script>
