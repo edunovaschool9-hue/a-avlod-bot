@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#EFF2F0">
+<title>EduNova — Ota-ona kabineti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--pp:#EFF2F0;--pn:#FCFDFC;--ink:#14201B;--mu:#65726B;--ln:#D6DED9;
+  --ac:#0E6E5C;--go:#B7791F;--vi:#7A3CC4;--rd:#B3261E;--r:14px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{background:var(--pp);color:var(--ink);font:400 16px/1.5 "Onest",-apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.d{font-family:"Unbounded",sans-serif;letter-spacing:-.02em}
+.m{font-family:"JetBrains Mono",monospace}
+.app{display:flex;flex-direction:column;min-height:100dvh}
+header{position:sticky;top:0;z-index:20;background:var(--pp);border-bottom:1px solid var(--ln);
+  padding:max(10px,env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-family:"Unbounded";font-weight:800;font-size:13px}
+.brand span{color:var(--ac)}
+.lang{display:flex;border:1px solid var(--ink);border-radius:8px;overflow:hidden}
+.lang button{background:none;border:0;padding:6px 11px;font:700 11px "JetBrains Mono";color:var(--ink);cursor:pointer}
+.lang button.on{background:var(--ink);color:var(--pn)}
+main{flex:1;padding:18px 16px 100px}
+h1{font-family:"Unbounded";font-weight:800;font-size:22px;line-height:1.2}
+.eye{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mu);font-weight:700}
+.card{background:var(--pn);border:1px solid var(--ln);border-radius:var(--r);padding:16px;margin-bottom:12px}
+label{display:block;font-size:10px;font-weight:700;color:var(--mu);margin-bottom:5px;letter-spacing:.5px;text-transform:uppercase}
+input{width:100%;background:#fff;border:1px solid var(--ln);border-radius:10px;padding:13px;font-size:16px;font-family:inherit;color:var(--ink)}
+input:focus{outline:2px solid var(--ac);outline-offset:-1px}
+.f{margin-bottom:12px}
+.btn{width:100%;background:var(--ink);color:var(--pn);border:0;border-radius:10px;padding:15px;font:700 15px "Onest";cursor:pointer;font-family:inherit}
+.btn:active{background:var(--ac)}
+.btn.g{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.btn.s{width:auto;padding:9px 15px;font-size:13px;border-radius:9px}
+.err{color:var(--rd);font-size:14px;margin-top:10px;min-height:18px}
+.hero{background:linear-gradient(160deg,#12463C,#0E6E5C);color:#fff;border-radius:18px;padding:20px;margin-bottom:14px}
+.hero .n{font-family:"Unbounded";font-weight:800;font-size:23px;line-height:1.15}
+.hero .s{opacity:.8;font-size:13px;margin-top:4px}
+.stat{display:flex;gap:10px;margin-top:16px}
+.stat>div{flex:1;background:rgba(255,255,255,.12);border-radius:11px;padding:11px 12px}
+.stat b{display:block;font-family:"Unbounded";font-size:20px;font-weight:800}
+.stat span{font-size:10px;opacity:.85;text-transform:uppercase;letter-spacing:.5px}
+.les{background:var(--pn);border:1px solid var(--ln);border-radius:var(--r);padding:15px;margin-bottom:10px}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:7px;background:#E4EEE9;color:var(--ac)}
+.star{background:#FBF6E9;border-left:3px solid var(--go);padding:9px 12px;border-radius:0 9px 9px 0;margin-top:10px;font-size:13.5px}
+.quote{background:#F3EEFA;border-left:3px solid var(--vi);padding:9px 12px;border-radius:0 9px 9px 0;margin-top:7px;font-size:13.5px}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--ln);font-size:14px}
+.kv:last-child{border:0}
+.kv b{font-family:"JetBrains Mono"}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:30;background:var(--pn);border-top:1px solid var(--ln);
+  display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+nav button{flex:1;background:none;border:0;padding:9px 4px;font:600 11px "Onest";color:var(--mu);cursor:pointer;
+  border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:inherit}
+nav button.on{background:#E4EEE9;color:var(--ac)}
+nav i{font-size:19px;font-style:normal}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">EDUNOVA <span>/ OTA-ONA</span></div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <div class="lang"><button id="lru" onclick="setLang('ru')">RU</button><button id="luz" onclick="setLang('uz')">UZ</button></div>
+      <button id="out" class="btn s g hide" onclick="logout()">✕</button>
+    </div>
+  </header>
+  <main id="app"></main>
+  <nav id="nav" class="hide">
+    <button id="n-bugun" onclick="go('bugun')"><i>🏠</i><span data-t="navBugun"></span></button>
+    <button id="n-test"  onclick="go('test')"><i>📊</i><span data-t="navTest"></span></button>
+    <button id="n-kun"   onclick="go('kun')"><i>📖</i><span data-t="navKun"></span></button>
+  </nav>
+</div>
+
+<script>
+const SB_URL="https://unaodltahuevrfnarfha.supabase.co";
+const SB_KEY="";   // <-- anon key. Chatga yubormang.
+
+const T={
+ kirish:["Кабинет родителя","Ota-ona kabineti"],
+ lead:["Введите логин и пароль, которые дала школа.","Maktab bergan login va parolni kiriting."],
+ login:["Логин","Login"], parol:["Пароль","Parol"], kir:["Войти","Kirish"],
+ xato:["Неверный логин или пароль","Login yoki parol notoʻgʻri"],
+ aloqa:["Нет связи. Проверьте интернет.","Aloqa yoʻq. Internetni tekshiring."],
+ kuting:["Проверяем…","Tekshirilmoqda…"],
+ navBugun:["Сегодня","Bugun"], navTest:["Результаты","Natijalar"], navKun:["Дневник","Kundalik"],
+ sinf:["класс","sinf"],
+ oqituvchi:["Учитель","Oʻqituvchi"],
+ darslar:["уроков в этом месяце","bu oyda dars"],
+ testlar:["результатов тестов","test natijasi"],
+ bugunSarl:["Что было на уроке","Darsda nima boʻldi"],
+ bugunYoq:["Сегодня отчёта пока нет. Учитель заполняет его после уроков.",
+           "Bugun hisobot hali yoʻq. Oʻqituvchi darsdan keyin toʻldiradi."],
+ faol:["Хорошо участвовали","Yaxshi qatnashdilar"],
+ voqea:["Случай на уроке","Darsdagi holat"],
+ kuchli:["Сильные стороны ребёнка","Bolaning kuchli tomonlari"],
+ testSarl:["Результаты тестов","Test natijalari"],
+ testYoq:["Результатов пока нет. Они появятся после тестов в тест-кабинете.",
+          "Natijalar hali yoʻq. Test kabinetidagi testlardan keyin paydo boʻladi."],
+ testBog:["Результаты появятся, когда учитель свяжет ребёнка с базой школы.",
+          "Oʻqituvchi bolani maktab bazasi bilan bogʻlagach, natijalar chiqadi."],
+ kunSarl:["Дневник класса","Sinf kundaligi"],
+ kunYoq:["Записей пока нет","Yozuvlar hali yoʻq"],
+ bugunKun:["сегодня","bugun"], kecha:["вчера","kecha"]
+};
+let L=1, tok=localStorage.getItem("ota_tok")||"", me=null, tab="bugun", testlar=null, kunlar=null;
+const $=i=>document.getElementById(i), t=k=>T[k][L];
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+async function rpc(fn,body){
+  const r=await fetch(SB_URL+"/rest/v1/rpc/"+fn,{method:"POST",
+    headers:{apikey:SB_KEY,Authorization:"Bearer "+SB_KEY,"Content-Type":"application/json"},
+    body:JSON.stringify(body||{})});
+  if(!r.ok)throw new Error(r.status);
+  const x=await r.text(); return x?JSON.parse(x):null;
+}
+function setLang(l){
+  L=(l==="ru")?0:1;
+  $("lru").className=L?"":"on"; $("luz").className=L?"on":"";
+  document.documentElement.lang=L?"uz":"ru";
+  document.querySelectorAll("[data-t]").forEach(e=>e.textContent=T[e.dataset.t][L]);
+  render();
+}
+function sana(s){
+  const d=new Date().toISOString().slice(0,10);
+  const y=new Date(Date.now()-864e5).toISOString().slice(0,10);
+  return s===d?t("bugunKun"):s===y?t("kecha"):s;
+}
+
+/* ═══ KIRISH ═══ */
+function loginScreen(){
+  $("nav").classList.add("hide"); $("out").classList.add("hide");
+  $("app").innerHTML=`<div class="eye">EduNova School</div>
+   <h1 style="margin:8px 0 6px">${t("kirish")}</h1>
+   <p style="color:var(--mu);font-size:15px;margin-bottom:18px">${t("lead")}</p>
+   <div class="card">
+     <div class="f"><label>${t("login")}</label><input id="i-log" autocapitalize="none" autocomplete="username"></div>
+     <div class="f"><label>${t("parol")}</label><input id="i-par" type="password" inputmode="numeric"
+        autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+     <button class="btn" id="b-log" onclick="doLogin()">${t("kir")}</button>
+     <div class="err" id="e-log"></div>
+   </div>`;
+}
+async function doLogin(){
+  const lg=$("i-log").value.trim(), pr=$("i-par").value, e=$("e-log"), b=$("b-log");
+  if(!lg||!pr)return;
+  b.disabled=true; e.style.color="var(--mu)"; e.textContent=t("kuting");
+  try{
+    const d=await rpc("ota_kirish",{p_login:lg,p_parol:pr});
+    if(!d||!d.ok){e.style.color="var(--rd)";e.textContent=t("xato");b.disabled=false;return;}
+    tok=d.token; localStorage.setItem("ota_tok",tok); await boot();
+  }catch(err){e.style.color="var(--rd)";e.textContent=t("aloqa");b.disabled=false;}
+}
+async function logout(){
+  try{await rpc("ota_chiqish",{p_token:tok});}catch(e){}
+  localStorage.removeItem("ota_tok"); tok=""; me=null; testlar=null; kunlar=null; loginScreen();
+}
+async function boot(){
+  try{
+    me=await rpc("ota_bosh",{p_token:tok});
+    if(!me||!me.ok)throw new Error("x");
+    $("nav").classList.remove("hide"); $("out").classList.remove("hide");
+    go(tab);
+  }catch(e){ localStorage.removeItem("ota_tok"); tok=""; loginScreen(); }
+}
+function go(n){
+  tab=n; ["bugun","test","kun"].forEach(k=>$("n-"+k).classList.toggle("on",k===n));
+  render();
+}
+function render(){
+  if(!tok||!me){loginScreen();return;}
+  if(tab==="bugun")bugun(); else if(tab==="test")test(); else kun();
+}
+
+/* ═══ BUGUN ═══ */
+function darsCard(h){
+  return `<div class="les">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+      <span class="tag">${esc(h.fan||h.sinf)}</span>
+      <span class="m" style="font-size:11px;color:var(--mu)">${sana(h.sana)} · ${esc(h.oqituvchi||"")}</span></div>
+    <div style="font-weight:600;font-size:16px;margin-top:9px">${esc(h.mavzu)}</div>
+    ${h.faollar?`<div class="star">⭐ <b>${t("faol")}:</b> ${esc(h.faollar)}</div>`:""}
+    ${h.voqea?`<div class="quote">💬 <b>${t("voqea")}:</b> ${esc(h.voqea)}</div>`:""}
+  </div>`;
+}
+function bugun(){
+  const b=me.bugun||[];
+  $("app").innerHTML=`
+   <div class="hero">
+     <div class="n">${esc(me.fio)}</div>
+     <div class="s">${esc(me.sinf)} ${t("sinf")}${me.oqituvchi?" · "+t("oqituvchi")+": "+esc(me.oqituvchi):""}</div>
+     <div class="stat">
+       <div><b>${me.oylik_darslar}</b><span>${t("darslar")}</span></div>
+       <div><b>${me.testlar_soni}</b><span>${t("testlar")}</span></div>
+     </div>
+   </div>
+   ${me.kuchli?`<div class="card" style="background:#F2F8F5;border-color:#CFE3DA">
+     <div class="eye">${t("kuchli")}</div>
+     <div style="font-size:14.5px;margin-top:7px">💪 ${esc(me.kuchli)}</div></div>`:""}
+   <div class="eye" style="margin:18px 0 10px">${t("bugunSarl")}</div>
+   ${b.length?b.map(darsCard).join(""):`<div class="card" style="text-align:center;color:var(--mu);font-size:14px">${t("bugunYoq")}</div>`}`;
+}
+
+/* ═══ TESTLAR ═══ */
+function pick(o,keys){for(const k of keys)if(o[k]!=null&&o[k]!=="")return o[k];return null;}
+async function test(){
+  $("app").innerHTML=`<h1 style="margin-bottom:14px">${t("testSarl")}</h1><div id="tl"></div>`;
+  if(testlar===null){
+    try{ testlar=await rpc("ota_testlar",{p_token:tok})||[]; }catch(e){ testlar=[]; }
+  }
+  if(!me.bogli){$("tl").innerHTML=`<div class="card" style="text-align:center;color:var(--mu);font-size:14px">${t("testBog")}</div>`;return;}
+  if(!testlar.length){$("tl").innerHTML=`<div class="card" style="text-align:center;color:var(--mu);font-size:14px">${t("testYoq")}</div>`;return;}
+  const rows=testlar.map(r=>{
+    const fan=pick(r,["fan","subject","predmet","mavzu","topic","test_name","nom"]);
+    const ball=pick(r,["ball","score","natija","percent","foiz","result","togri"]);
+    const dat=pick(r,["sana","created_at","date","vaqt","sanasi"]);
+    const dar=pick(r,["daraja","level","uroven"]);
+    const n=Number(String(ball).replace(/[^\d.]/g,""));
+    const col=isNaN(n)?"var(--mu)":n>=80?"var(--ac)":n>=50?"var(--go)":"var(--rd)";
+    if(fan==null&&ball==null)
+      return `<div class="card">${Object.entries(r).slice(0,6).map(([k,v])=>
+        `<div class="kv"><span style="color:var(--mu)">${esc(k)}</span><b>${esc(v)}</b></div>`).join("")}</div>`;
+    return `<div class="les">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+        <div><div style="font-weight:600;font-size:15.5px">${esc(fan||"—")}</div>
+          ${dar?`<div style="font-size:12px;color:var(--mu);margin-top:2px">${esc(dar)}</div>`:""}</div>
+        <div class="m" style="font-size:21px;font-weight:700;color:${col}">${esc(ball!=null?ball:"—")}</div></div>
+      ${dat?`<div class="m" style="font-size:11px;color:var(--mu);margin-top:7px">${esc(String(dat).slice(0,10))}</div>`:""}
+    </div>`;}).join("");
+  $("tl").innerHTML=rows;
+}
+
+/* ═══ KUNDALIK ═══ */
+async function kun(){
+  $("app").innerHTML=`<h1 style="margin-bottom:14px">${t("kunSarl")}</h1><div id="kl"></div>`;
+  if(kunlar===null){
+    try{ kunlar=await rpc("ota_hisobotlar",{p_token:tok,p_limit:40})||[]; }catch(e){ kunlar=[]; }
+  }
+  $("kl").innerHTML=kunlar.length?kunlar.map(darsCard).join("")
+    :`<div class="card" style="text-align:center;color:var(--mu);font-size:14px">${t("kunYoq")}</div>`;
+}
+
+setLang("uz");
+if(tok)boot(); else loginScreen();
+</script>
+</body>
+</html>

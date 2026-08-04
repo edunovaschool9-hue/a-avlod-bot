@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F4F1EA">
+<title>EduNova — O'qituvchi kabineti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--pp:#F4F1EA;--pn:#FDFCF9;--ink:#1A1A18;--mu:#6E6A5F;--ln:#DFDACE;
+  --ac:#E85400;--gn:#0E6E5C;--go:#B7791F;--rd:#B3261E;--vi:#7A3CC4;--r:12px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{background:var(--pp);color:var(--ink);font:400 16px/1.5 "Onest",-apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.d{font-family:"Unbounded",sans-serif;letter-spacing:-.02em}
+.m{font-family:"JetBrains Mono",monospace}
+.app{display:flex;flex-direction:column;min-height:100dvh}
+header{position:sticky;top:0;z-index:20;background:var(--pp);border-bottom:1px solid var(--ln);
+  padding:max(10px,env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-family:"Unbounded";font-weight:800;font-size:13px}
+.brand span{color:var(--ac)}
+.lang{display:flex;border:1px solid var(--ink);border-radius:8px;overflow:hidden}
+.lang button{background:none;border:0;padding:6px 11px;font:700 11px "JetBrains Mono";color:var(--ink);cursor:pointer}
+.lang button.on{background:var(--ink);color:var(--pn)}
+main{flex:1;padding:18px 16px 100px}
+h1{font-family:"Unbounded";font-weight:800;font-size:22px;line-height:1.2}
+.eye{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mu);font-weight:700}
+.card{background:var(--pn);border:1px solid var(--ln);border-radius:var(--r);padding:16px;margin-bottom:12px}
+label{display:block;font-size:10px;font-weight:700;color:var(--mu);margin-bottom:5px;letter-spacing:.5px;text-transform:uppercase}
+input,select,textarea{width:100%;background:#fff;border:1px solid var(--ln);border-radius:10px;padding:13px;font-size:16px;font-family:inherit;color:var(--ink)}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--ac);outline-offset:-1px}
+textarea{min-height:90px;resize:vertical;line-height:1.55}
+.f{margin-bottom:12px}
+.btn{width:100%;background:var(--ink);color:var(--pn);border:0;border-radius:10px;padding:15px;font:700 15px "Onest";cursor:pointer;font-family:inherit}
+.btn:active{background:var(--ac)}
+.btn.g{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.btn.s{width:auto;padding:9px 15px;font-size:13px;border-radius:9px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.err{color:var(--rd);font-size:14px;margin-top:10px;min-height:18px}
+
+/* reyting */
+.score{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.score b{font-family:"Unbounded";font-size:46px;font-weight:800;line-height:1}
+.bars i{display:block;height:100%;border-radius:4px}
+.tr{height:8px;background:#E7E2D6;border-radius:4px;overflow:hidden;margin-bottom:11px}
+.lbl{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px}
+.lbl span:last-child{font-family:"JetBrains Mono";font-weight:700}
+
+/* tuxum infografika */
+.egg-wrap{display:flex;gap:16px;align-items:center}
+.eggs{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;flex:1}
+.egg{aspect-ratio:.78;border-radius:50% 50% 46% 46%;border:1.5px solid var(--ln);background:#fff}
+.egg.on{background:var(--go);border-color:var(--go)}
+.road{position:relative;height:6px;background:#E7E2D6;border-radius:3px;margin:14px 0 8px}
+.road i{display:block;height:100%;background:linear-gradient(90deg,var(--go),var(--ac));border-radius:3px}
+.road b{position:absolute;top:-7px;width:20px;height:20px;border-radius:50%;background:var(--ac);
+  border:3px solid var(--pn);transform:translateX(-50%)}
+.road-lbl{display:flex;justify-content:space-between;font-size:11px;color:var(--mu)}
+
+/* ro'yxat */
+.item{background:var(--pn);border:1px solid var(--ln);border-radius:var(--r);padding:13px 15px;margin-bottom:9px;display:flex;gap:12px;align-items:center}
+.chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:7px;white-space:nowrap}
+.warn{border-left:3px solid var(--go);padding:9px 12px;background:#FBF6E9;border-radius:0 9px 9px 0;margin-bottom:8px;font-size:13px}
+
+/* nav */
+nav{position:fixed;bottom:0;left:0;right:0;z-index:30;background:var(--pn);border-top:1px solid var(--ln);
+  display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+nav button{flex:1;background:none;border:0;padding:9px 4px;font:600 11px "Onest";color:var(--mu);cursor:pointer;
+  border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:inherit}
+nav button.on{background:#F6EFE6;color:var(--ac)}
+nav i{font-size:19px;font-style:normal}
+
+/* modal */
+.ov{position:fixed;inset:0;z-index:50;background:rgba(20,20,18,.5);display:flex;align-items:flex-end}
+.sheet{background:var(--pn);width:100%;max-height:92dvh;overflow-y:auto;border-radius:18px 18px 0 0;
+  padding:20px 16px calc(24px + env(safe-area-inset-bottom))}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">EDUNOVA <span>/ O'QITUVCHI</span></div>
+    <div class="row" style="gap:6px">
+      <div class="lang"><button id="lru" onclick="setLang('ru')">RU</button><button id="luz" onclick="setLang('uz')">UZ</button></div>
+      <button id="out" class="btn s g hide" onclick="logout()">✕</button>
+    </div>
+  </header>
+  <main id="app"></main>
+  <nav id="nav" class="hide">
+    <button id="n-profil"  onclick="go('profil')"><i>📊</i><span data-t="navProfil"></span></button>
+    <button id="n-oquvchi" onclick="go('oquvchi')"><i>👥</i><span data-t="navOquvchi"></span></button>
+    <button id="n-hisobot" onclick="go('hisobot')"><i>📝</i><span data-t="navHisobot"></span></button>
+  </nav>
+</div>
+<div id="ov" class="ov hide"><div class="sheet" id="sheet"></div></div>
+
+<script>
+const SB_URL="https://unaodltahuevrfnarfha.supabase.co";
+const SB_KEY="";   // <-- anon key. Chatga yubormang.
+
+const T={
+ kirish:["Вход в кабинет","Kabinetga kirish"],
+ login:["Логин","Login"], parol:["Пароль","Parol"],
+ kir:["Войти","Kirish"], xato:["Неверный логин или пароль","Login yoki parol notoʻgʻri"],
+ aloqa:["Нет связи. Проверьте интернет.","Aloqa yoʻq. Internetni tekshiring."],
+ kuting:["Проверяем…","Tekshirilmoqda…"],
+ navProfil:["Профиль","Profil"], navOquvchi:["Ученики","Oʻquvchilar"], navHisobot:["Отчёт","Hisobot"],
+ hafta:["Балл недели","Haftalik ball"],
+ test:["Тесты учеников","Oʻquvchilar testi"], dOq:["Посещаемость учеников","Oʻquvchilar davomati"],
+ dQ:["Мой давомат","Mening davomatim"], his:["Отчёты по урокам","Dars hisobotlari"],
+ tuxumSarl:["До клетки яиц","Tuxum kletkasigacha"],
+ tuxumBor:["Клетка яиц на этой неделе заработана","Bu hafta tuxum kletkasi ishlab topildi"],
+ tuxumQol:["ещё %N% баллов","yana %N% ball"],
+ dubay:["Путь в Дубай · 6 месяцев","Dubayga yoʻl · 6 oy"],
+ jamgarma:["накоплено","toʻplandi"],
+ ogoh:["Предупреждения","Ogohlantirishlar"],
+ ogohYoq:["Предупреждений нет","Ogohlantirish yoʻq"],
+ statOq:["учеников","oʻquvchi"], statHis:["отчётов","hisobot"], statTux:["клеток яиц","tuxum kletkasi"],
+ qosh:["Добавить ученика","Oʻquvchi qoʻshish"],
+ fio:["Ф.И.О. ученика","Oʻquvchining F.I.Sh."], sinf:["Класс","Sinf"],
+ boy:["Примерный рост, см","Taxminiy boʻy, sm"], vazn:["Примерный вес, кг","Taxminiy vazn, kg"],
+ kuchli:["Сильные стороны и характер","Kuchli tomonlari va xarakteri"],
+ zaif:["Слабые стороны","Zaif tomonlari"],
+ shik:["Жалобы","Shikoyatlar"],
+ saqla:["Сохранить","Saqlash"], bekor:["Отмена","Bekor qilish"],
+ ochir:["Удалить","Oʻchirish"], ochirTasdiq:["Удалить ученика?","Oʻquvchini oʻchirasizmi?"],
+ yoq:["Пока никого нет","Hali hech kim yoʻq"],
+ bazada:["Найден в базе школы — привязать?","Maktab bazasida topildi — bogʻlansinmi?"],
+ boglash:["Привязать","Bogʻlash"],
+ ichki:["Видно только вам и маркетологу","Faqat sizga va marketologga koʻrinadi"],
+ hisSarl:["Отчёт за сегодня","Bugungi hisobot"],
+ hisMatn:["Обязательно каждый день по каждому классу","Har kuni, har bir sinf boʻyicha majburiy"],
+ mavzu:["Тема урока","Dars mavzusi"],
+ faollar:["Кто хорошо участвовал","Kim yaxshi qatnashdi"],
+ voqea:["Интересный случай на уроке","Darsdagi qiziqarli holat"],
+ yubor:["Отправить отчёт","Hisobotni yuborish"],
+ yuborildi:["Отчёт сохранён","Hisobot saqlandi"],
+ shart:["Заполните класс и тему","Sinf va mavzuni toʻldiring"],
+ tarix:["История отчётов","Hisobotlar tarixi"],
+ bugun:["сегодня","bugun"]
+};
+let L=1, tok=localStorage.getItem("oq_tok")||"", me=null, tab="profil", oquvchilar=[], tahrir=null;
+const $=i=>document.getElementById(i), t=k=>T[k][L];
+
+async function rpc(fn,body){
+  const r=await fetch(SB_URL+"/rest/v1/rpc/"+fn,{method:"POST",
+    headers:{apikey:SB_KEY,Authorization:"Bearer "+SB_KEY,"Content-Type":"application/json"},
+    body:JSON.stringify(body||{})});
+  if(!r.ok)throw new Error(r.status);
+  const txt=await r.text();
+  return txt?JSON.parse(txt):null;
+}
+function setLang(l){
+  L=(l==="ru")?0:1;
+  $("lru").className=L?"":"on"; $("luz").className=L?"on":"";
+  document.documentElement.lang=L?"uz":"ru";
+  document.querySelectorAll("[data-t]").forEach(e=>e.textContent=T[e.dataset.t][L]);
+  render();
+}
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ═══ KIRISH ═══ */
+function loginScreen(){
+  $("nav").classList.add("hide"); $("out").classList.add("hide");
+  $("app").innerHTML=`<div class="eye">EduNova School</div>
+   <h1 style="margin:8px 0 20px">${t("kirish")}</h1>
+   <div class="card">
+     <div class="f"><label>${t("login")}</label><input id="i-log" autocapitalize="none" autocomplete="username"></div>
+     <div class="f"><label>${t("parol")}</label><input id="i-par" type="password" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')doLogin()"></div>
+     <button class="btn" id="b-log" onclick="doLogin()">${t("kir")}</button>
+     <div class="err" id="e-log"></div>
+   </div>`;
+}
+async function doLogin(){
+  const lg=$("i-log").value.trim(), pr=$("i-par").value, e=$("e-log"), b=$("b-log");
+  if(!lg||!pr)return;
+  b.disabled=true; e.style.color="var(--mu)"; e.textContent=t("kuting");
+  try{
+    const d=await rpc("oq_login",{p_login:lg,p_parol:pr});
+    if(!d||!d.ok){e.style.color="var(--rd)";e.textContent=t("xato");b.disabled=false;return;}
+    tok=d.token; localStorage.setItem("oq_tok",tok);
+    await boot();
+  }catch(err){e.style.color="var(--rd)";e.textContent=t("aloqa");b.disabled=false;}
+}
+async function logout(){
+  try{await rpc("oq_chiqish",{p_token:tok});}catch(e){}
+  localStorage.removeItem("oq_tok"); tok=""; me=null; loginScreen();
+}
+async function boot(){
+  try{
+    me=await rpc("oq_profil",{p_token:tok});
+    if(!me||!me.ok)throw new Error("x");
+    $("nav").classList.remove("hide"); $("out").classList.remove("hide");
+    oquvchilar=await rpc("oq_oquvchilar",{p_token:tok})||[];
+    go(tab);
+  }catch(e){ localStorage.removeItem("oq_tok"); tok=""; loginScreen(); }
+}
+function go(n){
+  tab=n;
+  ["profil","oquvchi","hisobot"].forEach(k=>$("n-"+k).classList.toggle("on",k===n));
+  render();
+}
+function render(){
+  if(!tok||!me){loginScreen();return;}
+  if(tab==="profil")profil(); else if(tab==="oquvchi")oquvchiList(); else hisobot();
+}
+
+/* ═══ PROFIL + INFOGRAFIKA ═══ */
+function profil(){
+  const r=me.reyting, jami=r.jami, qol=r.tuxum_uchun;
+  const pct=Math.min(100,Math.round(jami/75*100));
+  const yarim=r.yarim_yillik, dubayPct=Math.min(100,Math.round(yarim/1950*100));
+  const tux=me.tuxum_soni||0;
+  const bar=(k,lab,max,col)=>`<div><div class="lbl"><span>${lab}</span><span>${r[k]}/${max}</span></div>
+    <div class="tr"><i style="width:${Math.round(r[k]/max*100)}%;background:${col}"></i></div></div>`;
+  const eggs=[...Array(10)].map((_,i)=>`<div class="egg${i<Math.min(tux,10)?' on':''}"></div>`).join("");
+  const og=(me.ogohlantirishlar||[]);
+
+  $("app").innerHTML=`
+   <div class="eye">${esc(me.fan||"")} ${me.sinflar?"· "+esc(me.sinflar):""}</div>
+   <h1 style="margin:6px 0 16px">${esc(me.fio)}</h1>
+
+   <div class="card">
+     <div class="eye">${t("hafta")}</div>
+     <div class="score" style="margin:8px 0 16px">
+       <b style="color:${jami>=75?"var(--gn)":jami>=50?"var(--go)":"var(--ac)"}">${jami}</b>
+       <span class="m" style="color:var(--mu)">/ 100</span>
+     </div>
+     <div class="bars">
+       ${bar("test",t("test"),40,"var(--ac)")}
+       ${bar("davomat_oquvchi",t("dOq"),25,"var(--gn)")}
+       ${bar("davomat_oqituvchi",t("dQ"),20,"var(--vi)")}
+       ${bar("hisobot",t("his"),15,"var(--go)")}
+     </div>
+   </div>
+
+   <div class="card" style="background:linear-gradient(180deg,#FDF8EE,#FDFCF9)">
+     <div class="eye">${t("tuxumSarl")}</div>
+     <div style="font-family:'Unbounded';font-weight:800;font-size:17px;margin:6px 0 12px;
+       color:${r.tuxum_oldi?"var(--gn)":"var(--go)"}">
+       ${r.tuxum_oldi?"🥚 "+t("tuxumBor"):"🥚 "+t("tuxumQol").replace("%N%",qol)}</div>
+     <div class="tr" style="height:10px"><i style="width:${pct}%;background:linear-gradient(90deg,var(--go),var(--ac))"></i></div>
+     <div class="egg-wrap" style="margin-top:16px">
+       <div class="eggs">${eggs}</div>
+       <div style="text-align:right;flex:none">
+         <div class="m" style="font-size:21px;font-weight:700;color:var(--go)">${tux}</div>
+         <div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">${t("statTux")}</div>
+       </div>
+     </div>
+     <div class="road" style="margin-top:20px">
+       <i style="width:${dubayPct}%"></i><b style="left:${dubayPct}%"></b>
+     </div>
+     <div class="road-lbl"><span>${t("dubay")}</span>
+       <span class="m" style="font-weight:700;color:var(--ink)">${yarim} ${t("jamgarma")}</span></div>
+     <div style="text-align:right;font-size:22px;margin-top:2px">🛫 🌴</div>
+   </div>
+
+   <div class="card">
+     <div class="row" style="justify-content:space-between">
+       <div><div class="m" style="font-size:20px;font-weight:700">${me.oquvchilar_soni}</div>
+         <div style="font-size:10px;color:var(--mu);text-transform:uppercase">${t("statOq")}</div></div>
+       <div><div class="m" style="font-size:20px;font-weight:700">${me.hisobotlar_soni}</div>
+         <div style="font-size:10px;color:var(--mu);text-transform:uppercase">${t("statHis")}</div></div>
+     </div>
+   </div>
+
+   <div class="card">
+     <div class="eye" style="margin-bottom:10px">${t("ogoh")}</div>
+     ${og.length?og.map(o=>`<div class="warn">⚠️ <b>${o.sana}</b> — ${esc(o.sabab)}</div>`).join("")
+       :`<div style="font-size:14px;color:var(--gn)">✓ ${t("ogohYoq")}</div>`}
+   </div>`;
+}
+
+/* ═══ O'QUVCHILAR ═══ */
+function oquvchiList(){
+  $("app").innerHTML=`
+   <div class="row" style="justify-content:space-between;margin-bottom:14px">
+     <h1>${t("navOquvchi")}</h1>
+     <button class="btn s" onclick="oquvchiForm(null)">+ ${t("qosh")}</button>
+   </div>
+   ${oquvchilar.length?oquvchilar.map(o=>`
+     <div class="item" onclick="oquvchiForm('${o.id}')">
+       <div style="flex:1"><div style="font-weight:700">${esc(o.fio)}</div>
+         <div style="font-size:12px;color:var(--mu);margin-top:2px">
+           ${esc(o.sinf||"—")}${o.boy?" · "+o.boy+" sm":""}${o.vazn?" · "+o.vazn+" kg":""}</div></div>
+       ${o.student_id?`<span class="chip" style="background:#DFF1EB;color:var(--gn)">🔗</span>`:""}
+       <span style="color:var(--mu)">✏️</span>
+     </div>`).join("")
+   :`<div style="text-align:center;padding:40px;color:var(--mu)">${t("yoq")}</div>`}`;
+}
+function oquvchiForm(id){
+  tahrir=id?oquvchilar.find(o=>o.id===id):null;
+  const o=tahrir||{};
+  $("ov").classList.remove("hide");
+  $("sheet").innerHTML=`
+   <div class="row" style="justify-content:space-between;margin-bottom:16px">
+     <div class="d" style="font-size:18px;font-weight:800">${id?esc(o.fio):t("qosh")}</div>
+     <button class="btn s g" onclick="closeSheet()">✕</button></div>
+   <div class="f"><label>${t("fio")}</label><input id="s-fio" value="${esc(o.fio||"")}" oninput="qidir()"></div>
+   <div id="s-match"></div>
+   <div class="row" style="gap:10px">
+     <div class="f" style="flex:1"><label>${t("sinf")}</label><input id="s-sinf" value="${esc(o.sinf||"")}" placeholder="5-A"></div>
+     <div class="f" style="flex:1"><label>${t("boy")}</label><input id="s-boy" type="number" inputmode="numeric" value="${o.boy||""}"></div>
+     <div class="f" style="flex:1"><label>${t("vazn")}</label><input id="s-vazn" type="number" inputmode="numeric" value="${o.vazn||""}"></div>
+   </div>
+   <div style="font-size:12px;color:var(--mu);margin:2px 0 14px">🔒 ${t("ichki")}</div>
+   <div class="f"><label>${t("kuchli")}</label><textarea id="s-kuchli">${esc(o.kuchli||"")}</textarea></div>
+   <div class="f"><label>${t("zaif")}</label><textarea id="s-zaif">${esc(o.zaif||"")}</textarea></div>
+   <div class="f"><label>${t("shik")}</label><textarea id="s-shik">${esc(o.shikoyat||"")}</textarea></div>
+   <button class="btn" onclick="oquvchiSaqla()">${t("saqla")}</button>
+   ${id?`<button class="btn g" style="margin-top:9px;color:var(--rd);border-color:var(--rd)"
+      onclick="oquvchiOchir('${id}')">${t("ochir")}</button>`:""}
+   <div class="err" id="s-err"></div>`;
+}
+function closeSheet(){$("ov").classList.add("hide");tahrir=null;}
+let qtid=null, bogla="";
+function qidir(){
+  clearTimeout(qtid);
+  const v=$("s-fio").value.trim();
+  if(v.length<3){$("s-match").innerHTML="";return;}
+  qtid=setTimeout(async()=>{
+    try{
+      const d=await rpc("oq_oquvchi_qidir",{p_token:tok,p_fio:v});
+      if(!d||!d.length){$("s-match").innerHTML="";return;}
+      $("s-match").innerHTML=d.map(m=>`<div class="warn" style="border-color:var(--gn);background:#EDF7F3">
+        ${t("bazada")}<br><b>${esc(m.fio)}</b> ${m.sinf?"· "+m.sinf+"-sinf":""}
+        <button class="btn s" style="margin-top:7px" onclick="bogla='${m.id}';this.textContent='✓';this.disabled=true">
+        ${t("boglash")}</button></div>`).join("");
+    }catch(e){}
+  },500);
+}
+async function oquvchiSaqla(){
+  const fio=$("s-fio").value.trim();
+  if(!fio){$("s-fio").focus();return;}
+  const data={fio:fio,sinf:$("s-sinf").value.trim(),boy:$("s-boy").value,vazn:$("s-vazn").value,
+    kuchli:$("s-kuchli").value,zaif:$("s-zaif").value,shikoyat:$("s-shik").value};
+  if(bogla)data.student_id=bogla;
+  try{
+    await rpc("oq_oquvchi_saqla",{p_token:tok,p_id:tahrir?tahrir.id:null,p_data:data});
+    bogla=""; closeSheet();
+    oquvchilar=await rpc("oq_oquvchilar",{p_token:tok})||[];
+    me=await rpc("oq_profil",{p_token:tok}); oquvchiList();
+  }catch(e){$("s-err").textContent=t("aloqa");}
+}
+async function oquvchiOchir(id){
+  if(!confirm(t("ochirTasdiq")))return;
+  try{
+    await rpc("oq_oquvchi_ochir",{p_token:tok,p_id:id});
+    closeSheet();
+    oquvchilar=await rpc("oq_oquvchilar",{p_token:tok})||[];
+    me=await rpc("oq_profil",{p_token:tok}); oquvchiList();
+  }catch(e){}
+}
+
+/* ═══ HISOBOT ═══ */
+async function hisobot(){
+  const sinflar=(me.sinflar||"").split(",").map(s=>s.trim()).filter(Boolean);
+  $("app").innerHTML=`
+   <h1 style="margin-bottom:4px">${t("hisSarl")}</h1>
+   <div style="font-size:13px;color:var(--mu);margin-bottom:16px">${t("hisMatn")}</div>
+   <div class="card">
+     <div class="f"><label>${t("sinf")}</label>
+       ${sinflar.length?`<select id="h-sinf">${sinflar.map(s=>`<option>${esc(s)}</option>`).join("")}</select>`
+         :`<input id="h-sinf" placeholder="5-A">`}</div>
+     <div class="f"><label>${t("mavzu")}</label><textarea id="h-mavzu" style="min-height:70px"></textarea></div>
+     <div class="f"><label>${t("faollar")}</label><textarea id="h-faol" style="min-height:70px"></textarea></div>
+     <div class="f"><label>${t("voqea")}</label><textarea id="h-voqea"></textarea></div>
+     <button class="btn" onclick="hisYubor()">${t("yubor")}</button>
+     <div class="err" id="h-err"></div>
+   </div>
+   <div class="eye" style="margin:20px 0 10px">${t("tarix")}</div>
+   <div id="h-list"></div>`;
+  try{
+    const d=await rpc("oq_hisobotlar",{p_token:tok,p_limit:20})||[];
+    $("h-list").innerHTML=d.length?d.map(h=>`<div class="card" style="padding:13px 15px">
+      <div class="row" style="justify-content:space-between">
+        <span class="chip" style="background:#F0EAE0;color:var(--mu)">${esc(h.sinf)}</span>
+        <span class="m" style="font-size:11px;color:var(--mu)">${h.sana===new Date().toISOString().slice(0,10)?t("bugun"):h.sana}</span></div>
+      <div style="font-weight:600;margin-top:7px">${esc(h.mavzu)}</div>
+      ${h.faollar?`<div style="font-size:13px;color:var(--mu);margin-top:5px">⭐ ${esc(h.faollar)}</div>`:""}
+      ${h.voqea?`<div style="font-size:13px;color:var(--mu);margin-top:3px">💬 ${esc(h.voqea)}</div>`:""}
+      </div>`).join(""):`<div style="text-align:center;padding:24px;color:var(--mu)">${t("yoq")}</div>`;
+  }catch(e){}
+}
+async function hisYubor(){
+  const e=$("h-err");
+  const sinf=$("h-sinf").value.trim(), mavzu=$("h-mavzu").value.trim();
+  if(!sinf||!mavzu){e.style.color="var(--rd)";e.textContent=t("shart");return;}
+  try{
+    const d=await rpc("oq_hisobot_yubor",{p_token:tok,p_sinf:sinf,p_mavzu:mavzu,
+      p_faollar:$("h-faol").value.trim(),p_voqea:$("h-voqea").value.trim()});
+    if(!d||!d.ok)throw new Error("x");
+    e.style.color="var(--gn)"; e.textContent="✓ "+t("yuborildi");
+    me=await rpc("oq_profil",{p_token:tok});
+    setTimeout(()=>hisobot(),700);
+  }catch(err){e.style.color="var(--rd)";e.textContent=t("aloqa");}
+}
+
+setLang("uz");
+if(tok)boot(); else loginScreen();
+</script>
+</body>
+</html>
