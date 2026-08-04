@@ -2009,44 +2009,6 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
   </div>
 </div>
 
-<!-- KIOSK -->
-<div id="oq-kiosk">
-  <div class="kio-wrap">
-    <div style="width:100%;display:flex;justify-content:space-between;align-items:center">
-      <div style="font-weight:800;font-size:17px">🖥 Davomat — PIN kodingizni kiriting</div>
-      <button onclick="oqKioskClose()" style="background:#1a1f30;border:1px solid #2e3650;color:#fff;border-radius:10px;padding:9px 15px;font-weight:700;cursor:pointer">✕ Chiqish</button>
-    </div>
-    <div class="kio-cam"><video id="kio-video" autoplay playsinline muted></video></div>
-    <div class="kio-dots"><div class="kio-dot" id="kd0"></div><div class="kio-dot" id="kd1"></div><div class="kio-dot" id="kd2"></div><div class="kio-dot" id="kd3"></div></div>
-    <div class="kio-msg" id="kio-msg" style="color:#a0a8bd">Kamera tayyorlanmoqda…</div>
-    <div class="kio-pad">
-      <div class="kio-key" onclick="oqKey('1')">1</div><div class="kio-key" onclick="oqKey('2')">2</div><div class="kio-key" onclick="oqKey('3')">3</div>
-      <div class="kio-key" onclick="oqKey('4')">4</div><div class="kio-key" onclick="oqKey('5')">5</div><div class="kio-key" onclick="oqKey('6')">6</div>
-      <div class="kio-key" onclick="oqKey('7')">7</div><div class="kio-key" onclick="oqKey('8')">8</div><div class="kio-key" onclick="oqKey('9')">9</div>
-      <div class="kio-key" style="font-size:19px" onclick="oqKey('C')">C</div><div class="kio-key" onclick="oqKey('0')">0</div><div class="kio-key" style="font-size:19px" onclick="oqKey('B')">⌫</div>
-    </div>
-  </div>
-</div>
-
-
-<!-- IMZO OVERLAY -->
-<div id="imzo-overlay">
-  <div class="imzo-hint">✍️ Barmoq bilan imzo chizing (telefonni yonboshlatsangiz qulayroq)</div>
-  <div class="imzo-line"></div>
-  <canvas id="imzo-canvas"></canvas>
-  <div class="imzo-bar">
-    <button style="background:#f1f1f1;color:#333" onclick="shCloseImzo()">Bekor</button>
-    <button style="background:#FFF3E5;color:#C2410C" onclick="shImzoClear()">🧹 Tozalash</button>
-    <button style="background:#1E8E4E;color:#fff" onclick="shImzoSave()">✅ Saqlash</button>
-  </div>
-</div>
-
-
-  </div>
-</div>
-
-<!-- WORK TIMER BAR removed — work tracking is now automatic -->
-
 <!-- ═══════ HR: OʻQITUVCHI TESTI ═══════ -->
 <style>
 .hr-stat{background:var(--glass);border:1px solid var(--glass-brd);border-radius:14px;padding:14px 16px;flex:1;min-width:120px}
@@ -2164,6 +2126,46 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
   </div>
 
 </div>
+
+
+
+<!-- KIOSK -->
+<div id="oq-kiosk">
+  <div class="kio-wrap">
+    <div style="width:100%;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:800;font-size:17px">🖥 Davomat — PIN kodingizni kiriting</div>
+      <button onclick="oqKioskClose()" style="background:#1a1f30;border:1px solid #2e3650;color:#fff;border-radius:10px;padding:9px 15px;font-weight:700;cursor:pointer">✕ Chiqish</button>
+    </div>
+    <div class="kio-cam"><video id="kio-video" autoplay playsinline muted></video></div>
+    <div class="kio-dots"><div class="kio-dot" id="kd0"></div><div class="kio-dot" id="kd1"></div><div class="kio-dot" id="kd2"></div><div class="kio-dot" id="kd3"></div></div>
+    <div class="kio-msg" id="kio-msg" style="color:#a0a8bd">Kamera tayyorlanmoqda…</div>
+    <div class="kio-pad">
+      <div class="kio-key" onclick="oqKey('1')">1</div><div class="kio-key" onclick="oqKey('2')">2</div><div class="kio-key" onclick="oqKey('3')">3</div>
+      <div class="kio-key" onclick="oqKey('4')">4</div><div class="kio-key" onclick="oqKey('5')">5</div><div class="kio-key" onclick="oqKey('6')">6</div>
+      <div class="kio-key" onclick="oqKey('7')">7</div><div class="kio-key" onclick="oqKey('8')">8</div><div class="kio-key" onclick="oqKey('9')">9</div>
+      <div class="kio-key" style="font-size:19px" onclick="oqKey('C')">C</div><div class="kio-key" onclick="oqKey('0')">0</div><div class="kio-key" style="font-size:19px" onclick="oqKey('B')">⌫</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- IMZO OVERLAY -->
+<div id="imzo-overlay">
+  <div class="imzo-hint">✍️ Barmoq bilan imzo chizing (telefonni yonboshlatsangiz qulayroq)</div>
+  <div class="imzo-line"></div>
+  <canvas id="imzo-canvas"></canvas>
+  <div class="imzo-bar">
+    <button style="background:#f1f1f1;color:#333" onclick="shCloseImzo()">Bekor</button>
+    <button style="background:#FFF3E5;color:#C2410C" onclick="shImzoClear()">🧹 Tozalash</button>
+    <button style="background:#1E8E4E;color:#fff" onclick="shImzoSave()">✅ Saqlash</button>
+  </div>
+</div>
+
+
+  </div>
+</div>
+
+<!-- WORK TIMER BAR removed — work tracking is now automatic -->
 
 <!-- nomzod ekrani -->
 <div id="hr-kiosk" style="display:none;position:fixed;inset:0;z-index:300;background:#E8E7E1;overflow-y:auto;
