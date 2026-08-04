@@ -2152,9 +2152,28 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
   </div>
 
   <div id="ok-body" style="display:none">
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px" id="ok-stats"></div>
-    <div id="ok-new" style="margin-bottom:16px"></div>
-    <div id="ok-list"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+      <div class="hr-ftab on" id="ok-t-kab" onclick="okTab('kab')">👨‍🏫 Oʻqituvchilar</div>
+      <div class="hr-ftab"    id="ok-t-ota" onclick="okTab('ota')">👨‍👩‍👦 Ota-onalar</div>
+    </div>
+
+    <div id="ok-pane-kab">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px" id="ok-stats"></div>
+      <div id="ok-new" style="margin-bottom:16px"></div>
+      <div id="ok-list"></div>
+    </div>
+
+    <div id="ok-pane-ota" style="display:none">
+      <div class="tbl-wrap" style="padding:16px;margin-bottom:16px">
+        <div style="font-size:13px;color:var(--mu2);margin-bottom:12px">Login va parol oʻquvchi qoʻshilganda avtomatik yaratiladi. Bu yerda ularni oʻzgartirish, qayta yaratish yoki bekor qilish mumkin. Parol ota-onaga koʻrsatish uchun ochiq saqlanadi.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input id="ok-ota-q" placeholder="Bola ismi, sinf yoki login boʻyicha qidirish"
+            style="flex:1;min-width:200px" oninput="okOtaFilter()">
+          <button class="btn-sm" style="padding:11px 16px;background:var(--glass);border-color:var(--glass-brd);color:var(--mu2)" onclick="okOtaLoad()">🔄</button>
+        </div>
+      </div>
+      <div id="ok-ota-list"></div>
+    </div>
   </div>
 </div>
 
@@ -6883,6 +6902,14 @@ let hrL=0,hrI=0,hrAns={},hrOpenA={},hrRt={O1:0,O2:0,O3:0,M4:0},hrTo=0,hrTid=null
 
 function hrEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function hrKod(){return sessionStorage.getItem('hr_kod')||'';}
+function hrXato(err){
+  const m=String((err&&(err.message||err.hint||err.details))||err||'');
+  if(/PGRST202|Could not find the function|does not exist|schema cache/i.test(m))
+    return 'SQL bajarilmagan yoki PostgREST hali koʻrmagan. SQL Editor da: notify pgrst, \'reload schema\';';
+  if(/KOD_XATO/i.test(m)) return 'Kod notoʻgʻri';
+  return 'Xatolik: '+m.slice(0,120);
+}
+
 function hrTx(k){return HRT[k][hrL];}
 function hrColor(v){return v>=85?'#34d399':v>=70?'#FF8A47':v>=55?'#fbbf24':'#fb7185';}
 
@@ -6901,7 +6928,7 @@ async function hrUnlock(){
     const{data,error}=await sb.rpc('hr_royxat',{p_kod:k});
     if(error)throw error;
     sessionStorage.setItem('hr_kod',k);hrData=data||[];loadHrTest();
-  }catch(err){e.textContent='Kod notoʻgʻri yoki bazaga ulanib boʻlmadi';}
+  }catch(err){e.textContent=hrXato(err);}
 }
 async function hrLoad(force){
   const list=document.getElementById('hr-list');
@@ -7479,7 +7506,7 @@ async function okUnlock(){
     const{data,error}=await sb.rpc('oq_kabinetlar',{p_kod:k});
     if(error)throw error;
     sessionStorage.setItem('hr_kod',k); okData=data||[]; loadOqKab();
-  }catch(err){e.textContent='Kod notoʻgʻri yoki SQL bajarilmagan';}
+  }catch(err){e.textContent=hrXato(err);}
 }
 async function okLoad(){
   const list=document.getElementById('ok-list');
@@ -7493,7 +7520,7 @@ async function okLoad(){
     okBugun=(r2&&r2.data&&r2.data.royxat)||[];
     okPaint();
   }catch(e){
-    if(list)list.innerHTML='<div style="color:var(--rd);padding:20px;font-size:14px">Yuklanmadi — oqituvchi_kabinet.sql va _admin.sql bajarilganini tekshiring</div>';
+    if(list)list.innerHTML='<div style="color:var(--rd);padding:20px;font-size:14px">'+hrXato(e)+'</div>';
   }
 }
 function okPaint(){
@@ -7714,6 +7741,103 @@ async function okDelete(){
     if(error)throw error;
     toast('🗑 Oʻchirildi');okClose();okLoad();
   }catch(e){toast('❌ Oʻchmadi');}
+}
+
+/* ══════ OTA-ONA KIRISHLARI ══════ */
+let okOta=[], okOtaQ='';
+
+function okTab(n){
+  const kab=(n==='kab');
+  document.getElementById('ok-pane-kab').style.display=kab?'block':'none';
+  document.getElementById('ok-pane-ota').style.display=kab?'none':'block';
+  document.getElementById('ok-t-kab').classList.toggle('on',kab);
+  document.getElementById('ok-t-ota').classList.toggle('on',!kab);
+  if(!kab&&!okOta.length)okOtaLoad();
+}
+async function okOtaLoad(){
+  const box=document.getElementById('ok-ota-list');
+  box.innerHTML='<div class="loading-center"><div class="spin"></div></div>';
+  try{
+    const{data,error}=await sb.rpc('oq_ota_royxat',{p_kod:hrKod(),p_qidiruv:null});
+    if(error)throw error;
+    okOta=data||[]; okOtaPaint();
+  }catch(e){
+    box.innerHTML='<div style="color:var(--rd);padding:20px;font-size:14px">'+hrXato(e)+'</div>';
+  }
+}
+function okOtaFilter(){
+  okOtaQ=document.getElementById('ok-ota-q').value.trim().toLowerCase();
+  okOtaPaint();
+}
+function okOtaPaint(){
+  const box=document.getElementById('ok-ota-list');
+  const rows=okOta.filter(o=>!okOtaQ
+    || (o.fio||'').toLowerCase().includes(okOtaQ)
+    || (o.sinf||'').toLowerCase().includes(okOtaQ)
+    || (o.login||'').toLowerCase().includes(okOtaQ));
+  if(!rows.length){box.innerHTML='<div style="text-align:center;padding:36px;color:var(--mu)">Topilmadi</div>';return;}
+  box.innerHTML=rows.map(o=>{
+    const yoq=!o.login;
+    const kir=o.kirgan?new Date(o.kirgan).toLocaleDateString('ru-RU'):null;
+    return `<div class="hr-row" style="cursor:default;align-items:flex-start">
+      <div style="flex:1;min-width:180px">
+        <div style="font-weight:700;font-size:15px">${hrEsc(o.fio)}
+          <span style="color:var(--mu2);font-weight:400;font-size:13px">${o.sinf?' · '+hrEsc(o.sinf):''}</span></div>
+        <div style="font-size:12px;color:var(--mu2);margin-top:2px">👨‍🏫 ${hrEsc(o.oqituvchi)}${o.fan?' · '+hrEsc(o.fan):''}
+          ${kir?' · oxirgi kirish '+kir:' · <span style="color:var(--go)">hali kirmagan</span>'}</div>
+      </div>
+      ${yoq?'<span class="hr-chip" style="background:rgba(251,113,133,.15);color:#fb7185">kirish yoʻq</span>'
+      :`<div style="font-family:var(--fm);font-size:13px;text-align:right;min-width:130px">
+          <div style="color:var(--mu2)">👤 ${hrEsc(o.login)}</div>
+          <div style="color:#34d399;font-weight:700">🔑 ${hrEsc(o.parol)}</div></div>`}
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${yoq?'':`<button class="btn-sm green" onclick="okOtaSend('${o.id}')">📤</button>`}
+        <button class="btn-sm blue" onclick="okOtaEdit('${o.id}')">✏️</button>
+        <button class="btn-sm" style="background:var(--glass);border-color:var(--glass-brd);color:var(--mu2)"
+          onclick="okOtaRandom('${o.id}')">🎲</button>
+      </div>
+    </div>`;}).join('');
+}
+function okOtaEdit(id){
+  const o=okOta.find(x=>x.id===id); if(!o)return;
+  const lg=prompt('Login (kamida 4 belgi):', o.login||'');
+  if(lg===null)return;
+  const pr=prompt('Parol (kamida 4 belgi):', o.parol||'');
+  if(pr===null)return;
+  okOtaSave(id,lg.trim(),pr);
+}
+async function okOtaSave(id,lg,pr){
+  try{
+    const{data,error}=await sb.rpc('oq_ota_yangila',{p_kod:hrKod(),p_id:id,p_login:lg,p_parol:pr});
+    if(error)throw error;
+    if(!data||!data.ok){
+      toast(data&&data.xato==='LOGIN_BAND'?'❌ Bu login band'
+        :data&&data.xato==='LOGIN_QISQA'?'❌ Login qisqa':'❌ Parol qisqa');
+      return;
+    }
+    const o=okOta.find(x=>x.id===id); if(o){o.login=data.login;o.parol=data.parol;}
+    okOtaPaint(); toast('✅ Saqlandi');
+  }catch(e){toast('❌ Saqlanmadi');}
+}
+async function okOtaRandom(id){
+  if(!confirm('Yangi login va parol yaratilsinmi? Eskisi ishlamay qoladi.'))return;
+  try{
+    const{data,error}=await sb.rpc('oq_ota_tasodifiy',{p_kod:hrKod(),p_id:id});
+    if(error)throw error;
+    const o=okOta.find(x=>x.id===id); if(o){o.login=data.login;o.parol=data.parol;}
+    okOtaPaint(); okOtaSend(id);
+  }catch(e){toast('❌ Yaratilmadi');}
+}
+function okOtaSend(id){
+  const o=okOta.find(x=>x.id===id); if(!o||!o.login)return;
+  const msg='Assalomu alaykum! EduNova maktabining ota-ona kabineti.\n\n'
+    +'Farzandingiz: '+o.fio+(o.sinf?' · '+o.sinf+' sinf':'')+'\n\n'
+    +'Havola: https://www.edunovaschool.uz/ota.html\n'
+    +'Login: '+o.login+'\nParol: '+o.parol+'\n\n'
+    +'Har kuni kirib, bolangiz darsda nima oʻrganganini, test natijalarini va '
+    +'oʻqituvchining kundalik hisobotini koʻrishingiz mumkin.';
+  navigator.clipboard.writeText(msg).then(()=>toast('📋 Xabar nusxalandi'))
+   .catch(()=>prompt('Xabar:',msg));
 }
 
 </script>
