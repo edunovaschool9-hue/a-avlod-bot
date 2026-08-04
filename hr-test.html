@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#E8E7E1">
+<title>EduNova — Oʻqituvchi testi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#E8E7E1;--panel:#FBFAF6;--ink:#131A16;--mu:#6B7169;--line:#D3D3C8;
+  --st:#0E6E5C;--cr:#7A3CC4;--warn:#C2571F;--r:10px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{background:var(--paper);color:var(--ink);font-family:"Onest",-apple-system,system-ui,sans-serif;
+  font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.disp{font-family:"Unbounded",sans-serif;letter-spacing:-.02em;line-height:1.15}
+.mono{font-family:"JetBrains Mono",monospace}
+.app{display:flex;flex-direction:column;min-height:100dvh}
+
+/* header */
+header{position:sticky;top:0;z-index:10;background:var(--paper);border-bottom:1px solid var(--line);
+  padding:max(10px,env(safe-area-inset-top)) 16px 10px}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-family:"Unbounded";font-weight:800;font-size:13px}
+.brand span{color:var(--st)}
+.lang{display:flex;border:1px solid var(--ink);border-radius:8px;overflow:hidden;flex:none}
+.lang button{background:none;border:0;padding:7px 13px;font:700 12px "JetBrains Mono";color:var(--ink);cursor:pointer}
+.lang button.on{background:var(--ink);color:var(--panel)}
+.prog{height:3px;background:var(--line);border-radius:2px;overflow:hidden;margin-top:10px}
+.prog i{display:block;height:100%;background:var(--ink);transition:width .3s}
+.meta{display:flex;justify-content:space-between;font:700 11px "JetBrains Mono";color:var(--mu);margin-top:7px}
+.tw{display:flex;align-items:center;gap:10px;margin-top:9px}
+.tbar{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.tbar i{display:block;height:100%;background:var(--st);width:100%;transition:width 1s linear}
+.tnum{font:700 15px "JetBrains Mono";min-width:44px;text-align:right}
+.hot{color:var(--warn)!important}.hot i{background:var(--warn)!important}
+
+main{flex:1;padding:20px 16px calc(28px + env(safe-area-inset-bottom))}
+h1{font-family:"Unbounded";font-weight:800;font-size:23px;letter-spacing:-.02em;line-height:1.2}
+.eye{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mu);font-weight:700}
+.lead{color:var(--mu);font-size:15px;margin:10px 0 20px}
+.rules{border-left:2px solid var(--st);padding-left:14px;margin-bottom:22px}
+.rules li{list-style:none;font-size:14px;margin-bottom:9px}
+.rules li::before{content:"—";color:var(--st);margin-right:7px}
+label{display:block;font-size:11px;font-weight:700;color:var(--mu);margin-bottom:6px;
+  letter-spacing:.4px;text-transform:uppercase}
+input,select,textarea{width:100%;background:#fff;border:1px solid var(--line);border-radius:var(--r);
+  padding:14px;font-size:16px;font-family:inherit;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--st);outline-offset:-1px}
+textarea{min-height:190px;resize:vertical;line-height:1.6}
+.field{margin-bottom:14px}
+.btn{width:100%;background:var(--ink);color:var(--panel);border:0;border-radius:var(--r);
+  padding:17px;font:600 16px "Onest";cursor:pointer;font-family:inherit}
+.btn:active{background:var(--st)}
+.btn.g{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+
+.qb{font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;margin-bottom:10px}
+.qt{font-size:19px;font-weight:600;line-height:1.4;margin-bottom:20px}
+.opt{border:1px solid var(--line);border-radius:var(--r);padding:16px;background:#fff;
+  display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;min-height:58px;cursor:pointer}
+.opt:active{border-color:var(--ink);background:#F4F2ED}
+.opt b{font:700 12px "JetBrains Mono";color:var(--mu);padding-top:3px;flex:none}
+.hint{font-size:13px;color:var(--mu);margin:12px 0 16px}
+
+/* PIN */
+.pin-in{font:700 30px "JetBrains Mono";text-align:center;letter-spacing:.32em;padding:18px 14px}
+.err{color:var(--warn);font-size:14px;margin-top:12px;min-height:20px}
+.ok-mark{width:56px;height:56px;border-radius:50%;background:var(--st);color:#fff;display:flex;
+  align-items:center;justify-content:center;font-size:28px;margin-bottom:16px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="hrow">
+      <div class="brand">EDUNOVA <span>/ HR</span></div>
+      <div class="lang"><button id="lru" onclick="setLang('ru')">RU</button><button id="luz" onclick="setLang('uz')">UZ</button></div>
+    </div>
+    <div id="hbar"></div>
+  </header>
+  <main id="app"></main>
+</div>
+
+<script>
+/* ═══ SOZLAMA ═══ */
+const SB_URL = "https://unaodltahuevrfnarfha.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVuYW9kbHRhaHVldnJmbmFyZmhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNDE0NDEsImV4cCI6MjA5NDkxNzQ0MX0.e6vf7eMkihzmGlBidSb5WtKtDu9FYn-C1C_EOLhByeQ";   // <-- academy.html dan nusxa oling. Chatga yubormang.
+
+const Q=[
+/* ---------- СТРЕСС / STRESS (таймер 45 сек) ---------- */
+{id:"S1",b:"st",t:45,
+q:["Идёт 10-я минута урока. Ученик громко спорит с вами и намеренно провоцирует, весь класс смотрит.",
+   "Dars boshlanganiga 10 daqiqa. O'quvchi ovozini ko'tarib siz bilan bahslashyapti va ataylab provokatsiya qilyapti, butun sinf qarab turibdi."],
+o:[["Повышаю голос и выставляю его из класса.","Ovozimni ko'taraman va uni sinfdan chiqarib yuboraman.",0],
+   ["Одной короткой фразой напоминаю правило и веду урок дальше; разговор — после урока наедине.","Qisqa bir jumla bilan qoidani eslataman va darsni davom ettiraman; suhbat — darsdan keyin yakkama-yakka.",3],
+   ["Останавливаю урок и выясняю отношения при всех, пока он не признает.","Darsni to'xtatib, u tan olguncha hamma oldida munosabatni oydinlashtiraman.",1],
+   ["Перевожу в шутку и возвращаю класс к работе, после урока говорю отдельно.","Hazilga burib, sinfni ishga qaytaraman, darsdan keyin alohida gaplashaman.",2]]},
+
+{id:"S2",b:"st",t:45,
+q:["Родитель звонит вечером в 22:00 и на повышенных тонах обвиняет вас в предвзятости.",
+   "Ota-ona kechqurun soat 22:00 da qo'ng'iroq qilib, sizni baland ovozda tarafkashlikda ayblayapti."],
+o:[["Отвечаю тем же тоном, защищаю себя.","Men ham xuddi shu ohangda javob beraman, o'zimni himoya qilaman.",0],
+   ["Выслушиваю, ночью не спорю, договариваюсь о встрече или звонке завтра в рабочее время.","Tinglayman, kechasi bahslashmayman, ertaga ish vaqtida uchrashuv yoki qo'ng'iroqqa kelishaman.",3],
+   ["Не беру трубку, утром сообщаю администрации и перезваниваю сам.","Go'shakni ko'tarmayman, ertalab ma'muriyatga xabar berib, o'zim qayta qo'ng'iroq qilaman.",2],
+   ["Начинаю оправдываться и обещаю всё исправить, лишь бы он успокоился.","Tinchlansin deb oqlana boshlayman va hammasini to'g'rilashga va'da beraman.",1]]},
+
+{id:"S3",b:"st",t:45,
+q:["Директор при коллегах резко критикует ваш урок.",
+   "Direktor hamkasblar oldida darsingizni keskin tanqid qilyapti."],
+o:[["Спорю при всех и доказываю свою правоту.","Hamma oldida bahslashaman, haqligimni isbotlayman.",0],
+   ["Молча принимаю, потом сам анализирую урок и что-то меняю.","Indamay qabul qilaman, keyin darsni o'zim tahlil qilib, nimanidir o'zgartiraman.",2],
+   ["Благодарю за замечание, уточняю, что именно исправить, и прошу отдельную встречу.","Izoh uchun rahmat aytaman, aniq nimani tuzatish kerakligini so'rayman va alohida uchrashuv so'rayman.",3],
+   ["Вслух соглашаюсь, но считаю, что он не разбирается в предмете.","Ovoz chiqarib roziman, lekin ichimda u fanni tushunmaydi deb hisoblayman.",1]]},
+
+{id:"S4",b:"st",t:45,
+q:["За 5 минут до открытого урока отключилось электричество: ни проектора, ни презентации. В классе 25 детей, комиссия уже сидит.",
+   "Ochiq darsga 5 daqiqa qolganda svet o'chdi: na proyektor, na taqdimot ishlaydi. Sinfda 25 bola, komissiya o'tiribdi."],
+o:[["Прошу перенести урок.","Darsni ko'chirishni so'rayman.",0],
+   ["Провожу урок без техники: доска, мел, работа в парах — логику темы я знаю сам.","Darsni texnikasiz o'taman: doska, bo'r, juftlikda ishlash — mavzu mantig'ini o'zim yaxshi bilaman.",3],
+   ["Прошу дежурного заняться техникой, сам продолжаю урок устно.","Navbatchidan texnikani ko'rishni so'rayman, o'zim darsni og'zaki davom ettiraman.",2],
+   ["Даю самостоятельную работу по учебнику и жду, пока дадут свет.","Darslikdan mustaqil ish beraman va svet kelishini kutaman.",1]]},
+
+{id:"S5",b:"st",t:45,
+q:["Вы ошиблись в решении на доске, ученик громко это заметил, класс смеётся.",
+   "Doskada xato qildingiz, o'quvchi buni baland ovozda aytdi, sinf kulyapti."],
+o:[["Настаиваю, что прав, чтобы не потерять авторитет.","Obro'yimni yo'qotmaslik uchun haqman deb turib olaman.",0],
+   ["Признаю ошибку, исправляю и иду дальше.","Xatoni tan olaman, tuzataman va davom etaman.",2],
+   ["Признаю, хвалю внимательность ученика и разбираю с классом, откуда взялась ошибка.","Tan olaman, o'quvchining diqqatini maqtayman va sinf bilan xato qayerdan chiqqanini tahlil qilaman.",3],
+   ["Говорю, что это была специальная проверка на внимательность.","Bu diqqatni tekshirish uchun ataylab qilingan edi deyman.",1]]},
+
+{id:"S6",b:"st",t:45,
+q:["Третий урок подряд вы заменяете заболевшего коллегу. Вы устали, впереди ещё два класса.",
+   "Ketma-ket uchinchi dars, kasal hamkasbingiz o'rniga dars berayapsiz. Charchagansiz, oldinda yana ikki sinf bor."],
+o:[["Провожу формально: дал задание — сижу.","Rasmiy o'taman: vazifa berib, o'tiraman.",1],
+   ["У меня есть готовый «резервный урок» на такой случай — провожу его в облегчённом, но рабочем формате.","Bunday holatlar uchun tayyor «zaxira dars»im bor — uni yengilroq, lekin ishchi formatda o'taman.",3],
+   ["Прошу администрацию не ставить замену третьим уроком и объясняю почему.","Ma'muriyatdan 3-darsga o'rinbosarlik qo'ymaslikni so'rayman va sababini tushuntiraman.",2],
+   ["Соглашаюсь на всё, а вечером срываюсь на близких.","Hammasiga roziman, kechqurun esa yaqinlarimga asabiylashaman.",0]]},
+
+{id:"S7",b:"st",t:45,
+q:["Ученик расплакался и срывает урок, остальные 24 ребёнка ждут.",
+   "O'quvchi yig'lab yubordi va darsni buzyapti, qolgan 24 bola kutyapti."],
+o:[["Отправляю его к психологу или дежурному, класс продолжает работать.","Uni psixolog yoki navbatchiga jo'nataman, sinf ishlashda davom etadi.",2],
+   ["Выясняю причину при всём классе.","Sababini butun sinf oldida aniqlayman.",0],
+   ["Даю классу задание на 3 минуты, коротко говорю с ребёнком отдельно и решаю: остаётся или идёт к психологу.","Sinfga 3 daqiqalik vazifa beraman, bola bilan alohida qisqa gaplashaman va qaror qilaman: qoladimi yoki psixologga boradimi.",3],
+   ["Не обращаю внимания, пока не успокоится сам.","O'zi tinchlanguncha e'tibor bermayman.",1]]},
+
+{id:"S8",b:"st",t:45,
+q:["Тяжёлая неделя: сорванный урок, жалоба родителя, замечание директора. Вечер пятницы.",
+   "Og'ir hafta: buzilgan dars, ota-onaning shikoyati, direktorning tanbehi. Juma kechasi."],
+o:[["Прокручиваю всё в голове до утра и не могу уснуть.","Ertalabgacha hammasini boshimda aylantiraman, uxlay olmayman.",0],
+   ["Отключаюсь полностью и стараюсь не вспоминать о школе до понедельника.","Butunlay o'chiraman va dushanbagacha maktabni eslamaslikka harakat qilaman.",1],
+   ["Записываю, что именно пошло не так, делаю один вывод на следующую неделю — и переключаюсь на отдых.","Aynan nima noto'g'ri ketganini yozib olaman, keyingi haftaga bitta xulosa chiqaraman — va dam olishga o'taman.",3],
+   ["Проговариваю с коллегами или близкими, выговариваюсь и отпускаю.","Hamkasb yoki yaqinlarim bilan gaplashib, ichimni bo'shataman va qo'yib yuboraman.",2]]},
+
+/* ---------- КРЕАТИВНОСТЬ / KREATIVLIK ---------- */
+{id:"K1",b:"cr",
+q:["Тема скучная и сложная, класс «поплыл» через 10 минут. У вас 3 минуты на решение.",
+   "Mavzu zerikarli va qiyin, sinf 10 daqiqadan keyin «suzib ketdi». Yechim uchun 3 daqiqangiz bor."],
+o:[["Повторяю то же самое громче и строже.","Xuddi shuni balandroq va qattiqroq ohangda takrorlayman.",0],
+   ["Перевожу тему на понятный им пример из их жизни (телефон, TikTok, деньги, футбол) и строю объяснение на нём.","Mavzuni ularning hayotidan olingan misolga (telefon, TikTok, pul, futbol) ko'chiraman va tushuntirishni shunga quraman.",3],
+   ["Даю тест, чтобы собрать внимание.","Diqqatni yig'ish uchun test beraman.",1],
+   ["Делю класс на группы: каждая объясняет свою часть темы остальным.","Sinfni guruhlarga bo'laman: har biri o'z qismini qolganlarga tushuntiradi.",2]]},
+
+{id:"K2",b:"cr",
+q:["Школа просит придумать формат урока, который родители захотят снимать на видео.",
+   "Maktab sizdan ota-onalar videoga olishni xohlaydigan dars formatini o'ylab topishni so'rayapti."],
+o:[["Обычный урок, только красиво оформлю доску.","Oddiy dars, faqat doskani chiroyli bezayman.",0],
+   ["Урок-соревнование между командами, где в конце есть реальный результат: продукт, эксперимент, выступление.","Jamoalar o'rtasida musobaqa-dars: oxirida real natija bo'ladi — mahsulot, tajriba, chiqish.",3],
+   ["Приглашаю родителей просто посидеть на уроке.","Ota-onalarni shunchaki darsda o'tirishga taklif qilaman.",1],
+   ["Даю детям снимать урок самим и делаем из этого мини-репортаж.","Bolalarning o'zlariga darsni suratga olishni topshiraman va undan mini-reportaj yasaymiz.",2]]},
+
+{id:"K3",b:"cr",
+q:["Ни учебника, ни интернета, ни распечаток — только класс и 40 минут.",
+   "Na darslik, na internet, na tarqatma bor — faqat sinf va 40 daqiqa."],
+o:[["Провожу по памяти, лекцией.","Yoddan, ma'ruza tarzida o'taman.",1],
+   ["Строю урок на том, что есть в кабинете и в карманах и рюкзаках у детей.","Darsni xonada va bolalarning cho'ntagi va ryukzagida bor narsalar ustiga quraman.",3],
+   ["Прошу учебник у соседнего класса.","Qo'shni sinfdan darslik so'rayman.",2],
+   ["Делаю свободный урок-беседу без плана.","Rejasiz erkin suhbat-dars qilaman.",0]]},
+
+{id:"O1",b:"cr",open:"flu",
+q:["Придумайте максимум способов объяснить ключевую тему вашего предмета без учебника и доски. Каждый способ — с новой строки.",
+   "Faningizning asosiy mavzusini darslik va doskasiz tushuntirishning imkon qadar ko'p usulini o'ylab toping. Har bir usulni yangi qatordan yozing."]},
+
+{id:"O2",b:"cr",open:"flu",
+q:["Обычная пластиковая бутылка. Придумайте как можно больше учебных применений на вашем уроке. Каждое — с новой строки.",
+   "Oddiy plastik shisha. Uni darsingizda o'quv maqsadida ishlatishning imkon qadar ko'p usulini yozing. Har birini yangi qatordan."]},
+
+{id:"O3",b:"cr",open:"hr",
+q:["10 минут на подготовку, бюджет 0 сум. Как превратить самую скучную тему вашего предмета в игру? Опишите механику: что делают дети, как считаются очки, что в конце.",
+   "Tayyorgarlik uchun 10 daqiqa, byudjet 0 so'm. Faningizdagi eng zerikarli mavzuni qanday qilib o'yinga aylantirasiz? Mexanikani yozing: bolalar nima qiladi, ochko qanday sanaladi, oxirida nima bo'ladi."]},
+
+/* ---------- ПЕДАГОГИКА / PEDAGOGIKA ---------- */
+{id:"P1",b:"pd",
+q:["Ученик стабильно не делает домашние задания.","O'quvchi muntazam uy vazifasini bajarmaydi."],
+o:[["Ставлю двойки, пока не исправится.","Tuzatgunicha 2 qo'yaveraman.",0],
+   ["Выясняю причину — не понимает, нет условий дома или нет мотивации — и подбираю решение под причину.","Sababini aniqlayman — tushunmayapti, uyda sharoit yo'q yoki motivatsiya yo'q — va sababga mos yechim tanlayman.",3],
+   ["Вызываю родителей и перекладываю ответственность на них.","Ota-onasini chaqirib, mas'uliyatni ularga o'tkazaman.",1],
+   ["Даю более лёгкие задания, чтобы он начал видеть результат.","Natija ko'ra boshlashi uchun yengilroq vazifalar beraman.",2]]},
+
+{id:"P2",b:"pd",
+q:["В классе есть сильные и слабые ученики. Программу нужно пройти.","Sinfda kuchli va bo'sh o'quvchilar bor. Dasturni esa o'tish kerak."],
+o:[["Веду по средним, остальные подтянутся сами.","O'rtachaga qarab boraman, qolganlari o'zi yetib oladi.",1],
+   ["Даю разноуровневые задания: базовый минимум для всех и усложнённые для сильных.","Darajali vazifalar beraman: hamma uchun bazaviy minimum va kuchlilarga murakkablashtirilgani.",3],
+   ["Ориентируюсь на сильных, чтобы класс тянулся вверх.","Kuchlilarga qarab boraman, sinf yuqoriga tortilsin.",0],
+   ["Сильные помогают слабым в парах, я контролирую.","Kuchlilar juftlikda bo'shlarga yordam beradi, men nazorat qilaman.",2]]},
+
+{id:"P3",b:"pd",
+q:["Как вы понимаете, что урок прошёл успешно?","Dars muvaffaqiyatli o'tganini qanday bilasiz?"],
+o:[["Я успел пройти весь запланированный материал.","Rejalashtirilgan materialni to'liq o'tib ulgurdim.",1],
+   ["Дети вели себя тихо и не мешали.","Bolalar tinch o'tirdi va xalaqit bermadi.",0],
+   ["В конце урока большинство детей может само применить новое.","Dars oxirida ko'pchilik yangi mavzuni o'zi qo'llay oladi.",3],
+   ["Детям было интересно, они активно участвовали.","Bolalarga qiziq bo'ldi, ular faol qatnashdi.",2]]},
+
+{id:"P4",b:"pd",
+q:["Ребёнок не понял тему после третьего объяснения.","Bola uchinchi marta tushuntirgandan keyin ham mavzuni tushunmadi."],
+o:[["Объясняю четвёртый раз так же, только медленнее.","To'rtinchi marta xuddi shunday, faqat sekinroq tushuntiraman.",1],
+   ["Меняю способ: рисунок, реальный предмет, пример из жизни, объяснение через одноклассника.","Usulni o'zgartiraman: rasm, real predmet, hayotiy misol, sinfdoshi orqali tushuntirish.",3],
+   ["Отправляю на дополнительные занятия.","Qo'shimcha mashg'ulotga jo'nataman.",2],
+   ["Считаю, что это уже не мой уровень ответственности.","Bu mening mas'uliyatim darajasi emas deb hisoblayman.",0]]},
+
+{id:"P5",b:"pd",
+q:["Дисциплина: класс шумит на каждом уроке.","Intizom: sinf har darsda shovqin qiladi."],
+o:[["Ужесточаю наказания и вызываю родителей.","Jazoni kuchaytiraman va ota-onalarni chaqiraman.",1],
+   ["Сначала проверяю себя: темп урока, смена деятельности каждые 10–15 минут, понятные правила с первого дня.","Avval o'zimni tekshiraman: dars temp'i, har 10–15 daqiqada faoliyat almashishi, birinchi kundan aniq qoidalar.",3],
+   ["Нахожу «зачинщиков» и рассаживаю их.","«Boshlovchi»larni topib, alohida o'tqazaman.",2],
+   ["Терплю, главное — пройти программу.","Chidayman, asosiysi — dasturni o'tish.",0]]},
+
+{id:"P6",b:"pd",
+q:["Вам дали новый предмет или направление, которое вы не вели.","Sizga o'zingiz olib bormagan yangi fan yoki yo'nalish berildi."],
+o:[["Отказываюсь — это не моя специализация.","Rad etaman — bu mening yo'nalishim emas.",0],
+   ["Беру: за две недели разбираю программу, нахожу источники и коллегу-наставника, честно предупреждаю, что первый месяц догоняю.","Olaman: 2 haftada dasturni o'rganaman, manba va murabbiy-hamkasb topaman, birinchi oy quvib yetishimni ochiq aytaman.",3],
+   ["Беру и иду по учебнику шаг за шагом вместе с детьми.","Olaman va darslik bo'yicha, bolalar bilan birga qadam-baqadam boraman.",2],
+   ["Беру, но веду по старым материалам своего предмета.","Olaman, lekin o'z fanimning eski materiallari bilan olib boraman.",1]]},
+
+{id:"P7",b:"pd",
+q:["Ежедневные тесты показали: у половины класса результат упал.","Kundalik testlar ko'rsatdi: sinfning yarmida natija tushib ketdi."],
+o:[["Считаю, что дети стали меньше стараться.","Bolalar tirishmay qo'yibdi deb hisoblayman.",0],
+   ["Разбираю, какие именно вопросы завалили, и возвращаюсь к этой части темы.","Aynan qaysi savollarni yiqitganini tahlil qilaman va mavzuning o'sha qismiga qaytaman.",3],
+   ["Провожу тест повторно — возможно, дело в самом тесте.","Testni qayta o'tkazaman — balki muammo testning o'zida.",2],
+   ["Задаю больше домашних заданий.","Ko'proq uy vazifasi beraman.",1]]},
+
+/* ---------- КОММУНИКАЦИЯ / KOMMUNIKATSIYA ---------- */
+{id:"C1",b:"cm",
+q:["Родитель публично написал жалобу в общий чат школы.","Ota-ona maktabning umumiy chatiga ochiq shikoyat yozdi."],
+o:[["Отвечаю в чате подробно и доказываю, что он неправ.","Chatda batafsil javob beraman va uning noto'g'riligini isbotlayman.",0],
+   ["В чате коротко: «вижу, свяжусь с вами лично», дальше — личный звонок или встреча плюс информирую администрацию.","Chatda qisqa: «ko'rdim, siz bilan shaxsan bog'lanaman», keyin — shaxsiy qo'ng'iroq yoki uchrashuv va ma'muriyatni xabardor qilaman.",3],
+   ["В чате молчу, но сразу иду к администрации и вместе готовим ответ.","Chatda indamayman, lekin darhol ma'muriyatga boraman va javobni birga tayyorlaymiz.",2],
+   ["Пишу ему в личку эмоциональное объяснение.","Unga shaxsiyga hissiyotli tushuntirish yozaman.",1]]},
+
+{id:"C2",b:"cm",
+q:["Родитель требует ставить его ребёнку оценки выше.","Ota-ona farzandiga baholarni yuqoriroq qo'yishni talab qilyapti."],
+o:[["Иду навстречу, чтобы не было конфликта.","Nizo bo'lmasin deb yon beraman.",0],
+   ["Отказываю: объясняю критерии оценки, показываю работы ребёнка и даю реальный план, как поднять балл.","Rad etaman: baho mezonlarini tushuntiraman, bolaning ishlarini ko'rsataman va ballni ko'tarishning real rejasini beraman.",3],
+   ["Отказываю коротко: «есть правила школы».","Qisqa rad etaman: «maktab qoidalari shunday».",2],
+   ["Перевожу вопрос на директора.","Masalani direktorga o'tkazaman.",1]]},
+
+{id:"C3",b:"cm",
+q:["Коллега при вас плохо отзывается о другом учителе.","Hamkasbingiz sizning oldingizda boshqa o'qituvchi haqida yomon gapiryapti."],
+o:[["Поддерживаю разговор.","Suhbatni qo'llab-quvvatlayman.",0],
+   ["Не участвую и меняю тему; если проблема реальная — предлагаю сказать это ему самому или администрации.","Qatnashmayman va mavzuni o'zgartiraman; muammo real bo'lsa — buni o'sha odamning o'ziga yoki ma'muriyatga aytishni taklif qilaman.",3],
+   ["Молчу и слушаю до конца.","Indamay, oxirigacha tinglayman.",1],
+   ["Молча выхожу из разговора.","Indamay suhbatdan chiqib ketaman.",2]]},
+
+{id:"C4",b:"cm",
+q:["Нужно сообщить родителю плохую новость о ребёнке.","Ota-onaga bolasi haqida yomon xabarni yetkazish kerak."],
+o:[["Говорю прямо и по фактам, без предисловий.","To'g'ridan-to'g'ri, faktlar bilan, kirish so'zlarsiz aytaman.",2],
+   ["Сначала факты и сильные стороны ребёнка, потом конкретная проблема, потом конкретный план на две недели.","Avval faktlar va bolaning kuchli tomonlari, keyin aniq muammo, keyin 2 haftalik aniq reja.",3],
+   ["Смягчаю так, что родитель не понимает серьёзности.","Shunchalik yumshataman-ki, ota-ona jiddiyligini tushunmay qoladi.",0],
+   ["Пишу подробное сообщение в мессенджере.","Messenjerga batafsil xabar yozaman.",1]]},
+
+{id:"C5",b:"cm",
+q:["Новый учитель в вашей команде явно не справляется.","Jamoangizdagi yangi o'qituvchi ochiq-oydin uddalay olmayapti."],
+o:[["Не лезу, это дело администрации.","Aralashmayman, bu ma'muriyatning ishi.",1],
+   ["Предлагаю ему прийти на мой урок и вместе с ним разбираю его урок.","Darsimga kelishni taklif qilaman va uning darsini u bilan birga tahlil qilaman.",3],
+   ["Обсуждаю с другими коллегами.","Boshqa hamkasblar bilan muhokama qilaman.",0],
+   ["Говорю администрации, что новичку нужна поддержка.","Ma'muriyatga aytaman: yangi odamga qo'llab-quvvatlash kerak.",2]]},
+
+/* ---------- РОСТ / RIVOJLANISH ---------- */
+{id:"G1",b:"gr",
+q:["Последний навык, курс или книга, которые вы освоили для работы:","Ish uchun oxirgi o'zlashtirgan ko'nikma, kurs yoki kitobingiz:"],
+o:[["За последние 3 месяца прошёл курс или книгу и применил на уроке.","So'nggi 3 oyda kurs yoki kitobni tugatdim va darsda qo'lladim.",3],
+   ["За последний год что-то читал по своему предмету.","So'nggi bir yilda fanim bo'yicha nimadir o'qidim.",2],
+   ["Учился давно, опыта достаточно.","Ancha oldin o'qiganman, tajribam yetarli.",0],
+   ["Хочу, но нет времени.","Xohlayman, lekin vaqt yo'q.",1]]},
+
+{id:"G2",b:"gr",
+q:["Школа вводит новую систему: ежедневные тесты, электронный давомат, видеорегистрация прихода.",
+   "Maktab yangi tizim joriy qilyapti: kundalik testlar, elektron davomat, kelishni video ro'yxatdan o'tkazish."],
+o:[["Считаю, что это лишний контроль.","Bu ortiqcha nazorat deb hisoblayman.",0],
+   ["Разбираюсь первым и помогаю коллегам освоить.","Birinchi bo'lib o'rganaman va hamkasblarga yordam beraman.",3],
+   ["Осваиваю, когда обяжут.","Majbur qilishganda o'rganaman.",1],
+   ["Спокойно осваиваю в свой срок.","O'z vaqtimda xotirjam o'zlashtiraman.",2]]},
+
+{id:"G3",b:"gr",
+q:["Вам дали обратную связь, с которой вы не согласны.","Sizga o'zingiz rozi bo'lmagan fikr-mulohaza berishdi."],
+o:[["Игнорирую.","E'tiborsiz qoldiraman.",0],
+   ["Прошу конкретные примеры и проверяю на практике, прав ли я.","Aniq misollar so'rayman va amalda tekshiraman: haqmanmi.",3],
+   ["Принимаю и меняю, лишь бы не спорить.","Bahslashmaslik uchun qabul qilaman va o'zgartiraman.",1],
+   ["Обсуждаю с аргументами и прихожу к общему решению.","Dalillar bilan muhokama qilib, umumiy yechimga kelaman.",2]]},
+
+{id:"G4",b:"gr",
+q:["Ваш урок сняли на видео и разобрали при коллегах.","Darsingiz videoga olindi va hamkasblar oldida tahlil qilindi."],
+o:[["Мне некомфортно, я против.","Bu menga noqulay, men qarshiman.",0],
+   ["Нормально, если разбор конструктивный.","Tahlil konstruktiv bo'lsa — normal.",2],
+   ["Сам прошу снимать и разбирать — так расту быстрее.","O'zim suratga olish va tahlil qilishni so'rayman — shunda tezroq o'saman.",3],
+   ["Соглашусь, но проведу урок «на камеру», не как обычно.","Roziman, lekin darsni «kamera uchun» o'taman, odatdagidek emas.",1]]},
+
+/* ---------- МОТИВАЦИЯ / MOTIVATSIYA ---------- */
+{id:"M1",b:"mt",
+q:["Почему вы работаете учителем?","Nega o'qituvchi bo'lib ishlaysiz?"],
+o:[["Стабильная работа и график.","Barqaror ish va grafik.",1],
+   ["Мне нравится видеть, как ребёнок начинает понимать.","Bolaning tushuna boshlaganini ko'rish menga yoqadi.",3],
+   ["Так сложилось, другого варианта не было.","Shunday bo'lib qoldi, boshqa variant yo'q edi.",0],
+   ["Мне нравится мой предмет и я хочу его передавать.","Fanim yoqadi va uni yetkazishni xohlayman.",2]]},
+
+{id:"M2",b:"mt",
+q:["Вам предлагают на 20% больше в другой школе, но без развития и с большей нагрузкой.",
+   "Sizga boshqa maktabda 20% ko'proq maosh taklif qilishdi, lekin o'sishsiz va ko'proq yuklama bilan."],
+o:[["Сразу соглашаюсь — деньги решают.","Darhol roziman — pul hal qiladi.",1],
+   ["Остаюсь, если здесь есть рост и результат.","Bu yerda o'sish va natija bo'lsa, qolaman.",3],
+   ["Прежде чем решать, открыто обсуждаю условия здесь.","Qaror qilishdan oldin bu yerdagi shartlarni ochiq muhokama qilaman.",2],
+   ["Вообще не думаю о таких предложениях.","Bunday takliflar haqida umuman o'ylamayman.",1]]},
+
+{id:"M3",b:"mt",
+q:["Что для вас недопустимо в работе с детьми?","Bolalar bilan ishlashda siz uchun mutlaqo mumkin bo'lmagan narsa nima?"],
+o:[["Кричать на ребёнка.","Bolaga baqirish.",2],
+   ["Унижать, сравнивать и высмеивать при классе.","Sinf oldida kamsitish, solishtirish va masxara qilish.",3],
+   ["Опаздывать на урок.","Darsga kechikish.",1],
+   ["Обсуждать ребёнка с другими родителями.","Bolani boshqa ota-onalar bilan muhokama qilish.",2]]},
+
+{id:"M4",b:"mt",open:"hr",
+q:["Опишите один реальный случай, когда вы повлияли на конкретного ученика: что было до, что вы сделали, что стало после.",
+   "Aniq bir o'quvchiga real ta'sir ko'rsatgan bitta holatni yozing: avval qanday edi, siz nima qildingiz, keyin nima bo'ldi."]},
+
+/* ---------- ЦИФРА И AI / RAQAMLI SAVODXONLIK ---------- */
+{id:"D1",b:"dg",
+q:["Как вы используете AI при подготовке к уроку?","Darsga tayyorgarlikda AI dan qanday foydalanasiz?"],
+o:[["Не использую.","Foydalanmayman.",0],
+   ["Иногда прошу идеи или тексты и проверяю их.","Ba'zan g'oya yoki matn so'rayman va tekshiraman.",2],
+   ["Регулярно: генерирую задания, тесты, разноуровневые варианты, проверяю и адаптирую.","Muntazam: vazifa, test, darajali variantlar generatsiya qilaman, tekshirib moslashtiraman.",3],
+   ["Не доверяю AI, он ошибается.","AI ga ishonmayman, u xato qiladi.",1]]},
+
+{id:"D2",b:"dg",
+q:["Ученик сдал сочинение, явно написанное AI.","O'quvchi AI yozgani aniq ko'rinib turgan insho topshirdi."],
+o:[["Ставлю двойку и обвиняю.","2 qo'yaman va ayblayman.",1],
+   ["Спрашиваю устно по содержанию, потом даю переписать своими словами и объясняю, где AI помогает, а где мешает.","Mazmuni bo'yicha og'zaki savol beraman, keyin o'z so'zlari bilan qayta yozdiraman va AI qayerda yordam berishi, qayerda xalaqit qilishini tushuntiraman.",3],
+   ["Не замечаю, главное — сдал.","Sezmaganday qilaman, asosiysi — topshirdi.",0],
+   ["Прошу переписать без объяснений.","Tushuntirishsiz qayta yozishni so'rayman.",2]]},
+
+{id:"D3",b:"dg",
+q:["Завтра нужно показать результаты класса в цифрах.","Ertaga sinf natijalarini raqamlarda ko'rsatishingiz kerak."],
+o:[["Прошу администрацию посчитать.","Ma'muriyatdan hisoblab berishni so'rayman.",0],
+   ["Собираю данные в таблицу (Excel или Google Sheets) и сравниваю по неделям.","Ma'lumotlarni jadvalga (Excel yoki Google Sheets) yig'aman va haftalar kesimida solishtiraman.",3],
+   ["Пишу от руки в тетради.","Daftarga qo'lda yozaman.",1],
+   ["Готовлю таблицу с оценками, без сравнения.","Baholar jadvalini tayyorlayman, solishtiruvsiz.",2]]},
+
+/* ---------- ШКАЛА ИСКРЕННОСТИ / SAMIMIYLIK SHKALASI ---------- */
+{id:"I1",b:"sc",q:["Я никогда не раздражался на ученика.","Men hech qachon o'quvchiga jahlim chiqmagan."]},
+{id:"I2",b:"sc",q:["Я всегда с первого раза понимаю любого ребёнка.","Men har qanday bolani doim birinchi martadan tushunaman."]},
+{id:"I3",b:"sc",q:["Я никогда не опаздывал на работу.","Men hech qachon ishga kechikmaganman."]},
+{id:"I4",b:"sc",q:["Мне никогда не хотелось бросить эту профессию.","Menda hech qachon bu kasbni tashlash istagi bo'lmagan."]},
+{id:"I5",b:"sc",q:["Я никогда не говорил о коллегах за глаза.","Men hech qachon hamkasblarim haqida orqasidan gapirmaganman."]}
+];
+
+const T={
+ title:["Тест потенциала учителя","O'qituvchi potensiali testi"],
+ sub:["Оценка стрессоустойчивости, креативности и педагогического потенциала. 42 задания, около 25 минут.",
+      "Stressbardoshlik, kreativlik va pedagogik potensial baholash. 42 topshiriq, taxminan 25 daqiqa."],
+ r1:["Отвечайте так, как поступили бы на самом деле, а не как «правильно». Правильных ответов здесь нет.",
+     "«To'g'ri» emas, aslida qanday yo'l tutsangiz — shunday javob bering. Bu yerda to'g'ri javob yo'q."],
+ r2:["Первый блок идёт с таймером: 45 секунд на вопрос. Это часть измерения.",
+     "Birinchi blok taymer bilan: har savolga 45 soniya. Bu ham o'lchovning bir qismi."],
+ r3:["Вернуться назад нельзя. Ответ засчитывается сразу.","Orqaga qaytish mumkin emas. Javob darhol qayd etiladi."],
+ r4:["В открытых вопросах пишите каждую идею с новой строки.","Ochiq savollarda har bir g'oyani yangi qatordan yozing."],
+ fio:["Имя и фамилия","Ism va familiya"],
+ subj:["Предмет / направление","Fan / yo'nalish"],
+ exp:["Стаж работы","Ish staji"],
+ exps:[["до 1 года","1–3 года","3–7 лет","более 7 лет"],["1 yilgacha","1–3 yil","3–7 yil","7 yildan ko'p"]],
+ track:["Язык обучения","O'qitish tili"],
+ tracks:[["Узбекский","Русский","Оба"],["O'zbek","Rus","Ikkalasi"]],
+ start:["Начать тест","Testni boshlash"],
+ next:["Далее","Keyingisi"],
+ yes:["Да","Ha"],no:["Нет","Yo'q"],
+ q:["Вопрос","Savol"],of:["из","dan"],
+ blocks:{st:["Стрессоустойчивость","Stressbardoshlik"],cr:["Креативность","Kreativlik"],
+   pd:["Педагогическое мастерство","Pedagogik mahorat"],cm:["Коммуникация","Kommunikatsiya"],
+   gr:["Обучаемость и гибкость","O'rganuvchanlik va moslashuv"],mt:["Мотивация и ценности","Motivatsiya va qadriyatlar"],
+   dg:["Цифровые навыки и AI","Raqamli savodxonlik va AI"],sc:["Самооценка","O'z-o'zini baholash"]},
+ openhint:["Каждая идея — с новой строки. Чем больше разных идей, тем выше балл.",
+           "Har bir g'oya — yangi qatordan. Turli g'oyalar qancha ko'p bo'lsa, ball shuncha yuqori."],
+ done:["Тест завершён","Test yakunlandi"],
+ donetxt:["Спасибо. Результат передан в HR-отдел школы. Обсуждение — на собеседовании.",
+          "Rahmat. Natija maktab HR bo'limiga uzatildi. Muhokama — suhbat vaqtida."],
+ pin:["PIN сотрудника HR","HR xodimi PIN kodi"],
+ open:["Открыть отчёт","Hisobotni ochish"],
+ wrongpin:["Неверный PIN","PIN noto'g'ri"],
+ report:["Отчёт по кандидату","Nomzod bo'yicha hisobot"],
+ overall:["Общий потенциал","Umumiy potensial"],
+ map:["Карта потенциала","Potensial xaritasi"],
+ profile:["Профиль компетенций","Kompetensiyalar profili"],
+ speed:["Скорость решений под давлением","Bosim ostida qaror tezligi"],
+ sinc:["Шкала искренности","Samimiylik shkalasi"],
+ sincok:["Ответы выглядят честными.","Javoblar samimiy ko'rinadi."],
+ sincmid:["Есть склонность приукрашивать. Проверьте спорные места на собеседовании.",
+          "Bezash tendensiyasi bor. Bahsli joylarni suhbatda tekshiring."],
+ sincbad:["Результат завышен: кандидат отвечает «как надо». Балл читайте как верхнюю границу, проверяйте на практике — пробный урок обязателен.",
+          "Natija oshirib yuborilgan: nomzod «kerakligicha» javob beryapti. Ballni yuqori chegara sifatida o'qing, amalda tekshiring — sinov darsi shart."],
+ openans:["Открытые ответы — оценка HR","Ochiq javoblar — HR bahosi"],
+ rubric:["Оцените: 0 — шаблон или пусто · 1 — банально · 2 — рабочая идея · 3 — своя, применимая, сильная идея",
+         "Baholang: 0 — shablon yoki bo'sh · 1 — oddiy · 2 — ishchi g'oya · 3 — o'ziga xos, qo'llansa bo'ladigan, kuchli g'oya"],
+ ideas:["идей засчитано","g'oya hisobga olindi"],
+ rec:["Рекомендация","Tavsiya"],
+ ask:["Что проверить на собеседовании","Suhbatda nimani tekshirish kerak"],
+ print:["Печать","Chop etish"],
+ save:["Скачать JSON","JSON yuklab olish"],
+ again:["Новый кандидат","Yangi nomzod"],
+ notrated:["Балл предварительный: оцените открытые ответы ниже.","Ball dastlabki: quyidagi ochiq javoblarni baholang."],
+ svWait:["Сохранение…","Saqlanmoqda…"],
+ svOk:["Результат сохранён в базе школы.","Natija maktab bazasiga saqlandi."],
+ svOff:["База не подключена — сохраните файлом.","Baza ulanmagan — fayl sifatida saqlang."],
+ svErr:["Не удалось сохранить в базу. Скачайте файл и передайте в HR.","Bazaga saqlab bo'lmadi. Faylni yuklab olib, HR ga bering."],
+ v:[["Не рекомендуется на самостоятельный класс","Mustaqil sinfga tavsiya etilmaydi"],
+    ["Зона развития — только с наставником и планом","Rivojlanish zonasi — faqat murabbiy va reja bilan"],
+    ["Сильный кандидат","Kuchli nomzod"],
+    ["Высокий потенциал — брать и растить в наставника","Yuqori potensial — olib, murabbiy qilib o'stirish kerak"]]
+,
+ pinlead:["Введите PIN-код, который вам прислала школа.","Maktab yuborgan PIN kodni kiriting."],
+ pinlab:["PIN-код","PIN kod"],
+ enter:["Войти","Kirish"],
+ checking:["Проверяем…","Tekshirilmoqda…"],
+ pinbad:["PIN не найден. Проверьте код или попросите новый.","PIN topilmadi. Kodni tekshiring yoki yangisini soʻrang."],
+ pinused:["По этому PIN тест уже пройден. Попросите новый код.","Bu PIN boʻyicha test allaqachon topshirilgan. Yangi kod soʻrang."],
+ neterr:["Нет связи. Проверьте интернет и попробуйте снова.","Aloqa yoʻq. Internetni tekshirib, qayta urining."]
+};
+
+const W={st:.25,cr:.25,pd:.18,cm:.12,gr:.08,mt:.07,dg:.05};
+const MAXP={st:24,cr:26,pd:21,cm:15,gr:12,mt:12,dg:9};
+let L=0,i=0,ans={},openA={},timeouts=0,tid=null,cand={},pin="",inv={},started=false;
+const $=s=>document.getElementById(s),app=$("app"),t=k=>T[k][L];
+
+async function rpc(fn,body){
+  const r=await fetch(SB_URL+"/rest/v1/rpc/"+fn,{method:"POST",
+    headers:{apikey:SB_KEY,Authorization:"Bearer "+SB_KEY,"Content-Type":"application/json"},
+    body:JSON.stringify(body)});
+  if(!r.ok)throw new Error(r.status);
+  return r.json();
+}
+function setLang(l){L=(l==="uz")?1:0;$("lru").className=L?"":"on";$("luz").className=L?"on":"";
+  document.documentElement.lang=L?"uz":"ru";render();}
+
+/* ═══ 1. PIN ═══ */
+function pinScreen(){
+  $("hbar").innerHTML="";
+  app.innerHTML=`<div class="eye">EduNova School</div>
+   <h1 style="margin:8px 0 6px">${t("title")}</h1>
+   <p class="lead">${t("pinlead")}</p>
+   <div class="field"><label>${t("pinlab")}</label>
+     <input id="pin" class="pin-in" inputmode="numeric" pattern="[0-9]*" maxlength="6"
+       autocomplete="one-time-code" placeholder="000000" oninput="pinTyped()"></div>
+   <button class="btn" id="pinbtn" onclick="pinGo()" disabled>${t("enter")}</button>
+   <div class="err" id="pinerr"></div>`;
+  $("pin").focus();
+}
+function pinTyped(){
+  const v=$("pin").value.replace(/\D/g,"").slice(0,6);
+  $("pin").value=v;$("pinbtn").disabled=v.length!==6;$("pinerr").textContent="";
+  if(v.length===6)pinGo();
+}
+async function pinGo(){
+  const v=$("pin").value.trim(),e=$("pinerr"),b=$("pinbtn");
+  if(v.length!==6)return;
+  b.disabled=true;e.textContent=t("checking");
+  try{
+    const d=await rpc("hr_pin_tekshir",{p_pin:v});
+    if(!d||!d.ok){e.textContent=d&&d.xato==="PIN_ISHLATILGAN"?t("pinused"):t("pinbad");b.disabled=false;return;}
+    pin=v;inv=d;e.textContent="";intro();
+  }catch(err){e.textContent=t("neterr");b.disabled=false;}
+}
+
+/* ═══ 2. ANKETA ═══ */
+function intro(){
+  $("hbar").innerHTML="";
+  app.innerHTML=`<div class="eye">EduNova School · HR</div>
+   <h1 style="margin:8px 0 6px">${t("title")}</h1>
+   <p class="lead">${t("sub")}</p>
+   <ul class="rules"><li>${t("r1")}</li><li>${t("r2")}</li><li>${t("r3")}</li><li>${t("r4")}</li></ul>
+   <div class="field"><label>${t("fio")}</label><input id="f1" value="${(inv.fio||"").replace(/"/g,"&quot;")}"></div>
+   <div class="field"><label>${t("subj")}</label><input id="f2" value="${(inv.fan||"").replace(/"/g,"&quot;")}"></div>
+   <div class="field"><label>${t("exp")}</label><select id="f3">${T.exps[L].map(x=>`<option>${x}</option>`).join("")}</select></div>
+   <div class="field" style="margin-bottom:20px"><label>${t("track")}</label><select id="f4">${T.tracks[L].map(x=>`<option>${x}</option>`).join("")}</select></div>
+   <button class="btn" onclick="begin()">${t("start")} →</button>`;
+}
+function begin(){
+  if(!$("f1").value.trim()){$("f1").focus();return;}
+  cand={fio:$("f1").value.trim(),subj:$("f2").value.trim(),exp:$("f3").value,track:$("f4").value};
+  Q.forEach(q=>{if(q.o)q.sh=[...q.o].sort(()=>Math.random()-.5);});
+  started=true;i=0;
+  window.onbeforeunload=()=>"";
+  render();
+}
+
+/* ═══ 3. SAVOLLAR ═══ */
+function render(){
+  if(!pin){pinScreen();return;}
+  if(!started){intro();return;}
+  if(i>=Q.length){finish();return;}
+  clearInterval(tid);
+  const q=Q[i],pc=Math.round(i/Q.length*100);
+  $("hbar").innerHTML=`<div class="prog"><i style="width:${pc}%"></i></div>
+    <div class="meta"><span>${i+1} / ${Q.length}</span><span>${T.blocks[q.b][L]}</span></div>
+    ${q.t?`<div class="tw"><div class="tbar" id="tb"><i id="tf"></i></div><div class="tnum" id="tn">${q.t}s</div></div>`:""}`;
+  let body="";
+  if(q.open){
+    body=`<textarea id="ta" placeholder="1.&#10;2.&#10;3."></textarea>
+      <div class="hint">${t("openhint")}</div>
+      <button class="btn" onclick="saveOpen()">${t("next")} →</button>`;
+  }else if(q.b==="sc"){
+    body=`<div class="opt" onclick="pick(1)"><b>A</b><span>${t("yes")}</span></div>
+          <div class="opt" onclick="pick(0)"><b>B</b><span>${t("no")}</span></div>`;
+  }else{
+    body=q.sh.map((o,n)=>`<div class="opt" onclick="pick(${o[2]})"><b>${"ABCD"[n]}</b><span>${o[L]}</span></div>`).join("");
+  }
+  app.innerHTML=`<div class="qb" style="color:var(--${q.b==="cr"?"cr":"st"})">${T.blocks[q.b][L]}</div>
+    <div class="qt">${q.q[L]}</div>${body}`;
+  window.scrollTo(0,0);
+  if(q.t)timer(q.t);
+}
+function timer(sec){
+  let left=sec;const f=$("tf"),n=$("tn"),b=$("tb");
+  tid=setInterval(()=>{left--;f.style.width=(left/sec*100)+"%";n.textContent=left+"s";
+    if(left<=10){b.classList.add("hot");n.classList.add("hot");}
+    if(left<=0){clearInterval(tid);timeouts++;ans[Q[i].id]=0;i++;render();}},1000);
+}
+function pick(p){clearInterval(tid);ans[Q[i].id]=p;i++;render();}
+function saveOpen(){
+  const v=$("ta").value.trim();openA[Q[i].id]=v;
+  if(Q[i].open==="flu"){
+    const n=v.split(/\n|;/).map(s=>s.trim()).filter(s=>s.length>2).length;
+    ans[Q[i].id]=n>=6?4:n>=4?3:n>=2?2:n>=1?1:0;
+  }
+  i++;render();
+}
+
+/* ═══ 4. NATIJA ═══ */
+function calc(){
+  const raw={st:0,cr:0,pd:0,cm:0,gr:0,mt:0,dg:0};
+  Q.forEach(q=>{if(q.b!=="sc"&&ans[q.id]!==undefined)raw[q.b]+=ans[q.id];});
+  const pct={};Object.keys(raw).forEach(k=>pct[k]=Math.min(100,Math.round(raw[k]/MAXP[k]*100)));
+  let tot=0;Object.keys(W).forEach(k=>tot+=pct[k]*W[k]);
+  const lie=["I1","I2","I3","I4","I5"].reduce((s,k)=>s+(ans[k]||0),0);
+  return{pct,total:Math.round(tot),lie,speed:Math.round((8-timeouts)/8*100)};
+}
+function quad(cr,st){const h=c=>c>=65;
+  return h(st)&&h(cr)?"Innovator-yadro":h(st)?"Ishonchli tayanch":h(cr)?"Nozik ijodkor":"Xavf zonasi";}
+
+async function finish(){
+  clearInterval(tid);started=false;window.onbeforeunload=null;
+  $("hbar").innerHTML="";
+  app.innerHTML=`<div class="ok-mark">✓</div>
+    <h1>${t("done")}</h1><p class="lead">${t("donetxt")}</p>
+    <div class="mono" id="sv" style="font-size:13px;color:var(--mu)">${t("svWait")}</div>`;
+  const s=calc();
+  const payload={fio:cand.fio,fan:cand.subj,staj:cand.exp,til:cand.track,
+    umumiy:s.total,ballar:s.pct,kvadrant:quad(s.pct.cr,s.pct.st),
+    samimiylik:s.lie,tezlik:s.speed,javoblar:ans,ochiq:openA};
+  const e=$("sv");
+  for(let k=0;k<3;k++){
+    try{
+      const d=await rpc("hr_natija_saqlash",{p_pin:pin,p_data:payload});
+      if(d&&d.ok){e.style.color="var(--st)";e.textContent="✓ "+t("svOk");return;}
+      throw new Error(d&&d.xato||"err");
+    }catch(err){ if(k<2) await new Promise(r=>setTimeout(r,1500)); }
+  }
+  e.style.color="var(--warn)";
+  e.innerHTML=t("svErr")+`<button class="btn g" style="margin-top:14px" onclick="dl()">${t("save")}</button>`;
+  window._last=payload;
+}
+function dl(){
+  const b=new Blob([JSON.stringify(window._last,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(b);
+  a.download="hr_"+(cand.fio||"nomzod").replace(/\s+/g,"_")+".json";a.click();
+}
+setLang("ru");
+</script>
+</body>
+</html>

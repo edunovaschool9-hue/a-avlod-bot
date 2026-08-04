@@ -2047,6 +2047,153 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
 
 <!-- WORK TIMER BAR removed — work tracking is now automatic -->
 
+<!-- ═══════ HR: OʻQITUVCHI TESTI ═══════ -->
+<style>
+.hr-stat{background:var(--glass);border:1px solid var(--glass-brd);border-radius:14px;padding:14px 16px;flex:1;min-width:120px}
+.hr-stat b{display:block;font-family:var(--fd);font-size:24px;font-weight:800;line-height:1.1}
+.hr-stat span{font-size:11px;color:var(--mu2);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.hr-row{background:var(--glass);border:1px solid var(--glass-brd);border-radius:14px;padding:14px 16px;margin-bottom:10px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;cursor:pointer;transition:.18s}
+.hr-row:hover{border-color:rgba(255,107,26,.35);transform:translateX(3px)}
+.hr-score{font-family:var(--fm);font-size:22px;font-weight:700;min-width:62px;text-align:center;padding:6px 8px;border-radius:11px}
+.hr-chip{font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;white-space:nowrap}
+.hr-bar{height:9px;background:rgba(255,255,255,.07);border-radius:5px;overflow:hidden}
+.hr-bar i{display:block;height:100%;border-radius:5px}
+.hr-rate button{border:1px solid var(--brd2);background:var(--s2);color:var(--mu2);border-radius:9px;padding:7px 14px;
+  font-family:var(--fm);font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
+.hr-rate button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.hr-ans{white-space:pre-wrap;font-size:13px;line-height:1.6;background:var(--s2);border:1px solid var(--brd);
+  border-radius:11px;padding:12px 14px;margin-top:8px;color:var(--mu2)}
+.hr-ftab{padding:8px 16px;border-radius:11px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--glass-brd);
+  background:var(--glass);color:var(--mu2);transition:.15s}
+.hr-ftab.on{background:rgba(255,107,26,.16);border-color:rgba(255,107,26,.4);color:var(--tx)}
+
+/* ── kiosk (nomzod ekrani, alohida yorugʻ tema) ── */
+#hr-kiosk{--kp:#E8E7E1;--kpn:#FBFAF6;--kink:#131A16;--kmu:#6B7169;--kln:#D3D3C8;--kst:#0E6E5C;--kcr:#7A3CC4;--kwn:#C2571F}
+#hr-kiosk .kw{max-width:720px;margin:0 auto;padding:22px 16px 60px}
+#hr-kiosk .kbox{background:var(--kpn);border:1px solid var(--kln);border-radius:6px;padding:26px}
+#hr-kiosk h1{font-family:var(--fd);font-size:26px;font-weight:800;color:var(--kink);line-height:1.15;margin:6px 0}
+#hr-kiosk .keye{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--kmu);font-weight:700}
+#hr-kiosk .klead{color:var(--kmu);font-size:15px;margin:10px 0 20px}
+#hr-kiosk .krules li{list-style:none;font-size:14px;margin-bottom:8px;color:var(--kink)}
+#hr-kiosk .krules li::before{content:"—";color:var(--kst);margin-right:8px}
+#hr-kiosk .krules{border-left:2px solid var(--kst);padding-left:15px;margin-bottom:22px}
+#hr-kiosk label{display:block;font-size:11px;font-weight:700;color:var(--kmu);margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase}
+#hr-kiosk input,#hr-kiosk select,#hr-kiosk textarea{width:100%;background:#fff;border:1px solid var(--kln);border-radius:6px;
+  padding:11px 12px;font-size:15px;color:var(--kink);font-family:var(--ff)}
+#hr-kiosk textarea{min-height:150px;resize:vertical;line-height:1.6}
+#hr-kiosk input:focus,#hr-kiosk textarea:focus,#hr-kiosk select:focus{outline:2px solid var(--kst);outline-offset:-1px}
+#hr-kiosk .kbtn{background:var(--kink);color:var(--kpn);border:0;border-radius:6px;padding:13px 26px;font-size:14px;
+  font-weight:700;cursor:pointer;font-family:var(--ff)}
+#hr-kiosk .kbtn:hover{background:var(--kst)}
+#hr-kiosk .kbtn.g{background:transparent;color:var(--kink);border:1px solid var(--kink)}
+#hr-kiosk .kopt{border:1px solid var(--kln);border-radius:6px;padding:14px 16px;cursor:pointer;font-size:15px;line-height:1.45;
+  background:#fff;color:var(--kink);display:flex;gap:12px;align-items:flex-start;transition:.12s;margin-bottom:9px}
+#hr-kiosk .kopt:hover{border-color:var(--kink);transform:translateX(2px)}
+#hr-kiosk .kopt b{font-family:var(--fm);font-size:12px;color:var(--kmu);padding-top:3px}
+#hr-kiosk .kprog{height:3px;background:var(--kln);border-radius:2px;overflow:hidden;margin-bottom:6px}
+#hr-kiosk .kprog i{display:block;height:100%;background:var(--kink);transition:width .3s}
+#hr-kiosk .kmeta{display:flex;justify-content:space-between;font-family:var(--fm);font-size:11px;color:var(--kmu);margin-bottom:18px}
+#hr-kiosk .ktbar{flex:1;height:6px;background:var(--kln);border-radius:3px;overflow:hidden}
+#hr-kiosk .ktbar i{display:block;height:100%;background:var(--kst);width:100%;transition:width 1s linear}
+#hr-kiosk .ktnum{font-family:var(--fm);font-size:15px;font-weight:700;min-width:46px;text-align:right;color:var(--kink)}
+#hr-kiosk .khot{color:var(--kwn)!important}
+#hr-kiosk .khot i{background:var(--kwn)!important}
+#hr-kiosk .kqb{font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;margin-bottom:12px}
+#hr-kiosk .kqt{font-size:18px;font-weight:600;line-height:1.45;margin-bottom:20px;color:var(--kink)}
+#hr-kiosk .khint{font-size:12px;color:var(--kmu);margin-top:12px}
+@media(max-width:560px){#hr-kiosk .kbox{padding:20px 16px}#hr-kiosk h1{font-size:22px}}
+</style>
+
+<div class="admin-panel" id="ap-hrtest">
+  <div class="ap-head">
+    <div><div class="ap-title">🧠 Oʻqituvchi testi</div>
+      <div class="ap-sub">Stressbardoshlik, kreativlik va pedagogik potensial · 42 topshiriq</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn-sm green" style="padding:10px 18px" onclick="hrKioskStart()">🖥 Test topshirish</button>
+      <button class="btn-sm blue" style="padding:10px 18px" onclick="hrCopyLink()">🔗 Havola</button>
+      <button class="btn-sm" style="padding:10px 14px;background:var(--glass);border-color:var(--glass-brd);color:var(--mu2)" onclick="hrLoad(true)">🔄</button>
+    </div>
+  </div>
+
+  <!-- maxfiy kod -->
+  <div id="hr-gate" class="tbl-wrap" style="padding:22px;display:none">
+    <div style="font-family:var(--fd);font-size:16px;font-weight:700;margin-bottom:4px">🔐 HR kodi</div>
+    <div style="font-size:13px;color:var(--mu2);margin-bottom:14px">Nomzodlar natijalari maxfiy kod bilan ochiladi. Kod bir marta — sessiya davomida saqlanadi.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;max-width:420px">
+      <input id="hr-kod" type="password" placeholder="HR kodi" style="flex:1;min-width:180px"
+        onkeydown="if(event.key==='Enter')hrUnlock()">
+      <button class="btn-sm green" style="padding:11px 20px" onclick="hrUnlock()">Ochish</button>
+    </div>
+    <div id="hr-gate-err" style="color:var(--rd);font-size:13px;margin-top:10px"></div>
+  </div>
+
+  <div id="hr-body" style="display:none">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+      <div class="hr-ftab on" id="hr-t-list" onclick="hrTab('list')">📋 Nomzodlar</div>
+      <div class="hr-ftab"    id="hr-t-inv"  onclick="hrTab('inv')">🔑 Takliflar (PIN)</div>
+    </div>
+
+    <!-- ── NOMZODLAR ── -->
+    <div id="hr-pane-list">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px" id="hr-stats"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <div class="hr-ftab on" id="hr-f-all"     onclick="hrFilter('all',this)">Hammasi</div>
+        <div class="hr-ftab"    id="hr-f-yangi"   onclick="hrFilter('yangi',this)">🆕 Yangi</div>
+        <div class="hr-ftab"    id="hr-f-korildi" onclick="hrFilter('korildi',this)">👁 Koʻrildi</div>
+        <div class="hr-ftab"    id="hr-f-tavsiya" onclick="hrFilter('tavsiya',this)">✅ Tavsiya</div>
+        <div class="hr-ftab"    id="hr-f-rad"     onclick="hrFilter('rad',this)">✖ Rad</div>
+      </div>
+      <div id="hr-list"></div>
+    </div>
+
+    <!-- ── TAKLIFLAR ── -->
+    <div id="hr-pane-inv" style="display:none">
+      <div class="tbl-wrap" style="padding:18px;margin-bottom:18px">
+        <div style="font-family:var(--fd);font-size:16px;font-weight:700;margin-bottom:3px">🔑 Yangi taklif</div>
+        <div style="font-size:13px;color:var(--mu2);margin-bottom:14px">PIN yaratiladi → oʻqituvchiga havola va PIN yuboriladi → u telefonida topshiradi. PIN bir marta ishlaydi, 14 kun amal qiladi.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end">
+          <div class="field" style="margin:0"><label>F.I.Sh.</label><input id="hr-inv-fio" placeholder="Familiya Ism"></div>
+          <div class="field" style="margin:0"><label>Fan</label><input id="hr-inv-fan" placeholder="Matematika"></div>
+          <button class="btn-sm green" style="padding:13px 22px" onclick="hrInvCreate()">➕ PIN yaratish</button>
+        </div>
+        <div id="hr-inv-new"></div>
+      </div>
+      <div id="hr-inv-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- nomzod ekrani -->
+<div id="hr-kiosk" style="display:none;position:fixed;inset:0;z-index:300;background:#E8E7E1;overflow-y:auto;
+  background-image:linear-gradient(#D3D3C8 1px,transparent 1px),linear-gradient(90deg,#D3D3C8 1px,transparent 1px);background-size:28px 28px">
+  <div style="position:sticky;top:0;background:#E8E7E1;border-bottom:1px solid #D3D3C8;padding:10px 16px;display:flex;
+    align-items:center;justify-content:space-between;z-index:5">
+    <div style="font-family:var(--fd);font-weight:800;font-size:13px;color:#131A16">EDUNOVA <span style="color:#0E6E5C">/ HR</span></div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <div style="display:flex;border:1px solid #131A16;border-radius:6px;overflow:hidden">
+        <button id="hr-lru" onclick="hrSetLang('ru')" style="background:none;border:0;padding:6px 12px;font-family:var(--fm);font-size:12px;font-weight:700;cursor:pointer;color:#131A16">RU</button>
+        <button id="hr-luz" onclick="hrSetLang('uz')" style="background:none;border:0;padding:6px 12px;font-family:var(--fm);font-size:12px;font-weight:700;cursor:pointer;color:#131A16">UZ</button>
+      </div>
+      <button onclick="hrKioskExit()" style="background:none;border:1px solid #D3D3C8;border-radius:6px;padding:6px 11px;font-size:13px;cursor:pointer;color:#6B7169">✕</button>
+    </div>
+  </div>
+  <div class="kw"><div class="kbox" id="hr-k-app"></div></div>
+</div>
+
+<!-- hisobot -->
+<div id="hr-report" style="display:none;position:fixed;inset:0;z-index:250;background:var(--bg);overflow-y:auto">
+  <div style="background:var(--s);border-bottom:1px solid var(--brd);padding:14px 18px;display:flex;align-items:center;
+    justify-content:space-between;position:sticky;top:0;z-index:10">
+    <button onclick="hrCloseReport()" style="background:none;border:none;color:var(--mu);font-size:22px;cursor:pointer;padding:4px">←</button>
+    <div style="font-family:var(--fd);font-size:16px;font-weight:700" id="hr-r-name">—</div>
+    <button class="btn-sm red" onclick="hrDelete()">🗑</button>
+  </div>
+  <div style="max-width:820px;margin:0 auto;padding:22px 18px 70px" id="hr-r-body"></div>
+</div>
+
+
 <!-- ══ MODALS ══ -->
 <div class="modal-bg" id="add-student-modal"><div class="modal">
   <button class="modal-close" onclick="hideModal('add-student-modal')">×</button>
@@ -2272,8 +2419,8 @@ const POSITIONS = {
 };
 
 // ── ROLE MENUS ── (Variant B: everyone sees ALL sections; only timer differs)
-const FULL_MENU=['svodka','qabul','hujjat','dash','shartnoma','davomat','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
-const MARKETING_MENU=['svodka','qabul','testnat','hujjat','dash','shartnoma','davomat','hisobkitob','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
+const FULL_MENU=['svodka','qabul','hujjat','dash','shartnoma','davomat','hrtest','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
+const MARKETING_MENU=['svodka','qabul','testnat','hujjat','dash','shartnoma','davomat','hrtest','hisobkitob','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
 const MENUS = {
   admin:     FULL_MENU,
   marketing: MARKETING_MENU,
@@ -2301,6 +2448,7 @@ const MENU_META = {
   qabul:    {label:'🎯 Qabul',           fn:'loadQabul'},
   shartnoma:{label:'📄 Shartnoma tuzish', fn:'loadShartnoma'},
   davomat:  {label:'🕘 Davomat',          fn:'loadOqituvchi'},
+  hrtest:   {label:'🧠 O\'qituvchi testi', fn:'loadHrTest'},
   testnat:  {label:'📊 Test natijalari', fn:'loadTestNatijalari'},
   hujjat:   {label:'📄 Hujjat topshirganlar', fn:'loadHujjat'}
 };
@@ -6332,6 +6480,842 @@ async function oqSubmit(){
     const m=document.getElementById('kio-msg');
     if(document.getElementById('oq-kiosk').style.display==='block'){m.style.color='#a0a8bd';m.textContent='PIN kodingizni kiriting';}
   },3500);
+}
+
+const HRQ=[
+/* ---------- СТРЕСС / STRESS (таймер 45 сек) ---------- */
+{id:"S1",b:"st",t:45,
+q:["Идёт 10-я минута урока. Ученик громко спорит с вами и намеренно провоцирует, весь класс смотрит.",
+   "Dars boshlanganiga 10 daqiqa. O'quvchi ovozini ko'tarib siz bilan bahslashyapti va ataylab provokatsiya qilyapti, butun sinf qarab turibdi."],
+o:[["Повышаю голос и выставляю его из класса.","Ovozimni ko'taraman va uni sinfdan chiqarib yuboraman.",0],
+   ["Одной короткой фразой напоминаю правило и веду урок дальше; разговор — после урока наедине.","Qisqa bir jumla bilan qoidani eslataman va darsni davom ettiraman; suhbat — darsdan keyin yakkama-yakka.",3],
+   ["Останавливаю урок и выясняю отношения при всех, пока он не признает.","Darsni to'xtatib, u tan olguncha hamma oldida munosabatni oydinlashtiraman.",1],
+   ["Перевожу в шутку и возвращаю класс к работе, после урока говорю отдельно.","Hazilga burib, sinfni ishga qaytaraman, darsdan keyin alohida gaplashaman.",2]]},
+
+{id:"S2",b:"st",t:45,
+q:["Родитель звонит вечером в 22:00 и на повышенных тонах обвиняет вас в предвзятости.",
+   "Ota-ona kechqurun soat 22:00 da qo'ng'iroq qilib, sizni baland ovozda tarafkashlikda ayblayapti."],
+o:[["Отвечаю тем же тоном, защищаю себя.","Men ham xuddi shu ohangda javob beraman, o'zimni himoya qilaman.",0],
+   ["Выслушиваю, ночью не спорю, договариваюсь о встрече или звонке завтра в рабочее время.","Tinglayman, kechasi bahslashmayman, ertaga ish vaqtida uchrashuv yoki qo'ng'iroqqa kelishaman.",3],
+   ["Не беру трубку, утром сообщаю администрации и перезваниваю сам.","Go'shakni ko'tarmayman, ertalab ma'muriyatga xabar berib, o'zim qayta qo'ng'iroq qilaman.",2],
+   ["Начинаю оправдываться и обещаю всё исправить, лишь бы он успокоился.","Tinchlansin deb oqlana boshlayman va hammasini to'g'rilashga va'da beraman.",1]]},
+
+{id:"S3",b:"st",t:45,
+q:["Директор при коллегах резко критикует ваш урок.",
+   "Direktor hamkasblar oldida darsingizni keskin tanqid qilyapti."],
+o:[["Спорю при всех и доказываю свою правоту.","Hamma oldida bahslashaman, haqligimni isbotlayman.",0],
+   ["Молча принимаю, потом сам анализирую урок и что-то меняю.","Indamay qabul qilaman, keyin darsni o'zim tahlil qilib, nimanidir o'zgartiraman.",2],
+   ["Благодарю за замечание, уточняю, что именно исправить, и прошу отдельную встречу.","Izoh uchun rahmat aytaman, aniq nimani tuzatish kerakligini so'rayman va alohida uchrashuv so'rayman.",3],
+   ["Вслух соглашаюсь, но считаю, что он не разбирается в предмете.","Ovoz chiqarib roziman, lekin ichimda u fanni tushunmaydi deb hisoblayman.",1]]},
+
+{id:"S4",b:"st",t:45,
+q:["За 5 минут до открытого урока отключилось электричество: ни проектора, ни презентации. В классе 25 детей, комиссия уже сидит.",
+   "Ochiq darsga 5 daqiqa qolganda svet o'chdi: na proyektor, na taqdimot ishlaydi. Sinfda 25 bola, komissiya o'tiribdi."],
+o:[["Прошу перенести урок.","Darsni ko'chirishni so'rayman.",0],
+   ["Провожу урок без техники: доска, мел, работа в парах — логику темы я знаю сам.","Darsni texnikasiz o'taman: doska, bo'r, juftlikda ishlash — mavzu mantig'ini o'zim yaxshi bilaman.",3],
+   ["Прошу дежурного заняться техникой, сам продолжаю урок устно.","Navbatchidan texnikani ko'rishni so'rayman, o'zim darsni og'zaki davom ettiraman.",2],
+   ["Даю самостоятельную работу по учебнику и жду, пока дадут свет.","Darslikdan mustaqil ish beraman va svet kelishini kutaman.",1]]},
+
+{id:"S5",b:"st",t:45,
+q:["Вы ошиблись в решении на доске, ученик громко это заметил, класс смеётся.",
+   "Doskada xato qildingiz, o'quvchi buni baland ovozda aytdi, sinf kulyapti."],
+o:[["Настаиваю, что прав, чтобы не потерять авторитет.","Obro'yimni yo'qotmaslik uchun haqman deb turib olaman.",0],
+   ["Признаю ошибку, исправляю и иду дальше.","Xatoni tan olaman, tuzataman va davom etaman.",2],
+   ["Признаю, хвалю внимательность ученика и разбираю с классом, откуда взялась ошибка.","Tan olaman, o'quvchining diqqatini maqtayman va sinf bilan xato qayerdan chiqqanini tahlil qilaman.",3],
+   ["Говорю, что это была специальная проверка на внимательность.","Bu diqqatni tekshirish uchun ataylab qilingan edi deyman.",1]]},
+
+{id:"S6",b:"st",t:45,
+q:["Третий урок подряд вы заменяете заболевшего коллегу. Вы устали, впереди ещё два класса.",
+   "Ketma-ket uchinchi dars, kasal hamkasbingiz o'rniga dars berayapsiz. Charchagansiz, oldinda yana ikki sinf bor."],
+o:[["Провожу формально: дал задание — сижу.","Rasmiy o'taman: vazifa berib, o'tiraman.",1],
+   ["У меня есть готовый «резервный урок» на такой случай — провожу его в облегчённом, но рабочем формате.","Bunday holatlar uchun tayyor «zaxira dars»im bor — uni yengilroq, lekin ishchi formatda o'taman.",3],
+   ["Прошу администрацию не ставить замену третьим уроком и объясняю почему.","Ma'muriyatdan 3-darsga o'rinbosarlik qo'ymaslikni so'rayman va sababini tushuntiraman.",2],
+   ["Соглашаюсь на всё, а вечером срываюсь на близких.","Hammasiga roziman, kechqurun esa yaqinlarimga asabiylashaman.",0]]},
+
+{id:"S7",b:"st",t:45,
+q:["Ученик расплакался и срывает урок, остальные 24 ребёнка ждут.",
+   "O'quvchi yig'lab yubordi va darsni buzyapti, qolgan 24 bola kutyapti."],
+o:[["Отправляю его к психологу или дежурному, класс продолжает работать.","Uni psixolog yoki navbatchiga jo'nataman, sinf ishlashda davom etadi.",2],
+   ["Выясняю причину при всём классе.","Sababini butun sinf oldida aniqlayman.",0],
+   ["Даю классу задание на 3 минуты, коротко говорю с ребёнком отдельно и решаю: остаётся или идёт к психологу.","Sinfga 3 daqiqalik vazifa beraman, bola bilan alohida qisqa gaplashaman va qaror qilaman: qoladimi yoki psixologga boradimi.",3],
+   ["Не обращаю внимания, пока не успокоится сам.","O'zi tinchlanguncha e'tibor bermayman.",1]]},
+
+{id:"S8",b:"st",t:45,
+q:["Тяжёлая неделя: сорванный урок, жалоба родителя, замечание директора. Вечер пятницы.",
+   "Og'ir hafta: buzilgan dars, ota-onaning shikoyati, direktorning tanbehi. Juma kechasi."],
+o:[["Прокручиваю всё в голове до утра и не могу уснуть.","Ertalabgacha hammasini boshimda aylantiraman, uxlay olmayman.",0],
+   ["Отключаюсь полностью и стараюсь не вспоминать о школе до понедельника.","Butunlay o'chiraman va dushanbagacha maktabni eslamaslikka harakat qilaman.",1],
+   ["Записываю, что именно пошло не так, делаю один вывод на следующую неделю — и переключаюсь на отдых.","Aynan nima noto'g'ri ketganini yozib olaman, keyingi haftaga bitta xulosa chiqaraman — va dam olishga o'taman.",3],
+   ["Проговариваю с коллегами или близкими, выговариваюсь и отпускаю.","Hamkasb yoki yaqinlarim bilan gaplashib, ichimni bo'shataman va qo'yib yuboraman.",2]]},
+
+/* ---------- КРЕАТИВНОСТЬ / KREATIVLIK ---------- */
+{id:"K1",b:"cr",
+q:["Тема скучная и сложная, класс «поплыл» через 10 минут. У вас 3 минуты на решение.",
+   "Mavzu zerikarli va qiyin, sinf 10 daqiqadan keyin «suzib ketdi». Yechim uchun 3 daqiqangiz bor."],
+o:[["Повторяю то же самое громче и строже.","Xuddi shuni balandroq va qattiqroq ohangda takrorlayman.",0],
+   ["Перевожу тему на понятный им пример из их жизни (телефон, TikTok, деньги, футбол) и строю объяснение на нём.","Mavzuni ularning hayotidan olingan misolga (telefon, TikTok, pul, futbol) ko'chiraman va tushuntirishni shunga quraman.",3],
+   ["Даю тест, чтобы собрать внимание.","Diqqatni yig'ish uchun test beraman.",1],
+   ["Делю класс на группы: каждая объясняет свою часть темы остальным.","Sinfni guruhlarga bo'laman: har biri o'z qismini qolganlarga tushuntiradi.",2]]},
+
+{id:"K2",b:"cr",
+q:["Школа просит придумать формат урока, который родители захотят снимать на видео.",
+   "Maktab sizdan ota-onalar videoga olishni xohlaydigan dars formatini o'ylab topishni so'rayapti."],
+o:[["Обычный урок, только красиво оформлю доску.","Oddiy dars, faqat doskani chiroyli bezayman.",0],
+   ["Урок-соревнование между командами, где в конце есть реальный результат: продукт, эксперимент, выступление.","Jamoalar o'rtasida musobaqa-dars: oxirida real natija bo'ladi — mahsulot, tajriba, chiqish.",3],
+   ["Приглашаю родителей просто посидеть на уроке.","Ota-onalarni shunchaki darsda o'tirishga taklif qilaman.",1],
+   ["Даю детям снимать урок самим и делаем из этого мини-репортаж.","Bolalarning o'zlariga darsni suratga olishni topshiraman va undan mini-reportaj yasaymiz.",2]]},
+
+{id:"K3",b:"cr",
+q:["Ни учебника, ни интернета, ни распечаток — только класс и 40 минут.",
+   "Na darslik, na internet, na tarqatma bor — faqat sinf va 40 daqiqa."],
+o:[["Провожу по памяти, лекцией.","Yoddan, ma'ruza tarzida o'taman.",1],
+   ["Строю урок на том, что есть в кабинете и в карманах и рюкзаках у детей.","Darsni xonada va bolalarning cho'ntagi va ryukzagida bor narsalar ustiga quraman.",3],
+   ["Прошу учебник у соседнего класса.","Qo'shni sinfdan darslik so'rayman.",2],
+   ["Делаю свободный урок-беседу без плана.","Rejasiz erkin suhbat-dars qilaman.",0]]},
+
+{id:"O1",b:"cr",open:"flu",
+q:["Придумайте максимум способов объяснить ключевую тему вашего предмета без учебника и доски. Каждый способ — с новой строки.",
+   "Faningizning asosiy mavzusini darslik va doskasiz tushuntirishning imkon qadar ko'p usulini o'ylab toping. Har bir usulni yangi qatordan yozing."]},
+
+{id:"O2",b:"cr",open:"flu",
+q:["Обычная пластиковая бутылка. Придумайте как можно больше учебных применений на вашем уроке. Каждое — с новой строки.",
+   "Oddiy plastik shisha. Uni darsingizda o'quv maqsadida ishlatishning imkon qadar ko'p usulini yozing. Har birini yangi qatordan."]},
+
+{id:"O3",b:"cr",open:"hr",
+q:["10 минут на подготовку, бюджет 0 сум. Как превратить самую скучную тему вашего предмета в игру? Опишите механику: что делают дети, как считаются очки, что в конце.",
+   "Tayyorgarlik uchun 10 daqiqa, byudjet 0 so'm. Faningizdagi eng zerikarli mavzuni qanday qilib o'yinga aylantirasiz? Mexanikani yozing: bolalar nima qiladi, ochko qanday sanaladi, oxirida nima bo'ladi."]},
+
+/* ---------- ПЕДАГОГИКА / PEDAGOGIKA ---------- */
+{id:"P1",b:"pd",
+q:["Ученик стабильно не делает домашние задания.","O'quvchi muntazam uy vazifasini bajarmaydi."],
+o:[["Ставлю двойки, пока не исправится.","Tuzatgunicha 2 qo'yaveraman.",0],
+   ["Выясняю причину — не понимает, нет условий дома или нет мотивации — и подбираю решение под причину.","Sababini aniqlayman — tushunmayapti, uyda sharoit yo'q yoki motivatsiya yo'q — va sababga mos yechim tanlayman.",3],
+   ["Вызываю родителей и перекладываю ответственность на них.","Ota-onasini chaqirib, mas'uliyatni ularga o'tkazaman.",1],
+   ["Даю более лёгкие задания, чтобы он начал видеть результат.","Natija ko'ra boshlashi uchun yengilroq vazifalar beraman.",2]]},
+
+{id:"P2",b:"pd",
+q:["В классе есть сильные и слабые ученики. Программу нужно пройти.","Sinfda kuchli va bo'sh o'quvchilar bor. Dasturni esa o'tish kerak."],
+o:[["Веду по средним, остальные подтянутся сами.","O'rtachaga qarab boraman, qolganlari o'zi yetib oladi.",1],
+   ["Даю разноуровневые задания: базовый минимум для всех и усложнённые для сильных.","Darajali vazifalar beraman: hamma uchun bazaviy minimum va kuchlilarga murakkablashtirilgani.",3],
+   ["Ориентируюсь на сильных, чтобы класс тянулся вверх.","Kuchlilarga qarab boraman, sinf yuqoriga tortilsin.",0],
+   ["Сильные помогают слабым в парах, я контролирую.","Kuchlilar juftlikda bo'shlarga yordam beradi, men nazorat qilaman.",2]]},
+
+{id:"P3",b:"pd",
+q:["Как вы понимаете, что урок прошёл успешно?","Dars muvaffaqiyatli o'tganini qanday bilasiz?"],
+o:[["Я успел пройти весь запланированный материал.","Rejalashtirilgan materialni to'liq o'tib ulgurdim.",1],
+   ["Дети вели себя тихо и не мешали.","Bolalar tinch o'tirdi va xalaqit bermadi.",0],
+   ["В конце урока большинство детей может само применить новое.","Dars oxirida ko'pchilik yangi mavzuni o'zi qo'llay oladi.",3],
+   ["Детям было интересно, они активно участвовали.","Bolalarga qiziq bo'ldi, ular faol qatnashdi.",2]]},
+
+{id:"P4",b:"pd",
+q:["Ребёнок не понял тему после третьего объяснения.","Bola uchinchi marta tushuntirgandan keyin ham mavzuni tushunmadi."],
+o:[["Объясняю четвёртый раз так же, только медленнее.","To'rtinchi marta xuddi shunday, faqat sekinroq tushuntiraman.",1],
+   ["Меняю способ: рисунок, реальный предмет, пример из жизни, объяснение через одноклассника.","Usulni o'zgartiraman: rasm, real predmet, hayotiy misol, sinfdoshi orqali tushuntirish.",3],
+   ["Отправляю на дополнительные занятия.","Qo'shimcha mashg'ulotga jo'nataman.",2],
+   ["Считаю, что это уже не мой уровень ответственности.","Bu mening mas'uliyatim darajasi emas deb hisoblayman.",0]]},
+
+{id:"P5",b:"pd",
+q:["Дисциплина: класс шумит на каждом уроке.","Intizom: sinf har darsda shovqin qiladi."],
+o:[["Ужесточаю наказания и вызываю родителей.","Jazoni kuchaytiraman va ota-onalarni chaqiraman.",1],
+   ["Сначала проверяю себя: темп урока, смена деятельности каждые 10–15 минут, понятные правила с первого дня.","Avval o'zimni tekshiraman: dars temp'i, har 10–15 daqiqada faoliyat almashishi, birinchi kundan aniq qoidalar.",3],
+   ["Нахожу «зачинщиков» и рассаживаю их.","«Boshlovchi»larni topib, alohida o'tqazaman.",2],
+   ["Терплю, главное — пройти программу.","Chidayman, asosiysi — dasturni o'tish.",0]]},
+
+{id:"P6",b:"pd",
+q:["Вам дали новый предмет или направление, которое вы не вели.","Sizga o'zingiz olib bormagan yangi fan yoki yo'nalish berildi."],
+o:[["Отказываюсь — это не моя специализация.","Rad etaman — bu mening yo'nalishim emas.",0],
+   ["Беру: за две недели разбираю программу, нахожу источники и коллегу-наставника, честно предупреждаю, что первый месяц догоняю.","Olaman: 2 haftada dasturni o'rganaman, manba va murabbiy-hamkasb topaman, birinchi oy quvib yetishimni ochiq aytaman.",3],
+   ["Беру и иду по учебнику шаг за шагом вместе с детьми.","Olaman va darslik bo'yicha, bolalar bilan birga qadam-baqadam boraman.",2],
+   ["Беру, но веду по старым материалам своего предмета.","Olaman, lekin o'z fanimning eski materiallari bilan olib boraman.",1]]},
+
+{id:"P7",b:"pd",
+q:["Ежедневные тесты показали: у половины класса результат упал.","Kundalik testlar ko'rsatdi: sinfning yarmida natija tushib ketdi."],
+o:[["Считаю, что дети стали меньше стараться.","Bolalar tirishmay qo'yibdi deb hisoblayman.",0],
+   ["Разбираю, какие именно вопросы завалили, и возвращаюсь к этой части темы.","Aynan qaysi savollarni yiqitganini tahlil qilaman va mavzuning o'sha qismiga qaytaman.",3],
+   ["Провожу тест повторно — возможно, дело в самом тесте.","Testni qayta o'tkazaman — balki muammo testning o'zida.",2],
+   ["Задаю больше домашних заданий.","Ko'proq uy vazifasi beraman.",1]]},
+
+/* ---------- КОММУНИКАЦИЯ / KOMMUNIKATSIYA ---------- */
+{id:"C1",b:"cm",
+q:["Родитель публично написал жалобу в общий чат школы.","Ota-ona maktabning umumiy chatiga ochiq shikoyat yozdi."],
+o:[["Отвечаю в чате подробно и доказываю, что он неправ.","Chatda batafsil javob beraman va uning noto'g'riligini isbotlayman.",0],
+   ["В чате коротко: «вижу, свяжусь с вами лично», дальше — личный звонок или встреча плюс информирую администрацию.","Chatda qisqa: «ko'rdim, siz bilan shaxsan bog'lanaman», keyin — shaxsiy qo'ng'iroq yoki uchrashuv va ma'muriyatni xabardor qilaman.",3],
+   ["В чате молчу, но сразу иду к администрации и вместе готовим ответ.","Chatda indamayman, lekin darhol ma'muriyatga boraman va javobni birga tayyorlaymiz.",2],
+   ["Пишу ему в личку эмоциональное объяснение.","Unga shaxsiyga hissiyotli tushuntirish yozaman.",1]]},
+
+{id:"C2",b:"cm",
+q:["Родитель требует ставить его ребёнку оценки выше.","Ota-ona farzandiga baholarni yuqoriroq qo'yishni talab qilyapti."],
+o:[["Иду навстречу, чтобы не было конфликта.","Nizo bo'lmasin deb yon beraman.",0],
+   ["Отказываю: объясняю критерии оценки, показываю работы ребёнка и даю реальный план, как поднять балл.","Rad etaman: baho mezonlarini tushuntiraman, bolaning ishlarini ko'rsataman va ballni ko'tarishning real rejasini beraman.",3],
+   ["Отказываю коротко: «есть правила школы».","Qisqa rad etaman: «maktab qoidalari shunday».",2],
+   ["Перевожу вопрос на директора.","Masalani direktorga o'tkazaman.",1]]},
+
+{id:"C3",b:"cm",
+q:["Коллега при вас плохо отзывается о другом учителе.","Hamkasbingiz sizning oldingizda boshqa o'qituvchi haqida yomon gapiryapti."],
+o:[["Поддерживаю разговор.","Suhbatni qo'llab-quvvatlayman.",0],
+   ["Не участвую и меняю тему; если проблема реальная — предлагаю сказать это ему самому или администрации.","Qatnashmayman va mavzuni o'zgartiraman; muammo real bo'lsa — buni o'sha odamning o'ziga yoki ma'muriyatga aytishni taklif qilaman.",3],
+   ["Молчу и слушаю до конца.","Indamay, oxirigacha tinglayman.",1],
+   ["Молча выхожу из разговора.","Indamay suhbatdan chiqib ketaman.",2]]},
+
+{id:"C4",b:"cm",
+q:["Нужно сообщить родителю плохую новость о ребёнке.","Ota-onaga bolasi haqida yomon xabarni yetkazish kerak."],
+o:[["Говорю прямо и по фактам, без предисловий.","To'g'ridan-to'g'ri, faktlar bilan, kirish so'zlarsiz aytaman.",2],
+   ["Сначала факты и сильные стороны ребёнка, потом конкретная проблема, потом конкретный план на две недели.","Avval faktlar va bolaning kuchli tomonlari, keyin aniq muammo, keyin 2 haftalik aniq reja.",3],
+   ["Смягчаю так, что родитель не понимает серьёзности.","Shunchalik yumshataman-ki, ota-ona jiddiyligini tushunmay qoladi.",0],
+   ["Пишу подробное сообщение в мессенджере.","Messenjerga batafsil xabar yozaman.",1]]},
+
+{id:"C5",b:"cm",
+q:["Новый учитель в вашей команде явно не справляется.","Jamoangizdagi yangi o'qituvchi ochiq-oydin uddalay olmayapti."],
+o:[["Не лезу, это дело администрации.","Aralashmayman, bu ma'muriyatning ishi.",1],
+   ["Предлагаю ему прийти на мой урок и вместе с ним разбираю его урок.","Darsimga kelishni taklif qilaman va uning darsini u bilan birga tahlil qilaman.",3],
+   ["Обсуждаю с другими коллегами.","Boshqa hamkasblar bilan muhokama qilaman.",0],
+   ["Говорю администрации, что новичку нужна поддержка.","Ma'muriyatga aytaman: yangi odamga qo'llab-quvvatlash kerak.",2]]},
+
+/* ---------- РОСТ / RIVOJLANISH ---------- */
+{id:"G1",b:"gr",
+q:["Последний навык, курс или книга, которые вы освоили для работы:","Ish uchun oxirgi o'zlashtirgan ko'nikma, kurs yoki kitobingiz:"],
+o:[["За последние 3 месяца прошёл курс или книгу и применил на уроке.","So'nggi 3 oyda kurs yoki kitobni tugatdim va darsda qo'lladim.",3],
+   ["За последний год что-то читал по своему предмету.","So'nggi bir yilda fanim bo'yicha nimadir o'qidim.",2],
+   ["Учился давно, опыта достаточно.","Ancha oldin o'qiganman, tajribam yetarli.",0],
+   ["Хочу, но нет времени.","Xohlayman, lekin vaqt yo'q.",1]]},
+
+{id:"G2",b:"gr",
+q:["Школа вводит новую систему: ежедневные тесты, электронный давомат, видеорегистрация прихода.",
+   "Maktab yangi tizim joriy qilyapti: kundalik testlar, elektron davomat, kelishni video ro'yxatdan o'tkazish."],
+o:[["Считаю, что это лишний контроль.","Bu ortiqcha nazorat deb hisoblayman.",0],
+   ["Разбираюсь первым и помогаю коллегам освоить.","Birinchi bo'lib o'rganaman va hamkasblarga yordam beraman.",3],
+   ["Осваиваю, когда обяжут.","Majbur qilishganda o'rganaman.",1],
+   ["Спокойно осваиваю в свой срок.","O'z vaqtimda xotirjam o'zlashtiraman.",2]]},
+
+{id:"G3",b:"gr",
+q:["Вам дали обратную связь, с которой вы не согласны.","Sizga o'zingiz rozi bo'lmagan fikr-mulohaza berishdi."],
+o:[["Игнорирую.","E'tiborsiz qoldiraman.",0],
+   ["Прошу конкретные примеры и проверяю на практике, прав ли я.","Aniq misollar so'rayman va amalda tekshiraman: haqmanmi.",3],
+   ["Принимаю и меняю, лишь бы не спорить.","Bahslashmaslik uchun qabul qilaman va o'zgartiraman.",1],
+   ["Обсуждаю с аргументами и прихожу к общему решению.","Dalillar bilan muhokama qilib, umumiy yechimga kelaman.",2]]},
+
+{id:"G4",b:"gr",
+q:["Ваш урок сняли на видео и разобрали при коллегах.","Darsingiz videoga olindi va hamkasblar oldida tahlil qilindi."],
+o:[["Мне некомфортно, я против.","Bu menga noqulay, men qarshiman.",0],
+   ["Нормально, если разбор конструктивный.","Tahlil konstruktiv bo'lsa — normal.",2],
+   ["Сам прошу снимать и разбирать — так расту быстрее.","O'zim suratga olish va tahlil qilishni so'rayman — shunda tezroq o'saman.",3],
+   ["Соглашусь, но проведу урок «на камеру», не как обычно.","Roziman, lekin darsni «kamera uchun» o'taman, odatdagidek emas.",1]]},
+
+/* ---------- МОТИВАЦИЯ / MOTIVATSIYA ---------- */
+{id:"M1",b:"mt",
+q:["Почему вы работаете учителем?","Nega o'qituvchi bo'lib ishlaysiz?"],
+o:[["Стабильная работа и график.","Barqaror ish va grafik.",1],
+   ["Мне нравится видеть, как ребёнок начинает понимать.","Bolaning tushuna boshlaganini ko'rish menga yoqadi.",3],
+   ["Так сложилось, другого варианта не было.","Shunday bo'lib qoldi, boshqa variant yo'q edi.",0],
+   ["Мне нравится мой предмет и я хочу его передавать.","Fanim yoqadi va uni yetkazishni xohlayman.",2]]},
+
+{id:"M2",b:"mt",
+q:["Вам предлагают на 20% больше в другой школе, но без развития и с большей нагрузкой.",
+   "Sizga boshqa maktabda 20% ko'proq maosh taklif qilishdi, lekin o'sishsiz va ko'proq yuklama bilan."],
+o:[["Сразу соглашаюсь — деньги решают.","Darhol roziman — pul hal qiladi.",1],
+   ["Остаюсь, если здесь есть рост и результат.","Bu yerda o'sish va natija bo'lsa, qolaman.",3],
+   ["Прежде чем решать, открыто обсуждаю условия здесь.","Qaror qilishdan oldin bu yerdagi shartlarni ochiq muhokama qilaman.",2],
+   ["Вообще не думаю о таких предложениях.","Bunday takliflar haqida umuman o'ylamayman.",1]]},
+
+{id:"M3",b:"mt",
+q:["Что для вас недопустимо в работе с детьми?","Bolalar bilan ishlashda siz uchun mutlaqo mumkin bo'lmagan narsa nima?"],
+o:[["Кричать на ребёнка.","Bolaga baqirish.",2],
+   ["Унижать, сравнивать и высмеивать при классе.","Sinf oldida kamsitish, solishtirish va masxara qilish.",3],
+   ["Опаздывать на урок.","Darsga kechikish.",1],
+   ["Обсуждать ребёнка с другими родителями.","Bolani boshqa ota-onalar bilan muhokama qilish.",2]]},
+
+{id:"M4",b:"mt",open:"hr",
+q:["Опишите один реальный случай, когда вы повлияли на конкретного ученика: что было до, что вы сделали, что стало после.",
+   "Aniq bir o'quvchiga real ta'sir ko'rsatgan bitta holatni yozing: avval qanday edi, siz nima qildingiz, keyin nima bo'ldi."]},
+
+/* ---------- ЦИФРА И AI / RAQAMLI SAVODXONLIK ---------- */
+{id:"D1",b:"dg",
+q:["Как вы используете AI при подготовке к уроку?","Darsga tayyorgarlikda AI dan qanday foydalanasiz?"],
+o:[["Не использую.","Foydalanmayman.",0],
+   ["Иногда прошу идеи или тексты и проверяю их.","Ba'zan g'oya yoki matn so'rayman va tekshiraman.",2],
+   ["Регулярно: генерирую задания, тесты, разноуровневые варианты, проверяю и адаптирую.","Muntazam: vazifa, test, darajali variantlar generatsiya qilaman, tekshirib moslashtiraman.",3],
+   ["Не доверяю AI, он ошибается.","AI ga ishonmayman, u xato qiladi.",1]]},
+
+{id:"D2",b:"dg",
+q:["Ученик сдал сочинение, явно написанное AI.","O'quvchi AI yozgani aniq ko'rinib turgan insho topshirdi."],
+o:[["Ставлю двойку и обвиняю.","2 qo'yaman va ayblayman.",1],
+   ["Спрашиваю устно по содержанию, потом даю переписать своими словами и объясняю, где AI помогает, а где мешает.","Mazmuni bo'yicha og'zaki savol beraman, keyin o'z so'zlari bilan qayta yozdiraman va AI qayerda yordam berishi, qayerda xalaqit qilishini tushuntiraman.",3],
+   ["Не замечаю, главное — сдал.","Sezmaganday qilaman, asosiysi — topshirdi.",0],
+   ["Прошу переписать без объяснений.","Tushuntirishsiz qayta yozishni so'rayman.",2]]},
+
+{id:"D3",b:"dg",
+q:["Завтра нужно показать результаты класса в цифрах.","Ertaga sinf natijalarini raqamlarda ko'rsatishingiz kerak."],
+o:[["Прошу администрацию посчитать.","Ma'muriyatdan hisoblab berishni so'rayman.",0],
+   ["Собираю данные в таблицу (Excel или Google Sheets) и сравниваю по неделям.","Ma'lumotlarni jadvalga (Excel yoki Google Sheets) yig'aman va haftalar kesimida solishtiraman.",3],
+   ["Пишу от руки в тетради.","Daftarga qo'lda yozaman.",1],
+   ["Готовлю таблицу с оценками, без сравнения.","Baholar jadvalini tayyorlayman, solishtiruvsiz.",2]]},
+
+/* ---------- ШКАЛА ИСКРЕННОСТИ / SAMIMIYLIK SHKALASI ---------- */
+{id:"I1",b:"sc",q:["Я никогда не раздражался на ученика.","Men hech qachon o'quvchiga jahlim chiqmagan."]},
+{id:"I2",b:"sc",q:["Я всегда с первого раза понимаю любого ребёнка.","Men har qanday bolani doim birinchi martadan tushunaman."]},
+{id:"I3",b:"sc",q:["Я никогда не опаздывал на работу.","Men hech qachon ishga kechikmaganman."]},
+{id:"I4",b:"sc",q:["Мне никогда не хотелось бросить эту профессию.","Menda hech qachon bu kasbni tashlash istagi bo'lmagan."]},
+{id:"I5",b:"sc",q:["Я никогда не говорил о коллегах за глаза.","Men hech qachon hamkasblarim haqida orqasidan gapirmaganman."]}
+];
+const HRT={
+ title:["Тест потенциала учителя","O'qituvchi potensiali testi"],
+ sub:["Оценка стрессоустойчивости, креативности и педагогического потенциала. 42 задания, около 25 минут.",
+      "Stressbardoshlik, kreativlik va pedagogik potensial baholash. 42 topshiriq, taxminan 25 daqiqa."],
+ r1:["Отвечайте так, как поступили бы на самом деле, а не как «правильно». Правильных ответов здесь нет.",
+     "«To'g'ri» emas, aslida qanday yo'l tutsangiz — shunday javob bering. Bu yerda to'g'ri javob yo'q."],
+ r2:["Первый блок идёт с таймером: 45 секунд на вопрос. Это часть измерения.",
+     "Birinchi blok taymer bilan: har savolga 45 soniya. Bu ham o'lchovning bir qismi."],
+ r3:["Вернуться назад нельзя. Ответ засчитывается сразу.","Orqaga qaytish mumkin emas. Javob darhol qayd etiladi."],
+ r4:["В открытых вопросах пишите каждую идею с новой строки.","Ochiq savollarda har bir g'oyani yangi qatordan yozing."],
+ fio:["Имя и фамилия","Ism va familiya"],
+ subj:["Предмет / направление","Fan / yo'nalish"],
+ exp:["Стаж работы","Ish staji"],
+ exps:[["до 1 года","1–3 года","3–7 лет","более 7 лет"],["1 yilgacha","1–3 yil","3–7 yil","7 yildan ko'p"]],
+ track:["Язык обучения","O'qitish tili"],
+ tracks:[["Узбекский","Русский","Оба"],["O'zbek","Rus","Ikkalasi"]],
+ start:["Начать тест","Testni boshlash"],
+ next:["Далее","Keyingisi"],
+ yes:["Да","Ha"],no:["Нет","Yo'q"],
+ q:["Вопрос","Savol"],of:["из","dan"],
+ blocks:{st:["Стрессоустойчивость","Stressbardoshlik"],cr:["Креативность","Kreativlik"],
+   pd:["Педагогическое мастерство","Pedagogik mahorat"],cm:["Коммуникация","Kommunikatsiya"],
+   gr:["Обучаемость и гибкость","O'rganuvchanlik va moslashuv"],mt:["Мотивация и ценности","Motivatsiya va qadriyatlar"],
+   dg:["Цифровые навыки и AI","Raqamli savodxonlik va AI"],sc:["Самооценка","O'z-o'zini baholash"]},
+ openhint:["Каждая идея — с новой строки. Чем больше разных идей, тем выше балл.",
+           "Har bir g'oya — yangi qatordan. Turli g'oyalar qancha ko'p bo'lsa, ball shuncha yuqori."],
+ done:["Тест завершён","Test yakunlandi"],
+ donetxt:["Спасибо. Результат передан в HR-отдел школы. Обсуждение — на собеседовании.",
+          "Rahmat. Natija maktab HR bo'limiga uzatildi. Muhokama — suhbat vaqtida."],
+ pin:["PIN сотрудника HR","HR xodimi PIN kodi"],
+ open:["Открыть отчёт","Hisobotni ochish"],
+ wrongpin:["Неверный PIN","PIN noto'g'ri"],
+ report:["Отчёт по кандидату","Nomzod bo'yicha hisobot"],
+ overall:["Общий потенциал","Umumiy potensial"],
+ map:["Карта потенциала","Potensial xaritasi"],
+ profile:["Профиль компетенций","Kompetensiyalar profili"],
+ speed:["Скорость решений под давлением","Bosim ostida qaror tezligi"],
+ sinc:["Шкала искренности","Samimiylik shkalasi"],
+ sincok:["Ответы выглядят честными.","Javoblar samimiy ko'rinadi."],
+ sincmid:["Есть склонность приукрашивать. Проверьте спорные места на собеседовании.",
+          "Bezash tendensiyasi bor. Bahsli joylarni suhbatda tekshiring."],
+ sincbad:["Результат завышен: кандидат отвечает «как надо». Балл читайте как верхнюю границу, проверяйте на практике — пробный урок обязателен.",
+          "Natija oshirib yuborilgan: nomzod «kerakligicha» javob beryapti. Ballni yuqori chegara sifatida o'qing, amalda tekshiring — sinov darsi shart."],
+ openans:["Открытые ответы — оценка HR","Ochiq javoblar — HR bahosi"],
+ rubric:["Оцените: 0 — шаблон или пусто · 1 — банально · 2 — рабочая идея · 3 — своя, применимая, сильная идея",
+         "Baholang: 0 — shablon yoki bo'sh · 1 — oddiy · 2 — ishchi g'oya · 3 — o'ziga xos, qo'llansa bo'ladigan, kuchli g'oya"],
+ ideas:["идей засчитано","g'oya hisobga olindi"],
+ rec:["Рекомендация","Tavsiya"],
+ ask:["Что проверить на собеседовании","Suhbatda nimani tekshirish kerak"],
+ print:["Печать","Chop etish"],
+ save:["Скачать JSON","JSON yuklab olish"],
+ again:["Новый кандидат","Yangi nomzod"],
+ notrated:["Балл предварительный: оцените открытые ответы ниже.","Ball dastlabki: quyidagi ochiq javoblarni baholang."],
+ svWait:["Сохранение…","Saqlanmoqda…"],
+ svOk:["Результат сохранён в базе школы.","Natija maktab bazasiga saqlandi."],
+ svOff:["База не подключена — сохраните файлом.","Baza ulanmagan — fayl sifatida saqlang."],
+ svErr:["Не удалось сохранить в базу. Скачайте файл и передайте в HR.","Bazaga saqlab bo'lmadi. Faylni yuklab olib, HR ga bering."],
+ v:[["Не рекомендуется на самостоятельный класс","Mustaqil sinfga tavsiya etilmaydi"],
+    ["Зона развития — только с наставником и планом","Rivojlanish zonasi — faqat murabbiy va reja bilan"],
+    ["Сильный кандидат","Kuchli nomzod"],
+    ["Высокий потенциал — брать и растить в наставника","Yuqori potensial — olib, murabbiy qilib o'stirish kerak"]]
+};
+
+/* ══════════════════════════════════════════════════════════════
+   HR: OʻQITUVCHI TESTI — panel + kiosk + hisobot
+   ══════════════════════════════════════════════════════════════ */
+const HR_W   = {st:.25,cr:.25,pd:.18,cm:.12,gr:.08,mt:.07,dg:.05};
+const HR_MAX = {st:24,cr:26,pd:21,cm:15,gr:12,mt:12,dg:9};
+const HR_LINK= 'https://www.edunovaschool.uz/hr-test.html';
+const HR_HOL = {yangi:['🆕 Yangi','#60a5fa'],korildi:['👁 Koʻrildi','#a0a8bd'],
+                tavsiya:['✅ Tavsiya','#34d399'],rad:['✖ Rad','#fb7185']};
+
+let hrL=0,hrI=0,hrAns={},hrOpenA={},hrRt={O1:0,O2:0,O3:0,M4:0},hrTo=0,hrTid=null,
+    hrCand={},hrData=[],hrFlt='all',hrCur=null,hrStarted=false;
+
+function hrEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function hrKod(){return sessionStorage.getItem('hr_kod')||'';}
+function hrTx(k){return HRT[k][hrL];}
+function hrColor(v){return v>=85?'#34d399':v>=70?'#FF8A47':v>=55?'#fbbf24':'#fb7185';}
+
+/* ═══════ 1. PANEL ═══════ */
+function loadHrTest(){
+  const g=document.getElementById('hr-gate'),b=document.getElementById('hr-body');
+  if(!hrKod()){g.style.display='block';b.style.display='none';return;}
+  g.style.display='none';b.style.display='block';
+  if(!hrData.length)hrLoad();else hrPaint();
+}
+async function hrUnlock(){
+  const k=document.getElementById('hr-kod').value.trim();
+  const e=document.getElementById('hr-gate-err');e.textContent='';
+  if(!k)return;
+  try{
+    const{data,error}=await sb.rpc('hr_royxat',{p_kod:k});
+    if(error)throw error;
+    sessionStorage.setItem('hr_kod',k);hrData=data||[];loadHrTest();
+  }catch(err){e.textContent='Kod notoʻgʻri yoki bazaga ulanib boʻlmadi';}
+}
+async function hrLoad(force){
+  const list=document.getElementById('hr-list');
+  if(!hrKod()){loadHrTest();return;}
+  if(list)list.innerHTML='<div class="loading-center"><div class="spin"></div></div>';
+  try{
+    const{data,error}=await sb.rpc('hr_royxat',{p_kod:hrKod()});
+    if(error)throw error;
+    hrData=data||[];hrPaint();
+  }catch(err){
+    sessionStorage.removeItem('hr_kod');
+    if(list)list.innerHTML='<div style="color:var(--rd);padding:20px;font-size:14px">Natijalarni oʻqib boʻlmadi. Kodni qayta kiriting.</div>';
+    loadHrTest();
+  }
+}
+function hrPaint(){
+  const st=document.getElementById('hr-stats');
+  const n=hrData.length, yangi=hrData.filter(r=>r.holat==='yangi').length,
+        tav=hrData.filter(r=>r.holat==='tavsiya').length,
+        ort=n?Math.round(hrData.reduce((s,r)=>s+(r.umumiy||0),0)/n):0;
+  st.innerHTML=
+    `<div class="hr-stat"><b>${n}</b><span>Jami nomzod</span></div>`+
+    `<div class="hr-stat"><b style="color:#60a5fa">${yangi}</b><span>Yangi</span></div>`+
+    `<div class="hr-stat"><b style="color:#34d399">${tav}</b><span>Tavsiya etilgan</span></div>`+
+    `<div class="hr-stat"><b style="color:${hrColor(ort)}">${ort}%</b><span>Oʻrtacha ball</span></div>`;
+  const rows=hrData.filter(r=>hrFlt==='all'||r.holat===hrFlt);
+  const list=document.getElementById('hr-list');
+  if(!rows.length){list.innerHTML='<div style="text-align:center;padding:40px;color:var(--mu)">Nomzod yoʻq</div>';return;}
+  list.innerHTML=rows.map(r=>{
+    const c=hrColor(r.umumiy||0), h=HR_HOL[r.holat]||HR_HOL.yangi;
+    const d=new Date(r.created_at).toLocaleDateString('ru-RU');
+    const lie=(r.samimiylik||0)>=4?'<span class="hr-chip" style="background:rgba(251,113,133,.15);color:#fb7185">⚠ samimiylik</span>':'';
+    const norate=!(r.hr_baho&&Object.values(r.hr_baho).some(v=>v>0))
+      ?'<span class="hr-chip" style="background:rgba(251,191,36,.15);color:#fbbf24">⏳ dastlabki ball</span>':'';
+    const noai=!r.ai_tahlil?'':'<span class="hr-chip" style="background:rgba(96,165,250,.15);color:#60a5fa">🤖 tahlil bor</span>';
+    return `<div class="hr-row" onclick="hrOpenReport('${r.id}')">
+      <div class="hr-score" style="color:${c};background:${c}22">${r.umumiy||0}%</div>
+      <div style="flex:1;min-width:170px">
+        <div style="font-weight:700;font-size:15px">${hrEsc(r.fio)}</div>
+        <div style="font-size:12px;color:var(--mu2);margin-top:2px">${hrEsc(r.fan||'—')} · ${hrEsc(r.staj||'')} · ${d}</div>
+      </div>
+      <span class="hr-chip" style="background:rgba(122,60,196,.16);color:#c4a2f5">${hrEsc(r.kvadrant||'—')}</span>
+      ${norate}${noai}${lie}
+      <span class="hr-chip" style="background:${h[1]}22;color:${h[1]}">${h[0]}</span>
+    </div>`;}).join('');
+}
+function hrFilter(f,el){
+  hrFlt=f;document.querySelectorAll('.hr-ftab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');hrPaint();
+}
+function hrCopyLink(){
+  navigator.clipboard.writeText(HR_LINK).then(()=>toast('🔗 Havola nusxalandi'))
+   .catch(()=>prompt('Havola:',HR_LINK));
+}
+
+/* ═══ TAKLIFLAR (PIN) ═══ */
+let hrInv=[];
+function hrTab(n){
+  const isList=(n==='list');
+  document.getElementById('hr-pane-list').style.display=isList?'block':'none';
+  document.getElementById('hr-pane-inv').style.display=isList?'none':'block';
+  document.getElementById('hr-t-list').classList.toggle('on',isList);
+  document.getElementById('hr-t-inv').classList.toggle('on',!isList);
+  if(!isList)hrInvLoad();
+}
+async function hrInvLoad(){
+  const box=document.getElementById('hr-inv-list');
+  box.innerHTML='<div class="loading-center"><div class="spin"></div></div>';
+  try{
+    const{data,error}=await sb.rpc('hr_taklif_royxat',{p_kod:hrKod()});
+    if(error)throw error;
+    hrInv=data||[];hrInvPaint();
+  }catch(e){box.innerHTML='<div style="color:var(--rd);padding:18px;font-size:14px">Takliflarni oʻqib boʻlmadi</div>';}
+}
+function hrInvPaint(){
+  const box=document.getElementById('hr-inv-list');
+  if(!hrInv.length){box.innerHTML='<div style="text-align:center;padding:36px;color:var(--mu)">Hali taklif yaratilmagan</div>';return;}
+  box.innerHTML=hrInv.map(v=>{
+    const used=v.holat!=='yangi';
+    const eski=(Date.now()-new Date(v.created_at))/864e5>14;
+    const c=used?'#646b80':eski?'#fb7185':'#34d399';
+    const lab=used?'✔ Topshirgan':eski?'⏳ Muddati tugagan':'🟢 Kutilmoqda';
+    return `<div class="hr-row" style="cursor:default">
+      <div class="hr-score mono" style="color:${c};background:${c}22;font-size:19px;letter-spacing:.08em">${v.pin}</div>
+      <div style="flex:1;min-width:150px">
+        <div style="font-weight:700;font-size:15px">${hrEsc(v.fio||'— ism kiritilmagan')}</div>
+        <div style="font-size:12px;color:var(--mu2);margin-top:2px">${hrEsc(v.fan||'')} · ${new Date(v.created_at).toLocaleDateString('ru-RU')}</div>
+      </div>
+      <span class="hr-chip" style="background:${c}22;color:${c}">${lab}</span>
+      ${used?'':`<button class="btn-sm blue" onclick="hrInvSend('${v.pin}',event)">📤 Xabar</button>`}
+      <button class="btn-sm red" onclick="hrInvDel('${v.id}',event)">🗑</button>
+    </div>`;}).join('');
+}
+async function hrInvCreate(){
+  const fio=document.getElementById('hr-inv-fio').value.trim();
+  const fan=document.getElementById('hr-inv-fan').value.trim();
+  try{
+    const{data,error}=await sb.rpc('hr_taklif_yarat',{p_kod:hrKod(),p_fio:fio,p_fan:fan});
+    if(error)throw error;
+    if(!data||!data.ok)throw new Error('xato');
+    document.getElementById('hr-inv-fio').value='';
+    document.getElementById('hr-inv-fan').value='';
+    document.getElementById('hr-inv-new').innerHTML=
+      `<div style="margin-top:14px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.08);
+        border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:11px;color:var(--mu2);text-transform:uppercase;letter-spacing:.5px;font-weight:700">PIN kod</div>
+          <div class="mono" style="font-family:var(--fm);font-size:28px;font-weight:700;color:#34d399;letter-spacing:.14em">${data.pin}</div>
+        </div>
+        <button class="btn-sm green" style="padding:11px 18px" onclick="hrInvSend('${data.pin}',event)">📤 Xabar matni</button>
+      </div>`;
+    toast('✅ PIN yaratildi');hrInvLoad();
+  }catch(e){toast('❌ PIN yaratilmadi');}
+}
+function hrInvSend(pin,ev){
+  if(ev)ev.stopPropagation();
+  const msg='Assalomu alaykum! EduNova maktabiga oʻqituvchilikka nomzodlik testi.\n\n'
+    +'Havola: '+HR_LINK+'\nPIN kod: '+pin+'\n\n'
+    +'Telefondan ochsangiz boʻladi. Taxminan 25 daqiqa. Birinchi blok taymer bilan — tinch joyda boshlang.\n'
+    +'PIN bir marta ishlaydi va 14 kun amal qiladi.';
+  navigator.clipboard.writeText(msg).then(()=>toast('📋 Xabar nusxalandi'))
+   .catch(()=>prompt('Xabar:',msg));
+}
+async function hrInvDel(id,ev){
+  if(ev)ev.stopPropagation();
+  if(!confirm('Taklifni oʻchirasizmi?'))return;
+  try{
+    const{error}=await sb.rpc('hr_taklif_ochirish',{p_kod:hrKod(),p_id:id});
+    if(error)throw error;
+    hrInv=hrInv.filter(v=>v.id!==id);hrInvPaint();toast('🗑 Oʻchirildi');
+  }catch(e){toast('❌ Oʻchmadi');}
+}
+
+/* ═══════ 2. HISOB-KITOB ═══════ */
+function hrCalc(){
+  const raw={st:0,cr:0,pd:0,cm:0,gr:0,mt:0,dg:0};
+  HRQ.forEach(q=>{if(q.b!=='sc'&&hrAns[q.id]!==undefined)raw[q.b]+=hrAns[q.id];});
+  raw.cr+=hrRt.O1+hrRt.O2+hrRt.O3; raw.mt+=hrRt.M4;
+  const pct={};Object.keys(raw).forEach(k=>pct[k]=Math.min(100,Math.round(raw[k]/HR_MAX[k]*100)));
+  let tot=0;Object.keys(HR_W).forEach(k=>tot+=pct[k]*HR_W[k]);
+  const lie=['I1','I2','I3','I4','I5'].reduce((s,k)=>s+(hrAns[k]||0),0);
+  return{raw,pct,total:Math.round(tot),lie,speed:Math.round((8-hrTo)/8*100)};
+}
+function hrCalcFrom(r,rt){
+  const pct=Object.assign({},r.ballar||{});
+  const a=r.javoblar||{},base={cr:0,mt:0};
+  ['K1','K2','K3','O1','O2'].forEach(k=>base.cr+=(a[k]||0));
+  ['M1','M2','M3'].forEach(k=>base.mt+=(a[k]||0));
+  pct.cr=Math.min(100,Math.round((base.cr+rt.O1+rt.O2+rt.O3)/HR_MAX.cr*100));
+  pct.mt=Math.min(100,Math.round((base.mt+rt.M4)/HR_MAX.mt*100));
+  let tot=0;Object.keys(HR_W).forEach(k=>tot+=(pct[k]||0)*HR_W[k]);
+  return{pct,total:Math.round(tot)};
+}
+function hrQuad(cr,st){
+  const hi=c=>c>=65;
+  if(hi(st)&&hi(cr))return['Innovator-yadro',
+    'Ochiq darslar, tajribalar, ogʻir sinflar, yangilarga murabbiylik. Metodikani shu nomzod atrofida qurish mumkin.'];
+  if(hi(st))return['Ishonchli tayanch',
+    'Barqaror sinflar, intizom, imtihon va olimpiadaga tayyorgarlik. Metodik yangilik kutmang — tayyor formatlarni bering, uzilishsiz bajaradi.'];
+  if(hi(cr))return['Nozik ijodkor',
+    'Toʻgaraklar, loyihalar, kichik guruhlar, suratga olish va tadbirlar. Nizoli sinflar va ochiq darslarga qoʻllab-quvvatlashsiz qoʻymang — gʻoyalari kuchli, bardoshi zaif.'];
+  return['Xavf zonasi',
+    'Faqat murabbiy va qisqa sinov muddati bilan: 1 oy, har hafta dars tahlili, davomat va testlar boʻyicha oʻlchov.'];
+}
+function hrAsks(p){
+  const a=[];
+  if(p.st<60)a.push('Keys bering: ota-ona telefonda baqiryapti. Fikr yuritmasin — ovoz chiqarib oʻynab bersin.');
+  if(p.cr<60)a.push('5 daqiqada bitta mavzuning 3 xil tushuntirishini oʻylab topishni soʻrang. Nechtasini berganini sanang.');
+  if(p.pd<60)a.push('Soʻrang: mavzu tushunilganini qanday tekshirasiz? «Hammaga tushunarlimi deb soʻrayman» — qizil bayroq.');
+  if(p.cm<60)a.push('Yozma tekshiring: oʻzlashtirish tushgani haqida ota-onaga xabar yozib bersin.');
+  if(p.gr<60)a.push('Soʻnggi olti oyda ishida nimani oʻzgartirganini soʻrang. Aniq misol bilan.');
+  if(p.dg<60)a.push('Noutbuk bering: 10 daqiqada sinf natijalari jadvalini tuzsin.');
+  if(!a.length)a.push('Test boʻyicha zaif tomon yoʻq. Real sinfda sinov darsida tekshiring — 40 daqiqa, bir haftalik tayyorgarliksiz.');
+  return a;
+}
+
+/* ═══════ 3. HISOBOT ═══════ */
+function hrOpenReport(id){
+  hrCur=hrData.find(r=>r.id===id);if(!hrCur)return;
+  hrRt=Object.assign({O1:0,O2:0,O3:0,M4:0},hrCur.hr_baho||{});
+  document.getElementById('hr-report').style.display='block';
+  document.body.style.overflow='hidden';
+  hrPaintReport();
+}
+function hrCloseReport(){
+  document.getElementById('hr-report').style.display='none';
+  document.body.style.overflow='';hrCur=null;
+}
+function hrPaintReport(){
+  const r=hrCur,s=hrCalcFrom(r,hrRt),q=hrQuad(s.pct.cr,s.pct.st);
+  const lvl=s.total>=85?3:s.total>=70?2:s.total>=55?1:0;
+  const V=['Mustaqil sinfga tavsiya etilmaydi','Rivojlanish zonasi — faqat murabbiy va reja bilan','Kuchli nomzod','Yuqori potensial — olib, murabbiy qilib oʻstirish kerak'];
+  const LB={st:'Stressbardoshlik',cr:'Kreativlik',pd:'Pedagogik mahorat',cm:'Kommunikatsiya',
+            gr:'Oʻrganuvchanlik',mt:'Motivatsiya va qadriyatlar',dg:'Raqamli savodxonlik va AI'};
+  const c=hrColor(s.total);
+  const mx=20+(s.pct.cr||0)*1.6, my=180-(s.pct.st||0)*1.6;
+  const oq={O1:'Mavzuni darslik va doskasiz tushuntirish usullari',
+            O2:'Plastik shishaning oʻquv qoʻllanmalari',
+            O3:'Zerikarli mavzu → oʻyin (10 daqiqa, 0 soʻm)',
+            M4:'Aniq oʻquvchiga real taʼsir koʻrsatgan holat'};
+  const lie=r.samimiylik||0;
+  const lieTxt=lie<=1?['Javoblar samimiy koʻrinadi.','#34d399']
+    :lie<=3?['Bezash tendensiyasi bor. Bahsli joylarni suhbatda tekshiring.','#fbbf24']
+    :['Natija oshirib yuborilgan: nomzod «kerakligicha» javob beryapti. Ballni yuqori chegara sifatida oʻqing — sinov darsi shart.','#fb7185'];
+
+  document.getElementById('hr-r-name').textContent=r.fio;
+  document.getElementById('hr-r-body').innerHTML=`
+   <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mu);font-weight:700">Nomzod boʻyicha hisobot</div>
+   <div style="font-family:var(--fd);font-size:26px;font-weight:800;margin:6px 0 3px">${hrEsc(r.fio)}</div>
+   <div style="font-size:13px;color:var(--mu2)">${hrEsc(r.fan||'—')} · ${hrEsc(r.staj||'')} · ${hrEsc(r.til||'')} · ${new Date(r.created_at).toLocaleDateString('ru-RU')}</div>
+
+   <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:22px 0 6px">
+     <div style="font-family:var(--fd);font-size:56px;font-weight:800;line-height:1;color:${c}">${s.total}%</div>
+     <div style="padding:6px 13px;border-radius:10px;font-size:13px;font-weight:700;background:${c}22;color:${c}">${V[lvl]}</div>
+   </div>
+
+   <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;margin-top:24px">
+     <svg width="200" height="200" viewBox="0 0 200 200" style="flex:none">
+       <rect x="20" y="20" width="160" height="160" fill="rgba(255,255,255,.03)" stroke="var(--brd)"/>
+       <line x1="100" y1="20" x2="100" y2="180" stroke="var(--brd)"/>
+       <line x1="20" y1="100" x2="180" y2="100" stroke="var(--brd)"/>
+       <text x="100" y="13" font-size="7.5" text-anchor="middle" fill="#646b80" font-family="DM Mono">STRESSBARDOSHLIK +</text>
+       <text x="186" y="103" font-size="7.5" text-anchor="end" fill="#646b80" font-family="DM Mono">KREATIVLIK +</text>
+       <circle cx="${mx}" cy="${my}" r="7" fill="#7A3CC4"/>
+       <circle cx="${mx}" cy="${my}" r="14" fill="none" stroke="#7A3CC4" stroke-opacity=".4"/>
+     </svg>
+     <div style="flex:1;min-width:230px">
+       <div style="font-family:var(--fd);font-size:19px;font-weight:700;margin-bottom:8px">${q[0]}</div>
+       <div style="font-size:14px;color:var(--mu2);line-height:1.6">${q[1]}</div>
+     </div>
+   </div>
+
+   <div style="height:1px;background:var(--brd);margin:26px 0"></div>
+   <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+     <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mu);font-weight:700">🤖 AI tahlil</div>
+     <button class="btn-sm blue" style="padding:9px 16px" onclick="hrAI()">${r.ai_tahlil?'🔄 Qayta tahlil qilish':'🤖 Tahlil qilish'}</button>
+   </div>
+   <div id="hr-ai" class="tbl-wrap" style="padding:18px">${r.ai_tahlil?hrAiRender(r.ai_tahlil)
+     :'<div style="color:var(--mu);font-size:14px">Tahlil hali qilinmagan. Tugmani bosing — AI ballar va ochiq javoblarni oʻqib, xulosa va 3 oylik reja yozadi.</div>'}</div>
+
+   <div style="height:1px;background:var(--brd);margin:26px 0"></div>
+   <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mu);font-weight:700;margin-bottom:14px">Kompetensiyalar profili</div>
+   ${Object.keys(HR_W).map(k=>`<div style="margin-bottom:14px">
+     <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:500;margin-bottom:5px">
+       <span>${LB[k]}</span><span style="font-family:var(--fm);font-weight:700">${s.pct[k]||0}%</span></div>
+     <div class="hr-bar"><i style="width:${s.pct[k]||0}%;background:${k==='st'?'#0E6E5C':k==='cr'?'#7A3CC4':'var(--ac)'}"></i></div>
+   </div>`).join('')}
+
+   <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
+     <div class="hr-stat"><b style="font-size:20px">${r.tezlik||0}%</b><span>Bosim ostida qaror tezligi</span></div>
+     <div class="hr-stat"><b style="font-size:20px;color:${lieTxt[1]}">${lie}/5</b><span>Samimiylik shkalasi</span></div>
+   </div>
+   <div style="border-left:3px solid ${lieTxt[1]};padding-left:14px;margin:16px 0;font-size:14px;color:var(--mu2)">${lieTxt[0]}</div>
+
+   <div style="height:1px;background:var(--brd);margin:26px 0"></div>
+   <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mu);font-weight:700">Ochiq javoblar — HR bahosi</div>
+   <div style="font-size:12px;color:var(--mu);margin:6px 0 14px">0 — shablon yoki boʻsh · 1 — oddiy · 2 — ishchi gʻoya · 3 — oʻziga xos, qoʻllansa boʻladigan, kuchli gʻoya</div>
+   ${Object.keys(oq).map(id=>{
+     const flu=(id==='O1'||id==='O2');
+     return `<div class="tbl-wrap" style="padding:16px;margin-bottom:12px">
+       <div style="font-size:13px;font-weight:700">${oq[id]}</div>
+       ${flu?`<div style="font-family:var(--fm);font-size:12px;color:#34d399;margin-top:4px">${(r.javoblar||{})[id]||0}/4 · gʻoya soni</div>`:''}
+       <div class="hr-ans">${hrEsc((r.ochiq||{})[id]||'—')}</div>
+       <div class="hr-rate" style="display:flex;gap:6px;margin-top:10px">
+         ${[0,1,2,3].map(n=>`<button class="${hrRt[id]===n?'on':''}" onclick="hrSetRate('${id}',${n})">${n}</button>`).join('')}
+       </div></div>`;}).join('')}
+
+   <div style="height:1px;background:var(--brd);margin:26px 0"></div>
+   <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mu);font-weight:700;margin-bottom:10px">Suhbatda nimani tekshirish kerak</div>
+   <div style="border-left:2px solid var(--ac);padding-left:15px">
+     ${hrAsks(s.pct).map(a=>`<div style="font-size:14px;margin-bottom:8px;color:var(--mu2)">— ${a}</div>`).join('')}
+   </div>
+
+   <div style="height:1px;background:var(--brd);margin:26px 0"></div>
+   <div class="field" style="margin-bottom:12px"><label>HR izohi</label>
+     <textarea id="hr-izoh" style="min-height:80px">${hrEsc(r.izoh||'')}</textarea></div>
+   <div style="display:flex;gap:8px;flex-wrap:wrap">
+     <button class="btn-sm" style="padding:11px 18px;background:var(--glass);border-color:var(--glass-brd);color:var(--mu2)" onclick="hrSave('korildi')">👁 Koʻrildi</button>
+     <button class="btn-sm green" style="padding:11px 18px" onclick="hrSave('tavsiya')">✅ Tavsiya etaman</button>
+     <button class="btn-sm red" style="padding:11px 18px" onclick="hrSave('rad')">✖ Rad etaman</button>
+   </div>`;
+}
+function hrSetRate(id,n){hrRt[id]=n;hrPaintReport();}
+
+function hrAiRender(txt){
+  const tav=/YAKUNIY TAVSIYA|Yakuniy tavsiya/;
+  return String(txt).split('\n').map(l=>{
+    l=l.trim();
+    if(!l)return '';
+    if(l.startsWith('## '))
+      return `<div style="font-family:var(--fd);font-size:15px;font-weight:700;margin:16px 0 7px;color:var(--ac2)">${hrEsc(l.slice(3))}</div>`;
+    if(l.startsWith('- '))
+      return `<div style="font-size:14px;color:var(--mu2);margin-bottom:7px;padding-left:14px;position:relative">
+        <span style="position:absolute;left:0;color:var(--ac)">•</span>${hrEsc(l.slice(2))}</div>`;
+    const hl=/OLMASLIK|SINOV MUDDATI BILAN OLISH|OLISH/.test(l);
+    return `<div style="font-size:14px;line-height:1.65;margin-bottom:8px;color:${hl?'var(--tx)':'var(--mu2)'};font-weight:${hl?'600':'400'}">${hrEsc(l)}</div>`;
+  }).join('');
+}
+async function hrAI(){
+  if(!hrCur)return;
+  const box=document.getElementById('hr-ai');
+  box.innerHTML='<div class="loading-center"><div class="spin"></div></div>'+
+    '<div style="text-align:center;color:var(--mu);font-size:13px;margin-top:8px">DeepSeek tahlil qilmoqda… 10–20 soniya</div>';
+  const r=hrCur,s=hrCalcFrom(r,hrRt);
+  try{
+    const{data,error}=await sb.functions.invoke('hr-tahlil',{body:{
+      fio:r.fio,fan:r.fan,staj:r.staj,til:r.til,
+      umumiy:s.total,ballar:s.pct,kvadrant:r.kvadrant,
+      samimiylik:r.samimiylik,tezlik:r.tezlik,ochiq:r.ochiq||{}}});
+    if(error)throw error;
+    if(!data||!data.ok)throw new Error(data&&data.xato||'AI xato');
+    hrCur.ai_tahlil=data.tahlil;
+    box.innerHTML=hrAiRender(data.tahlil);
+    await sb.rpc('hr_yangilash',{p_kod:hrKod(),p_id:r.id,p_ai:data.tahlil});
+    toast('🤖 Tahlil tayyor');
+  }catch(e){
+    box.innerHTML='<div style="color:var(--rd);font-size:14px">Tahlil qilinmadi: '+hrEsc(String(e.message||e))+
+      '<br><span style="color:var(--mu);font-size:13px">hr-tahlil Edge Function deploy qilinganini va DEEPSEEK_API_KEY sozlanganini tekshiring.</span></div>';
+  }
+}
+async function hrSave(holat){
+  if(!hrCur)return;
+  const s=hrCalcFrom(hrCur,hrRt), izoh=document.getElementById('hr-izoh').value;
+  try{
+    const{error}=await sb.rpc('hr_yangilash',{p_kod:hrKod(),p_id:hrCur.id,p_hr:hrRt,
+      p_umumiy:s.total,p_holat:holat,p_izoh:izoh});
+    if(error)throw error;
+    Object.assign(hrCur,{hr_baho:hrRt,umumiy:s.total,holat:holat,izoh:izoh,ballar:s.pct});
+    toast('✅ Saqlandi');hrCloseReport();hrPaint();
+  }catch(e){toast('❌ Saqlanmadi');}
+}
+async function hrDelete(){
+  if(!hrCur||!confirm('Nomzod natijasini oʻchirasizmi?'))return;
+  try{
+    const{error}=await sb.rpc('hr_ochirish',{p_kod:hrKod(),p_id:hrCur.id});
+    if(error)throw error;
+    hrData=hrData.filter(r=>r.id!==hrCur.id);toast('🗑 Oʻchirildi');hrCloseReport();hrPaint();
+  }catch(e){toast('❌ Oʻchmadi');}
+}
+
+/* ═══════ 4. KIOSK — nomzod testi ═══════ */
+function hrSetLang(l){
+  hrL=(l==='uz')?1:0;
+  const ru=document.getElementById('hr-lru'),uz=document.getElementById('hr-luz');
+  ru.style.background=hrL?'transparent':'#131A16'; ru.style.color=hrL?'#131A16':'#FBFAF6';
+  uz.style.background=hrL?'#131A16':'transparent'; uz.style.color=hrL?'#FBFAF6':'#131A16';
+  hrRender();
+}
+let hrKioskPin='';
+async function hrKioskStart(){
+  hrAns={};hrOpenA={};hrRt={O1:0,O2:0,O3:0,M4:0};hrTo=0;hrI=0;hrCand={};hrStarted=false;hrKioskPin='';
+  HRQ.forEach(q=>{if(q.o)q.sh=[...q.o].sort(()=>Math.random()-.5);});
+  try{
+    const{data,error}=await sb.rpc('hr_taklif_yarat',{p_kod:hrKod(),p_fio:null,p_fan:null});
+    if(error)throw error;
+    hrKioskPin=data.pin;
+  }catch(e){toast('❌ Sessiya ochilmadi'); return;}
+  document.getElementById('hr-kiosk').style.display='block';
+  document.body.style.overflow='hidden';
+  hrSetLang('ru');
+}
+function hrKioskExit(){
+  if(hrStarted){
+    const k=prompt('Testni toʻxtatish uchun HR kodini kiriting:');
+    if(k!==hrKod()){alert('Kod notoʻgʻri');return;}
+  }
+  clearInterval(hrTid);
+  document.getElementById('hr-kiosk').style.display='none';
+  document.body.style.overflow='';
+}
+function hrRender(){
+  const app=document.getElementById('hr-k-app');
+  if(!hrStarted){hrIntro();return;}
+  if(hrI>=HRQ.length){hrFinish();return;}
+  clearInterval(hrTid);
+  const q=HRQ[hrI],pc=Math.round(hrI/HRQ.length*100);
+  let body='';
+  if(q.open){
+    body=`<textarea id="hr-ta" placeholder="1.&#10;2.&#10;3."></textarea>
+      <div class="khint">${hrTx('openhint')}</div>
+      <div style="margin-top:16px"><button class="kbtn" onclick="hrSaveOpen()">${hrTx('next')} →</button></div>`;
+  }else if(q.b==='sc'){
+    body=`<div class="kopt" onclick="hrPick(1)"><b>A</b><span>${hrTx('yes')}</span></div>
+          <div class="kopt" onclick="hrPick(0)"><b>B</b><span>${hrTx('no')}</span></div>`;
+  }else{
+    body=q.sh.map((o,n)=>`<div class="kopt" onclick="hrPick(${o[2]})"><b>${'ABCD'[n]}</b><span>${o[hrL]}</span></div>`).join('');
+  }
+  app.innerHTML=`<div class="kprog"><i style="width:${pc}%"></i></div>
+    <div class="kmeta"><span>${hrTx('q')} ${hrI+1} ${hrTx('of')} ${HRQ.length}</span><span>${hrEsc(hrCand.fio||'')}</span></div>
+    ${q.t?`<div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+      <div class="ktbar" id="hr-tb"><i id="hr-tf"></i></div><div class="ktnum" id="hr-tn">${q.t}s</div></div>`:''}
+    <div class="kqb" style="color:${q.b==='cr'?'#7A3CC4':'#0E6E5C'}">${HRT.blocks[q.b][hrL]}</div>
+    <div class="kqt">${q.q[hrL]}</div>${body}`;
+  if(q.t)hrTimer(q.t);
+  if(q.open)document.getElementById('hr-ta').focus();
+}
+function hrIntro(){
+  document.getElementById('hr-k-app').innerHTML=`
+   <div class="keye">EduNova School · HR</div>
+   <h1>${hrTx('title')}</h1>
+   <p class="klead">${hrTx('sub')}</p>
+   <ul class="krules"><li>${hrTx('r1')}</li><li>${hrTx('r2')}</li><li>${hrTx('r3')}</li><li>${hrTx('r4')}</li></ul>
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+     <div style="grid-column:1/-1"><label>${hrTx('fio')}</label><input id="hr-f1"></div>
+     <div><label>${hrTx('subj')}</label><input id="hr-f2"></div>
+     <div><label>${hrTx('exp')}</label><select id="hr-f3">${HRT.exps[hrL].map(x=>`<option>${x}</option>`).join('')}</select></div>
+     <div><label>${hrTx('track')}</label><select id="hr-f4">${HRT.tracks[hrL].map(x=>`<option>${x}</option>`).join('')}</select></div>
+   </div>
+   <div style="margin-top:18px"><button class="kbtn" onclick="hrBegin()">${hrTx('start')} →</button></div>`;
+}
+function hrBegin(){
+  const f=document.getElementById('hr-f1');
+  if(!f.value.trim()){f.focus();return;}
+  hrCand={fio:f.value.trim(),subj:document.getElementById('hr-f2').value.trim(),
+    exp:document.getElementById('hr-f3').value,track:document.getElementById('hr-f4').value};
+  hrStarted=true;hrI=0;hrRender();
+}
+function hrTimer(sec){
+  let left=sec;const f=document.getElementById('hr-tf'),n=document.getElementById('hr-tn'),b=document.getElementById('hr-tb');
+  hrTid=setInterval(()=>{left--;f.style.width=(left/sec*100)+'%';n.textContent=left+'s';
+    if(left<=10){b.classList.add('khot');n.classList.add('khot');}
+    if(left<=0){clearInterval(hrTid);hrTo++;hrAns[HRQ[hrI].id]=0;hrI++;hrRender();}},1000);
+}
+function hrPick(p){clearInterval(hrTid);hrAns[HRQ[hrI].id]=p;hrI++;hrRender();}
+function hrSaveOpen(){
+  const v=document.getElementById('hr-ta').value.trim();
+  hrOpenA[HRQ[hrI].id]=v;
+  if(HRQ[hrI].open==='flu'){
+    const n=v.split(/\n|;/).map(s=>s.trim()).filter(s=>s.length>2).length;
+    hrAns[HRQ[hrI].id]=n>=6?4:n>=4?3:n>=2?2:n>=1?1:0;
+  }
+  hrI++;hrRender();
+}
+async function hrFinish(){
+  clearInterval(hrTid);hrStarted=false;
+  const s=hrCalc();
+  document.getElementById('hr-k-app').innerHTML=`
+    <div class="keye">EduNova School · HR</div>
+    <h1>${hrTx('done')}</h1>
+    <p class="klead">${hrTx('donetxt')}</p>
+    <div id="hr-sv" style="font-family:var(--fm);font-size:12px;color:#6B7169">${hrTx('svWait')}</div>`;
+  const row={fio:hrCand.fio,fan:hrCand.subj,staj:hrCand.exp,til:hrCand.track,
+    umumiy:s.total,ballar:s.pct,kvadrant:hrQuad(s.pct.cr,s.pct.st)[0],
+    samimiylik:s.lie,tezlik:s.speed,javoblar:hrAns,ochiq:hrOpenA,hr_baho:hrRt};
+  const e=document.getElementById('hr-sv');
+  try{
+    const{data,error}=await sb.rpc('hr_natija_saqlash',{p_pin:hrKioskPin,p_data:row});
+    if(error)throw error;
+    if(!data||!data.ok)throw new Error('saqlanmadi');
+    e.style.color='#0E6E5C';e.textContent='✓ '+hrTx('svOk');
+    hrLoad();
+  }catch(err){
+    e.style.color='#C2571F';
+    e.innerHTML=hrTx('svErr')+` <button class="kbtn g" style="padding:6px 14px;margin-left:8px" onclick="hrDump()">JSON</button>`;
+    window._hrLast=row;
+  }
+  e.insertAdjacentHTML('afterend',
+    `<div style="margin-top:22px"><button class="kbtn g" onclick="hrKioskExit()">← Panelga qaytish</button></div>`);
+}
+function hrDump(){
+  const b=new Blob([JSON.stringify(window._hrLast,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download='hr_'+(hrCand.fio||'nomzod').replace(/\s+/g,'_')+'.json';a.click();
 }
 
 </script>
