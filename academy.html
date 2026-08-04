@@ -2190,7 +2190,10 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
     justify-content:space-between;position:sticky;top:0;z-index:10">
     <button onclick="hrCloseReport()" style="background:none;border:none;color:var(--mu);font-size:22px;cursor:pointer;padding:4px">←</button>
     <div style="font-family:var(--fd);font-size:16px;font-weight:700" id="hr-r-name">—</div>
-    <button class="btn-sm red" onclick="hrDelete()">🗑</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn-sm blue" id="hr-png-btn" onclick="hrPNG()">🖼 PNG</button>
+      <button class="btn-sm red" onclick="hrDelete()">🗑</button>
+    </div>
   </div>
   <div style="max-width:820px;margin:0 auto;padding:22px 18px 70px" id="hr-r-body"></div>
 </div>
@@ -7318,6 +7321,98 @@ function hrDump(){
   const b=new Blob([JSON.stringify(window._hrLast,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(b);
   a.download='hr_'+(hrCand.fio||'nomzod').replace(/\s+/g,'_')+'.json';a.click();
+}
+
+/* ═══════ 5. PNG EKSPORT ═══════ */
+function hrAiRenderLight(txt){
+  return String(txt).split('\n').map(l=>{
+    l=l.trim(); if(!l)return '';
+    if(l.startsWith('## '))
+      return '<div style="font-family:var(--fd);font-size:14px;font-weight:700;margin:14px 0 6px;color:#C2410C">'+hrEsc(l.slice(3))+'</div>';
+    if(l.startsWith('- '))
+      return '<div style="font-size:13px;color:#3A3A38;margin-bottom:5px;padding-left:12px">• '+hrEsc(l.slice(2))+'</div>';
+    const hl=/OLMASLIK|SINOV MUDDATI BILAN OLISH|OLISH/.test(l);
+    return '<div style="font-size:13px;line-height:1.6;margin-bottom:6px;color:'+(hl?'#131A16':'#3A3A38')+';font-weight:'+(hl?'700':'400')+'">'+hrEsc(l)+'</div>';
+  }).join('');
+}
+async function hrPNG(){
+  if(!hrCur){return;}
+  const btn=document.getElementById('hr-png-btn');
+  const oldTxt=btn?btn.textContent:'';
+  if(btn){btn.textContent='⏳ …';btn.disabled=true;}
+
+  const r=hrCur,s=hrCalcFrom(r,hrRt),q=hrQuad(s.pct.cr,s.pct.st);
+  const lvl=s.total>=85?3:s.total>=70?2:s.total>=55?1:0;
+  const V=['Mustaqil sinfga tavsiya etilmaydi','Rivojlanish zonasi — murabbiy va reja bilan','Kuchli nomzod','Yuqori potensial — murabbiy qilib oʻstirish kerak'];
+  const LB={st:'Stressbardoshlik',cr:'Kreativlik',pd:'Pedagogik mahorat',cm:'Kommunikatsiya',
+            gr:'Oʻrganuvchanlik',mt:'Motivatsiya va qadriyatlar',dg:'Raqamli savodxonlik va AI'};
+  const col=v=>v>=85?'#0E6E5C':v>=70?'#C2410C':v>=55?'#B7791F':'#B3261E';
+  const c=col(s.total), lie=r.samimiylik||0;
+  const lieTxt=lie<=1?['Javoblar samimiy koʻrinadi.','#0E6E5C']
+    :lie<=3?['Bezash tendensiyasi bor — bahsli joylarni suhbatda tekshiring.','#B7791F']
+    :['Natija oshirib yuborilgan: nomzod «kerakligicha» javob beryapti. Sinov darsi shart.','#B3261E'];
+  const mx=(s.pct.cr||0)*1.8, my=180-(s.pct.st||0)*1.8;
+  const bar=(k)=>'<div style="margin-bottom:10px">'
+    +'<div style="display:flex;justify-content:space-between;font-size:12.5px;color:#131A16;margin-bottom:4px">'
+    +'<span>'+LB[k]+'</span><span style="font-family:var(--fm);font-weight:700">'+(s.pct[k]||0)+'%</span></div>'
+    +'<div style="height:8px;background:#E4E1D9;border-radius:4px">'
+    +'<div style="height:8px;width:'+(s.pct[k]||0)+'%;background:'+(k==='st'?'#0E6E5C':k==='cr'?'#7A3CC4':'#C2410C')+';border-radius:4px"></div></div></div>';
+
+  const box=document.createElement('div');
+  box.style.cssText='position:fixed;left:-9999px;top:0;width:820px;background:#FBFAF6;'
+    +'padding:36px 40px;font-family:var(--ff);color:#131A16;box-sizing:border-box';
+  box.innerHTML=
+    '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #131A16;padding-bottom:12px">'
+      +'<div style="font-family:var(--fd);font-weight:800;font-size:15px;letter-spacing:-.02em">EDUNOVA SCHOOL <span style="color:#0E6E5C">/ HR</span></div>'
+      +'<div style="font-family:var(--fm);font-size:12px;color:#6B7169">'+new Date(r.created_at).toLocaleDateString('ru-RU')+'</div></div>'
+    +'<div style="font-family:var(--fd);font-size:27px;font-weight:800;margin:18px 0 4px">'+hrEsc(r.fio)+'</div>'
+    +'<div style="font-size:13px;color:#6B7169">'+hrEsc(r.fan||'—')+' · '+hrEsc(r.staj||'')+' · '+hrEsc(r.til||'')+'</div>'
+    +'<div style="display:flex;align-items:baseline;gap:14px;margin:20px 0 8px;flex-wrap:wrap">'
+      +'<div style="font-family:var(--fd);font-size:52px;font-weight:800;line-height:1;color:'+c+'">'+s.total+'%</div>'
+      +'<div style="padding:6px 13px;border-radius:8px;font-size:13px;font-weight:700;background:'+c+'1F;color:'+c+'">'+V[lvl]+'</div></div>'
+    +'<div style="display:flex;gap:26px;margin-top:22px;align-items:flex-start">'
+      +'<div style="position:relative;width:180px;height:180px;border:1px solid #D5D2C8;background:#fff;flex:none">'
+        +'<div style="position:absolute;left:90px;top:0;bottom:0;width:1px;background:#E8E5DD"></div>'
+        +'<div style="position:absolute;top:90px;left:0;right:0;height:1px;background:#E8E5DD"></div>'
+        +'<div style="position:absolute;left:'+(mx-7)+'px;top:'+(my-7)+'px;width:14px;height:14px;border-radius:7px;background:#7A3CC4"></div></div>'
+      +'<div style="flex:1">'
+        +'<div style="font-family:var(--fd);font-size:17px;font-weight:700;margin-bottom:6px">'+q[0]+'</div>'
+        +'<div style="font-size:13px;color:#3A3A38;line-height:1.6">'+q[1]+'</div>'
+        +'<div style="font-family:var(--fm);font-size:11px;color:#6B7169;margin-top:10px">'
+          +'↑ stressbardoshlik '+(s.pct.st||0)+'%  ·  → kreativlik '+(s.pct.cr||0)+'%</div></div></div>'
+    +'<div style="margin-top:26px">'+Object.keys(HR_W).map(bar).join('')+'</div>'
+    +'<div style="display:flex;gap:12px;margin-top:14px">'
+      +'<div style="flex:1;border:1px solid #E4E1D9;border-radius:10px;padding:12px 14px">'
+        +'<div style="font-family:var(--fd);font-size:19px;font-weight:800">'+(r.tezlik||0)+'%</div>'
+        +'<div style="font-size:11px;color:#6B7169;text-transform:uppercase;letter-spacing:.5px">Bosim ostida qaror tezligi</div></div>'
+      +'<div style="flex:1;border:1px solid #E4E1D9;border-radius:10px;padding:12px 14px">'
+        +'<div style="font-family:var(--fd);font-size:19px;font-weight:800;color:'+lieTxt[1]+'">'+lie+'/5</div>'
+        +'<div style="font-size:11px;color:#6B7169;text-transform:uppercase;letter-spacing:.5px">Samimiylik shkalasi</div></div></div>'
+    +'<div style="border-left:3px solid '+lieTxt[1]+';padding-left:12px;margin-top:12px;font-size:13px;color:#3A3A38">'+lieTxt[0]+'</div>'
+    +(r.ai_tahlil?'<div style="margin-top:26px;border-top:1px solid #E4E1D9;padding-top:18px">'
+      +'<div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#6B7169;font-weight:700;margin-bottom:8px">AI tahlil</div>'
+      +hrAiRenderLight(r.ai_tahlil)+'</div>':'')
+    +(r.izoh?'<div style="margin-top:22px;border-top:1px solid #E4E1D9;padding-top:16px">'
+      +'<div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#6B7169;font-weight:700;margin-bottom:6px">HR izohi</div>'
+      +'<div style="font-size:13px;color:#3A3A38;line-height:1.6;white-space:pre-wrap">'+hrEsc(r.izoh)+'</div></div>':'')
+    +'<div style="margin-top:26px;border-top:1px solid #E4E1D9;padding-top:12px;display:flex;justify-content:space-between;'
+      +'font-family:var(--fm);font-size:11px;color:#6B7169">'
+      +'<span>EduNova School · HR · oʻqituvchi potensiali testi</span><span>'+(HR_HOL[r.holat]||HR_HOL.yangi)[0].replace(/[^A-Za-zʻ ]/g,'').trim()+'</span></div>';
+
+  document.body.appendChild(box);
+  try{
+    const canvas=await html2canvas(box,{scale:2,backgroundColor:'#FBFAF6',logging:false});
+    const a=document.createElement('a');
+    a.download='HR_'+String(r.fio||'nomzod').replace(/[^\wА-Яа-яЎўҚқҒғҲҳ]+/g,'_')+'_'+s.total+'.png';
+    a.href=canvas.toDataURL('image/png');
+    a.click();
+    toast('🖼 PNG yuklab olindi');
+  }catch(e){
+    toast('❌ PNG xatolik');
+  }finally{
+    box.remove();
+    if(btn){btn.textContent=oldTxt;btn.disabled=false;}
+  }
 }
 
 </script>
