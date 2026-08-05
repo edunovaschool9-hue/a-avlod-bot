@@ -7842,7 +7842,7 @@ function okOtaSend(id){
 
 </script>
 
-<!-- ===== KABINETLAR (pin-sessiya: o'qituvchi / o'quvchi / ota-ona) ===== -->
+<!-- ===== EDUNOVA: kabinetlar + pin kirish ===== -->
 <script>
 (function(){
 if(window.EKAB)return;window.EKAB=1;
@@ -8136,17 +8136,134 @@ window.EKABI={
    if(d.ok){g("ek-hmatn").value="";g("ek-hmavzu").value="";S.his=null;oqitHis()}})}
 };
 
+/* ============ PIN KIRISH (eski login ekraniga QO'SHIMCHA) ============ */
+/* Eski forma va doUnifiedLogin() ga TEGILMAYDI. Faqat tugma qo'shiladi. */
+var PCSS = `
+#ek-pinov{position:fixed;inset:0;z-index:99995;display:none;align-items:center;justify-content:center;
+ background:rgba(10,10,12,.94);backdrop-filter:blur(6px);padding:16px;
+ font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+#ek-pinov.on{display:flex}
+#ek-pc{width:min(330px,100%);background:#17171b;border:1px solid rgba(255,255,255,.1);
+ border-radius:22px;padding:26px 22px;text-align:center;position:relative;color:#fff}
+#ek-px{position:absolute;top:10px;right:12px;background:none;border:none;color:#fff;
+ font-size:24px;cursor:pointer;opacity:.4;line-height:1}
+#ek-px:hover{opacity:1}
+#ek-pt{font-size:15px;font-weight:800;letter-spacing:.5px;margin:2px 0 3px}
+#ek-ps{font-size:12px;opacity:.55;margin-bottom:16px}
+#ek-pd{display:flex;justify-content:center;gap:9px;margin-bottom:6px;min-height:14px}
+#ek-pd i{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.18);transition:.12s}
+#ek-pd i.on{background:#FF6B1A;transform:scale(1.12)}
+#ek-pe{min-height:19px;font-size:12px;font-weight:700;color:#FF8A5B;margin-bottom:6px}
+#ek-pp{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+#ek-pp button{font-size:21px;font-weight:700;color:#fff;background:rgba(255,255,255,.06);
+ border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:13px 0;cursor:pointer;transition:.08s}
+#ek-pp button:active{transform:scale(.94);background:#FF6B1A}
+#ek-pp .m{background:transparent;border:none;font-size:16px;opacity:.55}
+#ek-pp .ok{background:#FF6B1A;border-color:#FF6B1A}
+#ek-pp .ok:disabled{opacity:.3;cursor:not-allowed}
+#ek-pc.shake{animation:ekSh .34s}
+@keyframes ekSh{20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+#ek-pl{display:none;font-size:12.5px;font-weight:700;padding:9px 0}
+#ek-pinbtn{width:100%;margin-top:10px;padding:13px;border-radius:12px;cursor:pointer;
+ background:transparent;color:inherit;border:1.5px solid rgba(255,255,255,.22);
+ font-family:inherit;font-size:15px;font-weight:700;transition:.15s}
+#ek-pinbtn:hover{border-color:#FF6B1A;color:#FF6B1A}
+`;
+var PMAX=7,PMIN=5,ppin="",pband=false,ptimer=null,pdots=null;
+
+function pinOch(){
+  if(!document.getElementById("ek-pinov")){
+    var st=document.createElement("style");st.textContent=PCSS;document.head.appendChild(st);
+    var keys=[1,2,3,4,5,6,7,8,9].map(function(n){return '<button data-n="'+n+'">'+n+'</button>'}).join("");
+    var html='<div id="ek-pinov"><div id="ek-pc"><button id="ek-px">&times;</button>'+
+      '<div id="ek-pt">EDUNOVA</div><div id="ek-ps">Shaxsiy pin-kodingiz</div>'+
+      '<div id="ek-pd"></div><div id="ek-pe"></div><div id="ek-pp">'+keys+
+      '<button class="m" data-n="b">&#9003;</button><button data-n="0">0</button>'+
+      '<button class="ok" data-n="ok" disabled>&#10003;</button></div>'+
+      '<div id="ek-pl">Tekshirilmoqda...</div></div></div>';
+    document.body.insertAdjacentHTML("beforeend",html);
+    var box=document.getElementById("ek-pd");
+    for(var i=0;i<PMAX;i++)box.appendChild(document.createElement("i"));
+    pdots=box.children;
+    document.getElementById("ek-px").addEventListener("click",pinYop);
+    document.getElementById("ek-pinov").addEventListener("click",function(e){
+      if(e.target.id==="ek-pinov")pinYop()});
+    document.getElementById("ek-pp").addEventListener("click",function(e){
+      var b=e.target.closest("button");if(!b||pband)return;
+      var n=b.getAttribute("data-n");clearTimeout(ptimer);
+      if(n==="b"){ppin=ppin.slice(0,-1);pinChiz();return}
+      if(n==="ok"){if(ppin.length>=PMIN)pinYubor();return}
+      if(ppin.length>=PMAX)return;
+      ppin+=n;pinChiz();document.getElementById("ek-pe").textContent="";
+      if(ppin.length===PMAX){pinYubor();return}
+      if(ppin.length>=PMIN)ptimer=setTimeout(pinYubor,1400);
+    });
+  }
+  ppin="";pinChiz();
+  document.getElementById("ek-pe").textContent="";
+  document.getElementById("ek-pl").style.display="none";
+  document.getElementById("ek-pinov").classList.add("on");
+}
+function pinYop(){clearTimeout(ptimer);var o=document.getElementById("ek-pinov");if(o)o.classList.remove("on")}
+function pinChiz(){
+  if(!pdots)return;
+  for(var i=0;i<PMAX;i++)pdots[i].className=i<ppin.length?"on":"";
+  var ok=document.querySelector('#ek-pp .ok');if(ok)ok.disabled=ppin.length<PMIN;
+}
+function pinQurilma(){var k="tx_qurilma",v=null;
+  try{v=localStorage.getItem(k)}catch(e){}
+  if(!v){v="q"+Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+    try{localStorage.setItem(k,v)}catch(e){}}
+  return v}
+function pinYubor(){
+  clearTimeout(ptimer);pband=true;
+  var e=document.getElementById("ek-pe"),l=document.getElementById("ek-pl"),c=document.getElementById("ek-pc");
+  l.style.display="block";e.textContent="";
+  fetch(ESHIK,{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({action:"kirish",pin:ppin,qurilma:pinQurilma()})})
+  .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})})
+  .then(function(x){
+    pband=false;l.style.display="none";
+    if(x.d&&x.d.token){
+      try{localStorage.setItem("edunova_token",x.d.token);
+        localStorage.setItem("edunova_rol",x.d.rol);
+        localStorage.setItem("edunova_ism",x.d.ism)}catch(err){}
+      if(["oqituvchi","oquvchi","ota_ona"].indexOf(x.d.rol)>-1){location.reload();return}
+      e.textContent="Xodimlar hozircha login/parol bilan kiradi";
+      ppin="";pinChiz();return;
+    }
+    c.classList.remove("shake");void c.offsetWidth;c.classList.add("shake");
+    if(x.s===429)e.textContent="Ko'p urinish. 15 daqiqadan keyin urining.";
+    else if(x.s===423)e.textContent="Akkaunt muzlatilgan.";
+    else e.textContent="Pin noto'g'ri";
+    ppin="";pinChiz();
+  }).catch(function(){pband=false;l.style.display="none";
+    e.textContent="Internet yo'q. Qayta urining.";ppin="";pinChiz()});
+}
+/* Eski login kartasiga tugma qo'shamiz (formaga tegilmaydi) */
+function pinTugma(){
+  var card=document.querySelector("#p-ulogin .lg-card");
+  if(!card||document.getElementById("ek-pinbtn"))return;
+  var b=document.createElement("button");
+  b.id="ek-pinbtn";b.type="button";
+  b.innerHTML="&#129370; Pin bilan kirish";
+  b.addEventListener("click",pinOch);
+  var foot=card.querySelector(".lg-foot");
+  if(foot)card.insertBefore(b,foot);else card.appendChild(b);
+}
+
 /* ============ ISHGA TUSHISH ============ */
 function boot(){
- var tk=tok();if(!tk)return;              /* pin-sessiya yo'q - sahifa odatdagidek */
+ var tk=tok();
+ if(!tk){ pinTugma(); return; }           /* sessiya yo'q -> login ekraniga pin tugmasi */
  api({action:"tekshir"}).then(function(d){
   if(!d||!d.ok)return;
-  if(["oqituvchi","oquvchi","ota_ona"].indexOf(d.rol)===-1)return;  /* xodimlar - eski kirish */
+  if(["oqituvchi","oquvchi","ota_ona"].indexOf(d.rol)===-1){pinTugma();return}  /* xodimlar - eski kirish */
   S.men=d;
   var st=document.createElement("style");st.textContent=CSS;document.head.appendChild(st);
   var w=document.createElement("div");w.id="ekab";document.body.appendChild(w);
   draw();
- }).catch(function(){});
+ }).catch(function(){pinTugma()});
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){setTimeout(boot,300)});
 else setTimeout(boot,300);
