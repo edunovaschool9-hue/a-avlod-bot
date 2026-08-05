@@ -1,0 +1,425 @@
+<!-- ============================================================
+     QABUL — O'Z-O'ZINI O'RNATADIGAN BLOK
+     Bitta ish qilasan: shu faylning HAMMASINI nusxalab,
+     academy.html ichida </body> dan OLDIN qo'yasan. Tamom.
+     Menyu qatori va panel o'zi yaratiladi.
+     Boshqa kodga, ayniqsa LOGIN ga tegilmagan.
+     ============================================================ -->
+<script>
+(function(){
+if(window.QAB)return; /* ikki marta qo'yilsa ham buzilmaydi */
+
+/* ================= 1. O'ZINI O'RNATISH ================= */
+var CSS=`
+#ap-qabul{--qi:#0F2D2A;--qg:#E8AC0E;--qgd:#8F6A00;--qgr:#1F8F5F;--qrd:#C24B2E;
+ --qm:rgba(15,45,42,.62);--ql:rgba(15,45,42,.14);--qbg:#F3F6F2;color:var(--qi);font-family:inherit}
+#ap-qabul *{box-sizing:border-box}
+#ap-qabul .qb-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+#ap-qabul .qb-h2{font-size:24px;font-weight:800;margin:0}
+#ap-qabul .qb-sub{font-size:14px;color:var(--qm);margin:4px 0 0}
+#ap-qabul .qb-lang{display:flex;gap:2px;border:1px solid var(--ql);border-radius:99px;padding:3px;background:#fff}
+#ap-qabul .qb-lang button{font-size:11px;font-weight:700;border:none;background:none;color:var(--qm);padding:6px 13px;border-radius:99px;cursor:pointer}
+#ap-qabul .qb-lang button.on{background:var(--qi);color:#fff}
+#ap-qabul .qb-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+#ap-qabul .qb-tabs button{font-size:13px;font-weight:700;border:1px solid var(--ql);background:#fff;color:var(--qm);padding:9px 16px;border-radius:99px;cursor:pointer}
+#ap-qabul .qb-tabs button.on{background:var(--qi);color:#fff;border-color:var(--qi)}
+#ap-qabul .qb-card{background:#fff;border:1px solid var(--ql);border-radius:16px;padding:22px;margin-bottom:14px}
+#ap-qabul .qb-card h3{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--qm);margin:0 0 14px}
+#ap-qabul label{display:block;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--qm);margin:12px 0 6px}
+#ap-qabul input[type=text],#ap-qabul select{width:100%;font-family:inherit;font-size:15px;color:var(--qi);background:var(--qbg);border:1.5px solid var(--ql);border-radius:11px;padding:11px 14px}
+#ap-qabul input:focus,#ap-qabul select:focus{outline:none;border-color:var(--qi)}
+#ap-qabul .qb-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+#ap-qabul .qb-b{font-family:inherit;font-weight:700;font-size:15px;background:var(--qi);color:#fff;border:none;border-radius:99px;padding:12px 24px;cursor:pointer}
+#ap-qabul .qb-b.gold{background:var(--qg);color:var(--qi)}
+#ap-qabul .qb-b.gh{background:transparent;color:var(--qi);border:1.5px solid var(--ql)}
+#ap-qabul .qb-b:disabled{opacity:.4;cursor:not-allowed}
+#ap-qabul .qb-opt{display:block;width:100%;text-align:left;font-family:inherit;font-size:16px;font-weight:600;color:var(--qi);background:var(--qbg);border:2px solid transparent;border-radius:12px;padding:14px 16px;cursor:pointer;margin-bottom:9px}
+#ap-qabul .qb-opt.sel{border-color:var(--qi);background:#fff}
+#ap-qabul .qb-chip{font-family:inherit;font-size:14px;font-weight:600;color:var(--qi);background:var(--qbg);border:1.5px solid transparent;border-radius:99px;padding:9px 15px;cursor:pointer;margin:0 8px 8px 0}
+#ap-qabul .qb-chip.sel{border-color:var(--qi);background:#fff}
+#ap-qabul .qb-bar{height:7px;background:rgba(15,45,42,.1);border-radius:99px;overflow:hidden;margin:12px 0 18px}
+#ap-qabul .qb-bar i{display:block;height:100%;background:var(--qg);border-radius:99px;transition:width .3s}
+#ap-qabul .qb-sec{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+#ap-qabul .qb-sec span{font-size:11px;font-weight:700;color:var(--qm);border:1px solid var(--ql);border-radius:7px;padding:4px 9px}
+#ap-qabul .qb-sec span.done{background:var(--qgr);border-color:var(--qgr);color:#fff}
+#ap-qabul .qb-sec span.cur{background:var(--qi);border-color:var(--qi);color:#fff}
+#ap-qabul .qb-q{font-size:21px;font-weight:700;line-height:1.4;margin-bottom:18px}
+#ap-qabul .qb-note{background:rgba(232,172,14,.13);border:1px solid var(--qg);border-radius:12px;padding:13px 15px;font-size:13.5px;margin-bottom:16px}
+#ap-qabul .qb-note b{display:block;margin-bottom:3px}
+#ap-qabul .qb-res{display:grid;gap:10px;margin:14px 0}
+#ap-qabul .qb-rr{display:flex;align-items:center;gap:12px;background:var(--qbg);border-radius:12px;padding:13px 15px}
+#ap-qabul .qb-rr b{width:150px;flex:none;font-size:15px}
+#ap-qabul .qb-rr .tr{flex:1;height:9px;background:rgba(15,45,42,.12);border-radius:99px;overflow:hidden}
+#ap-qabul .qb-rr .tr i{display:block;height:100%;border-radius:99px}
+#ap-qabul .qb-rr .v{font-size:13px;font-weight:800;width:118px;text-align:right}
+#ap-qabul .qb-acc{background:var(--qi);color:#fff;border-radius:14px;padding:20px;margin-top:14px}
+#ap-qabul .qb-acc h4{margin:0 0 12px;font-size:14px;font-weight:800;color:var(--qg)}
+#ap-qabul .qb-kv{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px dashed rgba(255,255,255,.2);font-size:15px}
+#ap-qabul .qb-kv:last-of-type{border-bottom:none}
+#ap-qabul .qb-kv b{font-family:ui-monospace,Menlo,monospace;font-size:17px;letter-spacing:.04em}
+#ap-qabul .qb-warn{font-size:12.5px;color:rgba(255,255,255,.72);margin-top:12px}
+#ap-qabul table{width:100%;border-collapse:collapse;font-size:14px}
+#ap-qabul th{font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--qm);text-align:left;padding:9px;border-bottom:1px solid var(--ql);white-space:nowrap}
+#ap-qabul td{padding:11px 9px;border-bottom:1px dashed var(--ql)}
+#ap-qabul .qb-tw{overflow-x:auto}
+#ap-qabul .qb-p{font-size:11px;font-weight:700;border-radius:7px;padding:3px 8px;display:inline-block}
+#ap-qabul .qb-p.g{background:rgba(31,143,95,.15);color:var(--qgr)}
+#ap-qabul .qb-p.y{background:var(--qg);color:var(--qi)}
+#ap-qabul .qb-p.r{background:rgba(194,75,46,.15);color:var(--qrd)}
+#ap-qabul .qb-empty{text-align:center;color:var(--qm);padding:38px 0;font-size:15px}
+#ap-qabul .qb-conn{font-size:11px;color:var(--qm);margin-top:14px}
+@media(max-width:700px){#ap-qabul .qb-grid{grid-template-columns:1fr}#ap-qabul .qb-rr b{width:105px;font-size:14px}#ap-qabul .qb-rr .v{width:95px}}
+`;
+
+var PANEL='<div class="qb-head"><div><h2 class="qb-h2">Qabul — yangi o\'quvchi</h2>'+
+ '<p class="qb-sub">Testni sapport o\'qituvchi o\'tkazadi. Yakunda ota-ona akkaunti yaratiladi.</p></div>'+
+ '<div class="qb-lang"><button id="qb-uz" onclick="QAB.lang(\'uz\')">UZ</button>'+
+ '<button id="qb-ru" onclick="QAB.lang(\'ru\')">RU</button></div></div>'+
+ '<div class="qb-tabs" id="qb-tabs"></div><div id="qb-body"></div><div class="qb-conn" id="qb-conn"></div>';
+
+function install(){
+ if(document.getElementById("ap-qabul"))return true;
+
+ /* --- stil --- */
+ var st=document.createElement("style");st.textContent=CSS;document.head.appendChild(st);
+
+ /* --- mavjud panelni topamiz (ap- bilan boshlanadigan) --- */
+ var panels=document.querySelectorAll('[id^="ap-"]');
+ var proto=panels.length?panels[panels.length-1]:null;
+ var panel=document.createElement("div");
+ panel.id="ap-qabul";
+ if(proto){panel.className=proto.className;proto.parentNode.appendChild(panel)}
+ else{panel.className="admin-panel";document.body.appendChild(panel)}
+ panel.innerHTML=PANEL;
+
+ /* --- menyu qatorini topamiz: showPanel chaqiradigan element --- */
+ var all=document.querySelectorAll("[onclick]"),items=[];
+ for(var i=0;i<all.length;i++){
+  var oc=all[i].getAttribute("onclick")||"";
+  if(/showPanel\s*\(/.test(oc))items.push(all[i]);
+ }
+ if(!items.length)items=[].slice.call(document.querySelectorAll("[data-key]"));
+
+ if(items.length){
+  var last=items[items.length-1],mi=last.cloneNode(true);
+  mi.setAttribute("data-key","qabul");
+  mi.setAttribute("onclick","showPanel('qabul')");
+  mi.classList.remove("active","on","selected");
+  var icon=mi.querySelector("span,i");
+  var wrote=false;
+  for(var k=0;k<mi.childNodes.length;k++){
+   var n=mi.childNodes[k];
+   if(n.nodeType===3&&n.textContent.trim()){n.textContent=" Qabul";wrote=true}
+  }
+  if(icon&&(icon.tagName==="SPAN"||icon.tagName==="I")&&!icon.children.length)icon.textContent="🎒";
+  if(!wrote)mi.appendChild(document.createTextNode(" Qabul"));
+  last.parentNode.insertBefore(mi,last.nextSibling);
+ }else{
+  console.warn("QABUL: menyu topilmadi. Panel yaratildi, uni showPanel('qabul') bilan oching.");
+ }
+ return true;
+}
+
+/* ================= 2. MATNLAR ================= */
+var L={
+uz:{tabs:["Yangi o'quvchi","Qabul qilinganlar"],
+ form:"O'quvchi ma'lumotlari",ism:"O'quvchi F.I.Sh.",ismP:"Ism familiya",
+ sinf:"Sinf",yon:"Yo'nalish",uzT:"O'zbek sinfi",ruT:"Rus sinfi",
+ ota:"Ota-ona F.I.Sh.",otaP:"Ota yoki ona ismi",tel:"Ota-ona telefoni",telP:"+998 __ ___ __ __",
+ sap:"Testni o'tkazayotgan sapport",sapP:"Ismingiz",
+ start:"Testni boshlash",next:"Keyingisi",fin:"Yakunlash",
+ secs:["Ona tili","Matematika va mantiq","Ingliz tili","Qiziqishlar"],
+ kichik:"1–4 sinf",orta:"5–9 sinf",katta:"10–11 sinf",
+ read:"Savolni sapport ovoz chiqarib o'qiydi. Shoshiltirmang — vaqt chegarasi yo'q.",
+ inote:"Bu bo'lim baholanmaydi — bola nimani yoqtirishini yozib qo'yamiz.",
+ resT:"Natija",strong:"Kuchli",mid:"O'rta",weak:"Ko'mak kerak",
+ total:"Umumiy",tav:"Tavsiya",likes:"Qiziqishlari",
+ accT:"Ota-ona akkaunti yaratildi",login:"Login",parol:"Parol",
+ accW:"Parolni ota-onaga bering va birinchi kirishda almashtirishni so'rang. Bu yerda u faqat almashtirilgunicha ko'rinadi.",
+ save:"Saqlash",saved:"Saqlandi",newOne:"Yangi o'quvchi",
+ th:["Sana","O'quvchi","Sinf","Yo'nalish","Ona tili","Matem.","Ingliz","Umumiy","Login"],
+ empty:"Hozircha qabul qilingan o'quvchi yo'q",fill:"Barcha maydonlarni to'ldiring",
+ noSB:"Supabase ulanmagan — ma'lumot faqat shu sahifada turadi",okSB:"Supabase ulangan",err:"Xatolik",
+ tv:{a:"Matematikadan kuchli — chuqurlashtirilgan guruhga tavsiya etiladi",
+     b:"Ingliz tilidan ko'mak kerak — qo'shimcha guruh",
+     c:"Ona tilidan ko'mak kerak — o'qish va yozuvga urg'u",
+     d:"Daraja sinfga mos — odatdagi guruh",
+     e:"Umumiy daraja past — birinchi chorakda kuchaytirilgan ko'mak"}},
+ru:{tabs:["Новый ученик","Принятые"],
+ form:"Данные ученика",ism:"Ф.И.О. ученика",ismP:"Имя фамилия",
+ sinf:"Класс",yon:"Направление",uzT:"Узбекский класс",ruT:"Русский класс",
+ ota:"Ф.И.О. родителя",otaP:"Имя отца или матери",tel:"Телефон родителя",telP:"+998 __ ___ __ __",
+ sap:"Саппорт, проводящий тест",sapP:"Ваше имя",
+ start:"Начать тест",next:"Далее",fin:"Завершить",
+ secs:["Родной язык","Математика и логика","Английский","Интересы"],
+ kichik:"1–4 класс",orta:"5–9 класс",katta:"10–11 класс",
+ read:"Вопрос саппорт читает вслух. Не торопите — ограничения по времени нет.",
+ inote:"Этот блок не оценивается — просто записываем, что ребёнку нравится.",
+ resT:"Результат",strong:"Сильно",mid:"Средне",weak:"Нужна помощь",
+ total:"Общий",tav:"Рекомендация",likes:"Интересы",
+ accT:"Аккаунт родителя создан",login:"Логин",parol:"Пароль",
+ accW:"Передайте пароль родителю и попросите сменить при первом входе. Здесь он виден только до смены.",
+ save:"Сохранить",saved:"Сохранено",newOne:"Новый ученик",
+ th:["Дата","Ученик","Класс","Направление","Родной","Матем.","Англ.","Общий","Логин"],
+ empty:"Пока нет принятых учеников",fill:"Заполните все поля",
+ noSB:"Supabase не подключён — данные только на этой странице",okSB:"Supabase подключён",err:"Ошибка",
+ tv:{a:"Силён в математике — рекомендуем углублённую группу",
+     b:"Нужна помощь по английскому — дополнительная группа",
+     c:"Нужна помощь по родному языку — упор на чтение и письмо",
+     d:"Уровень соответствует классу — обычная группа",
+     e:"Общий уровень низкий — усиленная поддержка в первой четверти"}}};
+
+/* ================= 3. TEST BANKI ================= */
+var BANK={
+kichik:{
+ ona:{uz:[
+  {q:{uz:"Qaysi so'z to'g'ri yozilgan?",ru:"Какое слово написано правильно?"},o:["kitob","kitop","kittob","qitob"],a:0},
+  {q:{uz:"«Olma» so'zida nechta bo'g'in bor?",ru:"Сколько слогов в слове «olma»?"},o:["2","1","3","4"],a:0},
+  {q:{uz:"Gapni to'ldir: Men maktabga ___.",ru:"Дополни: Men maktabga ___."},o:["boraman","borasan","boradi","borish"],a:0},
+  {q:{uz:"Qaysi so'z ko'plikda?",ru:"Какое слово во множественном числе?"},o:["kitoblar","kitob","kitobim","kitobga"],a:0},
+  {q:{uz:"«Katta» so'zining teskarisi:",ru:"Противоположное «katta»:"},o:["kichik","baland","uzun","keng"],a:0}],
+ ru:[
+  {q:{uz:"Какое слово написано правильно?",ru:"Какое слово написано правильно?"},o:["молоко","малако","молако","малоко"],a:0},
+  {q:{uz:"Сколько слогов в слове «собака»?",ru:"Сколько слогов в слове «собака»?"},o:["3","2","4","1"],a:0},
+  {q:{uz:"Закончи: Я иду ___ школу.",ru:"Закончи: Я иду ___ школу."},o:["в","на","из","к"],a:0},
+  {q:{uz:"Какое слово во множественном числе?",ru:"Какое слово во множественном числе?"},o:["книги","книга","книгу","книгой"],a:0},
+  {q:{uz:"Противоположное «большой»:",ru:"Противоположное «большой»:"},o:["маленький","высокий","длинный","широкий"],a:0}]},
+ mat:[
+  {q:{uz:"7 + 5 = ?",ru:"7 + 5 = ?"},o:["12","11","13","10"],a:0},
+  {q:{uz:"20 − 8 = ?",ru:"20 − 8 = ?"},o:["12","13","11","14"],a:0},
+  {q:{uz:"Davom ettir: 2, 4, 6, 8, ___",ru:"Продолжи: 2, 4, 6, 8, ___"},o:["10","9","12","11"],a:0},
+  {q:{uz:"Qaysi son eng katta?",ru:"Какое число самое большое?"},o:["71","17","27","7"],a:0},
+  {q:{uz:"3 × 4 = ?",ru:"3 × 4 = ?"},o:["12","7","14","9"],a:0},
+  {q:{uz:"10 ta olma edi, 3 tasini berdi. Nechta qoldi?",ru:"Было 10 яблок, отдал 3. Сколько осталось?"},o:["7","6","8","13"],a:0}],
+ eng:[
+  {q:{uz:"Hello, my ___ is Ali.",ru:"Hello, my ___ is Ali."},o:["name","nam","names","naming"],a:0},
+  {q:{uz:"A cat has four ___.",ru:"A cat has four ___."},o:["legs","leg","foots","legss"],a:0},
+  {q:{uz:"___ are you? — I am fine.",ru:"___ are you? — I am fine."},o:["How","What","Who","Where"],a:0},
+  {q:{uz:"I ___ a student.",ru:"I ___ a student."},o:["am","is","are","be"],a:0},
+  {q:{uz:"One, two, three, ___",ru:"One, two, three, ___"},o:["four","for","fore","far"],a:0}]},
+orta:{
+ ona:{uz:[
+  {q:{uz:"Men do'stim ___ maktabga bordim.",ru:"Men do'stim ___ maktabga bordim."},o:["bilan","uchun","haqida","kabi"],a:0},
+  {q:{uz:"«Mehnat» so'ziga eng yaqin ma'no:",ru:"Ближайшее к «mehnat»:"},o:["ish","dam","o'yin","uyqu"],a:0},
+  {q:{uz:"Qaysi so'z sifat?",ru:"Какое слово — прилагательное?"},o:["chiroyli","yugurmoq","kitob","men"],a:0},
+  {q:{uz:"Ega qaysi so'z: «Bolalar bog'da o'ynashdi»",ru:"Подлежащее: «Bolalar bog'da o'ynashdi»"},o:["Bolalar","bog'da","o'ynashdi","bog'"],a:0},
+  {q:{uz:"U ishni tugatgan___ keyin uyga ketdi.",ru:"U ishni tugatgan___ keyin uyga ketdi."},o:["dan","ga","ni","da"],a:0},
+  {q:{uz:"«Uning yuragi tosh» — qaysi so'z ko'chma ma'noda?",ru:"«Uning yuragi tosh» — какое слово в переносном значении?"},o:["tosh","yuragi","uning","hech qaysi"],a:0}],
+ ru:[
+  {q:{uz:"Он пришёл ___ школу вовремя.",ru:"Он пришёл ___ школу вовремя."},o:["в","на","из","к"],a:0},
+  {q:{uz:"«Внезапно» ближе всего к:",ru:"«Внезапно» ближе всего к:"},o:["неожиданно","медленно","постоянно","заранее"],a:0},
+  {q:{uz:"Подлежащее: «Дети играли во дворе»",ru:"Подлежащее: «Дети играли во дворе»"},o:["Дети","играли","во дворе","двор"],a:0},
+  {q:{uz:"Какое слово — прилагательное?",ru:"Какое слово — прилагательное?"},o:["красивый","бежать","книга","быстро"],a:0},
+  {q:{uz:"Он извинился ___ опоздание.",ru:"Он извинился ___ опоздание."},o:["за","о","про","без"],a:0},
+  {q:{uz:"«Золотые руки» — это:",ru:"«Золотые руки» — это:"},o:["умелый человек","дорогие украшения","больные руки","сильные руки"],a:0}]},
+ mat:[
+  {q:{uz:"200 ning 15% i = ?",ru:"15% от 200 = ?"},o:["30","25","35","20"],a:0},
+  {q:{uz:"x + 7 = 19, x = ?",ru:"x + 7 = 19, x = ?"},o:["12","13","11","26"],a:0},
+  {q:{uz:"Davom ettir: 3, 6, 12, 24, ___",ru:"Продолжи: 3, 6, 12, 24, ___"},o:["48","36","30","42"],a:0},
+  {q:{uz:"Tomoni 5 sm kvadrat perimetri:",ru:"Периметр квадрата со стороной 5 см:"},o:["20","25","10","15"],a:0},
+  {q:{uz:"1/2 + 1/4 = ?",ru:"1/2 + 1/4 = ?"},o:["3/4","2/6","1/6","1/3"],a:0},
+  {q:{uz:"−3 + 8 = ?",ru:"−3 + 8 = ?"},o:["5","−5","11","−11"],a:0},
+  {q:{uz:"5 ishchi 5 kunda 5 stol yasaydi. 10 ishchi 10 kunda nechta?",ru:"5 рабочих за 5 дней делают 5 столов. Сколько сделают 10 рабочих за 10 дней?"},o:["10","20","5","25"],a:0},
+  {q:{uz:"Barcha A — B. Barcha B — C. Demak:",ru:"Все A — это B. Все B — это C. Значит:"},o:["Barcha A — C","Barcha C — A","Hech qanday A — C emas","Aniqlab bo'lmaydi"],a:0}],
+ eng:[
+  {q:{uz:"She ___ a teacher.",ru:"She ___ a teacher."},o:["is","are","am","be"],a:0},
+  {q:{uz:"There ___ two books on the table.",ru:"There ___ two books on the table."},o:["are","is","have","was"],a:0},
+  {q:{uz:"I go to school ___ Monday.",ru:"I go to school ___ Monday."},o:["on","in","at","of"],a:0},
+  {q:{uz:"He ___ to Samarkand last year.",ru:"He ___ to Samarkand last year."},o:["went","go","goes","gone"],a:0},
+  {q:{uz:"This is ___ film I have ever seen.",ru:"This is ___ film I have ever seen."},o:["the best","best","better","more good"],a:0},
+  {q:{uz:"I'm interested ___ learning Korean.",ru:"I'm interested ___ learning Korean."},o:["in","on","at","for"],a:0},
+  {q:{uz:"If it rains tomorrow, we ___ at home.",ru:"If it rains tomorrow, we ___ at home."},o:["will stay","would stay","stayed","have stayed"],a:0},
+  {q:{uz:"She has been working here ___ 2019.",ru:"She has been working here ___ 2019."},o:["since","for","during","by"],a:0}]},
+katta:{
+ ona:{uz:[
+  {q:{uz:"«Asossiz» so'zining ma'nosi:",ru:"Значение «asossiz»:"},o:["dalilsiz","asosli","asosiy","asoschi"],a:0},
+  {q:{uz:"Rasmiy xatda qaysi ibora ortiqcha?",ru:"Какая фраза лишняя в деловом письме?"},o:["qisqasi","shu munosabat bilan","ko'rib chiqishingizni so'raymiz","hurmat bilan"],a:0},
+  {q:{uz:"Yomg'ir yog'ayotgan___ qaramay, yo'lga chiqishdi.",ru:"Yomg'ir yog'ayotgan___ qaramay, yo'lga chiqishdi."},o:["iga","ini","ida","idan"],a:0},
+  {q:{uz:"«Qo'l uchida ishlamoq» iborasi:",ru:"Идиома «qo'l uchida ishlamoq»:"},o:["beparvo ishlamoq","tez ishlamoq","ko'p ishlamoq","bepul ishlamoq"],a:0},
+  {q:{uz:"Ilmiy matnda qaysi so'z mos?",ru:"Какое слово уместно в научном тексте?"},o:["tadqiqot","gap-so'z","hangoma","ertak"],a:0},
+  {q:{uz:"Uning dalillari ___ bo'lib chiqdi.",ru:"Uning dalillari ___ bo'lib chiqdi."},o:["asossiz","asosli","asosiy","asoschi"],a:0}],
+ ru:[
+  {q:{uz:"Несмотря ___ трудности, он закончил работу.",ru:"Несмотря ___ трудности, он закончил работу."},o:["на","за","о","в"],a:0},
+  {q:{uz:"Отчёт, ___ вчера, содержит ошибки.",ru:"Отчёт, ___ вчера, содержит ошибки."},o:["подготовленный","подготовив","подготовляя","подготовит"],a:0},
+  {q:{uz:"Какая фраза неуместна в деловом письме?",ru:"Какая фраза неуместна в деловом письме?"},o:["короче говоря","в связи с этим","просим рассмотреть","с уважением"],a:0},
+  {q:{uz:"Его аргументы оказались ___",ru:"Его аргументы оказались ___"},o:["несостоятельными","бесчисленными","безоговорочными","первостепенными"],a:0},
+  {q:{uz:"«Работать спустя рукава» значит работать:",ru:"«Работать спустя рукава» значит работать:"},o:["небрежно","очень быстро","сверхурочно","бесплатно"],a:0},
+  {q:{uz:"Он сделал вид, ___ ничего не произошло.",ru:"Он сделал вид, ___ ничего не произошло."},o:["будто","чтобы","если","зато"],a:0}]},
+ mat:[
+  {q:{uz:"2⁵ = ?",ru:"2⁵ = ?"},o:["32","16","64","10"],a:0},
+  {q:{uz:"log₂ 8 = ?",ru:"log₂ 8 = ?"},o:["3","2","4","8"],a:0},
+  {q:{uz:"x² − 5x + 6 = 0 ildizlari:",ru:"Корни x² − 5x + 6 = 0:"},o:["2 va 3","1 va 6","−2 va −3","3 va 5"],a:0},
+  {q:{uz:"Zarda juft son tushish ehtimoli:",ru:"Вероятность чётного числа на кубике:"},o:["1/2","1/3","1/6","2/3"],a:0},
+  {q:{uz:"Davom ettir: 1, 1, 2, 3, 5, 8, ___",ru:"Продолжи: 1, 1, 2, 3, 5, 8, ___"},o:["13","11","16","10"],a:0},
+  {q:{uz:"Narx 20% oshdi, keyin 20% tushdi. Natija:",ru:"Цена выросла на 20%, потом упала на 20%. Итог:"},o:["Boshlang'ichdan past","Teng","Yuqori","Aniqlab bo'lmaydi"],a:0},
+  {q:{uz:"sin 30° = ?",ru:"sin 30° = ?"},o:["1/2","1","0","√3/2"],a:0},
+  {q:{uz:"«Barcha talabalar topshirdi» yolg'on. Rost:",ru:"«Все студенты сдали» — ложь. Верно:"},o:["Kamida bittasi topshirmadi","Hech kim topshirmadi","Hammasi topshirdi","Aniqlab bo'lmaydi"],a:0}],
+ eng:[
+  {q:{uz:"He ___ to Tashkent last week.",ru:"He ___ to Tashkent last week."},o:["went","go","goes","gone"],a:0},
+  {q:{uz:"I'm interested ___ history.",ru:"I'm interested ___ history."},o:["in","on","at","for"],a:0},
+  {q:{uz:"She has lived here ___ 2019.",ru:"She has lived here ___ 2019."},o:["since","for","during","by"],a:0},
+  {q:{uz:"“Reliable” most closely means:",ru:"“Reliable” most closely means:"},o:["trustworthy","expensive","difficult","temporary"],a:0},
+  {q:{uz:"The meeting was ___ because of the storm.",ru:"The meeting was ___ because of the storm."},o:["called off","called on","called up","called for"],a:0},
+  {q:{uz:"I'd rather you ___ tell anyone about this.",ru:"I'd rather you ___ tell anyone about this."},o:["didn't","don't","won't","aren't"],a:0},
+  {q:{uz:"Hardly ___ the office when the phone rang.",ru:"Hardly ___ the office when the phone rang."},o:["had he left","he had left","did he leave","he left"],a:0},
+  {q:{uz:"The bid was rejected ___ the grounds that it was too costly.",ru:"The bid was rejected ___ the grounds that it was too costly."},o:["on","in","by","under"],a:0}]}};
+
+var INT=[
+ {id:"fan",q:{uz:"Qaysi dars ko'proq yoqadi?",ru:"Какой урок нравится больше?"},
+  o:[{uz:"Matematika",ru:"Математика"},{uz:"Til va adabiyot",ru:"Язык и литература"},{uz:"Tabiiy fanlar",ru:"Естественные науки"},{uz:"Sport va ijod",ru:"Спорт и творчество"}]},
+ {id:"ish",q:{uz:"Qanday ishlash qulay?",ru:"Как удобнее работать?"},
+  o:[{uz:"Yolg'iz",ru:"Один"},{uz:"Juftlikda",ru:"В паре"},{uz:"Guruhda",ru:"В группе"},{uz:"Farqi yo'q",ru:"Без разницы"}]},
+ {id:"vaqt",q:{uz:"Bo'sh vaqtda nima qilasan?",ru:"Что делаешь в свободное время?"},
+  o:[{uz:"Kitob o'qiyman",ru:"Читаю"},{uz:"Kompyuter, telefon",ru:"Компьютер, телефон"},{uz:"Sport",ru:"Спорт"},{uz:"Rasm, musiqa",ru:"Рисую, музыка"}]},
+ {id:"usul",q:{uz:"Yangi mavzuni qanday yaxshi tushunasan?",ru:"Как лучше понимаешь новую тему?"},
+  o:[{uz:"Tushuntirib berishsa",ru:"Когда объясняют"},{uz:"O'zim o'qib",ru:"Читаю сам"},{uz:"Ko'rsatib berishsa",ru:"Когда показывают"},{uz:"Amalda qilib ko'rib",ru:"Когда делаю сам"}]},
+ {id:"xoh",q:{uz:"Nimani o'rganishni xohlaysan?",ru:"Что хочешь изучать?"},multi:true,
+  o:[{uz:"Dasturlash",ru:"Программирование"},{uz:"Chet tillar",ru:"Иностранные языки"},{uz:"Robototexnika",ru:"Робототехника"},{uz:"Shaxmat",ru:"Шахматы"},{uz:"San'at",ru:"Искусство"},{uz:"Sport",ru:"Спорт"}]}];
+
+/* ================= 4. LOGIKA ================= */
+var Q={lang:"uz",tab:0,SB:null,mem:[],F:{ism:"",sinf:"1",yon:"uz",ota:"",tel:"",sap:""},T:null};
+function E(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function x(){return L[Q.lang]}
+function g(id){return document.getElementById(id)}
+function grp(s){var n=parseInt(s,10);return n<=4?"kichik":n<=9?"orta":"katta"}
+function findSB(){var c=[window.supabase,window.sb,window.supabaseClient,window.db,window._sb];
+ for(var i=0;i<c.length;i++){if(c[i]&&typeof c[i].from==="function")return c[i]}return null}
+async function getList(){
+ if(Q.SB){var r=await Q.SB.from("qab_oquvchi").select("*").order("created_at",{ascending:false}).limit(200);return r.data||[]}
+ return Q.mem}
+async function addRow(row){
+ if(Q.SB){var r=await Q.SB.from("qab_oquvchi").insert(row).select().single();if(r.error)throw r.error;return r.data}
+ row.id=Date.now();row.created_at=new Date().toISOString();Q.mem.unshift(row);return row}
+
+var TR={"а":"a","б":"b","в":"v","г":"g","д":"d","е":"e","ё":"yo","ж":"j","з":"z","и":"i","й":"y","к":"k","л":"l","м":"m","н":"n","о":"o","п":"p","р":"r","с":"s","т":"t","у":"u","ф":"f","х":"x","ц":"ts","ч":"ch","ш":"sh","щ":"sh","ы":"i","э":"e","ю":"yu","я":"ya","ъ":"","ь":"","ў":"o","қ":"q","ғ":"g","ҳ":"h"};
+function slug(s){s=String(s||"").toLowerCase();var o="";
+ for(var i=0;i<s.length;i++){var c=s[i];o+=(TR[c]!==undefined?TR[c]:(/[a-z0-9]/.test(c)?c:""))}
+ return o.slice(0,12)||"oquvchi"}
+function mkLogin(ism){var p=String(ism||"").trim().split(/\s+/);
+ return slug(p[0])+(p[1]?slug(p[1]).slice(0,3):"")+String(Math.floor(Math.random()*90)+10)}
+function mkParol(){var a="abcdefghjkmnpqrstuvwxyz23456789",s="";
+ for(var i=0;i<8;i++)s+=a[Math.floor(Math.random()*a.length)];return s}
+
+function draw(){
+ var t=x();
+ if(!g("ap-qabul"))return;
+ g("qb-uz").className=Q.lang==="uz"?"on":"";
+ g("qb-ru").className=Q.lang==="ru"?"on":"";
+ g("qb-tabs").innerHTML=t.tabs.map(function(n,i){return '<button class="'+(Q.tab===i?"on":"")+'" onclick="QAB.tab('+i+')">'+n+'</button>'}).join("");
+ g("qb-conn").textContent=Q.SB?"● "+t.okSB:"○ "+t.noSB;
+ if(Q.tab===0){if(!Q.T)drawForm();else if(Q.T.done)drawResult();else drawQ()}
+ else drawList();
+}
+function drawForm(){
+ var t=x(),F=Q.F,s="";
+ for(var i=1;i<=11;i++)s+='<option value="'+i+'"'+(F.sinf==String(i)?" selected":"")+'>'+i+'</option>';
+ g("qb-body").innerHTML='<div class="qb-card"><h3>'+t.form+'</h3><div class="qb-grid">'+
+ '<div><label>'+t.ism+'</label><input type="text" id="qb-ism" value="'+E(F.ism)+'" placeholder="'+t.ismP+'"></div>'+
+ '<div><label>'+t.sinf+'</label><select id="qb-sinf" onchange="QAB.sinf(this.value)">'+s+'</select></div>'+
+ '<div><label>'+t.yon+'</label><select id="qb-yon"><option value="uz"'+(F.yon==="uz"?" selected":"")+'>'+t.uzT+'</option><option value="ru"'+(F.yon==="ru"?" selected":"")+'>'+t.ruT+'</option></select></div>'+
+ '<div><label>'+t.tel+'</label><input type="text" id="qb-tel" value="'+E(F.tel)+'" placeholder="'+t.telP+'"></div>'+
+ '<div><label>'+t.ota+'</label><input type="text" id="qb-ota" value="'+E(F.ota)+'" placeholder="'+t.otaP+'"></div>'+
+ '<div><label>'+t.sap+'</label><input type="text" id="qb-sap" value="'+E(F.sap)+'" placeholder="'+t.sapP+'"></div></div>'+
+ '<div style="margin-top:10px;font-size:13px;color:var(--qm)">'+t[grp(F.sinf)]+' — '+t.secs.join(" · ")+'</div>'+
+ '<div style="margin-top:18px"><button class="qb-b gold" onclick="QAB.start()">'+t.start+' →</button></div></div>';
+}
+function drawQ(){
+ var t=x(),T=Q.T,sec=T.sec,it,tot,body;
+ var secs=t.secs.map(function(n,i){return '<span class="'+(i<sec?"done":i===sec?"cur":"")+'">'+n+'</span>'}).join("");
+ if(sec<3){var arr=T.bank[["ona","mat","eng"][sec]];it=arr[T.i];tot=arr.length;
+  body=it.o.map(function(o,i){return '<button class="qb-opt'+(T.cur===i?" sel":"")+'" onclick="QAB.pick('+i+')">'+E(o)+'</button>'}).join("")}
+ else{it=INT[T.i];tot=INT.length;
+  if(it.multi){var c=T.ans.int[it.id]||[];
+   body=it.o.map(function(o,i){return '<button class="qb-chip'+(c.indexOf(i)>-1?" sel":"")+'" onclick="QAB.multi('+i+')">'+E(o[Q.lang])+'</button>'}).join("")}
+  else body=it.o.map(function(o,i){return '<button class="qb-opt'+(T.cur===i?" sel":"")+'" onclick="QAB.pick('+i+')">'+E(o[Q.lang])+'</button>'}).join("")}
+ var ok=(sec===3&&it.multi)?((T.ans.int[it.id]||[]).length>0):T.cur!==null;
+ var last=sec===3&&T.i===INT.length-1;
+ g("qb-body").innerHTML='<div class="qb-card">'+
+  '<div style="font-size:12px;font-weight:700;color:var(--qm)">'+E(T.ism)+' · '+t[T.grp]+'</div>'+
+  '<div class="qb-sec" style="margin-top:10px">'+secs+'</div>'+
+  '<div class="qb-bar"><i style="width:'+Math.round((sec*100+T.i/tot*100)/4)+'%"></i></div>'+
+  (T.grp==="kichik"?'<div class="qb-note">'+t.read+'</div>':"")+
+  (sec===3?'<div class="qb-note">'+t.inote+'</div>':"")+
+  '<div class="qb-q">'+E(it.q[Q.lang])+'</div>'+body+
+  '<div style="margin-top:16px;text-align:right"><button class="qb-b" onclick="QAB.next()" '+(ok?"":"disabled")+'>'+(last?t.fin:t.next)+' →</button></div></div>';
+}
+function lvl(p){var t=x();return p>=80?{n:t.strong,c:"var(--qgr)",k:"g"}:p>=50?{n:t.mid,c:"var(--qg)",k:"y"}:{n:t.weak,c:"var(--qrd)",k:"r"}}
+function drawResult(){
+ var t=x(),T=Q.T,r=T.res;
+ var bars=[["ona",t.secs[0]],["mat",t.secs[1]],["eng",t.secs[2]]].map(function(p){
+  var v=r[p[0]],M=lvl(v);
+  return '<div class="qb-rr"><b>'+p[1]+'</b><span class="tr"><i style="width:'+v+'%;background:'+M.c+'"></i></span><span class="v">'+v+'% · '+M.n+'</span></div>'}).join("");
+ var likes=INT.map(function(k){var a=T.ans.int[k.id];if(a===undefined)return"";
+  var v=k.multi?(a||[]).map(function(i){return k.o[i][Q.lang]}).join(", "):k.o[a][Q.lang];
+  return '<div style="font-size:14px;padding:5px 0"><span style="color:var(--qm);font-weight:700">'+E(k.q[Q.lang])+'</span><br>'+E(v)+'</div>'}).join("");
+ g("qb-body").innerHTML='<div class="qb-card"><h3>'+t.resT+' — '+E(T.ism)+'</h3><div class="qb-res">'+bars+'</div>'+
+  '<div class="qb-rr" style="background:var(--qi);color:#fff"><b>'+t.total+'</b>'+
+  '<span class="tr" style="background:rgba(255,255,255,.2)"><i style="width:'+r.total+'%;background:var(--qg)"></i></span>'+
+  '<span class="v">'+r.total+'%</span></div>'+
+  '<div class="qb-note" style="margin-top:14px"><b>'+t.tav+'</b>'+E(r.tav)+'</div>'+
+  '<h3 style="margin-top:18px">'+t.likes+'</h3>'+likes+
+  '<div class="qb-acc"><h4>'+t.accT+'</h4>'+
+  '<div class="qb-kv"><span>'+t.login+'</span><b>'+E(T.login)+'</b></div>'+
+  '<div class="qb-kv"><span>'+t.parol+'</span><b>'+E(T.parol)+'</b></div>'+
+  '<div class="qb-warn">'+t.accW+'</div></div>'+
+  '<div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">'+
+  '<button class="qb-b gold" onclick="QAB.save()" '+(T.saved?"disabled":"")+'>'+(T.saved?t.saved:t.save)+'</button>'+
+  '<button class="qb-b gh" onclick="QAB.reset()">'+t.newOne+'</button></div></div>';
+}
+async function drawList(){
+ var t=x(),rows=await getList();
+ if(!rows.length){g("qb-body").innerHTML='<div class="qb-card"><div class="qb-empty">'+t.empty+'</div></div>';return}
+ var body=rows.map(function(r){var n=r.natijalar||{},M=lvl(r.umumiy_ball||0);
+  return '<tr><td style="white-space:nowrap">'+new Date(r.created_at).toLocaleDateString("ru-RU")+'</td>'+
+  '<td><b>'+E(r.ism)+'</b></td><td>'+E(r.sinf)+'</td><td>'+(r.yonalish==="ru"?t.ruT:t.uzT)+'</td>'+
+  '<td>'+(n.ona||0)+'%</td><td>'+(n.mat||0)+'%</td><td>'+(n.eng||0)+'%</td>'+
+  '<td><span class="qb-p '+M.k+'">'+(r.umumiy_ball||0)+'%</span></td>'+
+  '<td style="font-family:ui-monospace,monospace">'+E(r.login||"—")+'</td></tr>'}).join("");
+ g("qb-body").innerHTML='<div class="qb-card"><h3>'+t.tabs[1]+' · '+rows.length+'</h3><div class="qb-tw"><table><thead><tr>'+
+  t.th.map(function(h){return '<th>'+h+'</th>'}).join("")+'</tr></thead><tbody>'+body+'</tbody></table></div></div>';
+}
+
+window.QAB={
+ lang:function(l){Q.lang=l;draw()},
+ tab:function(i){Q.tab=i;draw()},
+ sinf:function(v){var F=Q.F;F.sinf=v;F.ism=g("qb-ism").value;F.ota=g("qb-ota").value;
+  F.tel=g("qb-tel").value;F.sap=g("qb-sap").value;F.yon=g("qb-yon").value;drawForm()},
+ start:function(){var t=x(),F=Q.F;
+  F.ism=g("qb-ism").value.trim();F.ota=g("qb-ota").value.trim();F.tel=g("qb-tel").value.trim();
+  F.sap=g("qb-sap").value.trim();F.yon=g("qb-yon").value;F.sinf=g("qb-sinf").value;
+  if(!F.ism||!F.ota||!F.tel){alert(t.fill);return}
+  var gr=grp(F.sinf),B=BANK[gr];
+  Q.T={ism:F.ism,grp:gr,sec:0,i:0,cur:null,saved:false,done:false,
+   bank:{ona:B.ona[F.yon],mat:B.mat,eng:B.eng},ans:{ona:[],mat:[],eng:[],int:{}}};
+  draw()},
+ pick:function(i){Q.T.cur=i;draw()},
+ multi:function(i){var T=Q.T,it=INT[T.i],c=T.ans.int[it.id]||[];
+  c=c.indexOf(i)>-1?c.filter(function(v){return v!==i}):c.concat([i]);T.ans.int[it.id]=c;draw()},
+ next:function(){var T=Q.T;
+  if(T.sec<3){var k=["ona","mat","eng"][T.sec],arr=T.bank[k];
+   T.ans[k].push(T.cur===arr[T.i].a?1:0);T.i++;T.cur=null;
+   if(T.i>=arr.length){T.sec++;T.i=0}return draw()}
+  var it=INT[T.i];if(!it.multi)T.ans.int[it.id]=T.cur;
+  T.i++;T.cur=null;
+  if(T.i<INT.length)return draw();
+  QAB.finish()},
+ finish:function(){var t=x(),T=Q.T;
+  function pc(a){return a.length?Math.round(a.reduce(function(s,v){return s+v},0)/a.length*100):0}
+  var ona=pc(T.ans.ona),mat=pc(T.ans.mat),eng=pc(T.ans.eng),total=Math.round((ona+mat+eng)/3),tv;
+  if(total<40)tv=t.tv.e;else if(mat>=80)tv=t.tv.a;else if(eng<50)tv=t.tv.b;
+  else if(ona<50)tv=t.tv.c;else tv=t.tv.d;
+  T.res={ona:ona,mat:mat,eng:eng,total:total,tav:tv};
+  T.login=mkLogin(T.ism);T.parol=mkParol();T.done=true;draw()},
+ save:async function(){var T=Q.T,F=Q.F,t=x();
+  try{await addRow({ism:T.ism,sinf:parseInt(F.sinf,10),yonalish:F.yon,ota_ona:F.ota,telefon:F.tel,
+   saport:F.sap,natijalar:T.res,qiziqishlar:T.ans.int,umumiy_ball:T.res.total,tavsiya:T.res.tav,
+   login:T.login,parol_vaqt:T.parol,parol_almashtirildi:false});
+   T.saved=true;draw()}catch(e){console.error(e);alert(t.err)}},
+ reset:function(){Q.T=null;Q.F.ism="";Q.F.ota="";Q.F.tel="";draw()}
+};
+
+function boot(){if(install()){Q.SB=findSB();draw()}}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){setTimeout(boot,500)});
+else setTimeout(boot,500);
+})();
+</script>
