@@ -377,6 +377,8 @@ if(window.TUXUM)return;window.TUXUM=1;
 /* ================= SOZLAMALAR ================= */
 var SUPABASE_URL="https://unaodltahuevrfnarfha.supabase.co";
 var ESHIK=SUPABASE_URL+"/functions/v1/eshik";
+var PKEY="sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP";
+var HDR={"Content-Type":"application/json","apikey":PKEY,"Authorization":"Bearer "+PKEY};
 var XODIM_SAHIFA="/academy.html";
 var MAX=7, MIN=5;
 
@@ -472,7 +474,7 @@ function boshla(){
  var t=bor();
  if(!t){och();return}
  band=true;
- fetch(ESHIK,{method:"POST",headers:{"Content-Type":"application/json"},
+ fetch(ESHIK,{method:"POST",headers:HDR,
   body:JSON.stringify({action:"tekshir",token:t})})
  .then(function(r){return r.json()}).then(function(d){band=false;
   if(d&&d.ok&&YOLLAR[d.rol]){saqla(t,d.rol,d.ism);location.href=YOLLAR[d.rol]}else och()})
@@ -507,7 +509,7 @@ document.addEventListener("keydown",function(e){
 
 function yubor(){
  clearTimeout(timer);band=true;load.style.display="block";err.textContent="";
- fetch(ESHIK,{method:"POST",headers:{"Content-Type":"application/json"},
+ fetch(ESHIK,{method:"POST",headers:HDR,
   body:JSON.stringify({action:"kirish",pin:pin,qurilma:qurilma()})})
  .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})})
  .then(function(x){

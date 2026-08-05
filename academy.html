@@ -7850,6 +7850,8 @@ if(window.EKAB)return;window.EKAB=1;
 /* ============ SOZLAMALAR ============ */
 var SUPABASE_URL="https://unaodltahuevrfnarfha.supabase.co";
 var ESHIK=SUPABASE_URL+"/functions/v1/eshik";
+var PKEY="sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP";
+var HDR={"Content-Type":"application/json","apikey":PKEY,"Authorization":"Bearer "+PKEY};
 var LANDING="index.html";   /* bosh sahifa fayli */
 
 /* ============ MATNLAR ============ */
@@ -7961,7 +7963,7 @@ function til(){try{return localStorage.getItem("edunova_til")||"uz"}catch(e){ret
 function tilSaqla(l){try{localStorage.setItem("edunova_til",l)}catch(e){}}
 function E(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function api(body){body.token=tok();
- return fetch(ESHIK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+ return fetch(ESHIK,{method:"POST",headers:HDR,body:JSON.stringify(body)})
  .then(function(r){return r.json()})}
 
 var S={lang:til(),men:null,tab:0,studs:null,royxat:null,his:null,pick:false,qid:""};
@@ -8219,7 +8221,7 @@ function pinYubor(){
   clearTimeout(ptimer);pband=true;
   var e=document.getElementById("ek-pe"),l=document.getElementById("ek-pl"),c=document.getElementById("ek-pc");
   l.style.display="block";e.textContent="";
-  fetch(ESHIK,{method:"POST",headers:{"Content-Type":"application/json"},
+  fetch(ESHIK,{method:"POST",headers:HDR,
     body:JSON.stringify({action:"kirish",pin:ppin,qurilma:pinQurilma()})})
   .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})})
   .then(function(x){
@@ -8275,6 +8277,8 @@ else setTimeout(boot,300);
 if(window.ODAM)return;window.ODAM=1;
 
 var ESHIK="https://unaodltahuevrfnarfha.supabase.co/functions/v1/eshik";
+var PKEY="sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP";
+var HDR={"Content-Type":"application/json","apikey":PKEY,"Authorization":"Bearer "+PKEY};
 
 /* ================= STIL ================= */
 var CSS=`
@@ -8329,9 +8333,10 @@ var ROL=[["marketolog","Marketolog"],["admin","Admin"],["saport","Sapport"],
 function rolNom(r){for(var i=0;i<ROL.length;i++)if(ROL[i][0]===r)return ROL[i][1];return r}
 function E(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
  return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
-function tok(){if(T)return T;try{return sessionStorage.getItem("od_token")}catch(e){return null}}
+function tok(){if(T)return T;
+ try{return localStorage.getItem("od_token")||localStorage.getItem("edunova_token")}catch(e){return null}}
 function api(b){b.token=tok();
- return fetch(ESHIK,{method:"POST",headers:{"Content-Type":"application/json"},
+ return fetch(ESHIK,{method:"POST",headers:HDR,
   body:JSON.stringify(b)}).then(function(r){return r.json()})}
 function P(){return document.getElementById("ap-odamlar")}
 
@@ -8373,7 +8378,7 @@ function chiz(){
 }
 function gate(){
  P().innerHTML='<div class="od-gate"><h3>\u{1F511} Odamlar</h3>'+
-  '<p>Bu bo\'limda barcha pin kodlar turadi. Davom etish uchun marketolog pinini kiriting.</p>'+
+  '<p>Bir marta kiritasiz - keyin bu qurilmada boshqa so\'ralmaydi.</p>'+
   '<input class="od-pin" id="od-p" inputmode="numeric" maxlength="7" placeholder="•••••">'+
   '<div class="od-err" id="od-e"></div>'+
   '<button class="od-b" id="od-go" style="width:100%;padding:12px">Kirish</button></div>';
@@ -8387,22 +8392,23 @@ function kir(){
  var v=(document.getElementById("od-p").value||"").trim(),e=document.getElementById("od-e");
  if(!/^\d{5,7}$/.test(v)){e.textContent="5-7 raqam";return}
  BAND=true;e.textContent="Tekshirilmoqda...";
- fetch(ESHIK,{method:"POST",headers:{"Content-Type":"application/json"},
+ fetch(ESHIK,{method:"POST",headers:HDR,
   body:JSON.stringify({action:"kirish",pin:v,qurilma:"admin-panel"})})
  .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})})
  .then(function(x){
   BAND=false;
   if(x.d&&x.d.token){
    if(["marketolog","admin"].indexOf(x.d.rol)===-1){e.textContent="Faqat marketolog uchun";return}
-   T=x.d.token;try{sessionStorage.setItem("od_token",T)}catch(err){}
+   T=x.d.token;try{localStorage.setItem("od_token",T)}catch(err){}
    royxatOl();return}
   e.textContent=x.s===429?"Ko'p urinish. 15 daqiqadan keyin.":"Pin noto'g'ri";
- }).catch(function(){BAND=false;e.textContent="Internet yo'q"});
+ }).catch(function(){BAND=false;
+  e.textContent="Server javob bermadi. \"eshik\" funksiyasi deploy qilinganmi?"});
 }
 function royxatOl(){
  P().innerHTML='<div class="od-empty">Yuklanmoqda...</div>';
  api({action:"royxat"}).then(function(d){
-  if(d&&d.xato){T=null;try{sessionStorage.removeItem("od_token")}catch(e){}
+  if(d&&d.xato){T=null;try{localStorage.removeItem("od_token")}catch(e){}
    return gate()}
   ROYXAT=d.royxat||[];jadval();
  }).catch(function(){P().innerHTML='<div class="od-empty">Xatolik. Qayta uring.</div>'});
