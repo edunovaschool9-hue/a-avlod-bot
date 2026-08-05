@@ -8308,6 +8308,9 @@ var CSS=`
 #ap-odamlar .od-r.m{background:#FF6B1A;color:#fff}
 #ap-odamlar .od-r.o{background:rgba(31,143,95,.2);color:#1F8F5F}
 #ap-odamlar .od-off{opacity:.4}
+#ap-odamlar .od-sel{font-size:12px;font-weight:700;padding:5px 8px;border-radius:8px;
+ border:1px solid rgba(128,128,128,.3);background:rgba(128,128,128,.08);color:inherit;cursor:pointer}
+#ap-odamlar .od-sel:focus{outline:none;border-color:#FF6B1A}
 #ap-odamlar .od-new{background:rgba(128,128,128,.08);border-radius:14px;padding:16px;margin-bottom:14px}
 #ap-odamlar .od-new .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
 #ap-odamlar .od-new input,#ap-odamlar .od-new select{width:100%;padding:9px 12px;border-radius:10px;
@@ -8423,7 +8426,8 @@ function jadval(){
                 :'<span class="od-code od-hid" data-show="1">•••••</span>';
   return '<tr class="'+(o.faol?"":"od-off")+'" data-id="'+o.id+'">'+
    '<td><b>'+E(o.ism)+'</b>'+(o.telefon?'<br><span style="font-size:12px;opacity:.55">'+E(o.telefon)+'</span>':'')+'</td>'+
-   '<td><span class="od-r '+(o.rol==="marketolog"?"m":o.rol==="oquvchi"?"o":"")+'">'+rolNom(o.rol)+'</span></td>'+
+   '<td><select class="od-sel" data-rol-id="'+o.id+'">'+ROL.map(function(r){
+     return '<option value="'+r[0]+'"'+(r[0]===o.rol?' selected':'')+'>'+r[1]+'</option>'}).join('')+'</select></td>'+
    '<td>'+(o.sinf?E(o.sinf)+"-sinf":"-")+'</td>'+
    '<td>'+kod+'</td>'+
    '<td style="white-space:nowrap">'+
@@ -8450,6 +8454,10 @@ function jadval(){
  if(qi)qi.addEventListener("input",function(){QIDIR=this.value;jadval();
   var n=document.getElementById("od-q");if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}});
  P().addEventListener("click",bosildi);
+ P().addEventListener("change",function(e){
+  var s=e.target.closest("[data-rol-id]");if(!s)return;
+  rolOzgar(s.getAttribute("data-rol-id"),s.value);
+ });
 }
 function forma(){
  return '<div class="od-new"><div class="g">'+
@@ -8500,6 +8508,18 @@ function yangilash(id){
   if(d&&d.pin){OQ="<b>"+E(d.pin)+"</b> - yangi pin"+(o?" ("+E(o.ism)+")":"")+". Odamga yetkazing.";
    royxatOl()}
   else alert("Xatolik: "+(d&&d.xato?d.xato:"?"));
+ });
+}
+function rolOzgar(id,rol){
+ var o=ROYXAT.filter(function(r){return String(r.id)===String(id)})[0];
+ if(!o)return;
+ if(rol===o.rol)return;
+ if(["marketolog","admin"].indexOf(rol)>-1&&
+    !confirm((o.ism||"Bu odam")+" ga "+rolNom(rol)+" huquqi berilsinmi? U barcha ma'lumotni ko'radi."))
+  {jadval();return}
+ api({action:"rol_ozgar",odam_id:parseInt(id,10),rol:rol}).then(function(d){
+  if(d&&d.ok){OQ=E(o.ism)+" endi "+rolNom(rol)+".";royxatOl()}
+  else{alert("Xatolik: "+(d&&d.xato?d.xato:"?"));jadval()}
  });
 }
 function ochirish(id){
