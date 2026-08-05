@@ -8269,5 +8269,256 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 else setTimeout(boot,300);
 })();
 </script>
+<!-- ===== EDUNOVA: Odamlar (pin boshqaruvi) ===== -->
+<script>
+(function(){
+if(window.ODAM)return;window.ODAM=1;
+
+var ESHIK="https://unaodltahuevrfnarfha.supabase.co/functions/v1/eshik";
+
+/* ================= STIL ================= */
+var CSS=`
+#ap-odamlar .od-gate{max-width:330px;margin:40px auto;text-align:center}
+#ap-odamlar .od-gate h3{font-size:17px;font-weight:800;margin:0 0 6px}
+#ap-odamlar .od-gate p{font-size:13px;opacity:.6;margin:0 0 18px}
+#ap-odamlar .od-pin{font-size:24px;font-weight:800;letter-spacing:.5em;text-align:center;
+ width:100%;padding:14px;border-radius:12px;border:1.5px solid rgba(128,128,128,.35);
+ background:rgba(128,128,128,.08);color:inherit;font-family:ui-monospace,Menlo,monospace}
+#ap-odamlar .od-pin:focus{outline:none;border-color:#FF6B1A}
+#ap-odamlar .od-err{color:#D9480F;font-size:12.5px;font-weight:700;min-height:18px;margin:8px 0}
+#ap-odamlar .od-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+#ap-odamlar .od-bar input[type=text]{flex:1;min-width:170px;padding:9px 13px;border-radius:10px;
+ border:1.5px solid rgba(128,128,128,.3);background:rgba(128,128,128,.07);color:inherit;font-size:14px}
+#ap-odamlar .od-f{font-size:12.5px;font-weight:700;border:1px solid rgba(128,128,128,.3);
+ background:transparent;color:inherit;opacity:.65;padding:7px 13px;border-radius:99px;cursor:pointer}
+#ap-odamlar .od-f.on{background:#FF6B1A;border-color:#FF6B1A;color:#fff;opacity:1}
+#ap-odamlar .od-b{font-size:12.5px;font-weight:700;border:none;background:#FF6B1A;color:#fff;
+ padding:8px 14px;border-radius:99px;cursor:pointer}
+#ap-odamlar .od-b.gh{background:transparent;color:inherit;border:1.5px solid rgba(128,128,128,.3)}
+#ap-odamlar .od-b:disabled{opacity:.4;cursor:not-allowed}
+#ap-odamlar table{width:100%;border-collapse:collapse;font-size:14px}
+#ap-odamlar th{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+ opacity:.55;text-align:left;padding:9px;border-bottom:1px solid rgba(128,128,128,.25);white-space:nowrap}
+#ap-odamlar td{padding:10px 9px;border-bottom:1px dashed rgba(128,128,128,.2);vertical-align:middle}
+#ap-odamlar .od-code{font-family:ui-monospace,Menlo,monospace;font-size:15px;font-weight:700;
+ letter-spacing:.1em;cursor:pointer;border-bottom:1px dotted rgba(128,128,128,.5)}
+#ap-odamlar .od-hid{letter-spacing:.2em;opacity:.35}
+#ap-odamlar .od-r{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:7px;
+ background:rgba(128,128,128,.15);white-space:nowrap}
+#ap-odamlar .od-r.m{background:#FF6B1A;color:#fff}
+#ap-odamlar .od-r.o{background:rgba(31,143,95,.2);color:#1F8F5F}
+#ap-odamlar .od-off{opacity:.4}
+#ap-odamlar .od-new{background:rgba(128,128,128,.08);border-radius:14px;padding:16px;margin-bottom:14px}
+#ap-odamlar .od-new .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+#ap-odamlar .od-new input,#ap-odamlar .od-new select{width:100%;padding:9px 12px;border-radius:10px;
+ border:1.5px solid rgba(128,128,128,.3);background:rgba(128,128,128,.07);color:inherit;font-size:14px}
+#ap-odamlar .od-ok{background:rgba(31,143,95,.15);border:1px solid #1F8F5F;border-radius:12px;
+ padding:14px;margin-bottom:14px;font-size:14px}
+#ap-odamlar .od-ok b{font-family:ui-monospace,Menlo,monospace;font-size:19px;letter-spacing:.12em}
+#ap-odamlar .od-empty{text-align:center;opacity:.55;padding:36px 0;font-size:14px}
+#ap-odamlar .od-tw{overflow-x:auto}
+`;
+
+/* ================= HOLAT ================= */
+var T=null, ROYXAT=[], FILTR="all", QIDIR="", KORSAT=false, YANGI=false, OQ=null, BAND=false;
+var ROL=[["marketolog","Marketolog"],["admin","Admin"],["saport","Sapport"],
+         ["oqituvchi","O'qituvchi"],["xodim","Xodim"],["oquvchi","O'quvchi"],["ota_ona","Ota-ona"]];
+function rolNom(r){for(var i=0;i<ROL.length;i++)if(ROL[i][0]===r)return ROL[i][1];return r}
+function E(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+ return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function tok(){if(T)return T;try{return sessionStorage.getItem("od_token")}catch(e){return null}}
+function api(b){b.token=tok();
+ return fetch(ESHIK,{method:"POST",headers:{"Content-Type":"application/json"},
+  body:JSON.stringify(b)}).then(function(r){return r.json()})}
+function P(){return document.getElementById("ap-odamlar")}
+
+/* ================= O'RNATISH ================= */
+function ornat(){
+ if(document.getElementById("ap-odamlar"))return;
+ var st=document.createElement("style");st.textContent=CSS;document.head.appendChild(st);
+ var proto=document.getElementById("ap-staff")||document.querySelector('[id^="ap-"]');
+ var d=document.createElement("div");
+ d.id="ap-odamlar";
+ d.className=proto?proto.className:"admin-panel";
+ if(proto&&proto.parentNode)proto.parentNode.appendChild(d);else document.body.appendChild(d);
+ try{ if(typeof MENU_META!=="undefined")
+   MENU_META.odamlar={label:"\u{1F511} Odamlar",fn:"loadOdamlar"}; }catch(e){}
+ window.loadOdamlar=chiz;
+}
+
+/* Menyuga qator qo'shamiz - faqat marketologga. Eski funksiyalar o'zgarmaydi. */
+function menyu(){
+ var nav=document.getElementById("sb-nav");
+ if(!nav||!nav.children.length)return;
+ if(document.querySelector('#sb-nav [data-panel="odamlar"]'))return;
+ var mark=false;
+ try{ mark=!!(typeof currentStaff!=="undefined"&&currentStaff&&currentStaff.isMarketer); }catch(e){}
+ if(!mark)return;
+ var proto=nav.children[0],it=proto.cloneNode(false);
+ it.className=proto.className.replace(/\bactive\b/,"").trim();
+ it.setAttribute("data-panel","odamlar");
+ it.setAttribute("onclick","navTo('odamlar',this)");
+ it.textContent="\u{1F511} Odamlar";
+ nav.appendChild(it);
+}
+
+/* ================= EKRANLAR ================= */
+function chiz(){
+ var p=P();if(!p)return;
+ if(!tok())return gate();
+ royxatOl();
+}
+function gate(){
+ P().innerHTML='<div class="od-gate"><h3>\u{1F511} Odamlar</h3>'+
+  '<p>Bu bo\'limda barcha pin kodlar turadi. Davom etish uchun marketolog pinini kiriting.</p>'+
+  '<input class="od-pin" id="od-p" inputmode="numeric" maxlength="7" placeholder="•••••">'+
+  '<div class="od-err" id="od-e"></div>'+
+  '<button class="od-b" id="od-go" style="width:100%;padding:12px">Kirish</button></div>';
+ var inp=document.getElementById("od-p");
+ inp.focus();
+ inp.addEventListener("keydown",function(e){if(e.key==="Enter")kir()});
+ document.getElementById("od-go").addEventListener("click",kir);
+}
+function kir(){
+ if(BAND)return;
+ var v=(document.getElementById("od-p").value||"").trim(),e=document.getElementById("od-e");
+ if(!/^\d{5,7}$/.test(v)){e.textContent="5-7 raqam";return}
+ BAND=true;e.textContent="Tekshirilmoqda...";
+ fetch(ESHIK,{method:"POST",headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({action:"kirish",pin:v,qurilma:"admin-panel"})})
+ .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})})
+ .then(function(x){
+  BAND=false;
+  if(x.d&&x.d.token){
+   if(["marketolog","admin"].indexOf(x.d.rol)===-1){e.textContent="Faqat marketolog uchun";return}
+   T=x.d.token;try{sessionStorage.setItem("od_token",T)}catch(err){}
+   royxatOl();return}
+  e.textContent=x.s===429?"Ko'p urinish. 15 daqiqadan keyin.":"Pin noto'g'ri";
+ }).catch(function(){BAND=false;e.textContent="Internet yo'q"});
+}
+function royxatOl(){
+ P().innerHTML='<div class="od-empty">Yuklanmoqda...</div>';
+ api({action:"royxat"}).then(function(d){
+  if(d&&d.xato){T=null;try{sessionStorage.removeItem("od_token")}catch(e){}
+   return gate()}
+  ROYXAT=d.royxat||[];jadval();
+ }).catch(function(){P().innerHTML='<div class="od-empty">Xatolik. Qayta uring.</div>'});
+}
+
+function jadval(){
+ var q=QIDIR.toLowerCase();
+ var list=ROYXAT.filter(function(o){
+  if(FILTR==="xodim"&&["marketolog","admin","saport","oqituvchi","xodim"].indexOf(o.rol)===-1)return false;
+  if(FILTR==="oquvchi"&&o.rol!=="oquvchi")return false;
+  if(FILTR==="ota_ona"&&o.rol!=="ota_ona")return false;
+  if(q&&String(o.ism||"").toLowerCase().indexOf(q)===-1)return false;
+  return true;
+ });
+ var filtrlar=[["all","Hammasi"],["xodim","Xodimlar"],["oquvchi","O'quvchilar"],["ota_ona","Ota-onalar"]]
+  .map(function(f){return '<button class="od-f '+(FILTR===f[0]?"on":"")+'" data-f="'+f[0]+'">'+f[1]+'</button>'}).join("");
+
+ var rows=list.map(function(o){
+  var pin=o.pin||"-";
+  var kod=KORSAT?'<span class="od-code" data-copy="'+E(pin)+'">'+E(pin)+'</span>'
+                :'<span class="od-code od-hid" data-show="1">•••••</span>';
+  return '<tr class="'+(o.faol?"":"od-off")+'" data-id="'+o.id+'">'+
+   '<td><b>'+E(o.ism)+'</b>'+(o.telefon?'<br><span style="font-size:12px;opacity:.55">'+E(o.telefon)+'</span>':'')+'</td>'+
+   '<td><span class="od-r '+(o.rol==="marketolog"?"m":o.rol==="oquvchi"?"o":"")+'">'+rolNom(o.rol)+'</span></td>'+
+   '<td>'+(o.sinf?E(o.sinf)+"-sinf":"-")+'</td>'+
+   '<td>'+kod+'</td>'+
+   '<td style="white-space:nowrap">'+
+    '<button class="od-b gh" data-act="yangi" data-id="'+o.id+'">Yangilash</button> '+
+    (o.faol?'<button class="od-b gh" data-act="off" data-id="'+o.id+'">O\'chirish</button>':'<span style="font-size:12px;opacity:.5">o\'chirilgan</span>')+
+   '</td></tr>';
+ }).join("");
+
+ P().innerHTML=
+  '<div class="ap-head"><div><div class="ap-title">\u{1F511} Odamlar</div>'+
+  '<div class="ap-sub">Pin kodlarni berish, yangilash va o\'chirish</div></div>'+
+  '<button class="od-b" data-act="new">+ Yangi odam</button></div>'+
+  (OQ?'<div class="od-ok">'+OQ+'</div>':'')+
+  (YANGI?forma():'')+
+  '<div class="od-bar">'+filtrlar+
+   '<input type="text" id="od-q" placeholder="Ism bo\'yicha qidirish..." value="'+E(QIDIR)+'">'+
+   '<button class="od-b gh" data-act="korsat">'+(KORSAT?"Pinlarni yashirish":"Pinlarni ko\'rsatish")+'</button>'+
+  '</div>'+
+  '<div class="od-tw"><table><thead><tr><th>Ism</th><th>Rol</th><th>Sinf</th><th>Pin</th><th></th></tr></thead>'+
+  '<tbody>'+(rows||'<tr><td colspan="5" class="od-empty">Topilmadi</td></tr>')+'</tbody></table></div>'+
+  '<div style="font-size:12px;opacity:.5;margin-top:12px">Jami: '+list.length+' ta. Pin ustiga bosilsa nusxalanadi.</div>';
+
+ var qi=document.getElementById("od-q");
+ if(qi)qi.addEventListener("input",function(){QIDIR=this.value;jadval();
+  var n=document.getElementById("od-q");if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}});
+ P().addEventListener("click",bosildi);
+}
+function forma(){
+ return '<div class="od-new"><div class="g">'+
+  '<input type="text" id="od-ism" placeholder="Ism familiya">'+
+  '<select id="od-rol">'+ROL.map(function(r){
+    return '<option value="'+r[0]+'">'+r[1]+'</option>'}).join("")+'</select>'+
+  '<input type="text" id="od-tel" placeholder="+998 __ ___ __ __">'+
+  '<input type="text" id="od-sinf" placeholder="Sinf (o\'quvchi uchun)">'+
+  '</div><div style="margin-top:12px">'+
+  '<button class="od-b" data-act="save">Qo\'shish va pin berish</button> '+
+  '<button class="od-b gh" data-act="cancel">Bekor</button></div></div>';
+}
+function bosildi(e){
+ var b=e.target.closest("[data-act],[data-f],[data-copy],[data-show]");
+ if(!b)return;
+ if(b.hasAttribute("data-f")){FILTR=b.getAttribute("data-f");jadval();return}
+ if(b.hasAttribute("data-show")){KORSAT=true;jadval();return}
+ if(b.hasAttribute("data-copy")){
+  var v=b.getAttribute("data-copy");
+  try{navigator.clipboard.writeText(v);b.textContent="nusxalandi";
+   setTimeout(function(){b.textContent=v},900)}catch(err){}
+  return}
+ var a=b.getAttribute("data-act"),id=b.getAttribute("data-id");
+ if(a==="korsat"){KORSAT=!KORSAT;jadval();return}
+ if(a==="new"){YANGI=true;OQ=null;jadval();return}
+ if(a==="cancel"){YANGI=false;jadval();return}
+ if(a==="save")return saqla();
+ if(a==="yangi")return yangilash(id);
+ if(a==="off")return ochirish(id);
+}
+function saqla(){
+ var ism=(document.getElementById("od-ism").value||"").trim();
+ if(!ism){alert("Ismni yozing");return}
+ var rol=document.getElementById("od-rol").value;
+ var tel=(document.getElementById("od-tel").value||"").trim();
+ var sinf=parseInt(document.getElementById("od-sinf").value,10);
+ api({action:"odam_yarat",ism:ism,rol:rol,telefon:tel||null,
+      sinf:isNaN(sinf)?null:sinf}).then(function(d){
+  if(d&&d.pin){OQ="<b>"+E(d.pin)+"</b> - "+E(d.ism)+" ("+rolNom(d.rol)+"). Pinni odamga bering.";
+   YANGI=false;royxatOl()}
+  else alert("Xatolik: "+(d&&d.xato?d.xato:"?"));
+ });
+}
+function yangilash(id){
+ var o=ROYXAT.filter(function(r){return String(r.id)===String(id)})[0];
+ if(!confirm("Pin yangilansinmi? "+(o?o.ism:"")+" eski pin bilan kira olmaydi."))return;
+ api({action:"pin_yangila",odam_id:parseInt(id,10)}).then(function(d){
+  if(d&&d.pin){OQ="<b>"+E(d.pin)+"</b> - yangi pin"+(o?" ("+E(o.ism)+")":"")+". Odamga yetkazing.";
+   royxatOl()}
+  else alert("Xatolik: "+(d&&d.xato?d.xato:"?"));
+ });
+}
+function ochirish(id){
+ var o=ROYXAT.filter(function(r){return String(r.id)===String(id)})[0];
+ if(!confirm((o?o.ism:"Bu odam")+" o'chirilsinmi? Kirish darhol to'xtaydi."))return;
+ api({action:"ochir",odam_id:parseInt(id,10)}).then(function(d){
+  if(d&&d.ok){OQ=null;royxatOl()}else alert("Xatolik: "+(d&&d.xato?d.xato:"?"));
+ });
+}
+
+/* ================= ISHGA TUSHISH ================= */
+function boot(){
+ ornat();
+ menyu();
+ setInterval(menyu,1500);   /* login qilingach menyu qayta quriladi */
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){setTimeout(boot,400)});
+else setTimeout(boot,400);
+})();
+</script>
 </body>
 </html>
