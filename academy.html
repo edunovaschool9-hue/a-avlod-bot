@@ -7841,5 +7841,316 @@ function okOtaSend(id){
 }
 
 </script>
+
+<!-- ===== KABINETLAR (pin-sessiya: o'qituvchi / o'quvchi / ota-ona) ===== -->
+<script>
+(function(){
+if(window.EKAB)return;window.EKAB=1;
+
+/* ============ SOZLAMALAR ============ */
+var SUPABASE_URL="https://unaodltahuevrfnarfha.supabase.co";
+var ESHIK=SUPABASE_URL+"/functions/v1/eshik";
+var LANDING="index.html";   /* bosh sahifa fayli */
+
+/* ============ MATNLAR ============ */
+var K={
+uz:{yuk:"Yuklanmoqda...",xato:"Xatolik. Qayta uriring.",chiq:"Chiqish",
+ oqit:"O'qituvchi",oquv:"O'quvchi",ota:"Ota-ona",
+ tabs:["Profil","O'quvchilarim","Hisobot"],
+ ball:"ball",maqsad:"Hafta maqsadi: 1 kletka tuxum 🥚",dubai:"6 oy eng yuqori reyting - 2 kishilik Dubay yo'llanmasi",
+ reyting:"Reyting davomat va test natijalaridan yig'iladi",
+ qidir:"O'quvchi qidirish...",tanla:"Ro'yxatdan tanlash",yop:"Yopish",
+ biriktirilgan:"Biriktirilgan o'quvchilar",hech:"Hali o'quvchi biriktirilmagan",
+ boy:"Bo'y (taxminan)",vazn:"Vazn (taxminan)",kuchli:"Kuchli tomonlari, xarakteri",
+ zaif:"Zaif tomonlari",shikoyat:"O'quvchi shikoyatlari",
+ saqla:"Saqlash",saqlandi:"Saqlandi",ajrat:"ro'yxatdan chiqarish",
+ hisT:"Kunlik hisobot - dars diagnozi",hisM:"Har kuni dars oxirida to'ldirish majburiy.",
+ sinf:"Sinf",mavzu:"Bugungi mavzu",matn:"Qanday o'tdi: kim faol qatnashdi, qiziq voqea, umumiy xulosa",
+ yubor:"Yuborish",yuborildi:"Yuborildi",mening:"Mening hisobotlarim",hisYoq:"Hali hisobot yo'q",
+ salom:"Salom",natT:"Test natijalari",ona:"Ona tili",mat:"Matematika",eng:"Ingliz tili",umum:"Umumiy",
+ natYoq:"Test natijasi topilmadi",tavsiya:"Tavsiya",qiz:"Qiziqishlari",
+ lenta:"Sinf hisobotlari",lentaYoq:"Hisobotlar hali yo'q - o'qituvchi yozgach shu yerda ko'rinadi",
+ farzand:"Farzandingiz"},
+ru:{yuk:"Загрузка...",xato:"Ошибка. Попробуйте ещё раз.",chiq:"Выйти",
+ oqit:"Учитель",oquv:"Ученик",ota:"Родитель",
+ tabs:["Профиль","Мои ученики","Отчёт"],
+ ball:"баллов",maqsad:"Цель недели: 1 клетка яиц 🥚",dubai:"6 месяцев лучший рейтинг - путёвка в Дубай на двоих",
+ reyting:"Рейтинг собирается из давомата и результатов тестов",
+ qidir:"Поиск ученика...",tanla:"Выбрать из списка",yop:"Закрыть",
+ biriktirilgan:"Мои ученики",hech:"Пока никто не добавлен",
+ boy:"Рост (примерно)",vazn:"Вес (примерно)",kuchli:"Сильные стороны, характер",
+ zaif:"Слабые стороны",shikoyat:"Жалобы ученика",
+ saqla:"Сохранить",saqlandi:"Сохранено",ajrat:"убрать из списка",
+ hisT:"Ежедневный отчёт - диагноз урока",hisM:"Заполняется каждый день в конце занятий, обязательно.",
+ sinf:"Класс",mavzu:"Тема сегодня",matn:"Как прошло: кто хорошо участвовал, интересный случай, общий вывод",
+ yubor:"Отправить",yuborildi:"Отправлено",mening:"Мои отчёты",hisYoq:"Отчётов пока нет",
+ salom:"Привет",natT:"Результаты теста",ona:"Родной язык",mat:"Математика",eng:"Английский",umum:"Общий",
+ natYoq:"Результат теста не найден",tavsiya:"Рекомендация",qiz:"Интересы",
+ lenta:"Отчёты класса",lentaYoq:"Отчётов пока нет - как только учитель напишет, появятся здесь",
+ farzand:"Ваш ребёнок"}};
+
+/* qabul blokidagi qiziqish savollari - javoblarni matnga aylantirish uchun */
+var INT={
+ fan:{q:{uz:"Yoqadigan dars",ru:"Любимый урок"},o:[{uz:"Matematika",ru:"Математика"},{uz:"Til va adabiyot",ru:"Язык и литература"},{uz:"Tabiiy fanlar",ru:"Естественные науки"},{uz:"Sport va ijod",ru:"Спорт и творчество"}]},
+ ish:{q:{uz:"Qanday ishlash qulay",ru:"Как удобнее работать"},o:[{uz:"Yolg'iz",ru:"Один"},{uz:"Juftlikda",ru:"В паре"},{uz:"Guruhda",ru:"В группе"},{uz:"Farqi yo'q",ru:"Без разницы"}]},
+ vaqt:{q:{uz:"Bo'sh vaqtda",ru:"В свободное время"},o:[{uz:"Kitob o'qiydi",ru:"Читает"},{uz:"Kompyuter, telefon",ru:"Компьютер, телефон"},{uz:"Sport",ru:"Спорт"},{uz:"Rasm, musiqa",ru:"Рисует, музыка"}]},
+ usul:{q:{uz:"Yangi mavzuni tushunish",ru:"Как понимает новую тему"},o:[{uz:"Tushuntirib berishsa",ru:"Когда объясняют"},{uz:"O'zi o'qib",ru:"Читает сам"},{uz:"Ko'rsatib berishsa",ru:"Когда показывают"},{uz:"Amalda qilib",ru:"Когда делает сам"}]},
+ xoh:{q:{uz:"O'rganishni xohlaydi",ru:"Хочет изучать"},o:[{uz:"Dasturlash",ru:"Программирование"},{uz:"Chet tillar",ru:"Иностранные языки"},{uz:"Robototexnika",ru:"Робототехника"},{uz:"Shaxmat",ru:"Шахматы"},{uz:"San'at",ru:"Искусство"},{uz:"Sport",ru:"Спорт"}]}};
+
+/* ============ STIL ============ */
+var CSS=`
+#ekab{position:fixed;inset:0;z-index:99990;overflow-y:auto;background:#F3F6F2;color:#0F2D2A;
+ font-family:system-ui,-apple-system,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
+#ekab *{box-sizing:border-box}
+#ekab .w{max-width:760px;margin:0 auto;padding:0 16px 60px}
+#ekab .top{position:sticky;top:0;z-index:5;background:rgba(243,246,242,.94);backdrop-filter:blur(8px);
+ border-bottom:1px solid rgba(15,45,42,.12);margin:0 -16px 18px;padding:14px 16px;
+ display:flex;align-items:center;justify-content:space-between;gap:10px}
+#ekab .who b{font-size:17px;display:block}
+#ekab .who span{font-size:12px;color:rgba(15,45,42,.6);font-weight:700}
+#ekab .tr{display:flex;gap:8px;align-items:center}
+#ekab .lng{display:flex;gap:2px;border:1px solid rgba(15,45,42,.14);border-radius:99px;padding:2px;background:#fff}
+#ekab .lng button{font-size:11px;font-weight:700;border:none;background:none;color:rgba(15,45,42,.6);padding:5px 11px;border-radius:99px;cursor:pointer}
+#ekab .lng button.on{background:#0F2D2A;color:#fff}
+#ekab .out{font-size:12px;font-weight:700;background:none;border:1.5px solid rgba(15,45,42,.16);border-radius:99px;padding:7px 13px;cursor:pointer;color:#0F2D2A}
+#ekab .card{background:#fff;border:1px solid rgba(15,45,42,.12);border-radius:16px;padding:20px;margin-bottom:14px}
+#ekab .card h3{font-size:12.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:rgba(15,45,42,.6);margin:0 0 13px}
+#ekab .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+#ekab .tabs button{font-size:13px;font-weight:700;border:1px solid rgba(15,45,42,.14);background:#fff;color:rgba(15,45,42,.6);padding:9px 16px;border-radius:99px;cursor:pointer}
+#ekab .tabs button.on{background:#0F2D2A;color:#fff;border-color:#0F2D2A}
+#ekab label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:rgba(15,45,42,.55);margin:11px 0 5px}
+#ekab input[type=text],#ekab textarea,#ekab select{width:100%;font-family:inherit;font-size:15px;color:#0F2D2A;background:#F3F6F2;border:1.5px solid rgba(15,45,42,.14);border-radius:11px;padding:10px 13px}
+#ekab textarea{min-height:90px;resize:vertical}
+#ekab input:focus,#ekab textarea:focus,#ekab select:focus{outline:none;border-color:#0F2D2A}
+#ekab .b{font-family:inherit;font-weight:700;font-size:14px;background:#0F2D2A;color:#fff;border:none;border-radius:99px;padding:11px 20px;cursor:pointer}
+#ekab .b.gold{background:#E8AC0E;color:#0F2D2A}
+#ekab .b.gh{background:transparent;color:#0F2D2A;border:1.5px solid rgba(15,45,42,.16)}
+#ekab .b.xs{font-size:12px;padding:7px 12px}
+#ekab .b:disabled{opacity:.4;cursor:not-allowed}
+#ekab .bar{height:9px;background:rgba(15,45,42,.1);border-radius:99px;overflow:hidden}
+#ekab .bar i{display:block;height:100%;background:#E8AC0E;border-radius:99px;transition:width .5s}
+#ekab .rr{display:flex;align-items:center;gap:12px;background:#F3F6F2;border-radius:12px;padding:12px 14px;margin-bottom:8px}
+#ekab .rr b{width:120px;flex:none;font-size:14px}
+#ekab .rr .tr2{flex:1;height:9px;background:rgba(15,45,42,.12);border-radius:99px;overflow:hidden}
+#ekab .rr .tr2 i{display:block;height:100%;border-radius:99px}
+#ekab .rr .v{font-size:13px;font-weight:800;width:52px;text-align:right}
+#ekab .dark{background:#0F2D2A;color:#fff}
+#ekab .dark .tr2{background:rgba(255,255,255,.2)}
+#ekab .note{background:rgba(232,172,14,.14);border:1px solid #E8AC0E;border-radius:12px;padding:12px 14px;font-size:13.5px;margin-bottom:14px}
+#ekab .stud{border:1px solid rgba(15,45,42,.12);border-radius:14px;padding:16px;margin-bottom:12px;background:#fff}
+#ekab .stud .h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px}
+#ekab .stud .h b{font-size:15.5px}
+#ekab .pill{font-size:11px;font-weight:700;border-radius:8px;padding:3px 9px;background:#E8AC0E;color:#0F2D2A}
+#ekab .pill.gr{background:rgba(15,45,42,.08);color:rgba(15,45,42,.6)}
+#ekab .g2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+#ekab .feed{border-left:3px solid #E8AC0E;padding:2px 0 2px 14px;margin:0 0 14px}
+#ekab .feed .d{font-size:11px;font-weight:700;color:rgba(15,45,42,.55)}
+#ekab .feed b{display:block;font-size:14.5px;margin:2px 0}
+#ekab .feed p{font-size:14px;margin:0;color:rgba(15,45,42,.85)}
+#ekab .empty{text-align:center;color:rgba(15,45,42,.55);padding:26px 0;font-size:14px}
+#ekab .list{max-height:260px;overflow-y:auto;border:1px solid rgba(15,45,42,.12);border-radius:12px;margin-top:8px}
+#ekab .list button{display:flex;justify-content:space-between;width:100%;text-align:left;font-family:inherit;font-size:14px;font-weight:600;background:#fff;border:none;border-bottom:1px dashed rgba(15,45,42,.1);padding:11px 13px;cursor:pointer;color:#0F2D2A}
+#ekab .list button:hover{background:#F3F6F2}
+#ekab .ok{color:#1F8F5F;font-size:12.5px;font-weight:700}
+@media(max-width:560px){#ekab .g2{grid-template-columns:1fr}#ekab .rr b{width:90px}}
+`;
+
+/* ============ YORDAMCHI ============ */
+function tok(){try{return localStorage.getItem("edunova_token")}catch(e){return null}}
+function til(){try{return localStorage.getItem("edunova_til")||"uz"}catch(e){return"uz"}}
+function tilSaqla(l){try{localStorage.setItem("edunova_til",l)}catch(e){}}
+function E(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function api(body){body.token=tok();
+ return fetch(ESHIK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+ .then(function(r){return r.json()})}
+
+var S={lang:til(),men:null,tab:0,studs:null,royxat:null,his:null,pick:false,qid:""};
+function t(){return K[S.lang]}
+function g(id){return document.getElementById(id)}
+
+/* ============ UMUMIY QISMLAR ============ */
+function shell(rolLabel,inner){
+ return '<div class="w"><div class="top"><div class="who"><b>'+E(S.men.ism)+'</b><span>'+rolLabel+
+  (S.men.sinf?' · '+S.men.sinf+'-sinf':'')+'</span></div><div class="tr">'+
+  '<div class="lng"><button class="'+(S.lang==="uz"?"on":"")+'" onclick="EKABI.lang(\'uz\')">UZ</button>'+
+  '<button class="'+(S.lang==="ru"?"on":"")+'" onclick="EKABI.lang(\'ru\')">RU</button></div>'+
+  '<button class="out" onclick="EKABI.chiq()">'+t().chiq+'</button></div></div>'+inner+'</div>';
+}
+function natijaBars(n){
+ var x=t();
+ if(!n||!n.natijalar)return '<div class="empty">'+x.natYoq+'</div>';
+ var r=n.natijalar;
+ function row(nom,v){v=v||0;var c=v>=80?"#1F8F5F":v>=50?"#E8AC0E":"#C4442A";
+  return '<div class="rr"><b>'+nom+'</b><span class="tr2"><i style="width:'+v+'%;background:'+c+'"></i></span><span class="v">'+v+'%</span></div>'}
+ var h=row(x.ona,r.ona)+row(x.mat,r.mat)+row(x.eng,r.eng)+
+  '<div class="rr dark"><b>'+x.umum+'</b><span class="tr2"><i style="width:'+(r.total||0)+'%;background:#E8AC0E"></i></span><span class="v">'+(r.total||0)+'%</span></div>';
+ if(n.tavsiya)h+='<div class="note" style="margin-top:12px"><b>'+x.tavsiya+':</b> '+E(n.tavsiya)+'</div>';
+ if(n.qiziqishlar){var q=n.qiziqishlar,rows="";
+  for(var k in INT){if(q[k]===undefined||q[k]===null)continue;
+   var v=q[k],val;
+   if(Object.prototype.toString.call(v)==="[object Array]")val=v.map(function(i){return INT[k].o[i]?INT[k].o[i][S.lang]:""}).filter(Boolean).join(", ");
+   else val=INT[k].o[v]?INT[k].o[v][S.lang]:"";
+   if(val)rows+='<div style="font-size:14px;padding:4px 0"><span style="color:rgba(15,45,42,.55);font-weight:700">'+INT[k].q[S.lang]+':</span> '+E(val)+'</div>'}
+  if(rows)h+='<div style="margin-top:10px"><h3 style="font-size:12.5px;font-weight:800;text-transform:uppercase;color:rgba(15,45,42,.6);margin:0 0 8px">'+x.qiz+'</h3>'+rows+'</div>'}
+ return h;
+}
+function feed(list){
+ var x=t();
+ if(!list||!list.length)return '<div class="empty">'+x.lentaYoq+'</div>';
+ return list.map(function(h){
+  return '<div class="feed"><span class="d">'+E(h.sana||"")+(h.oqituvchi_ism?' · '+E(h.oqituvchi_ism):'')+'</span>'+
+   '<b>'+E(h.mavzu||"")+'</b><p>'+E(h.matn||"")+'</p></div>'}).join("");
+}
+
+/* ============ O'QITUVCHI ============ */
+function drawOqit(){
+ var x=t(),inner='<div class="tabs">'+x.tabs.map(function(n,i){
+  return '<button class="'+(S.tab===i?"on":"")+'" onclick="EKABI.tab('+i+')">'+n+'</button>'}).join("")+'</div><div id="ek-body"></div>';
+ g("ekab").innerHTML=shell(x.oqit,inner);
+ if(S.tab===0)oqitProfil();else if(S.tab===1)oqitStud();else oqitHis();
+}
+function oqitProfil(){
+ var x=t();
+ g("ek-body").innerHTML='<div class="card"><h3>'+x.tabs[0]+'</h3>'+
+  '<div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:40px;font-weight:800">0</span><span style="font-size:13px;color:rgba(15,45,42,.6);font-weight:700">'+x.ball+'</span></div>'+
+  '<div class="bar" style="margin:10px 0 8px"><i style="width:2%"></i></div>'+
+  '<div style="font-size:14px;font-weight:700">'+x.maqsad+'</div>'+
+  '<div style="font-size:12.5px;color:rgba(15,45,42,.6);margin-top:4px">'+x.dubai+'</div>'+
+  '<div style="font-size:12px;color:rgba(15,45,42,.5);margin-top:10px">'+x.reyting+'</div></div>';
+}
+function oqitStud(){
+ var x=t(),b=g("ek-body");
+ b.innerHTML='<div class="card"><h3>'+x.biriktirilgan+'</h3>'+
+  '<button class="b gh xs" onclick="EKABI.pickT()">'+(S.pick?x.yop:x.tanla)+'</button>'+
+  '<div id="ek-pick"></div></div><div id="ek-studs"><div class="empty">'+x.yuk+'</div></div>';
+ if(S.pick)drawPick();
+ if(S.studs)drawStuds();
+ else api({action:"mening_oquvchilarim"}).then(function(d){S.studs=d.royxat||[];drawStuds()});
+}
+function drawPick(){
+ var x=t(),p=g("ek-pick");if(!p)return;
+ function rend(){
+  var q=S.qid.toLowerCase();
+  var rows=(S.royxat||[]).filter(function(o){return !q||o.ism.toLowerCase().indexOf(q)>-1})
+   .slice(0,60).map(function(o){
+    return '<button onclick="EKABI.biriktir('+o.id+')"><span>'+E(o.ism)+'</span><span style="color:rgba(15,45,42,.5)">'+(o.sinf||"")+"-sinf"+'</span></button>'}).join("");
+  p.innerHTML='<input type="text" placeholder="'+x.qidir+'" value="'+E(S.qid)+'" oninput="EKABI.qid(this.value)" style="margin-top:10px">'+
+   '<div class="list">'+(rows||'<div class="empty">-</div>')+'</div>';
+ }
+ if(S.royxat)rend();
+ else api({action:"oquvchi_royxat"}).then(function(d){S.royxat=d.royxat||[];rend()});
+}
+function drawStuds(){
+ var x=t(),b=g("ek-studs");if(!b)return;
+ if(!S.studs.length){b.innerHTML='<div class="card"><div class="empty">'+x.hech+'</div></div>';return}
+ b.innerHTML=S.studs.map(function(s){
+  var k=s.kuzatuv||{};
+  return '<div class="stud"><div class="h"><b>'+E(s.ism)+'</b>'+
+   '<span class="pill '+(s.ball==null?"gr":"")+'">'+(s.ball==null?(s.sinf||"")+"-sinf":s.ball+"%")+'</span></div>'+
+   '<div class="g2">'+
+   '<div><label>'+x.boy+'</label><input type="text" id="ek-boy-'+s.id+'" value="'+E(k.boy)+'"></div>'+
+   '<div><label>'+x.vazn+'</label><input type="text" id="ek-vazn-'+s.id+'" value="'+E(k.vazn)+'"></div></div>'+
+   '<label>'+x.kuchli+'</label><input type="text" id="ek-kuchli-'+s.id+'" value="'+E(k.kuchli)+'">'+
+   '<label>'+x.zaif+'</label><input type="text" id="ek-zaif-'+s.id+'" value="'+E(k.zaif)+'">'+
+   '<label>'+x.shikoyat+'</label><input type="text" id="ek-shik-'+s.id+'" value="'+E(k.shikoyat)+'">'+
+   '<div style="margin-top:12px;display:flex;gap:10px;align-items:center">'+
+   '<button class="b xs" onclick="EKABI.kuzSaqla('+s.id+')">'+x.saqla+'</button>'+
+   '<span class="ok" id="ek-ok-'+s.id+'"></span>'+
+   '<button class="b gh xs" style="margin-left:auto" onclick="EKABI.ajrat('+s.id+')">'+x.ajrat+'</button></div></div>'}).join("");
+}
+function oqitHis(){
+ var x=t(),s="";for(var i=1;i<=11;i++)s+='<option value="'+i+'">'+i+'</option>';
+ g("ek-body").innerHTML='<div class="card"><h3>'+x.hisT+'</h3><div class="note">'+x.hisM+'</div>'+
+  '<div class="g2"><div><label>'+x.sinf+'</label><select id="ek-hsinf">'+s+'</select></div>'+
+  '<div><label>'+x.mavzu+'</label><input type="text" id="ek-hmavzu"></div></div>'+
+  '<label>'+x.matn+'</label><textarea id="ek-hmatn"></textarea>'+
+  '<div style="margin-top:12px;display:flex;gap:10px;align-items:center">'+
+  '<button class="b gold" onclick="EKABI.hisYubor()">'+x.yubor+'</button><span class="ok" id="ek-hok"></span></div></div>'+
+  '<div class="card"><h3>'+x.mening+'</h3><div id="ek-his"><div class="empty">'+x.yuk+'</div></div></div>';
+ api({action:"hisobotlarim"}).then(function(d){S.his=d.royxat||[];
+  var b=g("ek-his");if(!b)return;
+  b.innerHTML=S.his.length?S.his.map(function(h){
+   return '<div class="feed"><span class="d">'+E(h.sana)+' · '+(h.sinf||"")+'-sinf</span><b>'+E(h.mavzu||"")+'</b><p>'+E(h.matn||"")+'</p></div>'}).join("")
+   :'<div class="empty">'+x.hisYoq+'</div>'});
+}
+
+/* ============ OTA-ONA ============ */
+function drawOta(){
+ var x=t();
+ g("ekab").innerHTML=shell(x.ota,'<div id="ek-body"><div class="empty">'+x.yuk+'</div></div>');
+ api({action:"bolam"}).then(function(d){
+  var b=g("ek-body");if(!b)return;
+  if(!d.bola){b.innerHTML='<div class="card"><div class="empty">'+x.natYoq+'</div></div>';return}
+  b.innerHTML='<div class="card"><h3>'+x.farzand+'</h3>'+
+   '<div style="font-size:19px;font-weight:800">'+E(d.bola.ism)+'</div>'+
+   '<div style="font-size:13px;color:rgba(15,45,42,.6);font-weight:700">'+(d.bola.sinf||"")+'-sinf</div></div>'+
+   '<div class="card"><h3>'+x.natT+'</h3>'+natijaBars(d.natija)+'</div>'+
+   '<div class="card"><h3>'+x.lenta+'</h3>'+feed(d.hisobotlar)+'</div>';
+ }).catch(function(){g("ek-body").innerHTML='<div class="card"><div class="empty">'+x.xato+'</div></div>'});
+}
+
+/* ============ O'QUVCHI ============ */
+function drawOquv(){
+ var x=t();
+ g("ekab").innerHTML=shell(x.oquv,'<div id="ek-body"><div class="empty">'+x.yuk+'</div></div>');
+ api({action:"men_oquvchi"}).then(function(d){
+  var b=g("ek-body");if(!b)return;
+  b.innerHTML='<div class="card"><div style="font-size:19px;font-weight:800">'+x.salom+', '+E(d.ism)+'! 👋</div></div>'+
+   '<div class="card"><h3>'+x.natT+'</h3>'+natijaBars(d.natija)+'</div>'+
+   '<div class="card"><h3>'+x.lenta+'</h3>'+feed(d.hisobotlar)+'</div>';
+ }).catch(function(){g("ek-body").innerHTML='<div class="card"><div class="empty">'+x.xato+'</div></div>'});
+}
+
+/* ============ RENDER ============ */
+function draw(){
+ if(!S.men)return;
+ if(S.men.rol==="oqituvchi")drawOqit();
+ else if(S.men.rol==="ota_ona")drawOta();
+ else if(S.men.rol==="oquvchi")drawOquv();
+}
+
+/* ============ PUBLIC ============ */
+window.EKABI={
+ lang:function(l){S.lang=l;tilSaqla(l);draw()},
+ tab:function(i){S.tab=i;draw()},
+ chiq:function(){api({action:"chiqish"}).catch(function(){});
+  try{localStorage.removeItem("edunova_token");localStorage.removeItem("edunova_rol");localStorage.removeItem("edunova_ism")}catch(e){}
+  location.href=LANDING},
+ pickT:function(){S.pick=!S.pick;drawOqit()},
+ qid:function(v){S.qid=v;drawPick()},
+ biriktir:function(id){api({action:"biriktir",oquvchi_id:id}).then(function(){S.studs=null;S.pick=false;drawOqit()})},
+ ajrat:function(id){api({action:"ajrat",oquvchi_id:id}).then(function(){S.studs=null;drawOqit()})},
+ kuzSaqla:function(id){
+  api({action:"kuzatuv_saqla",oquvchi_id:id,
+   boy:g("ek-boy-"+id).value,vazn:g("ek-vazn-"+id).value,
+   kuchli:g("ek-kuchli-"+id).value,zaif:g("ek-zaif-"+id).value,shikoyat:g("ek-shik-"+id).value})
+  .then(function(d){var o=g("ek-ok-"+id);if(o)o.textContent=d.ok?t().saqlandi:t().xato;
+   if(S.studs){S.studs.forEach(function(s){if(s.id===id)s.kuzatuv={
+    boy:g("ek-boy-"+id).value,vazn:g("ek-vazn-"+id).value,kuchli:g("ek-kuchli-"+id).value,
+    zaif:g("ek-zaif-"+id).value,shikoyat:g("ek-shik-"+id).value}})}})},
+ hisYubor:function(){
+  var m=g("ek-hmatn").value.trim();if(!m)return;
+  api({action:"hisobot_saqla",sinf:parseInt(g("ek-hsinf").value,10),
+   mavzu:g("ek-hmavzu").value.trim(),matn:m})
+  .then(function(d){var o=g("ek-hok");if(o)o.textContent=d.ok?t().yuborildi:t().xato;
+   if(d.ok){g("ek-hmatn").value="";g("ek-hmavzu").value="";S.his=null;oqitHis()}})}
+};
+
+/* ============ ISHGA TUSHISH ============ */
+function boot(){
+ var tk=tok();if(!tk)return;              /* pin-sessiya yo'q - sahifa odatdagidek */
+ api({action:"tekshir"}).then(function(d){
+  if(!d||!d.ok)return;
+  if(["oqituvchi","oquvchi","ota_ona"].indexOf(d.rol)===-1)return;  /* xodimlar - eski kirish */
+  S.men=d;
+  var st=document.createElement("style");st.textContent=CSS;document.head.appendChild(st);
+  var w=document.createElement("div");w.id="ekab";document.body.appendChild(w);
+  draw();
+ }).catch(function(){});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){setTimeout(boot,300)});
+else setTimeout(boot,300);
+})();
+</script>
 </body>
 </html>

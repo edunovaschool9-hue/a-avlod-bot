@@ -368,5 +368,151 @@ async function sendForm(){
 var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target)}})},{threshold:.12});
 document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
 </script>
+
+<!-- ===== TUXUM: yagona kirish ===== -->
+<script>
+(function(){
+if(window.TUXUM)return;window.TUXUM=1;
+
+/* ================= SOZLAMALAR ================= */
+var SUPABASE_URL = "https://unaodltahuevrfnarfha.supabase.co";
+var ESHIK = SUPABASE_URL + "/functions/v1/eshik";
+
+/* Rol → qaysi sahifaga o'tadi. O'zingga moslab o'zgartir. */
+var YOLLAR = {
+  marketolog: "academy.html",
+  admin:      "academy.html",
+  saport:     "academy.html",
+  xodim:      "academy.html",
+  oqituvchi:  "academy.html",
+  oquvchi:    "academy.html",
+  ota_ona:    "academy.html"
+};
+
+/* ================= STIL ================= */
+var CSS = `
+#tx-joy{display:flex;justify-content:center;padding:46px 0 30px}
+#tx-egg{font-size:34px;background:none;border:none;cursor:pointer;line-height:1;
+ filter:grayscale(.25);opacity:.75;transition:transform .2s,opacity .2s,filter .2s;padding:8px}
+#tx-egg:hover{transform:translateY(-3px) rotate(-6deg);opacity:1;filter:none}
+#tx-ov{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;
+ background:rgba(15,45,42,.92);backdrop-filter:blur(6px);font-family:system-ui,-apple-system,sans-serif}
+#tx-ov.on{display:flex}
+#tx-card{width:min(340px,92vw);background:#F3F6F2;border-radius:26px;padding:30px 26px;text-align:center;
+ animation:txUp .25s ease}
+@keyframes txUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+#tx-x{position:absolute;top:18px;right:18px;background:none;border:none;color:#fff;font-size:26px;cursor:pointer;opacity:.7}
+#tx-x:hover{opacity:1}
+#tx-t{font-size:17px;font-weight:800;color:#0F2D2A;margin:2px 0 4px}
+#tx-s{font-size:12.5px;color:rgba(15,45,42,.6);margin-bottom:18px}
+#tx-dots{display:flex;justify-content:center;gap:12px;margin-bottom:8px}
+#tx-dots i{width:14px;height:14px;border-radius:50%;background:rgba(15,45,42,.15);transition:background .12s,transform .12s}
+#tx-dots i.on{background:#0F2D2A;transform:scale(1.15)}
+#tx-err{min-height:20px;font-size:12.5px;font-weight:700;color:#C4442A;margin-bottom:8px}
+#tx-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#tx-pad button{font-size:22px;font-weight:700;color:#0F2D2A;background:#fff;border:1px solid rgba(15,45,42,.12);
+ border-radius:16px;padding:14px 0;cursor:pointer;transition:transform .08s,background .08s}
+#tx-pad button:active{transform:scale(.94);background:#E8AC0E}
+#tx-pad button:disabled{opacity:.35;cursor:not-allowed}
+#tx-pad .tx-mute{background:transparent;border:none;font-size:17px}
+#tx-card.shake{animation:txShake .35s}
+@keyframes txShake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+#tx-load{display:none;font-size:13px;font-weight:700;color:#0F2D2A;padding:8px 0}
+`;
+
+/* ================= HTML ================= */
+var JOY = '<div id="tx-joy"><button id="tx-egg" aria-label="kirish" title="">🥚</button></div>';
+var OV =
+ '<div id="tx-ov"><button id="tx-x">×</button><div id="tx-card">'+
+ '<div id="tx-t">EduNova</div><div id="tx-s">Shaxsiy pin-kodingizni kiriting</div>'+
+ '<div id="tx-dots"><i></i><i></i><i></i><i></i><i></i></div>'+
+ '<div id="tx-err"></div>'+
+ '<div id="tx-pad">'+
+  [1,2,3,4,5,6,7,8,9].map(function(n){return '<button data-n="'+n+'">'+n+'</button>'}).join("")+
+  '<button class="tx-mute" data-n="c">✕</button><button data-n="0">0</button><button class="tx-mute" data-n="b">⌫</button>'+
+ '</div><div id="tx-load">Tekshirilmoqda...</div>'+
+ '</div></div>';
+
+/* ================= YORDAMCHI ================= */
+function qurilma(){
+ var k="tx_qurilma",v=null;
+ try{v=localStorage.getItem(k)}catch(e){}
+ if(!v){v="q"+Math.random().toString(36).slice(2,12)+Date.now().toString(36);
+  try{localStorage.setItem(k,v)}catch(e){}}
+ return v;
+}
+function saqla(token,rol,ism){
+ try{localStorage.setItem("edunova_token",token);
+     localStorage.setItem("edunova_rol",rol);
+     localStorage.setItem("edunova_ism",ism)}catch(e){}
+}
+function bor(){try{return localStorage.getItem("edunova_token")}catch(e){return null}}
+
+/* ================= O'RNATISH ================= */
+var st=document.createElement("style");st.textContent=CSS;document.head.appendChild(st);
+document.body.insertAdjacentHTML("beforeend",JOY);
+document.body.insertAdjacentHTML("beforeend",OV);
+
+var ov=document.getElementById("tx-ov"),card=document.getElementById("tx-card"),
+    err=document.getElementById("tx-err"),load=document.getElementById("tx-load"),
+    dots=document.getElementById("tx-dots").children,pad=document.getElementById("tx-pad");
+var pin="",band=false;
+
+function chiz(){for(var i=0;i<5;i++)dots[i].className=i<pin.length?"on":""}
+function och(){ov.classList.add("on");pin="";chiz();err.textContent=""}
+function yop(){ov.classList.remove("on")}
+
+document.getElementById("tx-egg").addEventListener("click",function(){
+ var t=bor();
+ if(t){ /* sessiya bo'lsa - tekshirib to'g'ri kabinetga */
+  band=true;
+  fetch(ESHIK,{method:"POST",headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({action:"tekshir",token:t})})
+  .then(function(r){return r.json()})
+  .then(function(d){band=false;
+   if(d&&d.ok&&YOLLAR[d.rol]){saqla(t,d.rol,d.ism);location.href=YOLLAR[d.rol]}
+   else och()})
+  .catch(function(){band=false;och()});
+  return;
+ }
+ och();
+});
+document.getElementById("tx-x").addEventListener("click",yop);
+ov.addEventListener("click",function(e){if(e.target===ov)yop()});
+
+pad.addEventListener("click",function(e){
+ var b=e.target.closest("button");if(!b||band)return;
+ var n=b.getAttribute("data-n");
+ if(n==="c"){yop();return}
+ if(n==="b"){pin=pin.slice(0,-1);chiz();err.textContent="";return}
+ if(pin.length>=5)return;
+ pin+=n;chiz();
+ if(pin.length===5)yubor();
+});
+
+function yubor(){
+ band=true;load.style.display="block";err.textContent="";
+ fetch(ESHIK,{method:"POST",headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({action:"kirish",pin:pin,qurilma:qurilma()})})
+ .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})})
+ .then(function(x){
+  band=false;load.style.display="none";
+  if(x.d&&x.d.token){
+   saqla(x.d.token,x.d.rol,x.d.ism);
+   var yol=YOLLAR[x.d.rol];
+   if(yol)location.href=yol;
+   else{err.textContent="Kabinet hali tayyor emas: "+x.d.rol;pin="";chiz()}
+   return;
+  }
+  card.classList.remove("shake");void card.offsetWidth;card.classList.add("shake");
+  if(x.s===429)err.textContent="Ko'p urinish. 15 daqiqadan keyin qayta urining.";
+  else err.textContent="Pin noto'g'ri";
+  pin="";chiz();
+ })
+ .catch(function(){band=false;load.style.display="none";
+  err.textContent="Internet yo'q. Qayta urining.";pin="";chiz()});
+}
+})();
+</script>
 </body>
 </html>
