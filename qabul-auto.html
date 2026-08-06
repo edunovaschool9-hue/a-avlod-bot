@@ -282,13 +282,24 @@ function E(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{
 function x(){return L[Q.lang]}
 function g(id){return document.getElementById(id)}
 function grp(s){var n=parseInt(s,10);return n<=4?"kichik":n<=9?"orta":"katta"}
-function findSB(){var c=[window.supabase,window.sb,window.supabaseClient,window.db,window._sb];
- for(var i=0;i<c.length;i++){if(c[i]&&typeof c[i].from==="function")return c[i]}return null}
+function findSB(){
+ try{if(typeof sb!=="undefined"&&sb&&typeof sb.rpc==="function")return sb}catch(e){}
+ var c=[window.sb,window.supabase,window.supabaseClient,window.db,window._sb];
+ for(var i=0;i<c.length;i++){if(c[i]&&typeof c[i].rpc==="function")return c[i]}return null}
+function qabKod(){try{return hrKod()}catch(e){return sessionStorage.getItem("hr_kod")||""}}
 async function getList(){
- if(Q.SB){var r=await Q.SB.from("qab_oquvchi").select("*").order("created_at",{ascending:false}).limit(200);return r.data||[]}
+ if(Q.SB&&qabKod()){
+  var r=await Q.SB.rpc("qabul_royxat",{p_kod:qabKod(),p_limit:200});
+  if(r.error)return Q.mem; return r.data||[]}
  return Q.mem}
 async function addRow(row){
- if(Q.SB){var r=await Q.SB.from("qab_oquvchi").insert(row).select().single();if(r.error)throw r.error;return r.data}
+ if(Q.SB&&qabKod()){
+  var r=await Q.SB.rpc("qabul_saqla",{p_kod:qabKod(),p_row:row});
+  if(r.error)throw r.error;
+  if(!r.data||!r.data.ok)throw new Error((r.data&&r.data.xato)||"saqlanmadi");
+  row.id=r.data.id;row.created_at=new Date().toISOString();
+  row.login=r.data.login;row.parol_vaqt=r.data.parol;row.student_id=r.data.student_id;
+  return row}
  row.id=Date.now();row.created_at=new Date().toISOString();Q.mem.unshift(row);return row}
 
 var TR={"а":"a","б":"b","в":"v","г":"g","д":"d","е":"e","ё":"yo","ж":"j","з":"z","и":"i","й":"y","к":"k","л":"l","м":"m","н":"n","о":"o","п":"p","р":"r","с":"s","т":"t","у":"u","ф":"f","х":"x","ц":"ts","ч":"ch","ш":"sh","щ":"sh","ы":"i","э":"e","ю":"yu","я":"ya","ъ":"","ь":"","ў":"o","қ":"q","ғ":"g","ҳ":"h"};
