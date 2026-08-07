@@ -7895,6 +7895,7 @@ function okOtaSend(id){
    QABUL NATIJALARI — marketolog uchun
    ══════════════════════════════════════════════════════════════ */
 let qnData=[], qnFlt='all', qnCur=null;
+function qnBogli(r){return r&&(r.qab_student_id||r.student_id)||null;}
 const QN_LINK='https://www.edunovaschool.uz/qabul.html';
 
 function loadQabNat(){
@@ -7939,7 +7940,7 @@ function qnPaint(){
   const q=(document.getElementById('qn-q').value||'').trim().toLowerCase();
   const oy=qnData.filter(r=>new Date(r.created_at)>=new Date(new Date().getFullYear(),new Date().getMonth(),1)).length;
   const ort=qnData.length?Math.round(qnData.reduce((s,r)=>s+qnBall(r),0)/qnData.length):0;
-  const yoq=qnData.filter(r=>!r.student_id).length;
+  const yoq=qnData.filter(r=>!qnBogli(r)).length;
   document.getElementById('qn-stats').innerHTML=
     `<div class="hr-stat"><b>${qnData.length}</b><span>Jami qabul</span></div>`+
     `<div class="hr-stat"><b style="color:#60a5fa">${oy}</b><span>Shu oyda</span></div>`+
@@ -7949,7 +7950,7 @@ function qnPaint(){
   let rows=qnData;
   if(qnFlt==='uz')  rows=rows.filter(r=>(r.yonalish||'').toLowerCase().startsWith('uz'));
   if(qnFlt==='ru')  rows=rows.filter(r=>(r.yonalish||'').toLowerCase().startsWith('ru'));
-  if(qnFlt==='yoq') rows=rows.filter(r=>!r.student_id);
+  if(qnFlt==='yoq') rows=rows.filter(r=>!qnBogli(r));
   if(q) rows=rows.filter(r=>(r.ism||'').toLowerCase().includes(q)||String(r.sinf||'').includes(q));
 
   const list=document.getElementById('qn-list');
@@ -7966,7 +7967,7 @@ function qnPaint(){
           ona ${n.ona??'—'} / mat ${n.mat??'—'} / eng ${n.eng??'—'} ·
           ${new Date(r.created_at).toLocaleDateString('ru-RU')}</div>
       </div>
-      ${r.student_id?'<span class="hr-chip" style="background:rgba(52,211,153,.15);color:#34d399">🔗 bazada</span>'
+      ${qnBogli(r)?'<span class="hr-chip" style="background:rgba(52,211,153,.15);color:#34d399">🔗 bazada</span>'
         :'<span class="hr-chip" style="background:rgba(251,113,133,.15);color:#fb7185">⚠ bogʻlanmagan</span>'}
       ${r.login?`<span class="hr-chip" style="background:var(--s2);color:var(--mu2)">👤 ${hrEsc(r.login)}</span>`:''}
     </div>`;}).join('');
@@ -8021,7 +8022,7 @@ function qnOpen(id){
      <tr><td style="padding:7px 0;color:var(--mu2)">Parol</td>
          <td style="padding:7px 0;text-align:right;font-family:var(--fm);color:#34d399;font-weight:700">${hrEsc(r.parol_vaqt||'—')}</td></tr>
    </table>
-   ${r.student_id?'':`<div style="border-left:3px solid #fb7185;padding-left:14px;margin-top:18px;font-size:13px;color:var(--mu2)">
+   ${qnBogli(r)?'':`<div style="border-left:3px solid #fb7185;padding-left:14px;margin-top:18px;font-size:13px;color:var(--mu2)">
      ⚠️ Bu oʻquvchi asosiy bazaga (students) bogʻlanmagan — ota-ona kabinetida test natijalari koʻrinmaydi.</div>`}`;
 }
 function qnClose(){
