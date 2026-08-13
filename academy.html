@@ -1872,7 +1872,7 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
     <div class="xj-tab" id="xjt-qb" onclick="xjTab('qb')">📗 Buyruq — qabul</div>
   </div>
   <div class="xj-grid">
-    <div class="field" data-xf="kelish ketish chb qb"><label>Hujjat raqami (faqat son)</label><input id="xj-num" type="text" placeholder="7"></div>
+    <div class="field" data-xf="kelish ketish chb qb"><label>Hujjat raqami <span id="xj-numhint" style="color:#22c55e;font-weight:700">(avtomat)</span></label><input id="xj-num" type="text" placeholder="avtomat" oninput="xjNumTouched()"></div>
     <div class="field" data-xf="kelish ketish chb qb"><label>Hujjat sanasi</label><input id="xj-sana" type="date"></div>
     <div class="field" data-xf="kelish ketish chb qb"><label>O&#8216;quvchining F.I.Sh.</label><input id="xj-fio" type="text" placeholder="Ruziboyeva Nafosat Hasan qizi"></div>
     <div class="field" data-xf="kelish ketish chb qb"><label>Tug&#8216;ilgan sanasi</label><input id="xj-tug" type="date"></div>
@@ -1889,9 +1889,19 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
     <div class="field" data-xf="qb"><label>Ota-ona arizasi №</label><input id="xj-arnum" type="text" placeholder="1"></div>
     <div class="field" data-xf="qb"><label>Ariza sanasi</label><input id="xj-arsana" type="date"></div>
   </div>
-  <div style="display:flex;gap:10px;flex-wrap:wrap">
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
     <button class="xj-btn xj-go" onclick="xjRender()">👁 Ko&#8216;rish</button>
-    <button class="xj-btn xj-dl" onclick="xjDownload()">⬇️ PNG yuklab olish</button>
+    <button class="xj-btn xj-dl" onclick="xjSaqlaYukla()">⬇️ Raqam berib PNG yuklash</button>
+    <button class="xj-btn" style="background:rgba(255,255,255,.08);color:#cdd3ea" onclick="xjDownload()">PNG (reyestrsiz)</button>
+    <span id="xj-msg" style="font-size:13px;color:#8892b0"></span>
+  </div>
+  <div id="xj-reyestr" style="margin-top:16px">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+      <div style="font-weight:800;color:#cdd3ea">📚 Reyestr</div>
+      <div id="xj-oxirgi" style="font-size:13px;color:#8892b0"></div>
+      <button class="xj-btn" style="background:rgba(255,255,255,.08);color:#cdd3ea;padding:7px 12px;font-size:12.5px" onclick="xjRoyxat()">🔄 Yangilash</button>
+    </div>
+    <div id="xj-list" style="max-height:320px;overflow:auto"></div>
   </div>
   <canvas id="xj-canvas" width="1654" height="2339"></canvas>
 </div>
@@ -8119,7 +8129,7 @@ function xjTab(t){
   xjHududUI();
   var lbl=document.getElementById('xj-mk-label');
   lbl.textContent=(t==='ketish'||t==='chb')?'Boradigan maktab raqami':'Kelgan maktab raqami';
-  xjRender();
+  if(typeof xjKeyingi==='function'){var n=document.getElementById('xj-num'); if(n&&!xjManual)n.value=''; xjKeyingi().then(xjRender);} else {xjRender();}
 }
 function xjHududUI(){
   var b=xjVal('xj-hudud')==='b';
@@ -8376,13 +8386,110 @@ function xjDownload(){
     },250);
   });
 }
+
+/* ---------- reyestr: raqamlash ---------- */
+var XJ_SER={kelish:'T',ketish:'KT',chb:'OQ',qb:'OQ'};
+var xjManual=false, xjRoyxatCache=[];
+function xjOquvYili(){
+  var d=xjVal('xj-sana')?new Date(xjVal('xj-sana')):new Date();
+  var y=d.getFullYear();
+  return (d.getMonth()>=7)?(y+'-'+(y+1)):((y-1)+'-'+y);
+}
+function xjMsg(t,c){var e=document.getElementById('xj-msg');if(e){e.textContent=t||'';e.style.color=c||'#8892b0';}}
+function xjNumTouched(){
+  xjManual=(xjVal('xj-num')!=='');
+  var h=document.getElementById('xj-numhint');
+  if(h){h.textContent=xjManual?"(qo\u2018lda)":'(avtomat)';h.style.color=xjManual?'#f59e0b':'#22c55e';}
+}
+function xjKeyingi(){
+  if(xjManual)return Promise.resolve(null);
+  return sb.rpc('hujjat_keyingi',{p_oquv:xjOquvYili(),p_seriya:XJ_SER[xjType]})
+    .then(function(r){
+      if(r.error){xjMsg('Reyestr bilan aloqa yo\u2018q — raqamni qo\u2018lda yozing','#f59e0b');return null;}
+      var n=r.data;
+      var el=document.getElementById('xj-num');
+      if(el&&!xjManual){el.value=n;}
+      xjMsg('');
+      return n;
+    })["catch"](function(){xjMsg('Reyestr bilan aloqa yo\u2018q','#f59e0b');return null;});
+}
+function xjRoyxat(){
+  var box=document.getElementById('xj-list');
+  if(box)box.innerHTML='<div style="color:#8892b0;font-size:13px;padding:8px">Yuklanmoqda\u2026</div>';
+  return sb.rpc('hujjat_royxat',{p_oquv:xjOquvYili(),p_limit:40}).then(function(r){
+    if(r.error){if(box)box.innerHTML='<div style="color:#f59e0b;font-size:13px;padding:8px">Reyestr jadvali topilmadi \u2014 SQL ishga tushirilmagan bo\u2018lishi mumkin</div>';return;}
+    xjRoyxatCache=r.data||[];
+    var last={T:0,KT:0,OQ:0};
+    xjRoyxatCache.forEach(function(x){if(x.raqam>last[x.seriya])last[x.seriya]=x.raqam;});
+    var oe=document.getElementById('xj-oxirgi');
+    if(oe)oe.textContent='oxirgi: '+last.T+'/T \u00B7 '+last.KT+'/KT \u00B7 '+last.OQ+"/O\u2018Q  \u2014  "+xjOquvYili();
+    if(!box)return;
+    if(!xjRoyxatCache.length){box.innerHTML='<div style="color:#8892b0;font-size:13px;padding:8px">Hozircha yozuv yo\u2018q</div>';return;}
+    var TUR={kelish:'Kelish talon',ketish:'Ketish talon',chb:'Buyruq \u00B7 chiqarish',qb:'Buyruq \u00B7 qabul'};
+    box.innerHTML=xjRoyxatCache.map(function(x,i){
+      return '<div style="display:flex;gap:12px;align-items:center;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.07);'+(x.bekor?'opacity:.45;text-decoration:line-through':'')+'">'
+        +'<div style="min-width:74px;font-weight:800;color:#7c5cff">\u2116 '+x.raqam+'/'+(x.seriya==='OQ'?'O\u2018Q':x.seriya)+'</div>'
+        +'<div style="flex:1;min-width:0"><div style="color:#e6e9f5;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(x.fio||'')+'</div>'
+        +'<div style="color:#8892b0;font-size:11.5px">'+(TUR[x.turi]||x.turi)+' \u00B7 '+(x.sana||'')+' \u00B7 '+(x.sinf?x.sinf+'-sinf':'')+'</div></div>'
+        +'<button class="xj-btn" style="background:rgba(255,255,255,.08);color:#cdd3ea;padding:6px 10px;font-size:12px" onclick="xjQayta('+i+')">\u21A9 Ochish</button>'
+        +(x.bekor?'':'<button class="xj-btn" style="background:rgba(239,68,68,.15);color:#fca5a5;padding:6px 10px;font-size:12px" onclick="xjBekor('+x.id+')">\u2715</button>')
+      +'</div>';
+    }).join('');
+  })["catch"](function(){});
+}
+function xjQayta(i){
+  var x=xjRoyxatCache[i]; if(!x)return;
+  var m=x.malumot||{};
+  xjTab(x.turi);
+  ['xj-num','xj-sana','xj-fio','xj-tug','xj-sinf','xj-til','xj-oquv','xj-mk','xj-hudud','xj-mkfull','xj-hline','xj-ktnum','xj-ktsana','xj-ourkt','xj-arnum','xj-arsana'].forEach(function(id){
+    var el=document.getElementById(id); if(el&&m[id]!==undefined)el.value=m[id];
+  });
+  var n=document.getElementById('xj-num'); if(n)n.value=x.raqam;
+  xjManual=true; xjNumTouched(); xjHududUI(); xjRender();
+  xjMsg('Reyestrdan ochildi \u2014 yangi raqam berilmaydi','#8892b0');
+}
+function xjBekor(id){
+  if(!confirm('Hujjat bekor qilinsinmi? Raqam qayta ishlatilmaydi.'))return;
+  sb.rpc('hujjat_bekor',{p_id:id,p_izoh:'bekor qilindi'}).then(function(){xjRoyxat();});
+}
+function xjFormData(){
+  var o={};
+  ['xj-num','xj-sana','xj-fio','xj-tug','xj-sinf','xj-til','xj-oquv','xj-mk','xj-hudud','xj-mkfull','xj-hline','xj-ktnum','xj-ktsana','xj-ourkt','xj-arnum','xj-arsana'].forEach(function(id){o[id]=xjVal(id);});
+  return o;
+}
+function xjSaqlaYukla(){
+  if(!xjVal('xj-fio')){alert('O\u2018quvchining F.I.Sh. kiritilmagan');return;}
+  var sch=xjSchool();
+  var payload={
+    p_oquv:xjOquvYili(), p_seriya:XJ_SER[xjType], p_turi:xjType,
+    p_sana:xjVal('xj-sana')||null, p_fio:xjVal('xj-fio'),
+    p_tugilgan:xjVal('xj-tug')||null, p_sinf:xjVal('xj-sinf')||null,
+    p_maktab:sch.short, p_hudud:xjVal('xj-hudud'),
+    p_malumot:xjFormData(), p_kim:(window.currentStaff&&(currentStaff.name||currentStaff.role))||'admin',
+    p_raqam: xjManual&&xjVal('xj-num')?parseInt(xjVal('xj-num'),10):null
+  };
+  xjMsg('Raqam berilmoqda\u2026');
+  sb.rpc('hujjat_qayd',payload).then(function(r){
+    if(r.error){xjMsg('Xato: reyestrga yozilmadi \u2014 PNG baribir yuklanadi','#f59e0b');xjDownload();return;}
+    var d=r.data;
+    if(!d||!d.ok){xjMsg((d&&d.msg)||'Raqam band','#f59e0b');return;}
+    var el=document.getElementById('xj-num'); if(el)el.value=d.raqam;
+    xjManual=false; xjNumTouched();
+    xjMsg('\u2116 '+d.raqam+' berildi va reyestrga yozildi','#22c55e');
+    xjRender();
+    setTimeout(function(){xjDownload();xjRoyxat();},400);
+  })["catch"](function(){xjMsg('Aloqa yo\u2018q \u2014 PNG reyestrsiz yuklanadi','#f59e0b');xjDownload();});
+}
+
 function loadXujjatIshlar(){
   if(!xjInited){
     xjInited=true;
     var today=new Date().toISOString().slice(0,10);
     document.getElementById('xj-sana').value=today;
     xjTab('kelish');
+    xjRoyxat();
   } else {
+    xjRoyxat();
     xjRender();
   }
 }
