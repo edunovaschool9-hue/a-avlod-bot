@@ -1891,8 +1891,7 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
     <div class="field"><label>Tug&#8216;ilgan yili</label><input id="ms-tugyil" type="text" placeholder="2015"></div>
     <div class="field"><label>Sinf (faqat son)</label><input id="ms-sinf" type="text" placeholder="5"></div>
     <div class="field"><label>Ta&#8217;lim tili</label><select id="ms-til"><option value="o&#8216;zbek">o&#8216;zbek</option><option value="rus">rus</option></select></div>
-    <div class="field"><label>O&#8216;quv yili boshi</label><input id="ms-m1" type="date"></div>
-    <div class="field"><label>O&#8216;quv yili oxiri</label><input id="ms-m2" type="date"></div>
+    <div class="field"><label>O&#8216;quv yili (boshlanish yili)</label><input id="ms-oyil" type="text" placeholder="2026"><div style="font-size:11.5px;color:#8892b0;margin-top:4px">1-sentabr &#8594; keyingi yil 30-iyun (10 oy)</div></div>
     <div class="field"><label>Bir oylik to&#8216;lov (so&#8216;m)</label><input id="ms-narx" type="text" placeholder="1500000"></div>
     <div class="field"><label>To&#8216;lov har oyning ... sanasigacha</label><input id="ms-tkun" type="text" value="5"></div>
     <div class="field"><label>Kechikish (kun, 5.5-band)</label><input id="ms-kkun" type="text" value="10"></div>
@@ -8645,7 +8644,7 @@ function msImzoOl(){
 function msMsg(t,c){var e=document.getElementById('ms-msg');if(e){e.textContent=t||'';e.style.color=c||'#8892b0';}}
 
 /* ---------- forma ---------- */
-var MS_IDS=['ms-sana','ms-otafio','ms-pasport','ms-tel','ms-manzil','ms-oquvchi','ms-tugyil','ms-sinf','ms-til','ms-m1','ms-m2','ms-narx','ms-tkun','ms-kkun','ms-gkun'];
+var MS_IDS=['ms-sana','ms-otafio','ms-pasport','ms-tel','ms-manzil','ms-oquvchi','ms-tugyil','ms-sinf','ms-til','ms-oyil','ms-narx','ms-tkun','ms-kkun','ms-gkun'];
 function msData(){var o={};MS_IDS.forEach(function(id){o[id]=xjVal(id);});return o;}
 function msSet(m){MS_IDS.forEach(function(id){var e=document.getElementById(id);if(e&&m[id]!==undefined)e.value=m[id];});}
 function msNarxFmt(v){
@@ -8670,7 +8669,9 @@ function msBlocks(d,raqam){
   P('quyidagilar to\u2018g\u2018risida mazkur shartnomani tuzdilar.');
   H('1. Shartnomaning predmeti');
   P('1.1. Maktab O\u2018quvchiga umumiy o\u2018rta ta\u2019lim dasturi hamda maktabning qo\u2018shimcha yo\u2018nalishlari (matematika, ingliz tili, koreys tili, AI va dasturlash, shaxmat, robototexnika, gimnastika, psixologiya) bo\u2018yicha ta\u2019lim va tarbiya beradi, Buyurtmachi esa belgilangan to\u2018lovni amalga oshiradi.');
-  P('1.2. O\u2018quv yili muddati: '+msSanaQ(d['ms-m1'])+' dan '+msSanaQ(d['ms-m2'])+' gacha. O\u2018quv yilining davomiyligi \u2014 10 (o\u2018n) o\u2018quv oyi.');
+  var oy1=parseInt(String(d['ms-oyil']||'').replace(/[^0-9]/g,''),10);
+  var oyTxt = oy1 ? (oy1+'-yil 1-sentabrdan '+(oy1+1)+'-yil 30-iyungacha') : '202___-yil 1-sentabrdan 202___-yil 30-iyungacha';
+  P('1.2. O\u2018quv yili muddati: '+oyTxt+'. O\u2018quv yilining davomiyligi \u2014 10 (o\u2018n) o\u2018quv oyi.');
   P('1.3. Ta\u2019lim tili: '+(d['ms-til']||'________________')+'.');
   H('2. Maktabning majburiyatlari');
   P('2.1. Davlat ta\u2019lim standartlari va maktabning ichki o\u2018quv dasturi asosida sifatli dars o\u2018tishni ta\u2019minlash.');
@@ -9041,6 +9042,8 @@ function loadMShartnoma(){
     msPadInit();
     var t=new Date().toISOString().slice(0,10);
     var e=document.getElementById('ms-sana'); if(e)e.value=t;
+    var oe=document.getElementById('ms-oyil');
+    if(oe&&!oe.value)oe.value=xjOquvYili().split('-')[0];
     xjLoadImgs();
   }
   msRoyxat();
