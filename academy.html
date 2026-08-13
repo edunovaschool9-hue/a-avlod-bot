@@ -1908,7 +1908,7 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
 
   <div class="ms-sec">3-qadam · Yo&#8216;l tanlang</div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-    <button class="ms-btn ms-ok" onclick="msTayyorla()">✅ Narx kelishilgan — shartnoma tayyorlash</button>
+    <button class="ms-btn ms-ok" onclick="msTayyorla()">✅ Narx kelishilgan — shartnoma (PDF)</button>
     <button class="ms-btn ms-portal" onclick="msPortalUI()">🟠 PORTAL — taklif / e&#8217;tiroz bor</button>
     <span id="ms-msg" style="font-size:13px;color:#8892b0"></span>
   </div>
@@ -8858,12 +8858,57 @@ function msImzoImgYukla(durl){
   });
 }
 
+
+/* ---------- universal data-url yuklab olish ---------- */
+function msDurlYukla(durl,name){
+  var head=durl.substring(0,durl.indexOf(',')), mime=(head.split(':')[1]||'').split(';')[0]||'application/octet-stream';
+  var b=atob(durl.split(',')[1]), n=b.length, u=new Uint8Array(n);
+  for(var i=0;i<n;i++)u[i]=b.charCodeAt(i);
+  var bl=new Blob([u],{type:mime});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(bl); a.download=name;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1500);
+}
+/* ---------- jsPDF ---------- */
+var msPdfLoading=null;
+function msLoadPdfLib(){
+  if(window.jspdf&&window.jspdf.jsPDF)return Promise.resolve(true);
+  if(msPdfLoading)return msPdfLoading;
+  msPdfLoading=new Promise(function(res){
+    var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
+    s.onload=function(){res(!!(window.jspdf&&window.jspdf.jsPDF));};
+    s.onerror=function(){res(false);};
+    document.head.appendChild(s);
+  });
+  return msPdfLoading;
+}
+function msPdfDurl(pages){
+  if(!(window.jspdf&&window.jspdf.jsPDF))return null;
+  try{
+    var J=window.jspdf.jsPDF;
+    var doc=new J({orientation:'portrait',unit:'mm',format:'a4',compress:true});
+    for(var i=0;i<pages.length;i++){
+      if(i>0)doc.addPage('a4','portrait');
+      doc.addImage(pages[i].toDataURL('image/jpeg',0.94),'JPEG',0,0,210,297,undefined,'FAST');
+    }
+    return doc.output('datauristring');
+  }catch(e){return null;}
+}
+
 function msYuklaPages(pages,raqam,fam){
   var base='SHARTNOMA_'+(raqam||'X')+'SH_'+fam;
-  pages.forEach(function(p,i){
-    setTimeout(function(){
-      try{xjDataUrlYukla(p.toDataURL('image/png'),base+'_'+(i+1)+'.png');}catch(e){}
-    }, i*450);
+  return msLoadPdfLib().then(function(ok){
+    var durl = ok ? msPdfDurl(pages) : null;
+    if(durl){ msDurlYukla(durl, base+'.pdf'); return durl; }
+    msMsg('PDF kutubxonasi yuklanmadi \u2014 PNG shaklida yuklanmoqda','#f59e0b');
+    pages.forEach(function(p,i){
+      setTimeout(function(){
+        try{msDurlYukla(p.toDataURL('image/png'),base+'_'+(i+1)+'.png');}catch(e){}
+      }, i*450);
+    });
+    return null;
   });
 }
 function msTallPng(pages){
@@ -8907,10 +8952,11 @@ function msFinal(raqam,hujjatId,imzoDurl){
     var pc=document.getElementById('ms-canvas');
     if(pc){pc.style.display='block';var c=pc.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,XJW,XJH);c.drawImage(pages[0],0,0);}
     var fam=(xjVal('ms-oquvchi')||'shartnoma').split(/\s+/)[0].replace(/[^A-Za-z0-9\-]+/g,'');
-    msYuklaPages(pages,raqam,fam);
-    var tall=msTallPng(pages);
-    if(tall&&hujjatId){sb.rpc('hujjat_png_saqla',{p_id:hujjatId,p_png:tall}).then(function(){})["catch"](function(){});}
-    msMsg('\u2713 Shartnoma \u2116 '+raqam+'/SH tayyor \u2014 '+pages.length+' sahifa yuklab olinmoqda','#22c55e');
+    msYuklaPages(pages,raqam,fam).then(function(durl){
+      var arx = durl || msTallPng(pages);
+      if(arx&&hujjatId){sb.rpc('hujjat_png_saqla',{p_id:hujjatId,p_png:arx}).then(function(){})["catch"](function(){});}
+    });
+    msMsg('\u2713 Shartnoma \u2116 '+raqam+'/SH tayyor \u2014 '+pages.length+' sahifa, PDF yuklanmoqda','#22c55e');
     msDraftId=null; msImzo=null;
     msRoyxat();
     if(typeof xjRoyxat==='function')xjRoyxat();
@@ -8984,7 +9030,8 @@ function msArx(hid,fam,raqam){
   msMsg('Arxivdan olinmoqda\u2026');
   sb.rpc('hujjat_png_ol',{p_id:hid}).then(function(r){
     if(r.error||!r.data){msMsg('Arxivda nusxa yo\u2018q','#f59e0b');return;}
-    xjDataUrlYukla(r.data,'SHARTNOMA_'+raqam+'SH_'+fam+'.png');
+    var ext=(String(r.data).indexOf('application/pdf')>=0)?'.pdf':'.png';
+    msDurlYukla(r.data,'SHARTNOMA_'+raqam+'SH_'+fam+ext);
     msMsg('\u2713 Yuklab olindi','#22c55e');
   })["catch"](function(){msMsg('Aloqa yo\u2018q','#f59e0b');});
 }
