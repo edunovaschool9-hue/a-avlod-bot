@@ -1954,10 +1954,15 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
     <div class="field" data-xf="qb"><label>Ota-ona arizasi №</label><input id="xj-arnum" type="text" placeholder="1"></div>
     <div class="field" data-xf="qb"><label>Ariza sanasi</label><input id="xj-arsana" type="date"></div>
   </div>
+  <div id="xj-imzobox" style="display:none;margin:6px 0 14px">
+    <div style="font-weight:800;color:#cdd3ea;margin-bottom:6px">✍️ Ota-onaning imzosi <span style="font-weight:500;color:#8892b0;font-size:12.5px">— buyruq bilan tanishdi</span></div>
+    <canvas id="xj-pad" width="560" height="180" style="background:#fff;border:2px dashed rgba(124,92,255,.6);border-radius:14px;touch-action:none;display:block;max-width:100%"></canvas>
+    <button class="xj-btn" style="background:rgba(255,255,255,.08);color:#cdd3ea;margin-top:8px;padding:8px 14px;font-size:13px" onclick="xjPadClear()">🧹 Tozalash</button>
+  </div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
     <button class="xj-btn xj-go" onclick="xjRender()">👁 Ko&#8216;rish</button>
-    <button class="xj-btn xj-dl" onclick="xjSaqlaYukla()">⬇️ Raqam berib PNG yuklash</button>
-    <button class="xj-btn" style="background:rgba(255,255,255,.08);color:#cdd3ea" onclick="xjDownload()">PNG (reyestrsiz)</button>
+    <button class="xj-btn xj-dl" onclick="xjSaqlaYukla()">⬇️ Raqam berib PDF yuklash</button>
+    <button class="xj-btn" style="background:rgba(255,255,255,.08);color:#cdd3ea" onclick="xjDownload()">PDF (reyestrsiz)</button>
     <span id="xj-msg" style="font-size:13px;color:#8892b0"></span>
   </div>
   <div id="xj-reyestr" style="margin-top:16px">
@@ -8196,6 +8201,8 @@ function xjTab(t){
   xjHududUI();
   var lbl=document.getElementById('xj-mk-label');
   lbl.textContent=(t==='ketish'||t==='chb')?'Boradigan maktab raqami':'Kelgan maktab raqami';
+  var ib=document.getElementById('xj-imzobox');
+  if(ib){ib.style.display=(t==='chb'||t==='qb')?'':'none'; if(t==='chb'||t==='qb')xjPadInit();}
   if(typeof xjKeyingi==='function'){var n=document.getElementById('xj-num'); if(n&&!xjManual)n.value=''; xjKeyingi().then(xjRender);} else {xjRender();}
 }
 function xjHududUI(){
@@ -8420,11 +8427,20 @@ function xjDrawBuyruq(ctx,kind){
   y=xjWrap(ctx,asos,XL,y,XR-XL,34,'left');
   var yb=xjSign(ctx,y+16,'buyruq');
   xf(ctx,26,false,false);
-  xjWrap(ctx,'Buyruq bilan tanishdim:  ota-ona (qonuniy vakil) ______________________________  imzo: ____________  \u00AB____\u00BB ____________ 2026-yil',XL,yb+38,XR-XL,32,'left');
+  var tanY=yb+38;
+  xjWrap(ctx,'Buyruq bilan tanishdim:  ota-ona (qonuniy vakil) ______________________________  imzo:',XL,tanY,XR-XL,32,'left');
+  if(xjImzoCache){
+    var iw=250, ih=Math.round(iw*xjImzoCache.height/xjImzoCache.width);
+    if(ih>96){ih=96;iw=Math.round(ih*xjImzoCache.width/xjImzoCache.height);}
+    ctx.drawImage(xjImzoCache,XR-iw-160,tanY-ih+18,iw,ih);
+  }else{
+    ctx.fillText('____________',XR-320,tanY+14);
+  }
+  ctx.fillText('\u00AB____\u00BB ____________ 2026-yil',XR-150-ctx.measureText('\u00AB____\u00BB ____________ 2026-yil').width+150,tanY+50);
 }
 
 function xjRender(){
-  xjLoadImgs().then(function(){
+  Promise.all([xjLoadImgs(),xjImzoImg()]).then(function(){
     var cv=document.getElementById('xj-canvas'); if(!cv)return;
     var ctx=cv.getContext('2d');
     ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,XJW,XJH);
@@ -8433,24 +8449,67 @@ function xjRender(){
     else xjDrawBuyruq(ctx,xjType);
   });
 }
+
+/* ---------- buyruq uchun ota-ona imzosi ---------- */
+var xjImzo=null, xjPadDrawn=false, xjPadReady=false;
+function xjPadClear(){
+  var p=document.getElementById('xj-pad'); if(!p)return;
+  var c=p.getContext('2d'); c.fillStyle='#fff'; c.fillRect(0,0,p.width,p.height);
+  c.strokeStyle='#1a237e'; c.lineWidth=3; c.lineCap='round'; c.lineJoin='round';
+  xjPadDrawn=false; xjImzo=null; xjRender();
+}
+function xjPadInit(){
+  var p=document.getElementById('xj-pad'); if(!p||xjPadReady)return;
+  xjPadReady=true; xjPadClear();
+  var draw=false;
+  function pos(e){var r=p.getBoundingClientRect();return [(e.clientX-r.left)*p.width/r.width,(e.clientY-r.top)*p.height/r.height];}
+  p.addEventListener('pointerdown',function(e){draw=true;var c=p.getContext('2d');var q=pos(e);c.beginPath();c.moveTo(q[0],q[1]);p.setPointerCapture(e.pointerId);e.preventDefault();});
+  p.addEventListener('pointermove',function(e){if(!draw)return;var c=p.getContext('2d');var q=pos(e);c.lineTo(q[0],q[1]);c.stroke();xjPadDrawn=true;e.preventDefault();});
+  p.addEventListener('pointerup',function(){draw=false;xjImzo=null;xjRender();});
+  p.addEventListener('pointercancel',function(){draw=false;});
+}
+function xjImzoDurl(){
+  if(xjImzo)return xjImzo;
+  if(!xjPadDrawn)return null;
+  var p=document.getElementById('xj-pad');
+  try{xjImzo=p.toDataURL('image/png');return xjImzo;}catch(e){return null;}
+}
+function xjImzoImg(){
+  var d=xjImzoDurl();
+  if(!d)return Promise.resolve(null);
+  if(xjImzoCache&&xjImzoCacheSrc===d)return Promise.resolve(xjImzoCache);
+  return new Promise(function(res){
+    var im=new Image();
+    im.onload=function(){xjImzoCache=im;xjImzoCacheSrc=d;res(im);};
+    im.onerror=function(){res(null);};
+    im.src=d;
+  });
+}
+var xjImzoCache=null, xjImzoCacheSrc=null;
+
+/* ---------- bitta sahifadan PDF ---------- */
+function xjPdfDurl(cv){
+  if(!(window.jspdf&&window.jspdf.jsPDF))return null;
+  try{
+    var doc=new window.jspdf.jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true});
+    doc.addImage(cv.toDataURL('image/jpeg',0.94),'JPEG',0,0,210,297,undefined,'FAST');
+    return doc.output('datauristring');
+  }catch(e){return null;}
+}
+function xjYukla(name){
+  var cv=document.getElementById('xj-canvas');
+  return msLoadPdfLib().then(function(ok){
+    var durl = ok ? xjPdfDurl(cv) : null;
+    if(durl){ msDurlYukla(durl, name.replace(/\.png$/,'.pdf')); return durl; }
+    try{ msDurlYukla(cv.toDataURL('image/png'), name); }catch(e){}
+    return null;
+  });
+}
+
 function xjDownload(){
-  xjLoadImgs().then(function(){
+  Promise.all([xjLoadImgs(),xjImzoImg()]).then(function(){
     xjRender();
-    setTimeout(function(){
-      var cv=document.getElementById('xj-canvas');
-      var fio=xjVal('xj-fio').split(/\s+/)[0]||'hujjat';
-      fio=fio.replace(/[^A-Za-z0-9\-]+/g,'');
-      var suf=XJ_SUF[xjType].replace(/[^A-Za-z]+/g,'');
-      var base={kelish:'KELISH_TALON',ketish:'KETISH_TALON',chb:'BUYRUQ_CHIQARISH',qb:'BUYRUQ_QABUL'}[xjType];
-      var name=base+'_'+(xjVal('xj-num')||'X')+suf+'_'+fio+'.png';
-      cv=document.getElementById('xj-canvas');
-      cv.toBlob(function(bl){
-        var a=document.createElement('a');
-        a.href=URL.createObjectURL(bl); a.download=name;
-        document.body.appendChild(a); a.click();
-        setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1500);
-      },'image/png');
-    },250);
+    setTimeout(function(){ xjYukla(xjFileName(xjType,xjVal('xj-num')||'X')); },300);
   });
 }
 
@@ -8563,7 +8622,8 @@ function xjArxivOch(i){
     if(r.error||!r.data){xjMsg('Arxivda nusxa yo\u2018q \u2014 \u21A9 Ochish orqali qayta chizing','#f59e0b');return;}
     var fio=(x.fio||'hujjat').split(/\s+/)[0].replace(/[^A-Za-z0-9\-]+/g,'');
     var base={kelish:'KELISH_TALON',ketish:'KETISH_TALON',chb:'BUYRUQ_CHIQARISH',qb:'BUYRUQ_QABUL'}[x.turi]||'HUJJAT';
-    xjDataUrlYukla(r.data, base+'_'+x.raqam+x.seriya+'_'+fio+'.png');
+    var ext=(String(r.data).indexOf('application/pdf')>=0)?'.pdf':'.png';
+    msDurlYukla(r.data, base+'_'+x.raqam+x.seriya+'_'+fio+ext);
     xjMsg('\u2713 Arxivdan yuklab olindi','#22c55e');
   })["catch"](function(){xjMsg('Aloqa yo\u2018q','#f59e0b');});
 }
@@ -8589,10 +8649,16 @@ function xjSaqlaYukla(){
     xjMsg('\u2116 '+d.raqam+' berildi \u2014 chizilmoqda\u2026','#22c55e');
     xjRender();
     setTimeout(function(){
-      var cv=document.getElementById('xj-canvas');
-      var name=xjFileName(xjType,d.raqam);
-      try{ xjDataUrlYukla(cv.toDataURL('image/png'),name); }catch(e){ xjDownload(); }
-      xjArxivSaqla(d.id).then(xjRoyxat);
+      xjYukla(xjFileName(xjType,d.raqam)).then(function(durl){
+        var cv=document.getElementById('xj-canvas');
+        var arx=durl;
+        if(!arx){ try{arx=cv.toDataURL('image/png');}catch(e){arx=null;} }
+        if(!arx)return xjRoyxat();
+        return sb.rpc('hujjat_png_saqla',{p_id:d.id,p_png:arx}).then(function(r){
+          if(!(r.error)&&r.data&&r.data.ok)xjMsg('\u2713 Reyestrga yozildi va arxivga saqlandi ('+r.data.kb+' KB)','#22c55e');
+          xjRoyxat();
+        })["catch"](function(){xjRoyxat();});
+      });
     },450);
   })["catch"](function(){xjMsg('Aloqa yo\u2018q \u2014 PNG reyestrsiz yuklanadi','#f59e0b');xjDownload();});
 }
