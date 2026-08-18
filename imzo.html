@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0A1C3D">
+<title>Imzo — EduNova School</title>
+<style>
+  :root{
+    --navy:#0A1C3D;
+    --navy-soft:#16305C;
+    --orange:#FF7A00;
+    --paper:#FFFFFF;
+    --bg:#EEF1F6;
+    --ink:#1A2233;
+    --muted:#6B7689;
+    --line:#D7DDE7;
+    --ok:#137A4B;
+    --err:#B3261E;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px;line-height:1.5;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .top{
+    background:var(--navy);color:#fff;
+    padding:14px 18px 12px;
+    border-bottom:3px solid var(--orange);
+  }
+  .brand{font-weight:800;letter-spacing:.14em;font-size:13px;text-transform:uppercase}
+  .brand span{color:var(--orange)}
+  .top h1{margin:6px 0 0;font-size:19px;font-weight:700;letter-spacing:-.01em}
+  .wrap{max-width:640px;margin:0 auto;padding:16px 14px 28px}
+
+  .card{
+    background:var(--paper);border:1px solid var(--line);border-radius:14px;
+    padding:16px;margin-bottom:14px;
+  }
+  .meta{display:flex;flex-wrap:wrap;gap:10px 26px;margin-bottom:2px}
+  .meta div{min-width:120px}
+  .lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .val{font-size:16px;font-weight:600;margin-top:2px}
+
+  .hujjat{
+    background:#fff;border:1px solid var(--line);border-radius:10px;
+    padding:16px 15px;max-height:44vh;overflow-y:auto;
+    font-family:Georgia,"Times New Roman",serif;font-size:15px;line-height:1.65;
+    white-space:pre-wrap;word-wrap:break-word;
+    -webkit-overflow-scrolling:touch;
+  }
+  .hujjat::-webkit-scrollbar{width:5px}
+  .hujjat::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+  .scroll-hint{font-size:12.5px;color:var(--muted);margin-top:8px}
+
+  label.field{display:block;margin-top:14px}
+  label.field .lbl{display:block;margin-bottom:6px}
+  input[type=text],input[type=tel]{
+    width:100%;padding:12px 13px;font-size:16px;font-family:inherit;color:var(--ink);
+    background:#fff;border:1px solid var(--line);border-radius:10px;outline:none;
+  }
+  input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,122,0,.15)}
+
+  .tanish{display:flex;gap:11px;align-items:flex-start;margin-top:16px;
+    background:#FFF6EC;border:1px solid #FFD9B0;border-radius:10px;padding:12px 13px}
+  .tanish input{width:22px;height:22px;margin:1px 0 0;accent-color:var(--orange);flex:0 0 auto}
+  .tanish span{font-size:14.5px}
+
+  .imzo-box{margin-top:6px;position:relative}
+  .imzo-frame{
+    position:relative;background:#fff;border:1px dashed #B9C2D0;border-radius:12px;
+    height:190px;overflow:hidden;touch-action:none;
+  }
+  canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
+  .baseline{position:absolute;left:22px;right:22px;bottom:44px;border-bottom:1px solid var(--line);pointer-events:none}
+  .placeholder{
+    position:absolute;left:0;right:0;bottom:16px;text-align:center;
+    font-size:13px;color:#9AA4B4;pointer-events:none;transition:opacity .15s
+  }
+  .imzo-caption{font-size:12px;color:var(--muted);margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .clear{background:none;border:none;color:var(--navy-soft);font:inherit;font-size:13px;font-weight:600;padding:4px 0;cursor:pointer;text-decoration:underline}
+
+  .send{
+    width:100%;margin-top:18px;padding:16px;border:none;border-radius:12px;
+    background:var(--orange);color:#fff;font:inherit;font-size:17px;font-weight:700;
+    cursor:pointer;transition:opacity .15s,transform .05s;
+  }
+  .send:active{transform:scale(.995)}
+  .send:disabled{background:#C6CDD8;color:#fff;cursor:not-allowed}
+  .note{font-size:12.5px;color:var(--muted);margin-top:12px;text-align:center}
+
+  .state{text-align:center;padding:38px 18px}
+  .state .icon{font-size:44px;line-height:1}
+  .state h2{margin:14px 0 6px;font-size:20px}
+  .state p{margin:0;color:var(--muted);font-size:15px}
+  .state.ok h2{color:var(--ok)}
+  .state.err h2{color:var(--err)}
+  .msg{margin-top:12px;font-size:14.5px;color:var(--err);text-align:center;min-height:20px}
+  .hidden{display:none !important}
+  .spin{
+    width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--orange);
+    border-radius:50%;margin:0 auto;animation:sp .8s linear infinite
+  }
+  @keyframes sp{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion:reduce){.spin{animation-duration:2s}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="brand">EDU<span>NOVA</span> SCHOOL</div>
+  <h1 id="sarlavha">Buyruq bilan tanishish</h1>
+</div>
+
+<div class="wrap">
+
+  <!-- YUKLANMOQDA -->
+  <div id="yuk" class="card state">
+    <div class="spin"></div>
+    <p style="margin-top:14px">Hujjat yuklanmoqda…</p>
+  </div>
+
+  <!-- XATO / HOLAT -->
+  <div id="xato" class="card state err hidden">
+    <div class="icon">⚠️</div>
+    <h2 id="xato-sarlavha"></h2>
+    <p id="xato-matn"></p>
+  </div>
+
+  <!-- ASOSIY FORMA -->
+  <div id="forma" class="hidden">
+
+    <div class="card">
+      <div class="meta">
+        <div><div class="lbl">O'quvchi</div><div class="val" id="f-ism">—</div></div>
+        <div><div class="lbl">Sinf</div><div class="val" id="f-sinf">—</div></div>
+        <div><div class="lbl">Buyruq</div><div class="val" id="f-raqam">—</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lbl" style="margin-bottom:8px">Hujjat matni</div>
+      <div class="hujjat" id="f-matn"></div>
+      <div class="scroll-hint">Matnni oxirigacha o'qib chiqing.</div>
+
+      <div class="tanish">
+        <input type="checkbox" id="tanishdim">
+        <span><label for="tanishdim">Buyruq mazmuni bilan tanishdim, e'tirozim yo'q.</label></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="field">
+        <span class="lbl">Ota-ona F.I.Sh.</span>
+        <input type="text" id="ota-ism" autocomplete="name" placeholder="Masalan: Yusupov Alisher Zoirovich">
+      </label>
+
+      <label class="field">
+        <span class="lbl">Telefon raqami</span>
+        <input type="tel" id="telefon" inputmode="tel" autocomplete="tel" placeholder="+998 90 123 45 67">
+      </label>
+
+      <div class="field">
+        <span class="lbl">Imzo</span>
+        <div class="imzo-box">
+          <div class="imzo-frame">
+            <canvas id="pad"></canvas>
+            <div class="baseline"></div>
+            <div class="placeholder" id="ph">Shu yerga barmog'ingiz bilan imzo chizing</div>
+          </div>
+          <div class="imzo-caption">
+            <span>Buyruq bilan tanishdim: __________</span>
+            <button type="button" class="clear" id="tozala">Qaytadan chizish</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="send" id="yubor" disabled>Imzoni yuborish</button>
+      <div class="msg" id="msg"></div>
+      <div class="note">Imzo yuborilgandan keyin havola yopiladi. Sana, vaqt va telefon raqami hujjatga qayd etiladi.</div>
+    </div>
+  </div>
+
+  <!-- MUVAFFAQIYAT -->
+  <div id="tayyor" class="card state ok hidden">
+    <div class="icon">✅</div>
+    <h2>Imzo qabul qilindi</h2>
+    <p id="tayyor-matn">Rahmat. Imzoyingiz maktab hujjatiga biriktirildi.</p>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   SOZLAMA — academy.html dagi bilan bir xil qiymatlarni qo'ying
+   ============================================================ */
+const SB_URL = 'https://unaodltahuevrfnarfha.supabase.co';
+const SB_KEY = 'sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP';   // academy.html ichidagi publishable/anon key
+/* ============================================================ */
+
+const $ = id => document.getElementById(id);
+const token = new URLSearchParams(location.search).get('k');
+
+function ko(el){ el.classList.remove('hidden'); }
+function yo(el){ el.classList.add('hidden'); }
+
+function xatoKorsat(sarlavha, matn){
+  yo($('yuk')); yo($('forma'));
+  $('xato-sarlavha').textContent = sarlavha;
+  $('xato-matn').textContent = matn;
+  ko($('xato'));
+}
+
+async function rpc(fn, body){
+  const r = await fetch(SB_URL + '/rest/v1/rpc/' + fn, {
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'apikey':SB_KEY,
+      'Authorization':'Bearer ' + SB_KEY
+    },
+    body: JSON.stringify(body || {})
+  });
+  if(!r.ok) throw new Error('HTTP ' + r.status);
+  return await r.json();
+}
+
+/* ---------- IMZO KANVASI ---------- */
+const pad = $('pad');
+const ctx = pad.getContext('2d');
+let chizildi = false, bosilgan = false, ohirgi = null;
+
+function kanvasOlchami(){
+  const saqlan = chizildi ? pad.toDataURL() : null;
+  const r = pad.parentElement.getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  pad.width  = Math.round(r.width  * dpr);
+  pad.height = Math.round(r.height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.lineWidth = 2.6;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = '#101828';
+  if(saqlan){
+    const im = new Image();
+    im.onload = () => ctx.drawImage(im, 0, 0, r.width, r.height);
+    im.src = saqlan;
+  }
+}
+
+function nuqta(e){
+  const r = pad.getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+
+pad.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  pad.setPointerCapture(e.pointerId);
+  bosilgan = true;
+  ohirgi = nuqta(e);
+  ctx.beginPath();
+  ctx.moveTo(ohirgi.x, ohirgi.y);
+  ctx.lineTo(ohirgi.x + 0.1, ohirgi.y + 0.1);
+  ctx.stroke();
+  chizildi = true;
+  $('ph').style.opacity = '0';
+  holatTekshir();
+});
+
+pad.addEventListener('pointermove', e => {
+  if(!bosilgan) return;
+  e.preventDefault();
+  const p = nuqta(e);
+  const o = { x:(ohirgi.x + p.x)/2, y:(ohirgi.y + p.y)/2 };
+  ctx.beginPath();
+  ctx.moveTo(ohirgi.x, ohirgi.y);
+  ctx.quadraticCurveTo(ohirgi.x, ohirgi.y, o.x, o.y);
+  ctx.stroke();
+  ohirgi = p;
+});
+
+['pointerup','pointercancel','pointerleave'].forEach(ev =>
+  pad.addEventListener(ev, () => { bosilgan = false; })
+);
+
+$('tozala').addEventListener('click', () => {
+  ctx.clearRect(0, 0, pad.width, pad.height);
+  chizildi = false;
+  $('ph').style.opacity = '1';
+  holatTekshir();
+});
+
+window.addEventListener('resize', kanvasOlchami);
+window.addEventListener('orientationchange', () => setTimeout(kanvasOlchami, 250));
+
+/* ---------- FORMA HOLATI ---------- */
+function holatTekshir(){
+  const ok = $('tanishdim').checked
+          && $('ota-ism').value.trim().length >= 5
+          && chizildi;
+  $('yubor').disabled = !ok;
+}
+$('tanishdim').addEventListener('change', holatTekshir);
+$('ota-ism').addEventListener('input', holatTekshir);
+
+/* ---------- YUBORISH ---------- */
+$('yubor').addEventListener('click', async () => {
+  const btn = $('yubor');
+  btn.disabled = true;
+  btn.textContent = 'Yuborilmoqda…';
+  $('msg').textContent = '';
+  try{
+    const j = await rpc('imzo_saqla', {
+      p_token:   token,
+      p_imzo:    pad.toDataURL('image/png'),
+      p_ota_ism: $('ota-ism').value.trim(),
+      p_telefon: $('telefon').value.trim(),
+      p_qurilma: navigator.userAgent
+    });
+    if(j && j.ok){
+      yo($('forma'));
+      ko($('tayyor'));
+      window.scrollTo(0, 0);
+    }else{
+      const x = (j && j.xato) || 'nomalum';
+      if(x === 'allaqachon_imzolangan'){
+        yo($('forma'));
+        $('tayyor-matn').textContent = 'Bu hujjat allaqachon imzolangan.';
+        ko($('tayyor'));
+      }else if(x === 'muddati_tugagan'){
+        xatoKorsat('Havola muddati tugagan', 'Maktabga murojaat qiling — yangi havola yuboriladi.');
+      }else{
+        $('msg').textContent = 'Yuborilmadi: ' + x;
+        btn.disabled = false;
+        btn.textContent = 'Imzoni yuborish';
+      }
+    }
+  }catch(e){
+    $('msg').textContent = 'Internet aloqasi uzildi. Qayta urinib ko\'ring.';
+    btn.disabled = false;
+    btn.textContent = 'Imzoni yuborish';
+  }
+});
+
+/* ---------- BOSHLANG'ICH YUKLASH ---------- */
+(async function init(){
+  if(!token || token.length < 20){
+    xatoKorsat('Havola noto\'g\'ri', 'Havolani to\'liq nusxalab, brauzerda oching.');
+    return;
+  }
+  try{
+    const j = await rpc('imzo_ol', { p_token: token });
+    if(!j || !j.ok){
+      const h = (j && j.holat) || 'topilmadi';
+      if(h === 'muddati_tugagan')      xatoKorsat('Havola muddati tugagan', 'Maktabga murojaat qiling — yangi havola yuboriladi.');
+      else if(h === 'bekor')           xatoKorsat('Havola bekor qilingan', 'Bu hujjat bo\'yicha imzo talab etilmaydi.');
+      else                             xatoKorsat('Hujjat topilmadi', 'Havola xato yoki eskirgan.');
+      return;
+    }
+
+    $('f-ism').textContent   = j.ism || '—';
+    $('f-sinf').textContent  = j.sinf ? j.sinf + '-sinf' : '—';
+    $('f-raqam').textContent = j.raqam ? '№ ' + j.raqam : '—';
+    $('f-matn').textContent  = j.matn || '';
+    if(j.turi === 'qb') $('sarlavha').textContent = 'Qabul buyrug\'i bilan tanishish';
+    if(j.ota_ism) $('ota-ism').value = j.ota_ism;
+
+    if(j.holat === 'imzolandi'){
+      yo($('yuk'));
+      $('tayyor-matn').textContent = 'Bu hujjat allaqachon imzolangan.';
+      ko($('tayyor'));
+      return;
+    }
+
+    yo($('yuk'));
+    ko($('forma'));
+    kanvasOlchami();
+    holatTekshir();
+  }catch(e){
+    xatoKorsat('Ulanmadi', 'Internetni tekshirib, sahifani yangilang.');
+  }
+})();
+</script>
+</body>
+</html>
