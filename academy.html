@@ -1958,6 +1958,23 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
     <div style="font-weight:800;color:#cdd3ea;margin-bottom:6px">✍️ Ota-onaning imzosi <span style="font-weight:500;color:#8892b0;font-size:12.5px">— buyruq bilan tanishdi</span></div>
     <canvas id="xj-pad" width="560" height="180" style="background:#fff;border:2px dashed rgba(124,92,255,.6);border-radius:14px;touch-action:none;display:block;max-width:100%"></canvas>
     <button class="xj-btn" style="background:rgba(255,255,255,.08);color:#cdd3ea;margin-top:8px;padding:8px 14px;font-size:13px" onclick="xjPadClear()">🧹 Tozalash</button>
+    <div id="xj-imzolink" style="margin-top:12px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="xj-btn" type="button" style="background:#7c5cff;color:#fff;padding:8px 14px;font-size:13px" onclick="xjImzoHavola()">📲 Imzo havolasi (telefonda)</button>
+        <button class="xj-btn" type="button" style="background:rgba(255,255,255,.08);color:#cdd3ea;padding:8px 14px;font-size:13px" onclick="xjImzoTekshir(1)">🔄 Tekshirish</button>
+        <span id="xj-im-msg" style="font-size:12.5px;color:#8892b0"></span>
+      </div>
+      <div id="xj-im-out" style="display:none;margin-top:10px;background:rgba(255,255,255,.05);border:1px solid rgba(124,92,255,.35);border-radius:12px;padding:12px">
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+          <div id="xj-im-qr" style="background:#fff;padding:6px;border-radius:10px;line-height:0"></div>
+          <div style="flex:1;min-width:230px">
+            <input id="xj-im-link" type="text" readonly onclick="this.select()" style="width:100%;font-size:12px;padding:9px 10px;border-radius:8px;border:1px solid rgba(124,92,255,.4);background:rgba(255,255,255,.06);color:#cdd3ea">
+            <button class="xj-btn" type="button" style="background:rgba(255,255,255,.08);color:#cdd3ea;margin-top:8px;padding:7px 12px;font-size:12.5px" onclick="xjImNusxa()">📋 Nusxalash</button>
+            <div style="font-size:12px;color:#8892b0;margin-top:8px">Ota-ona QR kodni telefon kamerasi bilan skaner qiladi yoki havolani Telegram orqali oladi, o‘qib chiqib barmog‘i bilan imzolaydi. Imzo kelishi bilan buyruqqa o‘zi tushadi.</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
     <button class="xj-btn xj-go" onclick="xjRender()">👁 Ko&#8216;rish</button>
@@ -8486,6 +8503,154 @@ function xjImzoImg(){
   });
 }
 var xjImzoCache=null, xjImzoCacheSrc=null;
+
+/* ---------- masofaviy imzo (ota-ona telefonda) ---------- */
+var xjImToken=null, xjImTimer=null, xjImTick=0;
+function xjImMsg(t,c){var e=document.getElementById('xj-im-msg');if(e){e.textContent=t||'';e.style.color=c||'#8892b0';}}
+function xjBuyruqMatn(kind){
+  var num=xjVal('xj-num'),
+      dTxt=xjDateUz(xjVal('xj-sana')),
+      fio=xjBlank(xjVal('xj-fio'),'____________________________'),
+      tug=xjVal('xj-tug')?xjDateDots(xjVal('xj-tug')):'____________',
+      sinf=xjBlank(xjVal('xj-sinf'),'____'),
+      sch=xjSchool();
+  var L=[];
+  L.push('B U Y R U Q');
+  L.push(dTxt+'   \u2116 '+(num||'____')+' '+XJ_SUF[kind]+'   Farg\u2018ona shahar');
+  L.push('');
+  L.push(kind==='chb'
+    ? 'O\u2018quvchini maktab o\u2018quvchilari safidan chiqarish to\u2018g\u2018risida'
+    : 'O\u2018quvchini maktab o\u2018quvchilari safiga qabul qilish to\u2018g\u2018risida');
+  L.push('');
+  var NIZ='O\u2018zbekiston Respublikasi Xalq ta\u2019limi vazirining 2015-yil 17-iyundagi buyrug\u2018i bilan tasdiqlangan \u00ABO\u2018quvchilarni sinfdan-sinfga va bir umumiy o\u2018rta ta\u2019lim muassasasidan boshqasiga o\u2018tkazish tartibi to\u2018g\u2018risida\u00BBgi nizomga (ro\u2018yxat raqami 2684) muvofiq';
+  if(kind==='chb'){
+    var ktn=xjBlank(xjVal('xj-ktnum'),'____');
+    var kts=xjVal('xj-ktsana')?xjDateUz(xjVal('xj-ktsana')):xjDateUz('');
+    L.push(sch.full+'ning '+kts+'dagi \u2116 '+ktn+'-sonli maktabga kelish taloni qabul qilib olinganligi munosabati bilan, '+NIZ);
+  }else{
+    var ars=xjVal('xj-arsana')?xjDateUz(xjVal('xj-arsana')):xjDateUz('');
+    L.push('Ota-onasining (qonuniy vakilining) '+ars+'dagi arizasi hamda taqdim etilgan hujjatlar asosida, '+NIZ);
+  }
+  L.push('');
+  L.push('BUYURAMAN:');
+  L.push('');
+  var items;
+  if(kind==='chb'){
+    var ourkt=xjVal('xj-ourkt');
+    items=[
+      'Maktabning '+sinf+'-sinf o\u2018quvchisi '+fio+' ('+tug+'da tug\u2018ilgan) '+sch.full+'ga o\u2018qishni davom ettirishi munosabati bilan '+dTxt+'dan boshlab \u201CEDU NOVA SCHOOL\u201D nodavlat ta\u2019lim muassasasi o\u2018quvchilari safidan chiqarilsin.',
+      'O\u2018quvchining ota-onasi (qonuniy vakili) mazkur buyruq bilan imzo qo\u2018ydirilgan holda tanishtirilsin hamda unga quyidagi hujjatlar tilxat asosida topshirilsin: ushbu buyruqdan ko\u2018chirma, baholar (o\u2018zlashtirish) tabeli va tibbiy karta.',
+      'Uch kun muddatda sinf jurnali va o\u2018quvchilar harakati daftariga tegishli yozuv kiritilsin hamda o\u2018quvchining chiqarilishi EduErp (erp.maktab.uz) elektron tizimida rasmiylashtirilsin.',
+      'Ota-onaning tilxati, maktabga kelish taloni'+(ourkt?', maktabning \u2116 '+ourkt+'/KT-sonli ketish taloni nusxasi':'')+' va qabul qiluvchi maktabdan keladigan buyruqdan ko\u2018chirma o\u2018quvchining shaxsiy hujjatlar yig\u2018majildiga tikib qo\u2018yilsin.',
+      'Mazkur buyruqning ijrosi ustidan nazoratni o\u2018z zimmamda qoldiraman.'
+    ];
+  }else{
+    items=[
+      fio+' ('+tug+'da tug\u2018ilgan) '+dTxt+'dan boshlab \u201CEDU NOVA SCHOOL\u201D nodavlat ta\u2019lim muassasasining '+sinf+'-sinfiga o\u2018quvchilar safiga qabul qilinsin ('+sch.full+'dan o\u2018tkazilishi munosabati bilan).',
+      'Ushbu buyruqdan ko\u2018chirma bir ish kuni ichida '+sch.full+'ga yuborilsin.',
+      'Uch kun muddatda sinf jurnali va o\u2018quvchilar harakati daftariga tegishli yozuv kiritilsin hamda o\u2018quvchi EduErp (erp.maktab.uz) elektron tizimida rasmiylashtirilsin.',
+      'O\u2018quvchining shaxsiy hujjatlar yig\u2018majildi shakllantirilsin: ota-onaning arizasi, kelish taloni nusxasi va taqdim etilgan hujjatlar.',
+      'Mazkur buyruqning ijrosi ustidan nazoratni o\u2018z zimmamda qoldiraman.'
+    ];
+  }
+  for(var k=0;k<items.length;k++) L.push((k+1)+'. '+items[k]);
+  L.push('');
+  if(kind==='chb'){
+    var ktn2=xjBlank(xjVal('xj-ktnum'),'____');
+    var kts2=xjVal('xj-ktsana')?xjDateUz(xjVal('xj-ktsana')):'____';
+    var ourkt2=xjVal('xj-ourkt');
+    L.push('Asos: '+sch.full+'ning '+kts2+'dagi \u2116 '+ktn2+'-sonli kelish taloni; '+(ourkt2?'maktabning \u2116 '+ourkt2+'/KT-sonli ketish taloni; ':'')+'ota-onaning arizasi.');
+  }else{
+    var arn=xjBlank(xjVal('xj-arnum'),'____');
+    var ars2=xjVal('xj-arsana')?xjDateUz(xjVal('xj-arsana')):'____';
+    L.push('Asos: ota-onaning '+ars2+'dagi \u2116 '+arn+'-sonli arizasi; '+sch.full+'dan olingan hujjatlar.');
+  }
+  L.push('');
+  L.push('Direktor: Xolmatov D.');
+  return L.join('\n');
+}
+function xjQrLib(){
+  if(window.qrcode)return Promise.resolve(true);
+  return new Promise(function(res){
+    var t=setTimeout(function(){res(!!window.qrcode);},7000);
+    var sc=document.createElement('script');
+    sc.src='https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js';
+    sc.onload=function(){clearTimeout(t);res(!!window.qrcode);};
+    sc.onerror=function(){clearTimeout(t);res(false);};
+    document.head.appendChild(sc);
+  });
+}
+function xjImzoHavola(){
+  if(xjType!=='chb'&&xjType!=='qb'){xjImMsg('Faqat buyruqlar uchun','#f87171');return;}
+  var fio=xjVal('xj-fio');
+  if(!fio){xjImMsg('Avval o\u2018quvchi F.I.Sh.ni kiriting','#f87171');return;}
+  var n=xjVal('xj-num');
+  xjImMsg('Havola tayyorlanmoqda\u2026');
+  sb.rpc('imzo_yarat',{
+    p_ism:fio,
+    p_matn:xjBuyruqMatn(xjType),
+    p_turi:xjType,
+    p_sinf:xjVal('xj-sinf')||null,
+    p_raqam:n?(n+XJ_SUF[xjType]):null
+  }).then(function(r){
+    var d=r.data, err=r.error;
+    if(err||!d||!d.ok){xjImMsg('Xato: '+((err&&err.message)||(d&&d.xato)||'server'),'#f87171');return;}
+    xjImToken=d.token; xjImTick=0;
+    var box=document.getElementById('xj-im-out'); if(box)box.style.display='block';
+    var inp=document.getElementById('xj-im-link'); if(inp)inp.value=d.havola;
+    xjQrLib().then(function(ok){
+      var q=document.getElementById('xj-im-qr'); if(!q)return;
+      if(ok){
+        try{var qr=window.qrcode(0,'M');qr.addData(d.havola);qr.make();q.innerHTML=qr.createImgTag(4,8);}
+        catch(e){q.innerHTML='';}
+      }else{q.innerHTML='';}
+    });
+    xjImMsg('Havola tayyor \u2014 QR ni skaner qildiring yoki Telegramda yuboring. Imzo kutilmoqda\u2026','#22c55e');
+    if(xjImTimer)clearInterval(xjImTimer);
+    xjImTimer=setInterval(function(){xjImzoTekshir(0);},6000);
+  });
+}
+function xjImzoTekshir(qolda){
+  if(!xjImToken){if(qolda)xjImMsg('Avval \u00ABImzo havolasi\u00BB tugmasini bosing','#f87171');return;}
+  xjImTick++;
+  if(xjImTick>200&&xjImTimer){clearInterval(xjImTimer);xjImTimer=null;}
+  sb.rpc('imzo_holat',{p_token:xjImToken}).then(function(r){
+    var d=r.data;
+    if(!d||!d.ok){if(qolda)xjImMsg('Topilmadi','#f87171');return;}
+    if(d.holat==='imzolandi'&&d.imzo){
+      if(xjImTimer){clearInterval(xjImTimer);xjImTimer=null;}
+      xjImQabul(d);
+    }else if(qolda){
+      xjImMsg(d.holat==='bekor'?'Havola bekor qilingan':'Hali imzolanmadi \u2014 kutilmoqda\u2026');
+    }
+  });
+}
+function xjImQabul(d){
+  xjImzo=d.imzo; xjPadDrawn=true; xjImzoCache=null; xjImzoCacheSrc=null;
+  var p=document.getElementById('xj-pad');
+  if(p){
+    var im=new Image();
+    im.onload=function(){
+      var c=p.getContext('2d');
+      c.fillStyle='#fff'; c.fillRect(0,0,p.width,p.height);
+      var w=p.width-20, h=Math.round(w*im.height/im.width);
+      if(h>p.height-20){h=p.height-20;w=Math.round(h*im.width/im.height);}
+      c.drawImage(im,(p.width-w)/2,(p.height-h)/2,w,h);
+      xjRender();
+    };
+    im.src=d.imzo;
+  }else{xjRender();}
+  xjImMsg('\u2705 Imzo keldi: '+(d.ota_ism||'')+(d.telefon?(' \u00B7 '+d.telefon):'')+' \u2014 buyruqqa qo\u2018yildi','#22c55e');
+}
+function xjImNusxa(){
+  var inp=document.getElementById('xj-im-link'); if(!inp||!inp.value)return;
+  inp.select();
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(inp.value);}
+    else{document.execCommand('copy');}
+    xjImMsg('Havola nusxalandi \u2014 Telegramga tashlang','#22c55e');
+  }catch(e){xjImMsg('Qo\u2018lda nusxalang (Ctrl+C)');}
+}
 
 /* ---------- bitta sahifadan PDF ---------- */
 function xjPdfDurl(cv){
