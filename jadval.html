@@ -279,6 +279,12 @@ details.more summary{cursor:pointer;font-weight:600;color:var(--ink-2);font-size
         <input type="number" id="cfg-big" min="10" max="40" onchange="setBell('big',+this.value)" title=""></div></div>
       <div class="fld"><label data-i18n="cfgBigAfter"></label>
         <select id="cfg-bigafter" onchange="setBell('bigAfter',+this.value)"><option value="2">2</option><option value="3">3</option></select></div>
+      <div class="fld"><label data-i18n="cfgLunch"></label><div class="duo">
+        <input type="number" id="cfg-tushlik" min="0" max="90" step="5" onchange="setBell('tushlik',+this.value)">
+        <select id="cfg-tushlikafter" onchange="setBell('tushlikAfter',+this.value)"></select></div></div>
+      <div class="fld"><label data-i18n="cfgDayEnd"></label><div class="duo">
+        <input type="time" id="cfg-kunoxiri" onchange="setBell('kunOxiri',this.value)">
+        <button class="btn sm" type="button" style="white-space:nowrap" onclick="kunRejimi()" data-i18n="btnDayMode"></button></div></div>
       <div class="fld"><label data-i18n="cfgRules"></label>
         <label class="chk"><input type="checkbox" checked disabled> <span data-i18n="rule1"></span></label><br>
         <label class="chk"><input type="checkbox" id="r-twice" onchange="setRule('twice',this.checked)"> <span data-i18n="rule2"></span></label><br>
@@ -385,6 +391,11 @@ uz:{
  cfgTitle:'Chop etishdagi sarlavha',cfgDays:'Haftada kunlar',cfgPer:'Kuniga darslar',
  d5:'5 kun (Du–Ju)',d6:'6 kun (Du–Sha)',
  cfgStart:'Birinchi dars boshlanishi',cfgLen:'Dars (daqiqa)',cfgBrk:'Tanaffus / katta tanaffus (daq)',cfgBigAfter:'Katta tanaffus qaysi darsdan keyin',
+ cfgLunch:'Tushlik (daqiqa) va qaysi darsdan keyin',cfgDayEnd:'Maktab kuni tugashi',btnDayMode:'🕗 08:00–16:00 rejimi',
+ afterLesson:'{0}-darsdan keyin',lunchWord:'tushlik',
+ dayFits:'Darslar {0}–{1}. {2} gacha {3} daqiqa qoladi — to‘garak yoki mustaqil ish uchun.',
+ dayOver:'Darslar {0} da tugaydi — bu {1} dan {2} daqiqa kech. Darslar sonini yoki tanaffuslarni kamaytiring.',
+ kunKamaydi:'{0} ta dars {1} gacha sig‘maydi — kuniga {2} ta dars qoladi. Ortiqcha darslar jadvaldan o‘chadi. Davom etilsinmi?',
  cfgRules:'Generator qoidalari',
  rule1:'O‘qituvchi bir vaqtning o‘zida faqat bitta sinfda',
  rule2:'Bir fanni bir kunda ikki marta qo‘ymaslik',
@@ -462,6 +473,11 @@ ru:{
  cfgTitle:'Заголовок при печати',cfgDays:'Дней в неделе',cfgPer:'Уроков в день',
  d5:'5 дней (Пн–Пт)',d6:'6 дней (Пн–Сб)',
  cfgStart:'Начало первого урока',cfgLen:'Урок (минут)',cfgBrk:'Перемена / большая (мин)',cfgBigAfter:'Большая перемена после урока',
+ cfgLunch:'Обед (минут) и после какого урока',cfgDayEnd:'Конец школьного дня',btnDayMode:'🕗 Режим 08:00–16:00',
+ afterLesson:'после {0}-го урока',lunchWord:'обед',
+ dayFits:'Уроки {0}–{1}. До {2} остаётся {3} минут — на кружки или самоподготовку.',
+ dayOver:'Уроки заканчиваются в {0} — это на {2} минут позже {1}. Уменьшите число уроков или перемены.',
+ kunKamaydi:'{0} уроков не помещаются до {1} — останется {2} уроков в день. Лишние уроки удалятся из расписания. Продолжить?',
  cfgRules:'Правила генератора',
  rule1:'Учитель — только в одном классе за час',
  rule2:'Не ставить предмет дважды в день',
@@ -566,7 +582,7 @@ function fresh(){
     meta:{v:2,updated:null},
     cfg:{ lang:'uz', dayCount:6, periods:6,
       rules:{twice:true,morning:true},
-      bells:{start:'08:30',len:45,brk:10,big:20,bigAfter:3},
+      bells:{start:'08:00',len:45,brk:10,big:20,bigAfter:2,tushlik:40,tushlikAfter:4,kunOxiri:'16:00'},
       title:'EDUNOVA SCHOOL · 2026–2027' },
     subjects, teachers:baseTeachers(subjects), classes:baseClasses(),
     load:{}, grid:{}, locks:{}, view:'classes', oqim:'all', tab:'p-subjects'
@@ -598,20 +614,52 @@ const getLoad=(c,s)=>S.load[lk(c,s)]||{h:0,teacherId:null};
 const vakName=n=>n.replace(/^Vakant\s*—\s*/,t('vak')+': ');
 
 /* ============ ЗВОНКИ ============ */
+function hhmm(x){ return String(Math.floor(x/60)%24).padStart(2,'0')+':'+String(x%60).padStart(2,'0'); }
+function daqiqa(s){ const p=String(s||'0:0').split(':'); return (+p[0]||0)*60+(+p[1]||0); }
 function periodTimes(){
   const b=S.cfg.bells;
-  let [h,m]=(b.start||'08:30').split(':').map(Number);
-  let cur=h*60+m; const out=[];
+  let cur=daqiqa(b.start||'08:00'); const out=[];
   for(let p=0;p<P();p++){
-    out.push({from:fmt(cur),to:fmt(cur+b.len)});
-    cur+=b.len+((p+1)===b.bigAfter?b.big:b.brk);
+    const it={from:hhmm(cur),to:hhmm(cur+b.len),tushlik:null};
+    cur+=b.len;
+    if(p<P()-1){
+      let br;
+      if(+b.tushlik>0 && (p+1)===+b.tushlikAfter){ br=+b.tushlik; it.tushlik={from:hhmm(cur),to:hhmm(cur+br)}; }
+      else if((p+1)===+b.bigAfter) br=+b.big;
+      else br=+b.brk;
+      cur+=br;
+    }
+    out.push(it);
   }
   return out;
-  function fmt(x){ return String(Math.floor(x/60)%24).padStart(2,'0')+':'+String(x%60).padStart(2,'0'); }
+}
+function kunOxiriVaqt(){ const t=periodTimes(); return t.length? t[t.length-1].to : (S.cfg.bells.start||'08:00'); }
+function kunRejimi(){
+  const b=S.cfg.bells;
+  b.start='08:00'; b.len=45; b.brk=10; b.big=20; b.bigAfter=2; b.tushlik=40; b.tushlikAfter=4;
+  if(!b.kunOxiri)b.kunOxiri='16:00';
+  const chek=daqiqa(b.kunOxiri), eski=S.cfg.periods;
+  let best=1;
+  for(let n=1;n<=8;n++){ S.cfg.periods=n; if(daqiqa(kunOxiriVaqt())<=chek)best=n; }
+  S.cfg.periods=best;
+  if(best<eski && !confirm(tf('kunKamaydi',eski,best))){ S.cfg.periods=eski; }
+  resizeGrid(); renderAll(); renderSteps(); save();
 }
 function renderBellsLine(){
   const el=document.getElementById('bellsline'); if(!el)return;
-  el.innerHTML='🔔 '+periodTimes().map((x,i)=>(i+1)+') '+x.from+'–'+x.to).join('&nbsp;&nbsp;·&nbsp;&nbsp;');
+  const T=periodTimes(), parts=[];
+  T.forEach((x,i)=>{
+    parts.push((i+1)+') '+x.from+'–'+x.to);
+    if(x.tushlik)parts.push('🍽 '+t('lunchWord')+' '+x.tushlik.from+'–'+x.tushlik.to);
+  });
+  const end=kunOxiriVaqt(), chek=S.cfg.bells.kunOxiri||'', qoldi=chek? daqiqa(chek)-daqiqa(end) : null;
+  let sum='';
+  if(chek){
+    sum = qoldi>=0
+      ? '<span style="color:var(--moss)">'+tf('dayFits',S.cfg.bells.start,end,chek,qoldi)+'</span>'
+      : '<span style="color:var(--anor)">'+tf('dayOver',end,chek,-qoldi)+'</span>';
+  }
+  el.innerHTML='🔔 '+parts.join('&nbsp;&nbsp;·&nbsp;&nbsp;')+(sum?'<br>'+sum:'');
 }
 function setBell(k,v){ S.cfg.bells[k]=v; renderBellsLine(); renderGrid(); save(); }
 
@@ -1096,13 +1144,24 @@ function renderGrid(){
   document.getElementById('cfg-brk').value=S.cfg.bells.brk;
   document.getElementById('cfg-big').value=S.cfg.bells.big;
   document.getElementById('cfg-bigafter').value=S.cfg.bells.bigAfter;
+  document.getElementById('cfg-tushlik').value=S.cfg.bells.tushlik;
+  document.getElementById('cfg-kunoxiri').value=S.cfg.bells.kunOxiri||'';
+  const ta=document.getElementById('cfg-tushlikafter');
+  if(ta){
+    let o='';
+    for(let n=1;n<P();n++)o+='<option value="'+n+'">'+tf('afterLesson',n)+'</option>';
+    ta.innerHTML=o||'<option value="0">—</option>';
+    ta.value=Math.min(S.cfg.bells.tushlikAfter||4,Math.max(1,P()-1));
+  }
   document.getElementById('cfg-title').value=S.cfg.title||'';
   document.getElementById('r-twice').checked=S.cfg.rules.twice;
   document.getElementById('r-morning').checked=S.cfg.rules.morning;
   ['classes','teachers','load'].forEach(v=>document.getElementById('v-'+v).setAttribute('aria-pressed',S.view===v));
   renderOqimSw();
   const oq=(S.oqim&&S.oqim!=='all')? ' · '+tf('oqimOne',S.oqim) : '';
-  document.getElementById('printhead').textContent=(S.cfg.title||'')+' — '+t('s5')+oq;
+  const T0=periodTimes(), lunch=T0.filter(x=>x.tushlik)[0];
+  const rej=' · '+(S.cfg.bells.start||'')+'–'+kunOxiriVaqt()+(lunch? ' · 🍽 '+lunch.tushlik.from+'–'+lunch.tushlik.to : '');
+  document.getElementById('printhead').textContent=(S.cfg.title||'')+' — '+t('s5')+oq+rej;
   renderBellsLine();
   const w=document.getElementById('gridwrap');
   if(!Object.keys(S.grid).length){
@@ -1358,8 +1417,10 @@ uz:`
 <li><b>Soatlar yakuni</b> — reja va jadvaldagi fakt: har bir o‘qituvchining haftalik soati. Maosh hisoblashga ham qulay.</li>
 </ul>
 
-<h3>5. Qo‘ng‘iroqlar</h3>
-<p>⚙️ Sozlamalarda birinchi dars vaqti, dars uzunligi, tanaffuslar va katta tanaffus o‘rnini kiriting — vaqtlar jadval ustunlarida ko‘rinadi. Me’yorlar: dars 45 daqiqadan, tanaffus 10 daqiqadan kam bo‘lmasin, 2- yoki 3-darsdan keyin 20–30 daqiqalik katta tanaffus, darslar 08:00 dan erta boshlanmasin.</p>
+<h3>5. Qo‘ng‘iroqlar va kun rejimi</h3>
+<p>⚙️ Sozlamalarda birinchi dars vaqti, dars uzunligi, tanaffuslar, katta tanaffus va <b>tushlik</b> o‘rnini kiriting — vaqtlar jadval ustunlarida va qo‘ng‘iroqlar qatorida ko‘rinadi.</p>
+<p><b>🕗 08:00–16:00 rejimi</b> tugmasi xususiy maktab kuni uchun hammasini bir bosishda qo‘yadi: boshlanish 08:00, dars 45 daqiqa, tanaffus 10, 2-darsdan keyin katta tanaffus 20, 4-darsdan keyin tushlik 40 daqiqa. Konstruktor «Maktab kuni tugashi» vaqtiga sig‘adigan darslar sonini o‘zi hisoblaydi va pastda yozadi: darslar necha da tugaydi va 16:00 gacha to‘garaklarga qancha vaqt qoladi.</p>
+<p>Me’yorlar: dars 45 daqiqadan, tanaffus 10 daqiqadan kam bo‘lmasin, tushlik kamida 30–40 daqiqa, darslar 08:00 dan erta boshlanmasin.</p>
 
 <h3>6. Saqlash va ko‘chirish</h3>
 <ul>
@@ -1410,8 +1471,10 @@ ru:`
 <li><b>Итог часов</b> — план и факт: сколько часов у каждого учителя в неделю. Удобно для расчёта зарплаты.</li>
 </ul>
 
-<h3>5. Звонки</h3>
-<p>В ⚙️ настройках задайте время первого урока, длину урока, перемены и место большой перемены — время появится в шапке расписания. Нормы: урок не длиннее 45 минут, перемены не короче 10 минут, после 2-го или 3-го урока большая перемена 20–30 минут, начало занятий не раньше 08:00.</p>
+<h3>5. Звонки и режим дня</h3>
+<p>В ⚙️ настройках задайте начало, длину урока, перемены, большую перемену и <b>обед</b> — время появится в шапке расписания и в строке звонков.</p>
+<p>Кнопка <b>🕗 Режим 08:00–16:00</b> ставит всё за один клик под день частной школы: начало 08:00, урок 45 минут, перемена 10, после 2-го урока большая 20, после 4-го — обед 40 минут. Конструктор сам считает, сколько уроков влезает до «Конца школьного дня» и пишет ниже: во сколько заканчиваются уроки и сколько времени остаётся до 16:00 на кружки.</p>
+<p>Нормы: урок не длиннее 45 минут, перемены не короче 10 минут, обед не меньше 30–40 минут, начало занятий не раньше 08:00.</p>
 
 <h3>6. Сохранение и перенос</h3>
 <ul>
