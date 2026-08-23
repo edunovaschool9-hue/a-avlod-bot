@@ -1,0 +1,1418 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EduNova — Dars jadvali konstruktori</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Unbounded:wght@600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+
+<style>
+:root{
+  --cobalt:#1B4E9B; --cobalt-d:#123669; --ishkor:#2E9E9B; --anor:#C6335A;
+  --saffron:#E0A020; --moss:#4E8C4A; --ink:#0E1826; --ink-2:#3C4A5C; --ink-3:#78889B;
+  --line:#DCE2EA; --line-2:#EDF1F5; --glaze:#F2F5F9; --paper:#FFFFFF;
+  --f-ui:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --f-grid:'IBM Plex Sans Condensed','IBM Plex Sans',system-ui,sans-serif;
+  --f-num:'IBM Plex Mono',ui-monospace,monospace;
+  --f-disp:'Unbounded','IBM Plex Sans',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--f-ui);color:var(--ink);background:var(--glaze);font-size:14px;line-height:1.45;-webkit-text-size-adjust:100%}
+button,input,select{font-family:inherit;font-size:14px;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--cobalt);outline-offset:2px}
+
+.app{max-width:1240px;margin:0 auto;padding:0 14px 80px}
+header.top{position:sticky;top:0;z-index:40;background:var(--ink);color:#fff;margin:0 -14px;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:3px solid var(--cobalt)}
+.wordmark{font-family:var(--f-disp);font-weight:800;font-size:15px;letter-spacing:-.02em;line-height:1}
+.wordmark span{color:var(--ishkor)}
+.wordmark small{display:block;font-family:var(--f-ui);font-weight:500;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#8FA3BC;margin-top:3px}
+.top .spacer{flex:1}
+.langsw{display:flex;background:#182437;border:1px solid #2A3A52;border-radius:999px;padding:3px}
+.langsw button{background:transparent;border:none;color:#8FA3BC;font-weight:700;font-size:12px;padding:4px 11px;border-radius:999px}
+.langsw button[aria-pressed="true"]{background:var(--cobalt);color:#fff}
+.saved{font-size:11.5px;color:#8FA3BC;font-family:var(--f-num);white-space:nowrap}
+.saved.on{color:var(--ishkor)}
+.svetofor{display:flex;align-items:center;gap:8px;background:#182437;border:1px solid #2A3A52;border-radius:999px;padding:5px 12px 5px 8px}
+.lamps{display:flex;gap:4px}
+.lamp{width:9px;height:9px;border-radius:50%;background:#2C3B52;transition:.2s}
+.lamp.g.on{background:var(--moss);box-shadow:0 0 8px #4E8C4A}
+.lamp.y.on{background:var(--saffron);box-shadow:0 0 8px #E0A020}
+.lamp.r.on{background:var(--anor);box-shadow:0 0 8px #C6335A}
+.svetofor b{font-size:11.5px;font-weight:600;color:#D6E0EC}
+
+nav.steps{display:flex;gap:6px;overflow-x:auto;padding:12px 14px;margin:0 -14px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+nav.steps::-webkit-scrollbar{display:none}
+.step{flex:0 0 auto;display:flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:8px 13px 8px 9px;color:var(--ink-2);font-weight:600;white-space:nowrap;transition:.15s}
+.step:hover{border-color:var(--cobalt)}
+.step .n{font-family:var(--f-disp);font-weight:800;font-size:11px;width:22px;height:22px;border-radius:6px;background:var(--glaze);color:var(--ink-3);display:grid;place-items:center}
+.step .n.ok{background:#EAF4E9;color:var(--moss)}
+.step .cnt{font-family:var(--f-num);font-size:11px;color:var(--ink-3)}
+.step[aria-current="true"]{background:var(--cobalt);border-color:var(--cobalt);color:#fff;box-shadow:0 3px 12px rgba(27,78,155,.28)}
+.step[aria-current="true"] .n{background:rgba(255,255,255,.18);color:#fff}
+.step[aria-current="true"] .cnt{color:#BFD4EE}
+
+.panel{display:none;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px}
+.panel.on{display:block}
+.phead{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.phead h2{margin:0;font-size:19px;letter-spacing:-.02em;font-weight:700}
+.phead p{margin:4px 0 0;color:var(--ink-3);font-size:13px;max-width:64ch}
+.phead .acts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.pfoot{display:flex;justify-content:space-between;gap:8px;margin-top:18px;border-top:1px solid var(--line-2);padding-top:14px}
+
+.btn{background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:8px 13px;font-weight:600;color:var(--ink-2);transition:.15s}
+.btn:hover{border-color:var(--cobalt);color:var(--cobalt)}
+.btn.primary{background:var(--cobalt);border-color:var(--cobalt);color:#fff}
+.btn.primary:hover{background:var(--cobalt-d);border-color:var(--cobalt-d);color:#fff}
+.btn.big{font-size:15px;padding:11px 18px;border-radius:11px}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--ink-3)}
+.btn.ghost:hover{color:var(--anor);border-color:var(--line)}
+.btn.sm{padding:5px 9px;font-size:12.5px;border-radius:7px}
+.btn.danger{border-color:#F3C9D4;color:var(--anor)}
+
+input[type=text],input[type=number],input[type=time],select{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}
+input:focus,select:focus{border-color:var(--cobalt);outline:none}
+input[type=color]{width:34px;height:32px;padding:2px;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
+label.chk{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-2);cursor:pointer}
+
+table{border-collapse:collapse;width:100%}
+.rows{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.rows table th{background:var(--glaze);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:9px 10px;font-weight:600;border-bottom:1px solid var(--line)}
+.rows table td{padding:7px 10px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+.rows table tr:last-child td{border-bottom:none}
+.rows table tr:hover td{background:#FAFCFE}
+.swatch{width:12px;height:12px;border-radius:3px;display:inline-block;vertical-align:-1px;margin-right:7px}
+.tag{display:inline-block;font-size:11.5px;padding:2px 7px;border-radius:6px;background:var(--glaze);color:var(--ink-2);margin:2px 4px 2px 0;border:1px solid var(--line)}
+.tag.vak{background:#FDF0F3;border-color:#F3C9D4;color:var(--anor)}
+.addrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.addrow input[type=text]{flex:1;min-width:180px;width:auto}
+.hint{font-size:12.5px;color:var(--ink-3)}
+.hint b{color:var(--ink-2)}
+
+.scroller{overflow-x:auto;border:1px solid var(--line);border-radius:12px;-webkit-overflow-scrolling:touch}
+.matrix{border-collapse:separate;border-spacing:0;min-width:100%}
+.matrix th,.matrix td{border-bottom:1px solid var(--line-2);border-right:1px solid var(--line-2);padding:0}
+.matrix thead th{position:sticky;top:0;z-index:3;background:var(--glaze);font-family:var(--f-grid);font-size:12px;font-weight:600;color:var(--ink-2);padding:8px 6px;text-align:center;min-width:74px;border-bottom:1px solid var(--line)}
+.matrix tbody th{position:sticky;left:0;z-index:2;background:var(--paper);text-align:left;padding:8px 10px;font-size:13px;font-weight:600;min-width:170px;max-width:210px;border-right:1px solid var(--line)}
+.matrix tbody th .sub{display:block;font-size:11px;font-weight:400;color:var(--ink-3)}
+.matrix td.cell{text-align:center;padding:3px}
+.matrix input.h{width:44px;text-align:center;font-family:var(--f-num);font-weight:600;padding:5px 2px;border-radius:6px;border:1px solid transparent;background:transparent;color:var(--ink-3)}
+.matrix input.h:hover{border-color:var(--line)}
+.matrix input.h.set{background:#EDF3FB;border-color:#CBDDF3;color:var(--cobalt)}
+.matrix td.tot{background:var(--glaze);font-family:var(--f-num);font-weight:600;text-align:center;font-size:13px}
+.matrix td.tot.over{background:#FDF0F3;color:var(--anor)}
+.matrix tfoot td,.matrix tfoot th{background:var(--glaze);font-family:var(--f-num);font-size:12px;text-align:center;font-weight:600;color:var(--ink-3);padding:7px 4px;position:sticky;bottom:0}
+.matrix tfoot th{text-align:left;font-family:var(--f-ui);z-index:2}
+
+.tpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;margin-top:14px}
+.tpick .row{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:9px;padding:6px 8px}
+.tpick .row span{font-size:12.5px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tpick .row select{width:auto;flex:1.1;font-size:12.5px;padding:5px 6px}
+
+.gridwrap{margin-top:8px}
+.gridblock{margin-bottom:22px;break-inside:avoid}
+.gridblock h3{margin:0 0 8px;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cobalt);display:flex;align-items:center;gap:10px}
+.gridblock h3 em{font-style:normal;font-family:var(--f-num);font-size:11px;color:var(--ink-3);letter-spacing:0;text-transform:none}
+table.tt{border-collapse:separate;border-spacing:0;width:100%;min-width:640px;background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+table.tt th{background:var(--glaze);font-family:var(--f-grid);font-size:11.5px;font-weight:600;letter-spacing:.04em;color:var(--ink-3);padding:6px;border-bottom:1px solid var(--line);border-right:1px solid var(--line-2)}
+table.tt th .tm{display:block;font-family:var(--f-num);font-weight:500;font-size:9.5px;color:var(--ink-3);letter-spacing:0;margin-top:1px}
+table.tt th.day{background:var(--paper);text-align:left;padding-left:10px;font-size:12.5px;color:var(--ink-2);border-right:1px solid var(--line);vertical-align:middle;width:112px}
+table.tt td{border-bottom:1px solid var(--line-2);border-right:1px solid var(--line-2);padding:3px;vertical-align:top}
+table.tt tr:last-child td{border-bottom:none}
+table.tt td:last-child,table.tt th:last-child{border-right:none}
+
+.cellbtn{width:100%;min-height:48px;border:1px solid transparent;border-radius:7px;padding:5px 6px;text-align:left;background:var(--line-2);display:block;position:relative;transition:.12s}
+.cellbtn.empty{background:repeating-linear-gradient(45deg,#F7F9FC,#F7F9FC 6px,#F1F4F8 6px,#F1F4F8 12px)}
+.cellbtn:hover{border-color:var(--cobalt)}
+.cellbtn .s{font-family:var(--f-grid);font-weight:700;font-size:12.5px;line-height:1.15;display:block;color:var(--ink)}
+.cellbtn .t{font-size:10px;line-height:1.2;color:var(--ink-3);display:block;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cellbtn .lk{position:absolute;top:3px;right:4px;font-size:9px;opacity:.7}
+.cellbtn.clash{border-color:var(--anor);box-shadow:inset 0 0 0 2px rgba(198,51,90,.16)}
+.cellbtn.clash .t{color:var(--anor);font-weight:600}
+.cellbtn.picked{border-color:var(--cobalt);box-shadow:0 0 0 3px rgba(27,78,155,.18)}
+.cellbtn.dragover{border-color:var(--ishkor);box-shadow:0 0 0 3px rgba(46,158,155,.2)}
+
+.pop{position:fixed;z-index:60;background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 50px rgba(14,24,38,.22);width:252px;max-height:70vh;overflow:auto;padding:8px}
+.pop h4{margin:2px 6px 8px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.pop .opt{display:flex;align-items:center;gap:8px;width:100%;border:none;background:transparent;padding:7px 8px;border-radius:7px;text-align:left;font-size:13px}
+.pop .opt:hover{background:var(--glaze)}
+.pop .opt .who{margin-left:auto;font-family:var(--f-num);font-size:10.5px;color:var(--ink-3)}
+.pop .sep{height:1px;background:var(--line-2);margin:6px 4px}
+.scrim{position:fixed;inset:0;z-index:55;background:transparent}
+
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin:2px 0 16px;font-size:12.5px;color:var(--ink-3)}
+.viewtabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.viewtabs button{background:var(--glaze);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-weight:600;font-size:13px;color:var(--ink-2)}
+.viewtabs button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+
+.notice{border-radius:10px;padding:10px 13px;font-size:13px;margin-bottom:14px;border:1px solid}
+.notice.warn{background:#FEF8EA;border-color:#F2DCA9;color:#7A5610}
+.notice.bad{background:#FDF0F3;border-color:#F3C9D4;color:#8E2340}
+.notice.ok{background:#EFF7EE;border-color:#CBE4C8;color:#2F6A2B}
+.notice ul{margin:6px 0 0;padding-left:18px}
+
+.settings{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:14px}
+.fld label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:5px;font-weight:600}
+.fld .duo{display:flex;gap:6px}
+details.more{margin-top:6px;border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;margin-bottom:14px}
+details.more summary{cursor:pointer;font-weight:600;color:var(--ink-2);font-size:13px}
+.bellsline{font-family:var(--f-num);font-size:12px;color:var(--ink-3);margin-top:8px;line-height:1.7}
+
+.empty-state{text-align:center;padding:36px 10px;color:var(--ink-3)}
+.empty-state b{display:block;color:var(--ink-2);font-size:15px;margin-bottom:4px}
+
+/* help */
+.help h3{font-size:15px;margin:22px 0 8px;color:var(--cobalt)}
+.help h3:first-child{margin-top:0}
+.help p,.help li{font-size:13.5px;color:var(--ink-2)}
+.help ol,.help ul{padding-left:20px;margin:6px 0}
+.help li{margin:4px 0}
+.help .kbd{font-family:var(--f-num);font-size:11.5px;background:var(--glaze);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+.help .lampx{display:inline-block;width:9px;height:9px;border-radius:50%;vertical-align:-1px;margin-right:5px}
+.dangerzone{margin-top:26px;border:1px dashed #F3C9D4;border-radius:12px;padding:14px}
+.dangerzone h3{color:var(--anor);margin-top:0}
+
+.printhead{display:none}
+@media (max-width:640px){
+  .panel{padding:14px 12px}
+  .phead .acts{margin-left:0;width:100%}
+  .phead .acts .btn{flex:1}
+  table.tt{min-width:560px}
+}
+@media print{
+  body{background:#fff}
+  header.top,nav.steps,.phead,.viewtabs,.legend,.notice,details.more,.settings,.pfoot,.noprint{display:none!important}
+  .app{max-width:none;padding:0}
+  .panel{border:none;padding:0}
+  .panel:not(#p-grid){display:none!important}
+  #p-grid{display:block!important}
+  .printhead{display:block;font-family:var(--f-grid);font-weight:700;font-size:15px;margin:0 0 10px;text-align:center;letter-spacing:.04em}
+  .scroller,.gridwrap{overflow:visible}
+  table.tt{min-width:0;font-size:10px;page-break-inside:avoid}
+  .gridblock{page-break-inside:avoid;margin-bottom:14px}
+  .cellbtn{min-height:34px;background:#fff!important;border:1px solid #ccc}
+  .cellbtn .t{color:#555}
+}
+</style>
+
+<div class="app">
+<header class="top">
+  <div class="wordmark">EDU<span>NOVA</span><small data-i18n="subtitle"></small></div>
+  <div class="spacer"></div>
+  <div class="langsw" role="group" aria-label="Til / Язык">
+    <button id="lang-uz" onclick="setLang('uz')">UZ</button>
+    <button id="lang-ru" onclick="setLang('ru')">RU</button>
+  </div>
+  <div class="svetofor" title=""><div class="lamps"><i class="lamp r" id="lr"></i><i class="lamp y" id="ly"></i><i class="lamp g" id="lg"></i></div><b id="svtext"></b></div>
+  <div class="saved" id="saved">···</div>
+</header>
+
+<nav class="steps" id="steps"></nav>
+
+<!-- 1 FANLAR -->
+<section class="panel" id="p-subjects">
+  <div class="phead"><div><h2 data-i18n="s1"></h2><p data-i18n="s1p"></p></div>
+    <div class="acts"><button class="btn ghost sm" onclick="resetSubjects()" data-i18n="btnBaseList"></button></div></div>
+  <div class="rows"><table id="tbl-subjects"></table></div>
+  <div class="addrow"><input type="text" id="new-subject" data-i18n-ph="phSubject" onkeydown="if(event.key==='Enter')addSubject()"><button class="btn primary" onclick="addSubject()" data-i18n="btnAddSubject"></button></div>
+  <div class="pfoot"><span></span><button class="btn big primary" onclick="go('p-teachers')" data-i18n="next"></button></div>
+</section>
+
+<!-- 2 O'QITUVCHILAR -->
+<section class="panel" id="p-teachers">
+  <div class="phead"><div><h2 data-i18n="s2"></h2><p data-i18n="s2p"></p></div>
+    <div class="acts"><button class="btn sm" onclick="addVacancy()">+ Vakant</button></div></div>
+  <div class="rows"><table id="tbl-teachers"></table></div>
+  <div class="addrow"><input type="text" id="new-teacher" data-i18n-ph="phTeacher" onkeydown="if(event.key==='Enter')addTeacher()"><button class="btn primary" onclick="addTeacher()" data-i18n="btnAddTeacher"></button></div>
+  <div class="pfoot"><button class="btn" onclick="go('p-subjects')" data-i18n="back"></button><button class="btn big primary" onclick="go('p-classes')" data-i18n="next"></button></div>
+</section>
+
+<!-- 3 SINFLAR -->
+<section class="panel" id="p-classes">
+  <div class="phead"><div><h2 data-i18n="s3"></h2><p data-i18n="s3p"></p></div>
+    <div class="acts"><button class="btn sm" onclick="addParallel()" data-i18n="btnParallel"></button></div></div>
+  <div class="rows"><table id="tbl-classes"></table></div>
+  <div class="addrow"><input type="text" id="new-class" data-i18n-ph="phClass" onkeydown="if(event.key==='Enter')addClass()"><button class="btn primary" onclick="addClass()" data-i18n="btnAddClass"></button></div>
+  <div class="pfoot"><button class="btn" onclick="go('p-teachers')" data-i18n="back"></button><button class="btn big primary" onclick="go('p-load')" data-i18n="next"></button></div>
+</section>
+
+<!-- 4 SOATLAR -->
+<section class="panel" id="p-load">
+  <div class="phead"><div><h2 data-i18n="s4"></h2><p data-i18n="s4p"></p></div>
+    <div class="acts">
+      <button class="btn sm" onclick="applyTemplate()" data-i18n="btnTemplate"></button>
+      <button class="btn ghost sm" onclick="clearLoad()" data-i18n="btnClearHours"></button>
+    </div></div>
+  <div id="load-notice"></div>
+  <div class="scroller"><table class="matrix" id="tbl-load"></table></div>
+  <p class="hint" style="margin-top:8px" data-i18n="sanHint"></p>
+  <details class="more" open><summary><span data-i18n="whoTeaches"></span> <span class="hint" id="tpick-count"></span></summary><div class="tpick" id="tpick"></div></details>
+  <div class="pfoot"><button class="btn" onclick="go('p-classes')" data-i18n="back"></button><button class="btn big primary" onclick="go('p-grid')" data-i18n="toSchedule"></button></div>
+</section>
+
+<!-- 5 JADVAL -->
+<section class="panel" id="p-grid">
+  <div class="phead"><div><h2 data-i18n="s5"></h2><p data-i18n="s5p"></p></div>
+    <div class="acts">
+      <button class="btn big primary" onclick="runGenerate()" data-i18n="btnGenerate"></button>
+      <button class="btn sm" onclick="window.print()" data-i18n="btnPrint"></button>
+      <button class="btn sm" onclick="exportCSV()" data-i18n="btnExcel"></button>
+      <button class="btn sm" onclick="exportJSON()" data-i18n="btnBackup"></button>
+      <button class="btn sm" onclick="document.getElementById('imp').click()" data-i18n="btnRestore"></button>
+      <input type="file" id="imp" accept="application/json" style="display:none" onchange="importJSON(this)">
+    </div></div>
+
+  <details class="more"><summary data-i18n="settingsSum"></summary>
+    <div class="settings" style="margin-top:12px">
+      <div class="fld"><label data-i18n="cfgTitle"></label><input type="text" id="cfg-title" onchange="S.cfg.title=this.value;save()"></div>
+      <div class="fld"><label data-i18n="cfgDays"></label>
+        <select id="cfg-days" onchange="setDays(this.value)"><option value="5" data-i18n="d5"></option><option value="6" data-i18n="d6"></option></select></div>
+      <div class="fld"><label data-i18n="cfgPer"></label>
+        <select id="cfg-per" onchange="setPeriods(this.value)"><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></div>
+      <div class="fld"><label data-i18n="cfgStart"></label><input type="time" id="cfg-start" onchange="setBell('start',this.value)"></div>
+      <div class="fld"><label data-i18n="cfgLen"></label><input type="number" id="cfg-len" min="30" max="60" onchange="setBell('len',+this.value)"></div>
+      <div class="fld"><label data-i18n="cfgBrk"></label><div class="duo">
+        <input type="number" id="cfg-brk" min="5" max="30" onchange="setBell('brk',+this.value)" title="">
+        <input type="number" id="cfg-big" min="10" max="40" onchange="setBell('big',+this.value)" title=""></div></div>
+      <div class="fld"><label data-i18n="cfgBigAfter"></label>
+        <select id="cfg-bigafter" onchange="setBell('bigAfter',+this.value)"><option value="2">2</option><option value="3">3</option></select></div>
+      <div class="fld"><label data-i18n="cfgRules"></label>
+        <label class="chk"><input type="checkbox" checked disabled> <span data-i18n="rule1"></span></label><br>
+        <label class="chk"><input type="checkbox" id="r-twice" onchange="setRule('twice',this.checked)"> <span data-i18n="rule2"></span></label><br>
+        <label class="chk"><input type="checkbox" id="r-morning" onchange="setRule('morning',this.checked)"> <span data-i18n="rule3"></span></label></div>
+    </div>
+    <div class="bellsline" id="bellsline"></div>
+  </details>
+
+  <div id="grid-notice"></div>
+
+  <div class="viewtabs noprint">
+    <button id="v-classes" onclick="setView('classes')" data-i18n="vClasses"></button>
+    <button id="v-teachers" onclick="setView('teachers')" data-i18n="vTeachers"></button>
+    <button id="v-load" onclick="setView('load')" data-i18n="vLoad"></button>
+    <span style="flex:1"></span>
+    <button class="btn ghost sm" onclick="clearGrid()" data-i18n="btnClearGrid"></button>
+  </div>
+
+  <div class="legend noprint">
+    <span><span class="swatch" style="background:var(--anor)"></span><span data-i18n="legClash"></span></span>
+    <span>🔒 <span data-i18n="legLock"></span></span>
+    <span data-i18n="legDrag"></span>
+  </div>
+
+  <div class="printhead" id="printhead"></div>
+  <div class="gridwrap" id="gridwrap"></div>
+  <div class="pfoot noprint"><button class="btn" onclick="go('p-load')" data-i18n="back"></button><button class="btn" onclick="go('p-help')" data-i18n="toHelp"></button></div>
+</section>
+
+<!-- 6 QO'LLANMA -->
+<section class="panel" id="p-help">
+  <div class="phead"><div><h2 data-i18n="s6"></h2><p data-i18n="s6p"></p></div></div>
+  <div class="help" id="helpbody"></div>
+  <div class="dangerzone noprint">
+    <h3 data-i18n="dzTitle"></h3>
+    <p class="hint" data-i18n="dzP"></p>
+    <button class="btn danger" onclick="resetAll()" data-i18n="dzBtn"></button>
+  </div>
+  <div class="pfoot"><button class="btn" onclick="go('p-grid')" data-i18n="back"></button><span></span></div>
+</section>
+</div>
+
+<script>
+/* ============ ХРАНИЛИЩЕ / SAQLASH ============ */
+const KEY='edunova_schedule_v1';
+const SB_URL='https://unaodltahuevrfnarfha.supabase.co';
+const SB_KEY='sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP';
+let jsb=null; try{ if(window.supabase&&window.supabase.createClient) jsb=window.supabase.createClient(SB_URL,SB_KEY); }catch(e){}
+let cloudOk=false;
+const store={
+  async get(k){
+    if(jsb){ try{
+      const r=await jsb.rpc('jadval_ol');
+      if(!r.error){ cloudOk=true; if(r.data){ try{localStorage.setItem(k,JSON.stringify(r.data));}catch(e){} return r.data; } }
+    }catch(e){} }
+    try{ if(window.storage){ const r=await window.storage.get(k); if(r&&r.value)return JSON.parse(r.value); } }catch(e){}
+    try{ const v=localStorage.getItem(k); if(v)return JSON.parse(v); }catch(e){}
+    return null;
+  },
+  async set(k,v){
+    let ok=false;
+    if(jsb){ try{
+      const r=await jsb.rpc('jadval_saqla',{p_data:v});
+      if(!r.error){ cloudOk=true; ok=true; } else cloudOk=false;
+    }catch(e){ cloudOk=false; } }
+    try{ if(window.storage){ await window.storage.set(k,JSON.stringify(v)); ok=true; } }catch(e){}
+    try{ localStorage.setItem(k,JSON.stringify(v)); ok=true; }catch(e){}
+    return ok;
+  }
+};
+let saveTimer=null;
+function save(){
+  clearTimeout(saveTimer);
+  const el=document.getElementById('saved');
+  el.textContent=t('saving'); el.className='saved';
+  saveTimer=setTimeout(async()=>{
+    S.meta.updated=new Date().toISOString();
+    const ok=await store.set(KEY,S);
+    el.textContent= ok? (cloudOk?'\u2601 ':'')+t('savedOk') : t('savedNo');
+    el.className= ok? 'saved on':'saved';
+  },400);
+}
+
+/* ============ I18N ============ */
+const I={
+uz:{
+ subtitle:'Dars jadvali · konstruktor',
+ s1:'Fanlar',s1p:'Maktab fanlari ro‘yxati. Rang — fan jadvalda shunday ko‘rinadi. «Qiyin fan» — generator uni 1–3-darsga qo‘yishga harakat qiladi.',
+ s2:'O‘qituvchilar',s2p:'Kim qaysi fanni o‘qitadi va qaysi kunlari ishlay olmaydi. Bo‘sh o‘rinlarni «Vakant» qilib qoldiring — jadval baribir tuziladi, soatlar band qilib qo‘yiladi.',
+ s3:'Sinflar',s3p:'A va B parallellari — alohida qatorlar. Generator bitta o‘qituvchi 5-A va 5-B da bir vaqtda bo‘lib qolmasligini kafolatlaydi.',
+ s4:'Soatlar',s4p:'Har bir sinfda har bir fandan haftasiga necha soat. Pastda — bu fanni shu sinfda kim o‘qitishi.',
+ s5:'Jadval',s5p:'Darsga bosing: almashtirish, o‘rin almashish, tozalash yoki 🔒 qulflash. Qulflangan darslar qayta generatsiyada saqlanadi.',
+ s6:'Qo‘llanma',s6p:'Konstruktordan foydalanish — boshidan oxirigacha.',
+ next:'Keyingi qadam →',back:'← Orqaga',toSchedule:'Jadvalga o‘tish →',toHelp:'Qo‘llanma',
+ btnBaseList:'Bazaviy ro‘yxatni qaytarish',btnAddSubject:'Fan qo‘shish',phSubject:'Fan nomi',
+ btnAddTeacher:'O‘qituvchi qo‘shish',phTeacher:'O‘qituvchi ismi',
+ btnParallel:'B parallelini qo‘shish',btnAddClass:'Sinf qo‘shish',phClass:'Masalan: 5-A',
+ btnTemplate:'Namunaviy soatlar bilan to‘ldirish',btnClearHours:'Soatlarni tozalash',
+ whoTeaches:'Fanni sinfda kim o‘qitadi',
+ sanHint:'Sanitariya me’yorlari: 5–6-sinf — kuniga ko‘pi bilan 6 dars, 7–11-sinf — 7 dars; dars 45 daqiqadan oshmasin.',
+ btnGenerate:'⚡ Jadval tuzish',btnPrint:'Chop etish',btnExcel:'Excel (CSV)',btnBackup:'Nusxa (JSON)',btnRestore:'Nusxani yuklash',
+ settingsSum:'⚙️ Sozlamalar: kunlar, darslar soni, qo‘ng‘iroqlar, qoidalar',
+ cfgTitle:'Chop etishdagi sarlavha',cfgDays:'Haftada kunlar',cfgPer:'Kuniga darslar',
+ d5:'5 kun (Du–Ju)',d6:'6 kun (Du–Sha)',
+ cfgStart:'Birinchi dars boshlanishi',cfgLen:'Dars (daqiqa)',cfgBrk:'Tanaffus / katta tanaffus (daq)',cfgBigAfter:'Katta tanaffus qaysi darsdan keyin',
+ cfgRules:'Generator qoidalari',
+ rule1:'O‘qituvchi bir vaqtning o‘zida faqat bitta sinfda',
+ rule2:'Bir fanni bir kunda ikki marta qo‘ymaslik',
+ rule3:'«Qiyin» fanlarni 1–3-darsga qo‘yish',
+ vClasses:'Sinflar bo‘yicha',vTeachers:'O‘qituvchilar bo‘yicha',vLoad:'Soatlar yakuni',
+ btnClearGrid:'Jadvalni tozalash',
+ legClash:'qizil ramka — o‘qituvchi shu soatda boshqa sinfda band',
+ legLock:'— dars qulflangan',legDrag:'Darsni sichqoncha bilan sudrab o‘rnini almashtirish mumkin',
+ hoursW:'soat',lesson:'dars',week:'hafta',
+ empty1:'Fanlar hali yo‘q',empty1p:'Quyida birinchi fanni qo‘shing.',
+ empty2:'O‘qituvchilar hali yo‘q',empty2p:'Quyida birinchi o‘qituvchini qo‘shing.',
+ empty3:'Sinflar hali yo‘q',empty3p:'Quyida birinchi sinfni qo‘shing.',
+ empty4:'Sinflar va fanlar kerak',empty4p:'Avval 1- va 3-qadamlarni to‘ldiring.',
+ empty5:'Jadval hali tuzilmagan',empty5p:'«Jadval tuzish» tugmasini bosing — 4-qadamdagi soatlar kunlarga taqsimlanadi.',
+ emptyT:'Hozircha bo‘sh',emptyTp:'Hech bir o‘qituvchiga dars biriktirilmagan.',
+ thSubject:'Fan',thMorning:'Qiyin fan',thWho:'Kim o‘qitadi',thTeacher:'O‘qituvchi',thSubs:'Fanlari',thOff:'Ishlamaydi',thHours:'Soat',
+ thClass:'Sinf',thGrade:'Sinf raqami',thWeekH:'Haftalik soat',thPlan:'Reja, soat',thFact:'Jadvalda',thDayoff:'Dam kunlari',
+ morningChip:'1–3-dars',none:'hech kim',noTeacher:'o‘qituvchi yo‘q',teachersN:'o‘qituvchi',
+ over:'ortiqcha',subjCol:'Fan \\ Sinf',totalRow:'Sinf jami',total:'Jami',
+ confTemplate:'5–11 uchun namunaviy soatlar qo‘yilsinmi? Joriy soatlar o‘chib ketadi.',
+ confClearHours:'Barcha soatlar tozalansinmi?',
+ confDelSubj:'«{0}» o‘chirilsinmi? Bu fan bo‘yicha soatlar ham o‘chadi.',
+ confResetSubj:'EduNova bazaviy fanlar ro‘yxati qaytarilsinmi? Soatlar va biriktirishlar o‘chadi.',
+ confDelTeacher:'«{0}» o‘chirilsinmi? Uning darslari o‘qituvchisiz qoladi.',
+ confDelClass:'«{0}» sinfi soatlari va jadvali bilan o‘chirilsinmi?',
+ confParallel:'{0} ta sinf uchun B paralleli yaratilib, soatlari ko‘chirilsinmi?',
+ noAClasses:'B yaratish uchun A harfli sinflar topilmadi.',
+ confClearGrid:'Tuzilgan jadval tozalansinmi? (Fanlar, o‘qituvchilar va soatlar qoladi)',
+ confReset1:'DIQQAT: hamma narsa o‘chadi — fanlar, o‘qituvchilar, sinflar, soatlar, jadval. Davom etilsinmi?',
+ confReset2:'Oxirgi savol: rostdan ham noldan boshlaymizmi?',
+ promptCopy:'Yangi sinf nomi:',copySuffix:' (nusxa)',
+ genNeedHours:'Avval 4-qadamda soatlarni kiriting — generatorga taqsimlaydigan narsa yo‘q.',
+ genOverCap:'Bu sinflarda soatlar haftadagi darslar sonidan ({0}) ko‘p: {1}. Ortiqchasi sig‘madi — 4-qadamda soatlarni kamaytiring.',
+ genNoTeachers:'O‘qituvchilar jismonan yetmaydi. Bir kishi haftasiga ko‘pi bilan {0} soat bera oladi, reja bo‘yicha esa:',
+ genNoTeachers2:'Bu fanga ikkinchi o‘qituvchi kerak — yoki soatlarni kamaytiring. Joylashmadi: {0} soat.',
+ genLimit:'soat, cheklov {0}',
+ genUnplaced:'{0} soat joylashmadi: {1}. Ko‘pincha sabab — o‘qituvchining yopiq kunlari yoki bitta o‘qituvchi juda ko‘p sinfda. «O‘qituvchilar bo‘yicha» ko‘rinishini tekshiring.',
+ andMore:'yana {0} ta',
+ genClash:'O‘qituvchilarda ustma-ust tushishlar bor: {0}.',
+ genOk:'Tayyor: barcha soatlar joylashdi, ustma-ust tushish yo‘q.',
+ genOkRelax:' {0} holatda fanni bir kunda ikki marta qo‘yishga to‘g‘ri keldi.',
+ svNone:'Tuzilmagan',svOverCap:'Soatlar sig‘maydi',svNoTeach:'O‘qituvchi yetmaydi',svPartial:'To‘liq emas',svClash:'Ustma-ust: {0}',svClean:'Jadval toza',
+ popEmpty:'▫︎ Bo‘sh',popLock:'🔒 Qulflash',popUnlock:'🔓 Ochish',popSwap:'⇄ O‘rin almashtirish…',popSubj:'Sinf fanlari',popNoHours:'Sinfda soatlar yo‘q.',
+ swapSameClass:'O‘rin almashtirish faqat bitta sinf ichida ishlaydi.',
+ loadOverCap:'Haftada {0} dars bor. Ortiqcha soat: {1}',
+ loadOverTeach:'O‘qituvchiga hafta yetmaydi: {0}. Bu fanga ikkinchi o‘qituvchi qo‘shing.',
+ loadNoTeach:'{0} soat o‘qituvchisiz — ular jadvalga tushadi, lekin «o‘qituvchi yo‘q» belgisi bilan.',
+ sumNote:'Jadvaldagi jami darslar: {0}. Qavsdagi farq — reja bilan mos kelmagan soatlar.',
+ importOk:'Nusxa yuklandi.',importBad:'Fayl mos kelmadi — «Nusxa (JSON)» tugmasi bilan yuklab olingan .json kerak.',
+ saving:'saqlanmoqda…',savedOk:'saqlandi ✓',savedNo:'saqlanmadi (vaqtinchalik)',loaded:'yuklandi ✓',newFile:'yangi fayl',
+ csvClass:'SINF',csvDay:'KUN',csvTeacherSheet:'O‘QITUVCHILAR BANDLIGI',
+ dzTitle:'Xavfli hudud',dzP:'Hammasini o‘chirib, noldan boshlash. Avval «Nusxa (JSON)» bilan zaxira oling.',dzBtn:'Hammasini tozalab, noldan boshlash',
+ vak:'Vakant'
+},
+ru:{
+ subtitle:'Расписание · конструктор',
+ s1:'Предметы',s1p:'Список предметов школы. Цвет — как предмет выглядит в сетке. «Сложный предмет» — генератор постарается поставить его на 1–3 урок.',
+ s2:'Учителя',s2p:'Кто что ведёт и в какие дни не может работать. Вакансии оставляйте как «Vakant» — расписание всё равно построится, часы будут зарезервированы.',
+ s3:'Классы',s3p:'Параллели А и Б — отдельные строки. Генератор гарантирует: один учитель не окажется в 5-А и 5-Б в один и тот же час.',
+ s4:'Часы',s4p:'Сколько часов в неделю у каждого класса по каждому предмету. Ниже — кто ведёт этот предмет в этом классе.',
+ s5:'Расписание',s5p:'Нажмите на урок: заменить, поменять местами, очистить или 🔒 закрепить. Закреплённые уроки переживают повторную генерацию.',
+ s6:'Инструкция',s6p:'Как пользоваться конструктором — от А до Я.',
+ next:'Следующий шаг →',back:'← Назад',toSchedule:'К расписанию →',toHelp:'Инструкция',
+ btnBaseList:'Вернуть базовый список',btnAddSubject:'Добавить предмет',phSubject:'Название предмета',
+ btnAddTeacher:'Добавить учителя',phTeacher:'Имя учителя',
+ btnParallel:'Добавить параллель Б',btnAddClass:'Добавить класс',phClass:'Например: 5-A',
+ btnTemplate:'Заполнить типовыми часами',btnClearHours:'Очистить часы',
+ whoTeaches:'Кто ведёт предмет в классе',
+ sanHint:'Санитарные нормы: 5–6 классы — не более 6 уроков в день, 7–11 — не более 7; урок не длиннее 45 минут.',
+ btnGenerate:'⚡ Сгенерировать',btnPrint:'Печать',btnExcel:'Excel (CSV)',btnBackup:'Копия (JSON)',btnRestore:'Загрузить копию',
+ settingsSum:'⚙️ Настройки: дни, уроки, звонки, правила',
+ cfgTitle:'Заголовок при печати',cfgDays:'Дней в неделе',cfgPer:'Уроков в день',
+ d5:'5 дней (Пн–Пт)',d6:'6 дней (Пн–Сб)',
+ cfgStart:'Начало первого урока',cfgLen:'Урок (минут)',cfgBrk:'Перемена / большая (мин)',cfgBigAfter:'Большая перемена после урока',
+ cfgRules:'Правила генератора',
+ rule1:'Учитель — только в одном классе за час',
+ rule2:'Не ставить предмет дважды в день',
+ rule3:'«Сложные» предметы — на 1–3 урок',
+ vClasses:'По классам',vTeachers:'По учителям',vLoad:'Итог часов',
+ btnClearGrid:'Очистить расписание',
+ legClash:'красная рамка — учитель в этот час занят в другом классе',
+ legLock:'— урок закреплён',legDrag:'Урок можно перетащить мышью, чтобы поменять местами',
+ hoursW:'ч',lesson:'урок',week:'нед',
+ empty1:'Предметов пока нет',empty1p:'Добавьте первый предмет ниже.',
+ empty2:'Учителей пока нет',empty2p:'Добавьте первого учителя ниже.',
+ empty3:'Классов пока нет',empty3p:'Добавьте первый класс ниже.',
+ empty4:'Нужны классы и предметы',empty4p:'Сначала заполните шаги 1 и 3.',
+ empty5:'Расписания ещё нет',empty5p:'Нажмите «Сгенерировать» — часы со шага 4 разложатся по дням.',
+ emptyT:'Пока пусто',emptyTp:'Ни одному учителю не назначены уроки.',
+ thSubject:'Предмет',thMorning:'Сложный',thWho:'Кто ведёт',thTeacher:'Учитель',thSubs:'Ведёт предметы',thOff:'Не работает',thHours:'Часы',
+ thClass:'Класс',thGrade:'Номер класса',thWeekH:'Часов в неделю',thPlan:'План, ч',thFact:'В расписании',thDayoff:'Выходные',
+ morningChip:'1–3 урок',none:'никто',noTeacher:'нет учителя',teachersN:'учит.',
+ over:'перебор',subjCol:'Предмет \\ Класс',totalRow:'Всего у класса',total:'Всего',
+ confTemplate:'Заполнить часы типовым шаблоном 5–11? Текущие часы будут перезаписаны.',
+ confClearHours:'Очистить все часы?',
+ confDelSubj:'Удалить «{0}»? Часы по этому предмету тоже удалятся.',
+ confResetSubj:'Вернуть базовый список предметов EduNova? Часы и привязки сбросятся.',
+ confDelTeacher:'Удалить «{0}»? Его уроки останутся без учителя.',
+ confDelClass:'Удалить класс «{0}» вместе с его часами и расписанием?',
+ confParallel:'Создать параллель Б для {0} классов и скопировать их часы?',
+ noAClasses:'Нет классов с буквой A, чтобы создать Б.',
+ confClearGrid:'Очистить построенное расписание? (Предметы, учителя и часы останутся)',
+ confReset1:'ВНИМАНИЕ: удалится всё — предметы, учителя, классы, часы, расписание. Продолжить?',
+ confReset2:'Последний вопрос: точно начинаем с нуля?',
+ promptCopy:'Название нового класса:',copySuffix:' (копия)',
+ genNeedHours:'Сначала заполните часы на шаге 4 — генератору нечего расставлять.',
+ genOverCap:'У этих классов часов больше, чем уроков в неделе ({0}): {1}. Лишнее не поместилось — уменьшите часы на шаге 4.',
+ genNoTeachers:'Физически не хватает учителей. Один человек может дать максимум {0} ч/нед, а по плану:',
+ genNoTeachers2:'Нужен второй учитель на этот предмет — или меньше часов. Не расставлено: {0} ч.',
+ genLimit:'ч при пределе {0}',
+ genUnplaced:'Не удалось расставить {0} ч.: {1}. Чаще всего мешают закрытые дни учителя или один учитель на слишком многих классах — смотрите «По учителям».',
+ andMore:'и ещё {0}',
+ genClash:'Найдены накладки у учителей: {0}.',
+ genOk:'Готово: все часы расставлены, накладок нет.',
+ genOkRelax:' В {0} случаях предмет пришлось поставить дважды в день.',
+ svNone:'Не сгенерировано',svOverCap:'Часы не помещаются',svNoTeach:'Не хватает учителей',svPartial:'Расставлено не всё',svClash:'Накладки: {0}',svClean:'Расписание чистое',
+ popEmpty:'▫︎ Пусто',popLock:'🔒 Закрепить',popUnlock:'🔓 Открепить',popSwap:'⇄ Поменять местами…',popSubj:'Предметы класса',popNoHours:'У класса нет часов.',
+ swapSameClass:'Менять местами можно только внутри одного класса.',
+ loadOverCap:'В неделе {0} уроков. Перебор: {1}',
+ loadOverTeach:'Учителю не хватит недели: {0}. Добавьте второго учителя на этот предмет.',
+ loadNoTeach:'{0} ч. без учителя — они встанут в сетку с пометкой «нет учителя».',
+ sumNote:'Всего уроков в расписании: {0}. Разница в скобках — часы, не совпавшие с планом.',
+ importOk:'Копия загружена.',importBad:'Файл не подошёл — нужен .json, скачанный кнопкой «Копия (JSON)».',
+ saving:'сохраняю…',savedOk:'сохранено ✓',savedNo:'локально (без сохранения)',loaded:'загружено ✓',newFile:'новый файл',
+ csvClass:'КЛАСС',csvDay:'ДЕНЬ',csvTeacherSheet:'ЗАНЯТОСТЬ УЧИТЕЛЕЙ',
+ dzTitle:'Опасная зона',dzP:'Стереть всё и начать с нуля. Сначала сделайте «Копию (JSON)».',dzBtn:'Стереть всё и начать заново',
+ vak:'Vakant'
+}};
+const DAYS={
+ uz:{full:['Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba'],sh:['Du','Se','Cho','Pa','Ju','Sha']},
+ ru:{full:['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'],sh:['Пн','Вт','Ср','Чт','Пт','Сб']}
+};
+function t(k){ const d=I[S.cfg.lang]||I.uz; return d[k]!==undefined?d[k]:(I.ru[k]!==undefined?I.ru[k]:k); }
+function tf(k){ const s=t(k); const a=[].slice.call(arguments,1); return s.replace(/\{(\d)\}/g,(_,i)=>a[+i]); }
+function setLang(l){ S.cfg.lang=l; applyLang(); save(); }
+function applyLang(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>el.placeholder=t(el.dataset.i18nPh));
+  document.getElementById('lang-uz').setAttribute('aria-pressed',S.cfg.lang==='uz');
+  document.getElementById('lang-ru').setAttribute('aria-pressed',S.cfg.lang==='ru');
+  renderSteps(); renderAll(); renderHelp(); updateSvetofor();
+}
+
+/* ============ БАЗОВЫЕ ДАННЫЕ ============ */
+const uid=p=>p+Math.random().toString(36).slice(2,8);
+const PAL=['#1B4E9B','#2E9E9B','#C6335A','#E0A020','#4E8C4A','#6C4FA3','#B5561F','#3A7CA5','#8C7B2E','#A23E7C','#2F6E6B','#7A4B2B'];
+function baseSubjects(){
+  const L=[['Matematika',1],['Ona tili va adabiyot',1],['Rus tili',0],['Ingliz tili',1],
+    ['Biologiya',1],['Kimyo',1],['Fizika',1],['Tarix',0],['Geografiya',0],
+    ['Huquq va mantiqiy fikrlash',0],["IT va sun'iy intellekt",0],['Robototexnika',0],
+    ['Koreys tili',0],['Nemis tili',0],['Karate',0],['Mehnat',0],
+    ['Jinsiy tarbiya',0],['Shaxmat',0],['Psixologiya',0]];
+  return L.map((x,i)=>({id:uid('s'),name:x[0],color:PAL[i%PAL.length],morning:!!x[1]}));
+}
+function baseTeachers(subs){
+  const f=n=>{const s=subs.find(x=>x.name===n);return s?s.id:null;};
+  const T=[["Behzodbek Jo'rayev",['Biologiya']],['Dildora Madaminjonovna',['Matematika']],
+    ['Azizali',['Matematika']],['Baxodirova Begoyim',['Ona tili va adabiyot']],
+    ['Mokhira Akbarovna',['Ona tili va adabiyot']],['Mohlaroy',['Tarix']],
+    ['Boburjon',['Huquq va mantiqiy fikrlash']],['Ruslan',['Karate']],['Nilufar',[]],
+    ['Vakant — Kimyo',['Kimyo']],['Vakant — Fizika',['Fizika']],
+    ['Vakant — Ingliz tili',['Ingliz tili']],['Vakant — Rus tili',['Rus tili']],
+    ["Vakant — IT va sun'iy intellekt",["IT va sun'iy intellekt",'Robototexnika']],
+    ['Vakant — Koreys tili',['Koreys tili']],['Vakant — Geografiya',['Geografiya','Mehnat']],
+    ['Vakant — Psixologiya',['Psixologiya','Jinsiy tarbiya','Shaxmat']]];
+  return T.map(x=>({id:uid('t'),name:x[0],subs:x[1].map(f).filter(Boolean),off:[],max:26}));
+}
+function baseClasses(){ return [5,6,7,8,9,10,11].map(g=>({id:uid('c'),name:g+'-A',grade:g})); }
+function fresh(){
+  const subjects=baseSubjects();
+  return {
+    meta:{v:2,updated:null},
+    cfg:{ lang:'uz', dayCount:6, periods:6,
+      rules:{twice:true,morning:true},
+      bells:{start:'08:30',len:45,brk:10,big:20,bigAfter:3},
+      title:'EDUNOVA SCHOOL · 2026–2027' },
+    subjects, teachers:baseTeachers(subjects), classes:baseClasses(),
+    load:{}, grid:{}, locks:{}, view:'classes', tab:'p-subjects'
+  };
+}
+let S=fresh();
+function migrate(s){
+  const f=fresh();
+  s.cfg=Object.assign({},f.cfg,s.cfg||{});
+  s.cfg.rules=Object.assign({},f.cfg.rules,(s.cfg&&s.cfg.rules)||{});
+  s.cfg.bells=Object.assign({},f.cfg.bells,(s.cfg&&s.cfg.bells)||{});
+  ['subjects','teachers','classes'].forEach(k=>{ if(!Array.isArray(s[k]))s[k]=f[k]; });
+  ['load','grid','locks'].forEach(k=>{ if(!s[k]||typeof s[k]!=='object')s[k]={}; });
+  if(!s.view)s.view='classes'; if(!s.tab||s.tab==='p-grid'&&!Object.keys(s.grid).length)s.tab=s.tab||'p-subjects';
+  if(!s.meta)s.meta={v:2,updated:null};
+  return s;
+}
+const days=()=>DAYS[S.cfg.lang].full.slice(0,S.cfg.dayCount);
+const daysSh=()=>DAYS[S.cfg.lang].sh.slice(0,S.cfg.dayCount);
+const P=()=>S.cfg.periods;
+const cap=()=>S.cfg.dayCount*S.cfg.periods;
+const subjById=id=>S.subjects.find(s=>s.id===id);
+const teachById=id=>S.teachers.find(x=>x.id===id);
+const clsById=id=>S.classes.find(c=>c.id===id);
+const lk=(c,s)=>c+'|'+s;
+const gk=(c,d,p)=>c+'|'+d+'|'+p;
+const getLoad=(c,s)=>S.load[lk(c,s)]||{h:0,teacherId:null};
+const vakName=n=>n.replace(/^Vakant\s*—\s*/,t('vak')+': ');
+
+/* ============ ЗВОНКИ ============ */
+function periodTimes(){
+  const b=S.cfg.bells;
+  let [h,m]=(b.start||'08:30').split(':').map(Number);
+  let cur=h*60+m; const out=[];
+  for(let p=0;p<P();p++){
+    out.push({from:fmt(cur),to:fmt(cur+b.len)});
+    cur+=b.len+((p+1)===b.bigAfter?b.big:b.brk);
+  }
+  return out;
+  function fmt(x){ return String(Math.floor(x/60)%24).padStart(2,'0')+':'+String(x%60).padStart(2,'0'); }
+}
+function renderBellsLine(){
+  const el=document.getElementById('bellsline'); if(!el)return;
+  el.innerHTML='🔔 '+periodTimes().map((x,i)=>(i+1)+') '+x.from+'–'+x.to).join('&nbsp;&nbsp;·&nbsp;&nbsp;');
+}
+function setBell(k,v){ S.cfg.bells[k]=v; renderBellsLine(); renderGrid(); save(); }
+
+/* ============ ШАБЛОН ЧАСОВ ============ */
+const TPL={
+ 'Matematika':{5:5,6:5,7:5,8:5,9:5,10:6,11:6},
+ 'Ona tili va adabiyot':{5:5,6:4,7:4,8:4,9:4,10:3,11:3},
+ 'Rus tili':{5:2,6:2,7:2,8:2,9:2,10:2,11:2},
+ 'Ingliz tili':{5:4,6:4,7:4,8:4,9:4,10:4,11:4},
+ 'Biologiya':{5:2,6:2,7:2,8:2,9:2,10:2,11:2},
+ 'Kimyo':{5:0,6:0,7:2,8:2,9:2,10:2,11:2},
+ 'Fizika':{5:0,6:2,7:2,8:2,9:2,10:2,11:2},
+ 'Tarix':{5:2,6:2,7:2,8:2,9:2,10:2,11:2},
+ 'Geografiya':{5:2,6:2,7:1,8:1,9:1,10:1,11:1},
+ 'Huquq va mantiqiy fikrlash':{5:1,6:1,7:1,8:1,9:2,10:2,11:2},
+ "IT va sun'iy intellekt":{5:2,6:2,7:2,8:2,9:2,10:2,11:2},
+ 'Robototexnika':{5:1,6:1,7:1,8:1,9:1,10:0,11:0},
+ 'Koreys tili':{5:2,6:2,7:2,8:2,9:2,10:2,11:2},
+ 'Nemis tili':{5:0,6:0,7:0,8:0,9:0,10:0,11:0},
+ 'Karate':{5:2,6:2,7:2,8:2,9:2,10:2,11:2},
+ 'Mehnat':{5:1,6:1,7:1,8:1,9:1,10:1,11:1},
+ 'Jinsiy tarbiya':{5:1,6:1,7:1,8:1,9:1,10:1,11:1},
+ 'Shaxmat':{5:1,6:1,7:1,8:1,9:0,10:0,11:0},
+ 'Psixologiya':{5:1,6:1,7:1,8:1,9:1,10:1,11:1}};
+function applyTemplate(){
+  if(!confirm(t('confTemplate')))return;
+  S.load={};
+  S.classes.forEach(c=>{
+    const g=c.grade||parseInt(c.name,10)||5;
+    S.subjects.forEach(s=>{
+      const h=(TPL[s.name]&&TPL[s.name][g])||0;
+      if(h>0)S.load[lk(c.id,s.id)]={h,teacherId:autoTeacher(s.id,c.id)};
+    });
+  });
+  renderLoad(); renderSteps(); save();
+}
+function autoTeacher(subjectId){
+  const cands=S.teachers.filter(x=>x.subs.includes(subjectId));
+  if(!cands.length)return null;
+  const load={}; cands.forEach(x=>load[x.id]=0);
+  Object.values(S.load).forEach(v=>{ if(v.teacherId&&load[v.teacherId]!==undefined)load[v.teacherId]+=v.h; });
+  cands.sort((a,b)=>load[a.id]-load[b.id]);
+  return cands[0].id;
+}
+function clearLoad(){ if(!confirm(t('confClearHours')))return; S.load={}; renderLoad(); renderSteps(); save(); }
+
+/* ============ ГЕНЕРАТОР ============ */
+function buildUnits(){
+  const out={};
+  S.classes.forEach(c=>{
+    out[c.id]=[];
+    S.subjects.forEach(s=>{
+      const L=getLoad(c.id,s.id);
+      if(L.h>0)out[c.id].push({subjectId:s.id,teacherId:L.teacherId||null,left:L.h,total:L.h});
+    });
+  });
+  return out;
+}
+function teacherOff(tid,d){ const x=teachById(tid); return !!(x&&x.off.includes(d)); }
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;};
+
+function attemptBuild(){
+  const D=S.cfg.dayCount, PR=P(), R=S.cfg.rules;
+  const grid={}, busy=new Map(), placedDay={}, daySubj={}, units={};
+  const src=buildUnits();
+  S.classes.forEach(c=>{
+    grid[c.id]=Array.from({length:D},()=>Array(PR).fill(null));
+    placedDay[c.id]=Array(D).fill(0);
+    daySubj[c.id]=Array.from({length:D},()=>new Set());
+    units[c.id]=src[c.id].map(u=>({...u}));
+  });
+  // qulflangan / закреплённые
+  S.classes.forEach(c=>{
+    for(let d=0;d<D;d++)for(let p=0;p<PR;p++){
+      if(!S.locks[gk(c.id,d,p)])continue;
+      const old=S.grid[c.id]&&S.grid[c.id][d]&&S.grid[c.id][d][p];
+      if(!old)continue;
+      grid[c.id][d][p]={...old};
+      placedDay[c.id][d]++; daySubj[c.id][d].add(old.subjectId);
+      if(old.teacherId){ const k=d+'|'+p; if(!busy.has(k))busy.set(k,new Set()); busy.get(k).add(old.teacherId); }
+      const u=units[c.id].find(x=>x.subjectId===old.subjectId);
+      if(u&&u.left>0)u.left--;
+    }
+  });
+  const target={};
+  S.classes.forEach(c=>{
+    const total=units[c.id].reduce((n,u)=>n+u.left,0)+placedDay[c.id].reduce((a,b)=>a+b,0);
+    const base=Math.floor(Math.min(total,D*PR)/D), rem=Math.min(total,D*PR)%D;
+    target[c.id]=Array.from({length:D},(_,d)=>Math.max(placedDay[c.id][d],Math.min(PR,base+(d<rem?1:0))));
+  });
+  let relaxed=0;
+  for(let d=0;d<D;d++){
+    for(let p=0;p<PR;p++){
+      const k=d+'|'+p;
+      if(!busy.has(k))busy.set(k,new Set());
+      const taken=busy.get(k);
+      shuffle(S.classes.slice()).forEach(c=>{
+        if(grid[c.id][d][p])return;
+        if(placedDay[c.id][d]>=target[c.id][d])return;
+        const free=u=>u.left>0&&(!u.teacherId||(!taken.has(u.teacherId)&&!teacherOff(u.teacherId,d)));
+        let pool=units[c.id].filter(u=>free(u)&&!(R.twice&&daySubj[c.id][d].has(u.subjectId)));
+        if(!pool.length){ pool=units[c.id].filter(u=>free(u)&&!daySubj[c.id][d].has(u.subjectId)); }
+        if(!pool.length){ pool=units[c.id].filter(free); if(pool.length)relaxed++; }
+        if(!pool.length)return;
+        const sc=u=>{
+          let v=u.left*10+Math.random()*4;
+          if(R.morning){ const s=subjById(u.subjectId); if(s&&s.morning)v+= p<3?6:-6; }
+          return v;
+        };
+        pool.sort((a,b)=>sc(b)-sc(a));
+        const pick=pool[0];
+        grid[c.id][d][p]={subjectId:pick.subjectId,teacherId:pick.teacherId};
+        pick.left--; placedDay[c.id][d]++; daySubj[c.id][d].add(pick.subjectId);
+        if(pick.teacherId)taken.add(pick.teacherId);
+      });
+    }
+  }
+  // Пасс 2 — досыпаем оставшиеся часы
+  const bset=k=>{ if(!busy.has(k))busy.set(k,new Set()); return busy.get(k); };
+  S.classes.forEach(c=>{
+    units[c.id].filter(u=>u.left>0).forEach(u=>{
+      let guard=200;
+      while(u.left>0&&guard-->0){
+        let done=false;
+        for(let pass=0;pass<2&&!done;pass++){
+          for(let d=0;d<D&&!done;d++){
+            if(u.teacherId&&teacherOff(u.teacherId,d))continue;
+            if(pass===0&&R.twice&&daySubj[c.id][d].has(u.subjectId))continue;
+            if(pass===1&&daySubj[c.id][d].has(u.subjectId)&&!R.twice)continue;
+            for(let p=0;p<PR;p++){
+              if(grid[c.id][d][p])continue;
+              if(u.teacherId&&bset(d+'|'+p).has(u.teacherId))continue;
+              grid[c.id][d][p]={subjectId:u.subjectId,teacherId:u.teacherId};
+              if(u.teacherId)bset(d+'|'+p).add(u.teacherId);
+              daySubj[c.id][d].add(u.subjectId); placedDay[c.id][d]++;
+              u.left--; done=true; if(pass===1)relaxed++; break;
+            }
+          }
+        }
+        if(!done)break;
+      }
+    });
+  });
+  // Пасс 3 — убираем «окна»
+  S.classes.forEach(c=>{
+    for(let d=0;d<D;d++){
+      for(let p=0;p<PR;p++){
+        if(grid[c.id][d][p])continue;
+        for(let q=p+1;q<PR;q++){
+          const cell=grid[c.id][d][q];
+          if(!cell)continue;
+          if(S.locks[gk(c.id,d,q)])break;
+          if(cell.teacherId&&bset(d+'|'+p).has(cell.teacherId))break;
+          grid[c.id][d][p]=cell; grid[c.id][d][q]=null;
+          if(cell.teacherId){ bset(d+'|'+p).add(cell.teacherId); bset(d+'|'+q).delete(cell.teacherId); }
+          break;
+        }
+      }
+    }
+  });
+  let unplaced=0,gaps=0;
+  S.classes.forEach(c=>{
+    units[c.id].forEach(u=>unplaced+=Math.max(0,u.left));
+    grid[c.id].forEach(row=>{ let hole=false; row.forEach(x=>{ if(!x)hole=true; else if(hole)gaps++; }); });
+  });
+  return {grid,score:unplaced*100+gaps*5+relaxed,unplaced,relaxed,gaps};
+}
+function runGenerate(){
+  if(!S.classes.length||!Object.keys(S.load).length){
+    notice('grid-notice','warn',t('genNeedHours')); return;
+  }
+  const t0=performance.now(); let best=null;
+  for(let i=0;i<800;i++){
+    const r=attemptBuild();
+    if(!best||r.score<best.score)best=r;
+    if(r.score===0)break;
+    if(performance.now()-t0>2500)break;
+  }
+  S.grid=best.grid;
+  renderGrid(); renderSteps(); save();
+  reportGenerate(best);
+}
+function overCapacity(){
+  const out=[];
+  S.classes.forEach(c=>{
+    const sum=S.subjects.reduce((n,s)=>n+getLoad(c.id,s.id).h,0);
+    if(sum>cap())out.push({name:c.name,sum});
+  });
+  return out;
+}
+function overloadedTeachers(){
+  return S.teachers.map(x=>({t:x,plan:teacherHours(x.id).plan,avail:(S.cfg.dayCount-x.off.length)*S.cfg.periods}))
+    .filter(y=>y.plan>y.avail);
+}
+function shortfall(){
+  const out=[];
+  S.classes.forEach(c=>{
+    const g=S.grid[c.id]; if(!g)return;
+    const got={}; g.forEach(r=>r.forEach(x=>{ if(x)got[x.subjectId]=(got[x.subjectId]||0)+1; }));
+    S.subjects.forEach(s=>{
+      const n=getLoad(c.id,s.id).h-(got[s.id]||0);
+      if(n>0)out.push({cls:c.name,subj:s.name,n});
+    });
+  });
+  return out.sort((a,b)=>b.n-a.n);
+}
+function reportGenerate(r){
+  const cl=findClashes(), over=overCapacity(), ov=overloadedTeachers();
+  if(over.length){
+    notice('grid-notice','bad',tf('genOverCap',cap(),'<b>'+over.map(o=>esc(o.name)+' — '+o.sum).join(', ')+'</b>'));
+    svetofor('r',t('svOverCap'));
+  } else if(ov.length){
+    notice('grid-notice','bad',tf('genNoTeachers',cap())+'<ul>'+
+      ov.map(x=>'<li><b>'+esc(x.t.name)+'</b> — '+x.plan+' '+tf('genLimit',x.avail)+'</li>').join('')+'</ul>'+
+      tf('genNoTeachers2',r.unplaced));
+    svetofor('r',t('svNoTeach'));
+  } else if(r.unplaced>0){
+    const miss=shortfall();
+    notice('grid-notice','warn',tf('genUnplaced','<b>'+r.unplaced+'</b>',
+      miss.slice(0,8).map(m=>'<b>'+esc(m.cls)+'</b> · '+esc(m.subj)+' −'+m.n).join(', ')+
+      (miss.length>8?', '+tf('andMore',miss.length-8):'')));
+    svetofor('y',t('svPartial'));
+  } else if(cl.size){
+    notice('grid-notice','bad',tf('genClash','<b>'+cl.size+'</b>'));
+    svetofor('r',tf('svClash',cl.size));
+  } else {
+    notice('grid-notice','ok',t('genOk')+(r.relaxed?tf('genOkRelax',r.relaxed):''));
+    svetofor('g',t('svClean'));
+  }
+}
+function findClashes(){
+  const map=new Map(), bad=new Set();
+  S.classes.forEach(c=>{
+    const g=S.grid[c.id]; if(!g)return;
+    g.forEach((row,d)=>row.forEach((cell,p)=>{
+      if(!cell||!cell.teacherId)return;
+      const k=d+'|'+p+'|'+cell.teacherId;
+      if(!map.has(k))map.set(k,[]);
+      map.get(k).push(gk(c.id,d,p));
+    }));
+  });
+  map.forEach(v=>{ if(v.length>1)v.forEach(x=>bad.add(x)); });
+  return bad;
+}
+function svetofor(c,txt){
+  ['lr','ly','lg'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  document.getElementById({r:'lr',y:'ly',g:'lg'}[c]).classList.add('on');
+  document.getElementById('svtext').textContent=txt;
+}
+function notice(el,type,html){ document.getElementById(el).innerHTML='<div class="notice '+type+'">'+html+'</div>'; }
+
+/* ============ ШАГИ ============ */
+const TABS=[
+ {id:'p-subjects',n:1,tt:'s1',c:()=>S.subjects.length,ok:()=>S.subjects.length>0},
+ {id:'p-teachers',n:2,tt:'s2',c:()=>S.teachers.length,ok:()=>S.teachers.length>0},
+ {id:'p-classes', n:3,tt:'s3',c:()=>S.classes.length,ok:()=>S.classes.length>0},
+ {id:'p-load',    n:4,tt:'s4',c:()=>Object.values(S.load).reduce((a,b)=>a+b.h,0),ok:()=>Object.keys(S.load).length>0},
+ {id:'p-grid',    n:5,tt:'s5',c:()=>Object.keys(S.grid).length?'✓':'—',ok:()=>Object.keys(S.grid).length>0},
+ {id:'p-help',    n:6,tt:'s6',c:()=>'?',ok:()=>false}
+];
+function renderSteps(){
+  document.getElementById('steps').innerHTML=TABS.map(x=>
+    '<button class="step" aria-current="'+(S.tab===x.id)+'" onclick="go(\''+x.id+'\')">'+
+    '<span class="n'+(x.ok()?' ok':'')+'">'+(x.ok()?'✓':x.n)+'</span>'+t(x.tt)+' <span class="cnt">'+x.c()+'</span></button>'
+  ).join('');
+  TABS.forEach(x=>document.getElementById(x.id).classList.toggle('on',S.tab===x.id));
+}
+function go(id){ S.tab=id; renderSteps(); renderAll(); save(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+/* ============ ПРЕДМЕТЫ ============ */
+function renderSubjects(){
+  const el=document.getElementById('tbl-subjects');
+  if(!S.subjects.length){ el.innerHTML='<tr><td class="empty-state"><b>'+t('empty1')+'</b>'+t('empty1p')+'</td></tr>'; return; }
+  el.innerHTML='<thead><tr><th style="width:44px"></th><th>'+t('thSubject')+'</th><th style="width:110px">'+t('thMorning')+'</th><th style="width:160px">'+t('thWho')+'</th><th style="width:44px"></th></tr></thead><tbody>'+
+  S.subjects.map((s,i)=>{
+    const who=S.teachers.filter(x=>x.subs.includes(s.id));
+    return '<tr>'+
+    '<td><input type="color" value="'+s.color+'" oninput="upSubject('+i+',\'color\',this.value)"></td>'+
+    '<td><input type="text" value="'+esc(s.name)+'" onchange="upSubject('+i+',\'name\',this.value)"></td>'+
+    '<td><label class="chk"><input type="checkbox" '+(s.morning?'checked':'')+' onchange="upSubject('+i+',\'morning\',this.checked)"> '+t('morningChip')+'</label></td>'+
+    '<td>'+(who.length?who.map(w=>'<span class="tag'+(/vakant/i.test(w.name)?' vak':'')+'">'+esc(vakName(w.name))+'</span>').join(''):'<span class="hint">'+t('none')+'</span>')+'</td>'+
+    '<td><button class="btn ghost sm" onclick="delSubject('+i+')">✕</button></td></tr>';
+  }).join('')+'</tbody>';
+}
+function upSubject(i,k,v){ S.subjects[i][k]=v; renderSubjects(); if(k!=='morning')renderLoad(); save(); }
+function addSubject(){
+  const el=document.getElementById('new-subject'); const n=el.value.trim(); if(!n)return;
+  S.subjects.push({id:uid('s'),name:n,color:PAL[S.subjects.length%PAL.length],morning:false});
+  el.value=''; renderSubjects(); renderSteps(); save();
+}
+function delSubject(i){
+  const s=S.subjects[i];
+  if(!confirm(tf('confDelSubj',s.name)))return;
+  S.subjects.splice(i,1);
+  Object.keys(S.load).forEach(k=>{ if(k.endsWith('|'+s.id))delete S.load[k]; });
+  S.teachers.forEach(x=>x.subs=x.subs.filter(y=>y!==s.id));
+  renderSubjects(); renderSteps(); save();
+}
+function resetSubjects(){
+  if(!confirm(t('confResetSubj')))return;
+  S.subjects=baseSubjects(); S.teachers=baseTeachers(S.subjects); S.load={}; S.grid={}; S.locks={};
+  renderAll(); renderSteps(); save();
+}
+
+/* ============ УЧИТЕЛЯ ============ */
+function teacherHours(tid){
+  let plan=0; Object.values(S.load).forEach(v=>{ if(v.teacherId===tid)plan+=v.h; });
+  let placed=0; S.classes.forEach(c=>{ const g=S.grid[c.id]; if(!g)return; g.forEach(r=>r.forEach(x=>{ if(x&&x.teacherId===tid)placed++; })); });
+  return {plan,placed};
+}
+function renderTeachers(){
+  const el=document.getElementById('tbl-teachers');
+  if(!S.teachers.length){ el.innerHTML='<tr><td class="empty-state"><b>'+t('empty2')+'</b>'+t('empty2p')+'</td></tr>'; return; }
+  const dn=daysSh();
+  el.innerHTML='<thead><tr><th>'+t('thTeacher')+'</th><th style="width:38%">'+t('thSubs')+'</th><th style="width:190px">'+t('thOff')+'</th><th style="width:64px">'+t('thHours')+'</th><th style="width:44px"></th></tr></thead><tbody>'+
+  S.teachers.map((tc,i)=>{
+    const ph=teacherHours(tc.id);
+    const avail=(S.cfg.dayCount-tc.off.length)*S.cfg.periods;
+    return '<tr>'+
+    '<td><input type="text" value="'+esc(tc.name)+'" onchange="upTeacher('+i+',\'name\',this.value)"></td>'+
+    '<td><div>'+S.subjects.map(s=>'<label class="tag" style="cursor:pointer;'+(tc.subs.includes(s.id)?'background:'+s.color+'18;border-color:'+s.color+'55;color:'+s.color+';font-weight:600':'')+'"><input type="checkbox" style="margin-right:4px;vertical-align:-1px" '+(tc.subs.includes(s.id)?'checked':'')+' onchange="toggleSub('+i+',\''+s.id+'\',this.checked)">'+esc(s.name)+'</label>').join('')+'</div></td>'+
+    '<td>'+dn.map((d,di)=>'<label class="tag" style="cursor:pointer;'+(tc.off.includes(di)?'background:#FDF0F3;border-color:#F3C9D4;color:var(--anor);font-weight:600':'')+'"><input type="checkbox" style="margin-right:3px;vertical-align:-1px" '+(tc.off.includes(di)?'checked':'')+' onchange="toggleOff('+i+','+di+',this.checked)">'+d+'</label>').join('')+'</td>'+
+    '<td style="font-family:var(--f-num);font-size:13px;color:'+(ph.plan>avail?'var(--anor)':'var(--ink-3)')+'">'+ph.plan+'</td>'+
+    '<td><button class="btn ghost sm" onclick="delTeacher('+i+')">✕</button></td></tr>';
+  }).join('')+'</tbody>';
+}
+function upTeacher(i,k,v){ S.teachers[i][k]=v; renderTeachers(); renderLoad(); save(); }
+function toggleSub(i,sid,on){ const x=S.teachers[i]; x.subs=on?[...new Set([...x.subs,sid])]:x.subs.filter(y=>y!==sid); renderTeachers(); renderLoad(); save(); }
+function toggleOff(i,d,on){ const x=S.teachers[i]; x.off=on?[...new Set([...x.off,d])]:x.off.filter(y=>y!==d); renderTeachers(); save(); }
+function addTeacher(){
+  const el=document.getElementById('new-teacher'); const n=el.value.trim(); if(!n)return;
+  S.teachers.push({id:uid('t'),name:n,subs:[],off:[],max:26}); el.value='';
+  renderTeachers(); renderSteps(); save();
+}
+function addVacancy(){ S.teachers.push({id:uid('t'),name:'Vakant — ',subs:[],off:[],max:26}); renderTeachers(); renderSteps(); save(); }
+function delTeacher(i){
+  const x=S.teachers[i];
+  if(!confirm(tf('confDelTeacher',x.name)))return;
+  S.teachers.splice(i,1);
+  Object.values(S.load).forEach(v=>{ if(v.teacherId===x.id)v.teacherId=null; });
+  S.classes.forEach(c=>{ const g=S.grid[c.id]; if(!g)return; g.forEach(r=>r.forEach(y=>{ if(y&&y.teacherId===x.id)y.teacherId=null; })); });
+  renderTeachers(); renderSteps(); save();
+}
+
+/* ============ КЛАССЫ ============ */
+function renderClasses(){
+  const el=document.getElementById('tbl-classes');
+  if(!S.classes.length){ el.innerHTML='<tr><td class="empty-state"><b>'+t('empty3')+'</b>'+t('empty3p')+'</td></tr>'; return; }
+  el.innerHTML='<thead><tr><th style="width:170px">'+t('thClass')+'</th><th style="width:110px">'+t('thGrade')+'</th><th>'+t('thWeekH')+'</th><th style="width:84px"></th></tr></thead><tbody>'+
+  S.classes.map((c,i)=>{
+    const sum=S.subjects.reduce((n,s)=>n+getLoad(c.id,s.id).h,0);
+    return '<tr>'+
+    '<td><input type="text" value="'+esc(c.name)+'" onchange="upClass('+i+',\'name\',this.value)"></td>'+
+    '<td><input type="number" min="1" max="11" value="'+(c.grade||'')+'" onchange="upClass('+i+',\'grade\',+this.value)"></td>'+
+    '<td style="font-family:var(--f-num);color:'+(sum>cap()?'var(--anor)':'var(--ink-3)')+'">'+sum+' / '+cap()+(sum>cap()?' — '+t('over'):'')+'</td>'+
+    '<td><button class="btn ghost sm" title="⧉" onclick="dupClass('+i+')">⧉</button><button class="btn ghost sm" onclick="delClass('+i+')">✕</button></td></tr>';
+  }).join('')+'</tbody>';
+}
+function upClass(i,k,v){ S.classes[i][k]=v; renderClasses(); renderLoad(); save(); }
+function addClass(){
+  const el=document.getElementById('new-class'); const n=el.value.trim(); if(!n)return;
+  S.classes.push({id:uid('c'),name:n,grade:parseInt(n,10)||null}); el.value='';
+  renderClasses(); renderSteps(); save();
+}
+function dupClass(i){
+  const c=S.classes[i];
+  const name=prompt(t('promptCopy'),c.name+t('copySuffix'));
+  if(!name)return;
+  const nc={id:uid('c'),name:name.trim(),grade:c.grade};
+  S.classes.push(nc);
+  S.subjects.forEach(s=>{ const L=getLoad(c.id,s.id); if(L.h>0)S.load[lk(nc.id,s.id)]={h:L.h,teacherId:L.teacherId}; });
+  renderClasses(); renderLoad(); renderSteps(); save();
+}
+function delClass(i){
+  const c=S.classes[i];
+  if(!confirm(tf('confDelClass',c.name)))return;
+  S.classes.splice(i,1);
+  Object.keys(S.load).forEach(k=>{ if(k.startsWith(c.id+'|'))delete S.load[k]; });
+  delete S.grid[c.id];
+  Object.keys(S.locks).forEach(k=>{ if(k.startsWith(c.id+'|'))delete S.locks[k]; });
+  renderClasses(); renderSteps(); save();
+}
+function addParallel(){
+  const src=S.classes.filter(c=>/-?A$/i.test(c.name)||!/-/.test(c.name));
+  if(!src.length){ alert(t('noAClasses')); return; }
+  if(!confirm(tf('confParallel',src.length)))return;
+  src.forEach(c=>{
+    const name=c.name.replace(/A$/i,'B');
+    if(S.classes.some(x=>x.name===name))return;
+    const nc={id:uid('c'),name,grade:c.grade};
+    S.classes.push(nc);
+    S.subjects.forEach(s=>{ const L=getLoad(c.id,s.id); if(L.h>0)S.load[lk(nc.id,s.id)]={h:L.h,teacherId:L.teacherId}; });
+  });
+  renderClasses(); renderLoad(); renderSteps(); save();
+}
+
+/* ============ НАГРУЗКА ============ */
+function renderLoad(){
+  const el=document.getElementById('tbl-load');
+  if(!S.classes.length||!S.subjects.length){
+    el.innerHTML='<tr><td class="empty-state"><b>'+t('empty4')+'</b>'+t('empty4p')+'</td></tr>';
+    document.getElementById('tpick').innerHTML=''; document.getElementById('load-notice').innerHTML=''; return;
+  }
+  let h='<thead><tr><th style="left:0;z-index:4">'+t('subjCol')+'</th>'+
+    S.classes.map(c=>'<th>'+esc(c.name)+'</th>').join('')+'<th style="min-width:56px">'+t('total')+'</th></tr></thead><tbody>';
+  S.subjects.forEach(s=>{
+    let row=0;
+    h+='<tr><th><span class="swatch" style="background:'+s.color+'"></span>'+esc(s.name)+
+       '<span class="sub">'+S.teachers.filter(x=>x.subs.includes(s.id)).length+' '+t('teachersN')+'</span></th>';
+    S.classes.forEach(c=>{
+      const L=getLoad(c.id,s.id); row+=L.h;
+      h+='<td class="cell"><input class="h'+(L.h?' set':'')+'" type="number" min="0" max="'+cap()+'" value="'+(L.h||'')+'" placeholder="·" onchange="setHours(\''+c.id+'\',\''+s.id+'\',this.value)"></td>';
+    });
+    h+='<td class="tot">'+(row||'')+'</td></tr>';
+  });
+  h+='</tbody><tfoot><tr><th>'+t('totalRow')+'</th>'+
+    S.classes.map(c=>{
+      const sum=S.subjects.reduce((n,s)=>n+getLoad(c.id,s.id).h,0);
+      return '<td class="tot'+(sum>cap()?' over':'')+'">'+sum+'</td>';
+    }).join('')+'<td class="tot">'+cap()+'</td></tr></tfoot>';
+  el.innerHTML=h;
+
+  const over=overCapacity(), ov=overloadedTeachers();
+  let noTeacher=0; Object.values(S.load).forEach(v=>{ if(!v.teacherId)noTeacher+=v.h; });
+  let n='';
+  if(over.length)n+='<div class="notice bad">'+tf('loadOverCap',cap(),'<b>'+over.map(o=>esc(o.name)+' — '+o.sum).join(', ')+'</b>')+'</div>';
+  if(ov.length)n+='<div class="notice bad">'+tf('loadOverTeach',ov.map(x=>'<b>'+esc(x.t.name)+'</b> — '+x.plan+' '+tf('genLimit',x.avail)).join(', '))+'</div>';
+  if(noTeacher)n+='<div class="notice warn">'+tf('loadNoTeach',noTeacher)+'</div>';
+  document.getElementById('load-notice').innerHTML=n;
+  renderTpick();
+}
+function setHours(cid,sid,v){
+  const h=Math.max(0,parseInt(v,10)||0);
+  const k=lk(cid,sid);
+  if(h===0)delete S.load[k];
+  else S.load[k]={h,teacherId:(S.load[k]&&S.load[k].teacherId)||autoTeacher(sid)};
+  renderLoad(); renderSteps(); save();
+}
+function renderTpick(){
+  const rows=[];
+  S.classes.forEach(c=>S.subjects.forEach(s=>{
+    const L=getLoad(c.id,s.id); if(!L.h)return;
+    const cands=S.teachers.filter(x=>x.subs.includes(s.id));
+    const opts=['<option value="">— '+t('noTeacher')+' —</option>']
+      .concat((cands.length?cands:S.teachers).map(x=>'<option value="'+x.id+'"'+(L.teacherId===x.id?' selected':'')+'>'+esc(x.name)+'</option>'));
+    rows.push('<div class="row"><span title="'+esc(c.name+' · '+s.name)+'"><b>'+esc(c.name)+'</b> · '+esc(s.name)+'</span>'+
+      '<select onchange="setTeacher(\''+c.id+'\',\''+s.id+'\',this.value)">'+opts.join('')+'</select></div>');
+  }));
+  document.getElementById('tpick').innerHTML=rows.length?rows.join(''):'<span class="hint">'+t('empty4p')+'</span>';
+  document.getElementById('tpick-count').textContent='('+rows.length+')';
+}
+function setTeacher(cid,sid,tid){
+  const k=lk(cid,sid); if(!S.load[k])return;
+  S.load[k].teacherId=tid||null;
+  const g=S.grid[cid];
+  if(g)g.forEach(r=>r.forEach(x=>{ if(x&&x.subjectId===sid)x.teacherId=tid||null; }));
+  renderLoad(); save(); if(S.tab==='p-grid')renderGrid();
+}
+
+/* ============ РАСПИСАНИЕ ============ */
+let picked=null,swapFrom=null;
+function setView(v){ S.view=v; renderGrid(); save(); }
+function renderGrid(){
+  document.getElementById('cfg-days').value=S.cfg.dayCount;
+  document.getElementById('cfg-per').value=S.cfg.periods;
+  document.getElementById('cfg-start').value=S.cfg.bells.start;
+  document.getElementById('cfg-len').value=S.cfg.bells.len;
+  document.getElementById('cfg-brk').value=S.cfg.bells.brk;
+  document.getElementById('cfg-big').value=S.cfg.bells.big;
+  document.getElementById('cfg-bigafter').value=S.cfg.bells.bigAfter;
+  document.getElementById('cfg-title').value=S.cfg.title||'';
+  document.getElementById('r-twice').checked=S.cfg.rules.twice;
+  document.getElementById('r-morning').checked=S.cfg.rules.morning;
+  ['classes','teachers','load'].forEach(v=>document.getElementById('v-'+v).setAttribute('aria-pressed',S.view===v));
+  document.getElementById('printhead').textContent=(S.cfg.title||'')+' — '+t('s5');
+  renderBellsLine();
+  const w=document.getElementById('gridwrap');
+  if(!Object.keys(S.grid).length){
+    w.innerHTML='<div class="empty-state"><b>'+t('empty5')+'</b>'+t('empty5p')+'</div>';
+    updateSvetofor(); return;
+  }
+  if(S.view==='classes')w.innerHTML=viewClasses();
+  else if(S.view==='teachers')w.innerHTML=viewTeachers();
+  else w.innerHTML=viewLoadSummary();
+  updateSvetofor();
+}
+function updateSvetofor(){
+  if(!Object.keys(S.grid).length){ svetofor('y',t('svNone')); return; }
+  const cl=findClashes();
+  if(cl.size)svetofor('r',tf('svClash',cl.size));
+  else svetofor('g',t('svClean'));
+}
+function headRow(){
+  const tm=periodTimes();
+  return '<thead><tr><th class="day"></th>'+Array.from({length:P()},(_,p)=>'<th>'+(p+1)+'<span class="tm">'+tm[p].from+'</span></th>').join('')+'</tr></thead>';
+}
+function viewClasses(){
+  const clash=findClashes(), D=days();
+  return S.classes.map(c=>{
+    const g=S.grid[c.id]; if(!g)return '';
+    const filled=g.flat().filter(Boolean).length;
+    let h='<div class="gridblock"><h3>'+esc(c.name)+' <em>'+filled+' '+t('hoursW')+'/'+t('week')+'</em></h3><div class="scroller"><table class="tt">'+headRow()+'<tbody>';
+    D.forEach((dn,d)=>{
+      h+='<tr><th class="day">'+dn+'</th>';
+      for(let p=0;p<P();p++)h+='<td>'+cellHTML(c.id,d,p,g[d]&&g[d][p],clash)+'</td>';
+      h+='</tr>';
+    });
+    return h+'</tbody></table></div></div>';
+  }).join('');
+}
+function cellHTML(cid,d,p,cell,clash){
+  const key=gk(cid,d,p);
+  const locked=!!S.locks[key], bad=clash.has(key), sel=picked===key;
+  if(!cell)return '<button class="cellbtn empty'+(sel?' picked':'')+'" data-k="'+key+'" draggable="true" onclick="openCell(event,\''+key+'\')"></button>';
+  const s=subjById(cell.subjectId), x=cell.teacherId?teachById(cell.teacherId):null;
+  return '<button class="cellbtn'+(bad?' clash':'')+(sel?' picked':'')+'" data-k="'+key+'" draggable="true" onclick="openCell(event,\''+key+'\')" '+
+    'style="background:'+(s?s.color+'14':'#EEF1F5')+';border-left:3px solid '+(s?s.color:'#ccc')+'">'+
+    (locked?'<span class="lk">🔒</span>':'')+
+    '<span class="s">'+esc(s?s.name:'—')+'</span>'+
+    '<span class="t">'+esc(x?vakName(x.name):t('noTeacher'))+'</span></button>';
+}
+function viewTeachers(){
+  const D=days();
+  const used=S.teachers.filter(x=>teacherHours(x.id).placed>0);
+  if(!used.length)return '<div class="empty-state"><b>'+t('emptyT')+'</b>'+t('emptyTp')+'</div>';
+  return used.map(x=>{
+    const cellsOf={};
+    S.classes.forEach(c=>{ const g=S.grid[c.id]; if(!g)return;
+      g.forEach((r,d)=>r.forEach((y,p)=>{ if(y&&y.teacherId===x.id){ (cellsOf[d+'|'+p]=cellsOf[d+'|'+p]||[]).push({c,y}); } })); });
+    const total=Object.values(cellsOf).reduce((n,a)=>n+a.length,0);
+    let h='<div class="gridblock"><h3>'+esc(x.name)+' <em>'+total+' '+t('hoursW')+'/'+t('week')+
+      (x.off.length?' · '+t('thDayoff').toLowerCase()+': '+x.off.map(d=>DAYS[S.cfg.lang].sh[d]).join(', '):'')+'</em></h3><div class="scroller"><table class="tt">'+headRow()+'<tbody>';
+    D.forEach((dn,d)=>{
+      h+='<tr><th class="day">'+dn+'</th>';
+      for(let p=0;p<P();p++){
+        const arr=cellsOf[d+'|'+p]||[];
+        if(!arr.length){ h+='<td><div class="cellbtn empty" style="cursor:default"></div></td>'; continue; }
+        const s=subjById(arr[0].y.subjectId), bad=arr.length>1;
+        h+='<td><div class="cellbtn'+(bad?' clash':'')+'" style="cursor:default;background:'+(s?s.color+'14':'#EEF1F5')+';border-left:3px solid '+(s?s.color:'#ccc')+'">'+
+          '<span class="s">'+esc(arr.map(a=>a.c.name).join(' + '))+'</span>'+
+          '<span class="t">'+esc(s?s.name:'')+(bad?' — !':'')+'</span></div></td>';
+      }
+      h+='</tr>';
+    });
+    return h+'</tbody></table></div></div>';
+  }).join('');
+}
+function viewLoadSummary(){
+  const rows=S.teachers.map(x=>({t:x,...teacherHours(x.id)})).filter(r=>r.plan||r.placed).sort((a,b)=>b.placed-a.placed);
+  if(!rows.length)return '<div class="empty-state"><b>'+t('emptyT')+'</b>'+t('empty4p')+'</div>';
+  let h='<div class="rows"><table><thead><tr><th>'+t('thTeacher')+'</th><th style="width:100px">'+t('thPlan')+'</th><th style="width:130px">'+t('thFact')+'</th><th style="width:120px">'+t('thDayoff')+'</th></tr></thead><tbody>';
+  rows.forEach(r=>{
+    const diff=r.placed-r.plan;
+    h+='<tr><td>'+esc(r.t.name)+'</td>'+
+      '<td style="font-family:var(--f-num)">'+r.plan+'</td>'+
+      '<td style="font-family:var(--f-num);color:'+(diff?'var(--anor)':'var(--moss)')+'">'+r.placed+(diff?' ('+(diff>0?'+':'')+diff+')':' ✓')+'</td>'+
+      '<td class="hint">'+(r.t.off.length?r.t.off.map(d=>DAYS[S.cfg.lang].sh[d]).join(', '):'—')+'</td></tr>';
+  });
+  const tot=rows.reduce((n,r)=>n+r.placed,0);
+  h+='</tbody></table></div><p class="hint" style="margin-top:10px">'+tf('sumNote','<b>'+tot+'</b>')+'</p>';
+  return h;
+}
+function clearGrid(){
+  if(!confirm(t('confClearGrid')))return;
+  S.grid={}; S.locks={}; renderGrid(); renderSteps(); save();
+}
+
+/* ============ РЕДАКТИРОВАНИЕ ЯЧЕЙКИ ============ */
+function openCell(e,key){
+  e.stopPropagation(); closePop();
+  if(swapFrom&&swapFrom!==key){ doSwap(swapFrom,key); swapFrom=null; picked=null; renderGrid(); save(); return; }
+  const [cid,d,p]=key.split('|'); const D=+d,PP=+p;
+  const cell=S.grid[cid]&&S.grid[cid][D]&&S.grid[cid][D][PP];
+  const subs=S.subjects.filter(s=>getLoad(cid,s.id).h>0);
+  const usedCount={}; (S.grid[cid]||[]).forEach(r=>r.forEach(x=>{ if(x)usedCount[x.subjectId]=(usedCount[x.subjectId]||0)+1; }));
+  const scrim=document.createElement('div'); scrim.className='scrim'; scrim.onclick=closePop;
+  const pop=document.createElement('div'); pop.className='pop'; pop.id='pop';
+  let h='<h4>'+esc(clsById(cid).name)+' · '+daysSh()[D]+' · '+(PP+1)+'-'+t('lesson')+'</h4>';
+  h+='<button class="opt" onclick="setCell(\''+key+'\',null)">'+t('popEmpty')+'</button>';
+  if(cell){
+    h+='<button class="opt" onclick="toggleLock(\''+key+'\')">'+(S.locks[key]?t('popUnlock'):t('popLock'))+'</button>';
+    h+='<button class="opt" onclick="startSwap(\''+key+'\')">'+t('popSwap')+'</button>';
+  }
+  h+='<div class="sep"></div><h4>'+t('popSubj')+'</h4>';
+  h+=subs.map(s=>{
+    const L=getLoad(cid,s.id);
+    return '<button class="opt" onclick="setCell(\''+key+'\',\''+s.id+'\')"><span class="swatch" style="background:'+s.color+'"></span>'+
+      esc(s.name)+'<span class="who">'+(usedCount[s.id]||0)+'/'+L.h+'</span></button>';
+  }).join('')||'<span class="hint" style="padding:0 8px">'+t('popNoHours')+'</span>';
+  pop.innerHTML=h;
+  document.body.appendChild(scrim); document.body.appendChild(pop);
+  const r=e.currentTarget.getBoundingClientRect();
+  pop.style.left=Math.min(r.left,innerWidth-264)+'px';
+  pop.style.top=Math.min(r.bottom+6,innerHeight-Math.min(pop.offsetHeight+10,innerHeight*0.7))+'px';
+}
+function closePop(){ const p=document.getElementById('pop'); if(p)p.remove(); document.querySelectorAll('.scrim').forEach(s=>s.remove()); }
+function setCell(key,sid){
+  const [cid,d,p]=key.split('|');
+  if(!S.grid[cid])S.grid[cid]=Array.from({length:S.cfg.dayCount},()=>Array(P()).fill(null));
+  S.grid[cid][+d][+p]= sid? {subjectId:sid,teacherId:getLoad(cid,sid).teacherId||null} : null;
+  if(!sid)delete S.locks[key];
+  closePop(); renderGrid(); save();
+}
+function toggleLock(key){ S.locks[key]?delete S.locks[key]:S.locks[key]=true; closePop(); renderGrid(); save(); }
+function startSwap(key){ swapFrom=key; picked=key; closePop(); renderGrid(); }
+function doSwap(a,b){
+  const [ac,ad,ap]=a.split('|'), [bc,bd,bp]=b.split('|');
+  if(ac!==bc){ alert(t('swapSameClass')); return; }
+  const g=S.grid[ac];
+  const tmp=g[+ad][+ap]; g[+ad][+ap]=g[+bd][+bp]; g[+bd][+bp]=tmp;
+  const la=S.locks[a], lb=S.locks[b];
+  lb?S.locks[a]=true:delete S.locks[a];
+  la?S.locks[b]=true:delete S.locks[b];
+}
+document.addEventListener('dragstart',e=>{ const b=e.target.closest('.cellbtn'); if(!b||!b.dataset.k)return; e.dataTransfer.setData('text/plain',b.dataset.k); });
+document.addEventListener('dragover',e=>{ const b=e.target.closest('.cellbtn'); if(b&&b.dataset.k){ e.preventDefault(); b.classList.add('dragover'); } });
+document.addEventListener('dragleave',e=>{ const b=e.target.closest('.cellbtn'); if(b)b.classList.remove('dragover'); });
+document.addEventListener('drop',e=>{
+  const b=e.target.closest('.cellbtn'); if(!b||!b.dataset.k)return; e.preventDefault(); b.classList.remove('dragover');
+  const from=e.dataTransfer.getData('text/plain'); if(!from||from===b.dataset.k)return;
+  doSwap(from,b.dataset.k); renderGrid(); save();
+});
+
+/* ============ НАСТРОЙКИ ============ */
+function setDays(v){ S.cfg.dayCount=+v; resizeGrid(); renderAll(); renderSteps(); save(); }
+function setPeriods(v){ S.cfg.periods=+v; resizeGrid(); renderAll(); renderSteps(); save(); }
+function setRule(k,v){ S.cfg.rules[k]=v; save(); }
+function resizeGrid(){
+  Object.keys(S.grid).forEach(cid=>{
+    const g=S.grid[cid];
+    while(g.length<S.cfg.dayCount)g.push(Array(P()).fill(null));
+    g.length=S.cfg.dayCount;
+    g.forEach(r=>{ while(r.length<P())r.push(null); r.length=P(); });
+  });
+}
+
+/* ============ ЭКСПОРТ ============ */
+function dl(name,mime,content){
+  const blob=new Blob([content],{type:mime});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+  URL.revokeObjectURL(a.href);
+}
+function exportJSON(){ dl('edunova-jadval-'+new Date().toISOString().slice(0,10)+'.json','application/json',JSON.stringify(S,null,1)); }
+function importJSON(input){
+  const f=input.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{ try{ const d=JSON.parse(r.result); if(!d.subjects||!d.classes)throw 0; S=migrate(d); applyLang(); save(); alert(t('importOk')); }catch(e){ alert(t('importBad')); } };
+  r.readAsText(f); input.value='';
+}
+function exportCSV(){
+  const tm=periodTimes(), D=days(), sep=';', q=v=>'\"'+String(v==null?'':v).replace(/\"/g,'\"\"')+'\"';
+  const L=[];
+  L.push([q(S.cfg.title||'EDUNOVA')].join(sep));
+  L.push([q(t('csvClass')),q(t('csvDay'))].concat(tm.map((x,i)=>q((i+1)+' ('+x.from+')'))).join(sep));
+  S.classes.forEach(c=>{
+    const g=S.grid[c.id]; if(!g)return;
+    D.forEach((dn,d)=>{
+      const row=[q(c.name),q(dn)];
+      for(let p=0;p<P();p++){
+        const cell=g[d]&&g[d][p];
+        if(!cell){ row.push(q('')); continue; }
+        const s=subjById(cell.subjectId), x=cell.teacherId?teachById(cell.teacherId):null;
+        row.push(q((s?s.name:'')+(x?' — '+vakName(x.name):'')));
+      }
+      L.push(row.join(sep));
+    });
+    L.push('');
+  });
+  L.push(''); L.push(q(t('csvTeacherSheet')));
+  L.push([q(t('thTeacher')),q(t('csvDay'))].concat(tm.map((x,i)=>q(i+1))).join(sep));
+  S.teachers.forEach(x=>{
+    if(!teacherHours(x.id).placed)return;
+    D.forEach((dn,d)=>{
+      const row=[q(x.name),q(dn)];
+      for(let p=0;p<P();p++){
+        const here=[];
+        S.classes.forEach(c=>{ const g=S.grid[c.id]; if(!g)return; const y=g[d]&&g[d][p]; if(y&&y.teacherId===x.id)here.push(c.name); });
+        row.push(q(here.join('+')));
+      }
+      L.push(row.join(sep));
+    });
+    L.push('');
+  });
+  dl('edunova-jadval-'+new Date().toISOString().slice(0,10)+'.csv','text/csv;charset=utf-8','\ufeffsep=;\n'+L.join('\n'));
+}
+function resetAll(){
+  if(!confirm(t('confReset1')))return;
+  if(!confirm(t('confReset2')))return;
+  const lang=S.cfg.lang;
+  S=fresh(); S.cfg.lang=lang; S.tab='p-subjects';
+  applyLang(); save();
+}
+
+/* ============ ИНСТРУКЦИЯ ============ */
+const HELP={
+uz:`
+<h3>1. Ish tartibi — 5 qadam</h3>
+<ol>
+<li><b>Fanlar</b> — ro‘yxatni tekshiring: keraksizini ✕ bilan o‘chiring, yangisini pastdagi maydondan qo‘shing. Rang jadvaldagi katak rangi bo‘ladi.</li>
+<li><b>O‘qituvchilar</b> — har bir o‘qituvchida uning fanlarini belgilang (yashil teg). Agar o‘qituvchi hali topilmagan bo‘lsa, «+ Vakant» bosib, fanni belgilab qo‘ying — soatlar band qilinadi.</li>
+<li><b>Sinflar</b> — kerakli sinflarni yozing. «B parallelini qo‘shish» barcha A sinflardan nusxa oladi — soatlari bilan. ⧉ tugmasi bitta sinfni nusxalaydi.</li>
+<li><b>Soatlar</b> — jadvaldagi kataklarga har fandan haftalik soatni yozing. Tezroq bo‘lishi uchun «Namunaviy soatlar bilan to‘ldirish»ni bosing, keyin o‘zingizga moslang. Pastda har bir «sinf · fan» juftligi uchun o‘qituvchini tanlang.</li>
+<li><b>Jadval</b> — «⚡ Jadval tuzish»ni bosing. Tayyor!</li>
+</ol>
+
+<h3>2. Svetofor nimani bildiradi</h3>
+<ul>
+<li><span class="lampx" style="background:var(--moss)"></span><b>Yashil</b> — hamma soat joylashdi, birorta o‘qituvchi ikki sinfda ustma-ust emas. Chop etish mumkin.</li>
+<li><span class="lampx" style="background:var(--saffron)"></span><b>Sariq</b> — jadval tuzildi, lekin bir nechta soat sig‘madi. Xabarda qaysi sinf va fan yozilgan bo‘ladi. Sabab: o‘qituvchining yopiq kunlari yoki bitta o‘qituvchi juda ko‘p sinfda.</li>
+<li><span class="lampx" style="background:var(--anor)"></span><b>Qizil</b> — jiddiy muammo: yo sinf soatlari haftaga sig‘maydi, yo bitta o‘qituvchiga rejadagi soat jismonan ko‘p (masalan, 42 soat, hafta esa 36). Yechim xabarning o‘zida yozilgan: soatni kamaytirish yoki shu fanga ikkinchi o‘qituvchi qo‘shish.</li>
+</ul>
+
+<h3>3. Qo‘lda tuzatish</h3>
+<ul>
+<li>Istalgan katakka <b>bosing</b> — fan almashtirish, bo‘shatish, 🔒 qulflash yoki «O‘rin almashtirish» ochiladi.</li>
+<li><b>O‘rin almashtirish:</b> «⇄» ni bosing, so‘ng ikkinchi katakka bosing (faqat bitta sinf ichida). Kompyuterda darsni sichqoncha bilan sudrasa ham bo‘ladi.</li>
+<li><b>🔒 Qulf:</b> qulflangan dars «Jadval tuzish» qayta bosilganda joyida qoladi. Muhim darslarni qulflang va bemalol qayta generatsiya qiling.</li>
+<li>Agar qo‘lda o‘zgartirishda o‘qituvchi boshqa sinfda band bo‘lib qolsa — katak <b>qizil ramka</b> bilan yonadi va yuqoridagi svetofor qizaradi.</li>
+</ul>
+
+<h3>4. Ko‘rinishlar</h3>
+<ul>
+<li><b>Sinflar bo‘yicha</b> — devorga chop etiladigan asosiy jadval.</li>
+<li><b>O‘qituvchilar bo‘yicha</b> — har bir o‘qituvchining shaxsiy haftasi. Kimga soat yetmayotganini shu yerda darrov ko‘rasiz.</li>
+<li><b>Soatlar yakuni</b> — reja va jadvaldagi fakt: har bir o‘qituvchining haftalik soati. Maosh hisoblashga ham qulay.</li>
+</ul>
+
+<h3>5. Qo‘ng‘iroqlar</h3>
+<p>⚙️ Sozlamalarda birinchi dars vaqti, dars uzunligi, tanaffuslar va katta tanaffus o‘rnini kiriting — vaqtlar jadval ustunlarida ko‘rinadi. Me’yorlar: dars 45 daqiqadan, tanaffus 10 daqiqadan kam bo‘lmasin, 2- yoki 3-darsdan keyin 20–30 daqiqalik katta tanaffus, darslar 08:00 dan erta boshlanmasin.</p>
+
+<h3>6. Saqlash va ko‘chirish</h3>
+<ul>
+<li>Hamma o‘zgarish <b>avtomatik saqlanadi</b> (yuqori o‘ng burchakda «saqlandi ✓»). Yopib, ertaga ochsangiz — hammasi joyida.</li>
+<li><b>Nusxa (JSON)</b> — butun bazani bitta faylga yuklab oling (zaxira yoki boshqa kompyuterga ko‘chirish uchun). <b>«Nusxani yuklash»</b> — shu fayldan tiklash.</li>
+<li><b>Excel (CSV)</b> — jadval Excel ochadigan faylga tushadi: barcha sinflar + o‘qituvchilar bandligi.</li>
+<li><b>Chop etish</b> — har sinf alohida blokda, sarlavha ⚙️ sozlamalardagi matndan olinadi. Devor uchun tilni UZ ga o‘tkazib chop eting.</li>
+</ul>
+
+<h3>7. Tez-tez uchraydigan savollar</h3>
+<ul>
+<li><b>«Soatlar sig‘maydi» deyapti.</b> Sinfning haftalik jami soati kun×dars sonidan katta. 4-qadamda kamaytiring yoki kuniga darslar sonini oshiring (5–6-sinfda 6 tadan, 7–11 da 7 tadan oshirmang).</li>
+<li><b>«O‘qituvchiga hafta yetmaydi».</b> Masalan, 2 matematik 14 sinfga 74 soat bera olmaydi (bir kishi maksimum 36). Yechim — uchinchi o‘qituvchi yoki soatni kamaytirish. Konstruktor kimga qancha ortiqcha ekanini aniq yozadi.</li>
+<li><b>Yashil bo‘lmayapti.</b> «Jadval tuzish»ni 2–3 marta bosib ko‘ring — har safar yangi variant quriladi va eng yaxshisi olinadi. Keyin sariq xabardagi ro‘yxatni tekshiring.</li>
+<li><b>O‘qituvchi ma’lum kunlari kela olmaydi.</b> 2-qadamda uning «Ishlamaydi» kunlarini belgilang — generator o‘sha kunlarga dars qo‘ymaydi.</li>
+<li><b>Bitta fan bir kunda ikki marta tushdi.</b> Bu faqat boshqa iloj qolmaganda bo‘ladi va xabarda ko‘rsatiladi. Qoidani ⚙️ da yoqib/o‘chirib boshqarasiz.</li>
+<li><b>Hammasini o‘chirib qaytadan boshlash.</b> Pastdagi «Xavfli hudud». Avval JSON nusxa oling!</li>
+</ul>`,
+ru:`
+<h3>1. Порядок работы — 5 шагов</h3>
+<ol>
+<li><b>Предметы</b> — проверьте список: лишнее удалите ✕, новое добавьте в поле снизу. Цвет — это цвет ячейки в сетке.</li>
+<li><b>Учителя</b> — у каждого отметьте его предметы (зелёный тег). Если учителя ещё нет — «+ Vakant» и отметьте предмет: часы будут зарезервированы.</li>
+<li><b>Классы</b> — впишите нужные классы. «Добавить параллель Б» дублирует все классы с буквой A вместе с часами. Кнопка ⧉ копирует один класс.</li>
+<li><b>Часы</b> — в таблице проставьте недельные часы каждого предмета. Быстрее — кнопкой «Заполнить типовыми часами», потом подгоните под себя. Ниже выберите учителя для каждой пары «класс · предмет».</li>
+<li><b>Расписание</b> — жмите «⚡ Сгенерировать». Готово!</li>
+</ol>
+
+<h3>2. Что означает светофор</h3>
+<ul>
+<li><span class="lampx" style="background:var(--moss)"></span><b>Зелёный</b> — все часы расставлены, ни один учитель не стоит в двух классах одновременно. Можно печатать.</li>
+<li><span class="lampx" style="background:var(--saffron)"></span><b>Жёлтый</b> — расписание построено, но несколько часов не влезло. В сообщении написано, какой класс и предмет. Причина: закрытые дни учителя или один учитель на слишком многих классах.</li>
+<li><span class="lampx" style="background:var(--anor)"></span><b>Красный</b> — серьёзная проблема: либо часы класса не помещаются в неделю, либо у одного учителя по плану физически больше часов, чем есть в неделе (например 42 при пределе 36). Решение написано прямо в сообщении: уменьшить часы или добавить второго учителя на предмет.</li>
+</ul>
+
+<h3>3. Ручная правка</h3>
+<ul>
+<li><b>Нажмите</b> на любую ячейку — откроется меню: заменить предмет, очистить, 🔒 закрепить или «Поменять местами».</li>
+<li><b>Поменять местами:</b> нажмите «⇄», затем нажмите на вторую ячейку (только внутри одного класса). На компьютере урок можно просто перетащить мышью.</li>
+<li><b>🔒 Замок:</b> закреплённый урок остаётся на месте при повторной генерации. Закрепите важное — и генерируйте сколько угодно.</li>
+<li>Если из-за ручной правки учитель оказался занят в другом классе — ячейка загорится <b>красной рамкой</b>, а светофор наверху станет красным.</li>
+</ul>
+
+<h3>4. Просмотры</h3>
+<ul>
+<li><b>По классам</b> — основная сетка для печати на стену.</li>
+<li><b>По учителям</b> — личная неделя каждого учителя. Здесь сразу видно, кому не хватает часов.</li>
+<li><b>Итог часов</b> — план и факт: сколько часов у каждого учителя в неделю. Удобно для расчёта зарплаты.</li>
+</ul>
+
+<h3>5. Звонки</h3>
+<p>В ⚙️ настройках задайте время первого урока, длину урока, перемены и место большой перемены — время появится в шапке расписания. Нормы: урок не длиннее 45 минут, перемены не короче 10 минут, после 2-го или 3-го урока большая перемена 20–30 минут, начало занятий не раньше 08:00.</p>
+
+<h3>6. Сохранение и перенос</h3>
+<ul>
+<li>Всё <b>сохраняется автоматически</b> (справа вверху «сохранено ✓»). Закрыли — открыли завтра, всё на месте.</li>
+<li><b>Копия (JSON)</b> — вся база одним файлом (бэкап или перенос на другой компьютер). <b>«Загрузить копию»</b> — восстановление из этого файла.</li>
+<li><b>Excel (CSV)</b> — расписание выгружается в файл для Excel: все классы + занятость учителей.</li>
+<li><b>Печать</b> — каждый класс отдельным блоком, заголовок берётся из ⚙️ настроек. Для стены переключите язык на UZ и печатайте.</li>
+</ul>
+
+<h3>7. Частые вопросы</h3>
+<ul>
+<li><b>Пишет «часы не помещаются».</b> Недельная сумма часов класса больше, чем дней×уроков. Уменьшите часы на шаге 4 или увеличьте уроков в день (для 5–6 классов не больше 6, для 7–11 — не больше 7).</li>
+<li><b>«Учителю не хватает недели».</b> Например, 2 математика не могут дать 74 часа на 14 классов (максимум одного человека — 36). Решение — третий учитель или меньше часов. Конструктор точно пишет, у кого и сколько лишнего.</li>
+<li><b>Не выходит зелёный.</b> Нажмите «Сгенерировать» 2–3 раза — каждый раз строится новый вариант и берётся лучший. Затем проверьте список из жёлтого сообщения.</li>
+<li><b>Учитель не может в определённые дни.</b> На шаге 2 отметьте его дни «Не работает» — генератор туда уроки не поставит.</li>
+<li><b>Один предмет попал дважды в день.</b> Так бывает только когда иначе никак, и это указывается в сообщении. Правило включается/выключается в ⚙️.</li>
+<li><b>Стереть всё и начать заново.</b> «Опасная зона» ниже. Сначала сделайте копию JSON!</li>
+</ul>`};
+function renderHelp(){ document.getElementById('helpbody').innerHTML=HELP[S.cfg.lang]||HELP.ru; }
+
+/* ============ УТИЛИТЫ И СТАРТ ============ */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function renderAll(){ renderSubjects(); renderTeachers(); renderClasses(); renderLoad(); renderGrid(); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closePop(); swapFrom=null; picked=null; renderGrid(); } });
+
+(async function init(){
+  const saved=await store.get(KEY);
+  if(saved&&saved.subjects)S=migrate(saved);
+  const el=document.getElementById('saved');
+  el.textContent= saved? (cloudOk?'\u2601 ':'')+t('loaded'):t('newFile');
+  el.className= saved? 'saved on':'saved';
+  applyLang();
+})();
+</script>
