@@ -139,7 +139,7 @@
       <div class="meta">
         <div><div class="lbl">O'quvchi</div><div class="val" id="f-ism">—</div></div>
         <div><div class="lbl">Sinf</div><div class="val" id="f-sinf">—</div></div>
-        <div><div class="lbl">Buyruq</div><div class="val" id="f-raqam">—</div></div>
+        <div><div class="lbl" id="lbl-hujjat">Buyruq</div><div class="val" id="f-raqam">—</div></div>
       </div>
     </div>
 
@@ -150,7 +150,7 @@
 
       <div class="tanish">
         <input type="checkbox" id="tanishdim">
-        <span><label for="tanishdim">Buyruq mazmuni bilan tanishdim, e'tirozim yo'q.</label></span>
+        <span><label for="tanishdim" id="tanish-matn">Buyruq mazmuni bilan tanishdim, e'tirozim yo'q.</label></span>
       </div>
     </div>
 
@@ -174,7 +174,7 @@
             <div class="placeholder" id="ph">Shu yerga barmog'ingiz bilan imzo chizing</div>
           </div>
           <div class="imzo-caption">
-            <span>Buyruq bilan tanishdim: __________</span>
+            <span id="imzo-cap">Buyruq bilan tanishdim: __________</span>
             <button type="button" class="clear" id="tozala">Qaytadan chizish</button>
           </div>
         </div>
@@ -368,6 +368,14 @@ $('yubor').addEventListener('click', async () => {
     $('f-raqam').textContent = j.raqam ? '№ ' + j.raqam : '—';
     $('f-matn').textContent  = j.matn || '';
     if(j.turi === 'qb') $('sarlavha').textContent = 'Qabul buyrug\'i bilan tanishish';
+    if(j.turi === 'shartnoma'){
+      document.title = 'Shartnoma \u2014 EduNova School';
+      $('sarlavha').textContent   = 'Shartnoma bilan tanishish';
+      $('lbl-hujjat').textContent = 'Shartnoma';
+      $('tanish-matn').textContent = 'Shartnoma shartlari, jumladan to\'lov miqdori bilan tanishdim va roziman.';
+      $('imzo-cap').textContent   = 'Shartnoma bilan tanishdim: __________';
+      if(!j.raqam) $('f-raqam').textContent = 'imzodan keyin';
+    }
     if(j.ota_ism) $('ota-ism').value = j.ota_ism;
 
     if(j.holat === 'imzolandi'){
