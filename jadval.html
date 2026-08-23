@@ -397,7 +397,8 @@ uz:{
  empty4:'Sinflar va fanlar kerak',empty4p:'Avval 1- va 3-qadamlarni to‘ldiring.',
  empty5:'Jadval hali tuzilmagan',empty5p:'«Jadval tuzish» tugmasini bosing — 4-qadamdagi soatlar kunlarga taqsimlanadi.',
  emptyT:'Hozircha bo‘sh',emptyTp:'Hech bir o‘qituvchiga dars biriktirilmagan.',
- thSubject:'Fan',thMorning:'Qiyin fan',thWho:'Kim o‘qitadi',thTeacher:'O‘qituvchi',thSubs:'Fanlari',thOff:'Ishlamaydi',thHours:'Soat',
+ thSubject:'Fan',thMorning:'Qiyin fan',thShared:'Umumiy o‘qituvchi',sharedChip:'barcha oqimlarda bitta',
+ sharedHint:'Belgilansa — bu fanni A va B (rus oqimi) sinflarida bitta o‘qituvchi olib boradi. Belgilanmasa — har bir oqimda o‘z o‘qituvchisi.',thWho:'Kim o‘qitadi',thTeacher:'O‘qituvchi',thSubs:'Fanlari',thOff:'Ishlamaydi',thHours:'Soat',
  thClass:'Sinf',thGrade:'Sinf raqami',thWeekH:'Haftalik soat',thPlan:'Reja, soat',thFact:'Jadvalda',thDayoff:'Dam kunlari',
  morningChip:'1–3-dars',none:'hech kim',noTeacher:'o‘qituvchi yo‘q',teachersN:'o‘qituvchi',
  over:'ortiqcha',subjCol:'Fan \\ Sinf',totalRow:'Sinf jami',total:'Jami',
@@ -407,7 +408,7 @@ uz:{
  confResetSubj:'EduNova bazaviy fanlar ro‘yxati qaytarilsinmi? Soatlar va biriktirishlar o‘chadi.',
  confDelTeacher:'«{0}» o‘chirilsinmi? Uning darslari o‘qituvchisiz qoladi.',
  confDelClass:'«{0}» sinfi soatlari va jadvali bilan o‘chirilsinmi?',
- confParallel:'{0} ta sinf uchun B paralleli yaratilib, soatlari ko‘chirilsinmi?',
+ confParallel:'{0} ta sinf uchun B paralleli (rus oqimi) yaratilsinmi?\n\nSoatlar ko‘chiriladi. O‘qituvchilar faqat «Umumiy o‘qituvchi» belgilangan fanlarda saqlanadi (masalan, Karate) — qolgan fanlar o‘qituvchisiz qoladi, ularni 4-qadamda tanlaysiz.',
  noAClasses:'B yaratish uchun A harfli sinflar topilmadi.',
  confClearGrid:'Tuzilgan jadval tozalansinmi? (Fanlar, o‘qituvchilar va soatlar qoladi)',
  confReset1:'DIQQAT: hamma narsa o‘chadi — fanlar, o‘qituvchilar, sinflar, soatlar, jadval. Davom etilsinmi?',
@@ -471,7 +472,8 @@ ru:{
  empty4:'Нужны классы и предметы',empty4p:'Сначала заполните шаги 1 и 3.',
  empty5:'Расписания ещё нет',empty5p:'Нажмите «Сгенерировать» — часы со шага 4 разложатся по дням.',
  emptyT:'Пока пусто',emptyTp:'Ни одному учителю не назначены уроки.',
- thSubject:'Предмет',thMorning:'Сложный',thWho:'Кто ведёт',thTeacher:'Учитель',thSubs:'Ведёт предметы',thOff:'Не работает',thHours:'Часы',
+ thSubject:'Предмет',thMorning:'Сложный',thShared:'Общий учитель',sharedChip:'один на оба потока',
+ sharedHint:'Если отмечено — этот предмет во всех классах А и Б (русский поток) ведёт один и тот же учитель. Если нет — у каждого потока свой.',thWho:'Кто ведёт',thTeacher:'Учитель',thSubs:'Ведёт предметы',thOff:'Не работает',thHours:'Часы',
  thClass:'Класс',thGrade:'Номер класса',thWeekH:'Часов в неделю',thPlan:'План, ч',thFact:'В расписании',thDayoff:'Выходные',
  morningChip:'1–3 урок',none:'никто',noTeacher:'нет учителя',teachersN:'учит.',
  over:'перебор',subjCol:'Предмет \\ Класс',totalRow:'Всего у класса',total:'Всего',
@@ -481,7 +483,7 @@ ru:{
  confResetSubj:'Вернуть базовый список предметов EduNova? Часы и привязки сбросятся.',
  confDelTeacher:'Удалить «{0}»? Его уроки останутся без учителя.',
  confDelClass:'Удалить класс «{0}» вместе с его часами и расписанием?',
- confParallel:'Создать параллель Б для {0} классов и скопировать их часы?',
+ confParallel:'Создать параллель Б (русский поток) для {0} классов?\n\nЧасы скопируются. Учителя перенесутся только у предметов с галочкой «Общий учитель» (например, каратэ) — у остальных поле останется пустым, выберете их на шаге 4.',
  noAClasses:'Нет классов с буквой A, чтобы создать Б.',
  confClearGrid:'Очистить построенное расписание? (Предметы, учителя и часы останутся)',
  confReset1:'ВНИМАНИЕ: удалится всё — предметы, учителя, классы, часы, расписание. Продолжить?',
@@ -534,7 +536,8 @@ function baseSubjects(){
     ['Huquq va mantiqiy fikrlash',0],["IT va sun'iy intellekt",0],['Robototexnika',0],
     ['Koreys tili',0],['Nemis tili',0],['Karate',0],['Mehnat',0],
     ['Jinsiy tarbiya',0],['Shaxmat',0],['Psixologiya',0]];
-  return L.map((x,i)=>({id:uid('s'),name:x[0],color:PAL[i%PAL.length],morning:!!x[1]}));
+  const UMUMIY=['Karate'];
+  return L.map((x,i)=>({id:uid('s'),name:x[0],color:PAL[i%PAL.length],morning:!!x[1],umumiy:UMUMIY.indexOf(x[0])>=0}));
 }
 function baseTeachers(subs){
   const f=n=>{const s=subs.find(x=>x.name===n);return s?s.id:null;};
@@ -570,6 +573,7 @@ function migrate(s){
   s.cfg.bells=Object.assign({},f.cfg.bells,(s.cfg&&s.cfg.bells)||{});
   ['subjects','teachers','classes'].forEach(k=>{ if(!Array.isArray(s[k]))s[k]=f[k]; });
   ['load','grid','locks'].forEach(k=>{ if(!s[k]||typeof s[k]!=='object')s[k]={}; });
+  s.subjects.forEach(x=>{ if(typeof x.umumiy!=='boolean')x.umumiy=/karate/i.test(x.name||''); });
   if(!s.view)s.view='classes'; if(!s.tab||s.tab==='p-grid'&&!Object.keys(s.grid).length)s.tab=s.tab||'p-subjects';
   if(!s.meta)s.meta={v:2,updated:null};
   return s;
@@ -874,18 +878,19 @@ function go(id){ S.tab=id; renderSteps(); renderAll(); save(); window.scrollTo({
 function renderSubjects(){
   const el=document.getElementById('tbl-subjects');
   if(!S.subjects.length){ el.innerHTML='<tr><td class="empty-state"><b>'+t('empty1')+'</b>'+t('empty1p')+'</td></tr>'; return; }
-  el.innerHTML='<thead><tr><th style="width:44px"></th><th>'+t('thSubject')+'</th><th style="width:110px">'+t('thMorning')+'</th><th style="width:160px">'+t('thWho')+'</th><th style="width:44px"></th></tr></thead><tbody>'+
+  el.innerHTML='<thead><tr><th style="width:44px"></th><th>'+t('thSubject')+'</th><th style="width:110px">'+t('thMorning')+'</th><th style="width:150px">'+t('thShared')+'</th><th style="width:160px">'+t('thWho')+'</th><th style="width:44px"></th></tr></thead><tbody>'+
   S.subjects.map((s,i)=>{
     const who=S.teachers.filter(x=>x.subs.includes(s.id));
     return '<tr>'+
     '<td><input type="color" value="'+s.color+'" oninput="upSubject('+i+',\'color\',this.value)"></td>'+
     '<td><input type="text" value="'+esc(s.name)+'" onchange="upSubject('+i+',\'name\',this.value)"></td>'+
     '<td><label class="chk"><input type="checkbox" '+(s.morning?'checked':'')+' onchange="upSubject('+i+',\'morning\',this.checked)"> '+t('morningChip')+'</label></td>'+
+    '<td><label class="chk" title="'+t('sharedHint')+'"><input type="checkbox" '+(s.umumiy?'checked':'')+' onchange="upSubject('+i+',\'umumiy\',this.checked)"> '+t('sharedChip')+'</label></td>'+
     '<td>'+(who.length?who.map(w=>'<span class="tag'+(/vakant/i.test(w.name)?' vak':'')+'">'+esc(vakName(w.name))+'</span>').join(''):'<span class="hint">'+t('none')+'</span>')+'</td>'+
     '<td><button class="btn ghost sm" onclick="delSubject('+i+')">✕</button></td></tr>';
   }).join('')+'</tbody>';
 }
-function upSubject(i,k,v){ S.subjects[i][k]=v; renderSubjects(); if(k!=='morning')renderLoad(); save(); }
+function upSubject(i,k,v){ S.subjects[i][k]=v; renderSubjects(); if(k!=='morning'&&k!=='umumiy')renderLoad(); save(); }
 function addSubject(){
   const el=document.getElementById('new-subject'); const n=el.value.trim(); if(!n)return;
   S.subjects.push({id:uid('s'),name:n,color:PAL[S.subjects.length%PAL.length],morning:false});
@@ -992,9 +997,9 @@ function addParallel(){
     if(S.classes.some(x=>x.name===name))return;
     const nc={id:uid('c'),name,grade:c.grade};
     S.classes.push(nc);
-    S.subjects.forEach(s=>{ const L=getLoad(c.id,s.id); if(L.h>0)S.load[lk(nc.id,s.id)]={h:L.h,teacherId:L.teacherId}; });
+    S.subjects.forEach(s=>{ const L=getLoad(c.id,s.id); if(L.h>0)S.load[lk(nc.id,s.id)]={h:L.h,teacherId: s.umumiy? (L.teacherId||null) : null}; });
   });
-  renderClasses(); renderLoad(); renderSteps(); save();
+  renderClasses(); renderLoad(); renderSteps(); go('p-load'); save();
 }
 
 /* ============ НАГРУЗКА ============ */
@@ -1299,9 +1304,9 @@ const HELP={
 uz:`
 <h3>1. Ish tartibi — 5 qadam</h3>
 <ol>
-<li><b>Fanlar</b> — ro‘yxatni tekshiring: keraksizini ✕ bilan o‘chiring, yangisini pastdagi maydondan qo‘shing. Rang jadvaldagi katak rangi bo‘ladi.</li>
+<li><b>Fanlar</b> — ro‘yxatni tekshiring: keraksizini ✕ bilan o‘chiring, yangisini pastdagi maydondan qo‘shing. Rang jadvaldagi katak rangi bo‘ladi. <b>«Umumiy o‘qituvchi»</b> ustuni: agar fanni ikkala oqimda (A va rus B) bitta odam olib borsa — belgilang (masalan, Karate). Belgilanmagan fanlarda har bir oqimning o‘z o‘qituvchisi bo‘ladi.</li>
 <li><b>O‘qituvchilar</b> — har bir o‘qituvchida uning fanlarini belgilang (yashil teg). Agar o‘qituvchi hali topilmagan bo‘lsa, «+ Vakant» bosib, fanni belgilab qo‘ying — soatlar band qilinadi.</li>
-<li><b>Sinflar</b> — kerakli sinflarni yozing. «B parallelini qo‘shish» barcha A sinflardan nusxa oladi — soatlari bilan. ⧉ tugmasi bitta sinfni nusxalaydi.</li>
+<li><b>Sinflar</b> — kerakli sinflarni yozing. «B parallelini qo‘shish» barcha A sinflaridan nusxa oladi va <b>rus oqimi</b> uchun B sinflarini yaratadi: soatlar ko‘chiriladi, o‘qituvchilar esa faqat «Umumiy o‘qituvchi» belgilangan fanlarda saqlanadi (Karate va shunga o‘xshashlar). Qolgan fanlarda B sinflari o‘qituvchisiz qoladi — 4-qadamda o‘z o‘qituvchilarini tanlaysiz. ⧉ tugmasi bitta sinfni o‘qituvchilari bilan nusxalaydi.</li>
 <li><b>Soatlar</b> — jadvaldagi kataklarga har fandan haftalik soatni yozing. Tezroq bo‘lishi uchun «Namunaviy soatlar bilan to‘ldirish»ni bosing, keyin o‘zingizga moslang. Pastda har bir «sinf · fan» juftligi uchun o‘qituvchini tanlang.</li>
 <li><b>Jadval</b> — «⚡ Jadval tuzish»ni bosing. Tayyor!</li>
 </ol>
@@ -1351,9 +1356,9 @@ uz:`
 ru:`
 <h3>1. Порядок работы — 5 шагов</h3>
 <ol>
-<li><b>Предметы</b> — проверьте список: лишнее удалите ✕, новое добавьте в поле снизу. Цвет — это цвет ячейки в сетке.</li>
+<li><b>Предметы</b> — проверьте список: лишнее удалите ✕, новое добавьте в поле снизу. Цвет — это цвет ячейки в сетке. Столбец <b>«Общий учитель»</b>: отметьте предметы, которые в обоих потоках ведёт один человек (например, каратэ). У неотмеченных предметов у каждого потока будет свой учитель.</li>
 <li><b>Учителя</b> — у каждого отметьте его предметы (зелёный тег). Если учителя ещё нет — «+ Vakant» и отметьте предмет: часы будут зарезервированы.</li>
-<li><b>Классы</b> — впишите нужные классы. «Добавить параллель Б» дублирует все классы с буквой A вместе с часами. Кнопка ⧉ копирует один класс.</li>
+<li><b>Классы</b> — впишите нужные классы. «Добавить параллель Б» создаёт классы Б (<b>русский поток</b>) по образцу А: часы копируются, а учителя переносятся только у предметов с галочкой «Общий учитель» (каратэ и подобные). У остальных предметов классы Б остаются без учителя — своих выберете на шаге 4. Кнопка ⧉ копирует один класс вместе с учителями.</li>
 <li><b>Часы</b> — в таблице проставьте недельные часы каждого предмета. Быстрее — кнопкой «Заполнить типовыми часами», потом подгоните под себя. Ниже выберите учителя для каждой пары «класс · предмет».</li>
 <li><b>Расписание</b> — жмите «⚡ Сгенерировать». Готово!</li>
 </ol>
