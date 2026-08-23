@@ -145,6 +145,8 @@ table.tt td:last-child,table.tt th:last-child{border-right:none}
 .viewtabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
 .viewtabs button{background:var(--glaze);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-weight:600;font-size:13px;color:var(--ink-2)}
 .viewtabs button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+#oqim-sw button{background:var(--glaze);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-weight:600;font-size:13px;color:var(--ink-2)}
+#oqim-sw button[aria-pressed="true"]{background:var(--cobalt);border-color:var(--cobalt);color:#fff}
 
 .notice{border-radius:10px;padding:10px 13px;font-size:13px;margin-bottom:14px;border:1px solid}
 .notice.warn{background:#FEF8EA;border-color:#F2DCA9;color:#7A5610}
@@ -291,6 +293,7 @@ details.more summary{cursor:pointer;font-weight:600;color:var(--ink-2);font-size
     <button id="v-classes" onclick="setView('classes')" data-i18n="vClasses"></button>
     <button id="v-teachers" onclick="setView('teachers')" data-i18n="vTeachers"></button>
     <button id="v-load" onclick="setView('load')" data-i18n="vLoad"></button>
+    <span id="oqim-sw" style="display:flex;gap:6px;margin-left:4px;padding-left:12px;border-left:1px solid var(--line)"></span>
     <span style="flex:1"></span>
     <button class="btn ghost sm" onclick="clearGrid()" data-i18n="btnClearGrid"></button>
   </div>
@@ -387,6 +390,8 @@ uz:{
  rule2:'Bir fanni bir kunda ikki marta qo‘ymaslik',
  rule3:'«Qiyin» fanlarni 1–3-darsga qo‘yish',
  vClasses:'Sinflar bo‘yicha',vTeachers:'O‘qituvchilar bo‘yicha',vLoad:'Soatlar yakuni',
+ oqimAll:'Hamma oqim',oqimOne:'{0} oqimi',oqimHint:'Faqat shu oqim sinflarini ko‘rsatish (chop etishga ham shu tanlov tushadi)',
+ oqimEmpty:'Bu oqimda sinf yo‘q',oqimEmptyP:'3-qadamda sinf qo‘shing yoki boshqa oqimni tanlang.',
  btnClearGrid:'Jadvalni tozalash',
  legClash:'qizil ramka — o‘qituvchi shu soatda boshqa sinfda band',
  legLock:'— dars qulflangan',legDrag:'Darsni sichqoncha bilan sudrab o‘rnini almashtirish mumkin',
@@ -462,6 +467,8 @@ ru:{
  rule2:'Не ставить предмет дважды в день',
  rule3:'«Сложные» предметы — на 1–3 урок',
  vClasses:'По классам',vTeachers:'По учителям',vLoad:'Итог часов',
+ oqimAll:'Все потоки',oqimOne:'Поток {0}',oqimHint:'Показывать только классы этого потока (печать тоже пойдёт по выбору)',
+ oqimEmpty:'В этом потоке нет классов',oqimEmptyP:'Добавьте класс на шаге 3 или выберите другой поток.',
  btnClearGrid:'Очистить расписание',
  legClash:'красная рамка — учитель в этот час занят в другом классе',
  legLock:'— урок закреплён',legDrag:'Урок можно перетащить мышью, чтобы поменять местами',
@@ -562,7 +569,7 @@ function fresh(){
       bells:{start:'08:30',len:45,brk:10,big:20,bigAfter:3},
       title:'EDUNOVA SCHOOL · 2026–2027' },
     subjects, teachers:baseTeachers(subjects), classes:baseClasses(),
-    load:{}, grid:{}, locks:{}, view:'classes', tab:'p-subjects'
+    load:{}, grid:{}, locks:{}, view:'classes', oqim:'all', tab:'p-subjects'
   };
 }
 let S=fresh();
@@ -574,7 +581,7 @@ function migrate(s){
   ['subjects','teachers','classes'].forEach(k=>{ if(!Array.isArray(s[k]))s[k]=f[k]; });
   ['load','grid','locks'].forEach(k=>{ if(!s[k]||typeof s[k]!=='object')s[k]={}; });
   s.subjects.forEach(x=>{ if(typeof x.umumiy!=='boolean')x.umumiy=/karate/i.test(x.name||''); });
-  if(!s.view)s.view='classes'; if(!s.tab||s.tab==='p-grid'&&!Object.keys(s.grid).length)s.tab=s.tab||'p-subjects';
+  if(!s.view)s.view='classes'; if(!s.oqim)s.oqim='all'; if(!s.tab||s.tab==='p-grid'&&!Object.keys(s.grid).length)s.tab=s.tab||'p-subjects';
   if(!s.meta)s.meta={v:2,updated:null};
   return s;
 }
@@ -1068,6 +1075,19 @@ function setTeacher(cid,sid,tid){
 /* ============ РАСПИСАНИЕ ============ */
 let picked=null,swapFrom=null;
 function setView(v){ S.view=v; renderGrid(); save(); }
+function classLetter(n){ const m=String(n||'').match(/([A-Za-z\u0410-\u042F\u0430-\u044F])\s*$/); return m? m[1].toUpperCase() : ''; }
+function oqimLetters(){ const out=[]; S.classes.forEach(c=>{ const L=classLetter(c.name); if(L&&out.indexOf(L)<0)out.push(L); }); return out.sort(); }
+function oqimClasses(){ const cur=S.oqim||'all'; return cur==='all'? S.classes : S.classes.filter(c=>classLetter(c.name)===cur); }
+function setOqim(v){ S.oqim=v; renderGrid(); save(); }
+function renderOqimSw(){
+  const el=document.getElementById('oqim-sw'); if(!el)return;
+  const ls=oqimLetters();
+  if(ls.length<2){ el.innerHTML=''; return; }
+  const cur=S.oqim||'all';
+  el.innerHTML=['all'].concat(ls).map(v=>
+    '<button onclick="setOqim(\''+v+'\')" aria-pressed="'+(cur===v)+'" title="'+t('oqimHint')+'">'+
+    (v==='all'? t('oqimAll') : tf('oqimOne',v))+'</button>').join('');
+}
 function renderGrid(){
   document.getElementById('cfg-days').value=S.cfg.dayCount;
   document.getElementById('cfg-per').value=S.cfg.periods;
@@ -1080,7 +1100,9 @@ function renderGrid(){
   document.getElementById('r-twice').checked=S.cfg.rules.twice;
   document.getElementById('r-morning').checked=S.cfg.rules.morning;
   ['classes','teachers','load'].forEach(v=>document.getElementById('v-'+v).setAttribute('aria-pressed',S.view===v));
-  document.getElementById('printhead').textContent=(S.cfg.title||'')+' — '+t('s5');
+  renderOqimSw();
+  const oq=(S.oqim&&S.oqim!=='all')? ' · '+tf('oqimOne',S.oqim) : '';
+  document.getElementById('printhead').textContent=(S.cfg.title||'')+' — '+t('s5')+oq;
   renderBellsLine();
   const w=document.getElementById('gridwrap');
   if(!Object.keys(S.grid).length){
@@ -1104,7 +1126,9 @@ function headRow(){
 }
 function viewClasses(){
   const clash=findClashes(), D=days();
-  return S.classes.map(c=>{
+  const list=oqimClasses();
+  if(!list.length)return '<div class="empty-state"><b>'+t('oqimEmpty')+'</b>'+t('oqimEmptyP')+'</div>';
+  return list.map(c=>{
     const g=S.grid[c.id]; if(!g)return '';
     const filled=g.flat().filter(Boolean).length;
     let h='<div class="gridblock"><h3>'+esc(c.name)+' <em>'+filled+' '+t('hoursW')+'/'+t('week')+'</em></h3><div class="scroller"><table class="tt">'+headRow()+'<tbody>';
@@ -1129,11 +1153,12 @@ function cellHTML(cid,d,p,cell,clash){
 }
 function viewTeachers(){
   const D=days();
-  const used=S.teachers.filter(x=>teacherHours(x.id).placed>0);
+  const vis={}; oqimClasses().forEach(c=>{ const g=S.grid[c.id]; if(!g)return; g.forEach(r=>r.forEach(y=>{ if(y&&y.teacherId)vis[y.teacherId]=1; })); });
+  const used=S.teachers.filter(x=>vis[x.id]);
   if(!used.length)return '<div class="empty-state"><b>'+t('emptyT')+'</b>'+t('emptyTp')+'</div>';
   return used.map(x=>{
     const cellsOf={};
-    S.classes.forEach(c=>{ const g=S.grid[c.id]; if(!g)return;
+    oqimClasses().forEach(c=>{ const g=S.grid[c.id]; if(!g)return;
       g.forEach((r,d)=>r.forEach((y,p)=>{ if(y&&y.teacherId===x.id){ (cellsOf[d+'|'+p]=cellsOf[d+'|'+p]||[]).push({c,y}); } })); });
     const total=Object.values(cellsOf).reduce((n,a)=>n+a.length,0);
     let h='<div class="gridblock"><h3>'+esc(x.name)+' <em>'+total+' '+t('hoursW')+'/'+t('week')+
