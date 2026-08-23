@@ -1994,6 +1994,13 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
   <canvas id="xj-canvas" width="1654" height="2339"></canvas>
 </div>
 
+<!-- ═══════ DARS JADVALI ═══════ -->
+<div class="admin-panel" id="ap-jadval">
+  <div class="ap-head"><div><div class="ap-title">📅 Dars jadvali</div><div class="ap-sub">Konstruktor: fanlar → o‘qituvchilar → sinflar → soatlar → jadval. Ma’lumotlar Supabase’da — barcha adminlar bitta jadvalni ko‘radi</div></div>
+    <a class="btn-sm" style="padding:10px 18px;text-decoration:none" href="jadval.html" target="_blank">⧉ Alohida oynada</a></div>
+  <iframe id="jadval-frame" title="Dars jadvali" style="width:100%;height:calc(100vh - 215px);min-height:560px;border:1px solid var(--brd);border-radius:16px;background:#fff"></iframe>
+</div>
+
 <!-- ═══════ SHARTNOMA TUZISH ═══════ -->
 <div class="admin-panel" id="ap-shartnoma">
   <div class="ap-head"><div><div class="ap-title">📄 Shartnoma tuzish</div><div class="ap-sub">Mijoz bilan shartnoma rasmiylashtirish — PNG yuklab olish bilan</div></div></div>
@@ -2679,8 +2686,8 @@ const POSITIONS = {
 };
 
 // ── ROLE MENUS ── (Variant B: everyone sees ALL sections; only timer differs)
-const FULL_MENU=['svodka','qabul','hujjat','dash','shartnoma','xujjatlar','mshartnoma','davomat','hrtest','oqkab','qabnat','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
-const MARKETING_MENU=['svodka','qabul','testnat','hujjat','dash','shartnoma','xujjatlar','mshartnoma','davomat','hrtest','oqkab','qabnat','hisobkitob','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
+const FULL_MENU=['svodka','qabul','hujjat','dash','shartnoma','xujjatlar','mshartnoma','davomat','jadval','hrtest','oqkab','qabnat','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
+const MARKETING_MENU=['svodka','qabul','testnat','hujjat','dash','shartnoma','xujjatlar','mshartnoma','davomat','jadval','hrtest','oqkab','qabnat','hisobkitob','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
 const MENUS = {
   admin:     FULL_MENU,
   marketing: MARKETING_MENU,
@@ -2710,6 +2717,7 @@ const MENU_META = {
   xujjatlar:{label:'🗂 Xujjat ishlar', fn:'loadXujjatIshlar'},
   mshartnoma:{label:'🏫 Maktab shartnomasi', fn:'loadMShartnoma'},
   davomat:  {label:'🕘 Davomat',          fn:'loadOqituvchi'},
+  jadval:   {label:'📅 Dars jadvali',    fn:'loadJadval'},
   hrtest:   {label:'🧠 O\'qituvchi testi', fn:'loadHrTest'},
   oqkab:    {label:'👨‍🏫 Kabinetlar',      fn:'loadOqKab'},
   qabnat:   {label:'📋 Qabul natijalari', fn:'loadQabNat'},
@@ -9278,6 +9286,14 @@ function loadMShartnoma(){
     xjLoadImgs();
   }
   msRoyxat();
+}
+</script>
+
+<script>
+/* ══════════ DARS JADVALI (jadval.html ichida) ══════════ */
+function loadJadval(){
+  var f=document.getElementById('jadval-frame');
+  if(f&&!f.getAttribute('src'))f.setAttribute('src','jadval.html');
 }
 </script>
 
