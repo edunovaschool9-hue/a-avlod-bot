@@ -1905,6 +1905,24 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
     <button class="ms-btn ms-gray" onclick="msPadClear()">🧹 Tozalash</button>
   </div>
 
+  <div id="ms-imzolink" style="margin-top:12px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button class="ms-btn ms-portal" type="button" onclick="msImzoHavola()">📲 Imzo havolasi (telefonda)</button>
+      <button class="ms-btn ms-gray" type="button" onclick="msImzoTekshir(1)">🔄 Tekshirish</button>
+      <span id="ms-im-msg" style="font-size:12.5px;color:#8892b0"></span>
+    </div>
+    <div id="ms-im-out" style="display:none;margin-top:10px;background:rgba(255,255,255,.05);border:1px solid rgba(124,92,255,.35);border-radius:12px;padding:12px">
+      <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+        <div id="ms-im-qr" style="background:#fff;padding:6px;border-radius:10px;line-height:0"></div>
+        <div style="flex:1;min-width:230px">
+          <input id="ms-im-link" type="text" readonly onclick="this.select()" style="width:100%;font-size:12px;padding:9px 10px;border-radius:8px;border:1px solid rgba(124,92,255,.4);background:rgba(255,255,255,.06);color:#cdd3ea">
+          <button class="ms-btn ms-gray" type="button" style="margin-top:8px;padding:7px 12px;font-size:12.5px" onclick="msImNusxa()">📋 Nusxalash</button>
+          <div style="font-size:12px;color:#8892b0;margin-top:8px">Ota-ona QR kodni telefon kamerasi bilan skaner qiladi yoki havolani Telegram orqali oladi. Shartnoma matnini, jumladan to‘lov miqdorini o‘qib chiqib, barmog‘i bilan imzolaydi. Imzo kelishi bilan yuqoridagi maydonga o‘zi tushadi.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="ms-sec">3-qadam · Yo&#8216;l tanlang</div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
     <button class="ms-btn ms-ok" onclick="msTayyorla()">✅ Narx kelishilgan — shartnoma (PDF)</button>
@@ -9294,6 +9312,89 @@ function loadMShartnoma(){
 function loadJadval(){
   var f=document.getElementById('jadval-frame');
   if(f&&!f.getAttribute('src'))f.setAttribute('src','jadval.html');
+}
+</script>
+
+<script>
+/* ══════════ MAKTAB SHARTNOMASI — masofaviy imzo (ota-ona telefonda) ══════════ */
+var msImToken=null, msImTimer=null, msImTick=0;
+function msImMsg(t,c){var e=document.getElementById('ms-im-msg');if(e){e.textContent=t||'';e.style.color=c||'#8892b0';}}
+function msShMatn(){
+  var d=msData(), B=msBlocks(d,'____'), L=[], i, b;
+  for(i=0;i<B.length;i++){
+    b=B[i];
+    if(b.k==='title'){ L.push('S H A R T N O M A'); L.push('\u2116 ____/SH   '+msSanaUz(d['ms-sana'])); L.push(''); }
+    else if(b.k==='h'){ L.push(''); L.push(b.t); }
+    else if(b.k==='p'){ L.push(b.t); }
+  }
+  L.push('');
+  L.push('Maktab: FERGHANA EDU NOVA SCHOOL mchj, direktor Xolmatov D.');
+  L.push('Buyurtmachi: '+(d['ms-otafio']||'____________________'));
+  return L.join('\n');
+}
+function msImzoHavola(){
+  var fio=xjVal('ms-otafio');
+  if(!fio){msImMsg('Avval ota-onaning F.I.Sh.ni kiriting','#f87171');return;}
+  if(!xjVal('ms-narx')){msImMsg('Avval bir oylik to\u2018lovni kiriting \u2014 ota-ona narxni ko\u2018rishi shart','#f87171');return;}
+  msImMsg('Havola tayyorlanmoqda\u2026');
+  sb.rpc('imzo_yarat',{
+    p_ism:xjVal('ms-oquvchi')||fio,
+    p_matn:msShMatn(),
+    p_turi:'shartnoma',
+    p_sinf:xjVal('ms-sinf')||null,
+    p_raqam:null
+  }).then(function(r){
+    var d=r.data, err=r.error;
+    if(err||!d||!d.ok){msImMsg('Xato: '+((err&&err.message)||(d&&d.xato)||'server'),'#f87171');return;}
+    msImToken=d.token; msImTick=0;
+    var box=document.getElementById('ms-im-out'); if(box)box.style.display='block';
+    var inp=document.getElementById('ms-im-link'); if(inp)inp.value=d.havola;
+    xjQrLib().then(function(ok){
+      var q=document.getElementById('ms-im-qr'); if(!q)return;
+      if(ok){
+        try{var qr=window.qrcode(0,'M');qr.addData(d.havola);qr.make();q.innerHTML=qr.createImgTag(4,8);}
+        catch(e){q.innerHTML='';}
+      }else{q.innerHTML='';}
+    });
+    msImMsg('Havola tayyor \u2014 QR ni skaner qildiring yoki Telegramda yuboring. Imzo kutilmoqda\u2026','#22c55e');
+    if(msImTimer)clearInterval(msImTimer);
+    msImTimer=setInterval(function(){msImzoTekshir(0);},6000);
+  });
+}
+function msImzoTekshir(qolda){
+  if(!msImToken){if(qolda)msImMsg('Avval \u00ABImzo havolasi\u00BB tugmasini bosing','#f87171');return;}
+  msImTick++;
+  if(msImTick>200&&msImTimer){clearInterval(msImTimer);msImTimer=null;}
+  sb.rpc('imzo_holat',{p_token:msImToken}).then(function(r){
+    var d=r.data;
+    if(!d||!d.ok){if(qolda)msImMsg('Topilmadi','#f87171');return;}
+    if(d.holat==='imzolandi'&&d.imzo){
+      if(msImTimer){clearInterval(msImTimer);msImTimer=null;}
+      msImQabul(d);
+    }else if(qolda){
+      msImMsg(d.holat==='bekor'?'Havola bekor qilingan':'Hali imzolanmadi \u2014 kutilmoqda\u2026');
+    }
+  });
+}
+function msImQabul(d){
+  msImzo=d.imzo; msPadDrawn=false; msImToken=null;
+  var of=document.getElementById('ms-otafio'); if(of&&!of.value&&d.ota_ism)of.value=d.ota_ism;
+  var tl=document.getElementById('ms-tel'); if(tl&&!tl.value&&d.telefon)tl.value=d.telefon;
+  msImzoImgYukla(d.imzo).then(function(im){
+    var p=document.getElementById('ms-pad'); if(!p)return;
+    var c=p.getContext('2d'); c.fillStyle='#fff'; c.fillRect(0,0,p.width,p.height);
+    if(im){var ih=p.height-20, iw=Math.round(ih*im.width/im.height); if(iw>p.width-20){iw=p.width-20;ih=Math.round(iw*im.height/im.width);} c.drawImage(im,(p.width-iw)/2,(p.height-ih)/2,iw,ih);}
+  });
+  msImMsg('\u2705 Imzo keldi: '+(d.ota_ism||'')+(d.telefon?(' \u00B7 '+d.telefon):'')+' \u2014 endi \u00ABNarx kelishilgan\u00BB tugmasini bosing','#22c55e');
+}
+function msImNusxa(){
+  var inp=document.getElementById('ms-im-link'); if(!inp||!inp.value)return;
+  inp.select();
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(inp.value);}
+    else{document.execCommand('copy');}
+    msImMsg('Havola nusxalandi \u2014 Telegramga tashlang','#22c55e');
+  }catch(e){msImMsg('Qo\u2018lda nusxalang (Ctrl+C)');}
 }
 </script>
 
