@@ -9544,13 +9544,18 @@ function xuSet(id,v){var e=document.getElementById(id);if(e)e.value=(v==null?'':
 function xuEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 
 function loadXulosa(){
-  var r=(window.currentStaff&&currentStaff.role)||'';
-  XU.boss=(r==='marketing'||r==='director');
+  var st=(typeof currentStaff!=='undefined'&&currentStaff)?currentStaff:null;
+  var r=(st&&st.role)||'';
+  XU.boss=(r==='marketing'||r==='director'||r==='admin');
   document.getElementById('xu-filtr').style.display=XU.boss?'flex':'none';
   if(XU.boss&&!XU.me){
-    XU.me={id:null,fio:(currentStaff&&currentStaff.name)||'Boshqaruv',fan:'',boss:true};
+    XU.me={id:null,fio:(st&&st.name)||'Boshqaruv',fan:'',boss:true};
     xuKimKorsat();
   }
+  var bosh=document.getElementById('xu-bosh');
+  if(bosh)bosh.textContent=XU.boss
+    ? '\u00AB+ Yangi xulosa\u00BB tugmasini bosing yoki chapdagi ro\u2018yxatdan tanlang'
+    : 'PIN kiriting va \u00AB+ Yangi xulosa\u00BB tugmasini bosing';
   if(!document.getElementById('xu-kon').innerHTML)xuKonChiz();
   xuStudents(function(){ xuRoyxat(); });
   xuTab('form');
