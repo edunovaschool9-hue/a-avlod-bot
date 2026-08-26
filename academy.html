@@ -2022,69 +2022,81 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
 <!-- ═══════ O'QUVCHI XULOSASI ═══════ -->
 <style>
 #ap-xulosa .xu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:14px}
-#ap-xulosa .xu-l{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8892b0;margin-bottom:4px;font-weight:600}
-#ap-xulosa .xu-sec{border:1px solid rgba(124,92,255,.25);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:rgba(255,255,255,.04)}
+#ap-xulosa .xu-l{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mu2);margin-bottom:4px;font-weight:700}
+#ap-xulosa .xu-sec{border:1px solid var(--brd);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--s)}
+#ap-xulosa .xu-sec b,#ap-xulosa .xu-r{color:var(--tx)}
 #ap-xulosa .xu-sec b{font-size:14px}
 #ap-xulosa .xu-r{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;cursor:pointer}
-#ap-xulosa input[type=text],#ap-xulosa input[type=date],#ap-xulosa input:not([type]),#ap-xulosa select,#ap-xulosa textarea{
-  width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(124,92,255,.35);
-  background:rgba(255,255,255,.06);color:#cdd3ea;font-family:inherit;font-size:13.5px;margin-top:4px}
+#ap-xulosa input,#ap-xulosa select,#ap-xulosa textarea{width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--brd);background:var(--s2);color:var(--tx);font-family:inherit;font-size:13.5px;margin-top:4px}
+#ap-xulosa input[type=range]{padding:0;background:transparent;border:none;margin:0}
+#ap-xulosa input[type=radio]{width:auto;margin:0}
 #ap-xulosa textarea{resize:vertical}
-#ap-xulosa input:focus,#ap-xulosa select:focus,#ap-xulosa textarea:focus{outline:none;border-color:rgba(124,92,255,.75)}
+#ap-xulosa input:focus,#ap-xulosa select:focus,#ap-xulosa textarea:focus{outline:none;border-color:var(--ac)}
+#ap-xulosa .xu-mu{color:var(--mu2);font-size:12.5px}
+#ap-xulosa .xu-card{background:var(--s);border:1px solid var(--brd);border-radius:14px;padding:14px 16px;margin-bottom:14px;color:var(--tx)}
+#ap-xulosa .xu-btn{background:var(--s2);border:1px solid var(--brd);border-radius:10px;padding:8px 13px;font-size:12.5px;font-weight:600;color:var(--tx);cursor:pointer;width:auto;margin:0}
+#ap-xulosa .xu-btn:hover{border-color:var(--ac);color:var(--ac)}
+#ap-xulosa .xu-btn.pri{background:var(--ac);border-color:var(--ac);color:#fff}
+#ap-xulosa .xu-btn.ok{background:#1E8E4E;border-color:#1E8E4E;color:#fff}
+#ap-xulosa .xu-item{cursor:pointer;background:var(--s);border:1px solid var(--brd);border-radius:10px;padding:9px 11px;margin-bottom:6px;color:var(--tx)}
+#ap-xulosa .xu-item:hover{border-color:var(--ac)}
+#ap-xulosa .xu-link{background:none;border:none;color:var(--ac);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;margin-top:4px;width:auto;text-align:left}
 </style>
 <div class="admin-panel" id="ap-xulosa">
   <div class="ap-head"><div><div class="ap-title">📝 O'quvchi xulosasi</div><div class="ap-sub">O'tgan yil (2025–2026) o'qituvchilari har bir o'quvchiga tavsifnoma yozadi — qog'ozda emas, shu yerda. Keyin bu xulosa o'quvchi kartasida ko'rinadi</div></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn-sm" type="button" onclick="xuTab('form')" id="xu-tb-form">✍️ Xulosa yozish</button>
-      <button class="btn-sm" type="button" onclick="xuTab('karta')" id="xu-tb-karta">👤 O'quvchi kartasi</button>
+      <button class="xu-btn" type="button" onclick="xuTab('form')" id="xu-tb-form">✍️ Xulosa yozish</button>
+      <button class="xu-btn" type="button" onclick="xuTab('karta')" id="xu-tb-karta">👤 O'quvchi kartasi</button>
     </div></div>
 
-  <!-- kim yozmoqda -->
-  <div id="xu-kim" style="background:rgba(255,255,255,.05);border:1px solid rgba(124,92,255,.3);border-radius:14px;padding:14px 16px;margin-bottom:14px">
+  <div class="xu-card" id="xu-kim">
     <div id="xu-kim-kirish" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
       <b style="font-size:14px">O'qituvchi PIN:</b>
-      <input id="xu-pin" type="password" inputmode="numeric" maxlength="4" placeholder="4 raqam" style="width:110px;font-size:16px;letter-spacing:4px;text-align:center;padding:8px 10px;border-radius:8px;border:1px solid rgba(124,92,255,.4);background:rgba(255,255,255,.06);color:#cdd3ea" onkeydown="if(event.key==='Enter')xuKirish()">
-      <button class="btn-sm" type="button" onclick="xuKirish()">Kirish</button>
-      <span id="xu-kim-msg" style="font-size:12.5px;color:#8892b0"></span>
+      <input id="xu-pin" type="password" inputmode="numeric" maxlength="4" placeholder="4 raqam" style="width:110px;font-size:16px;letter-spacing:4px;text-align:center;margin:0" onkeydown="if(event.key==='Enter')xuKirish()">
+      <button class="xu-btn pri" type="button" onclick="xuKirish()">Kirish</button>
+      <span id="xu-kim-msg" class="xu-mu"></span>
       <span style="flex:1"></span>
-      <button class="btn-sm" type="button" style="opacity:.75" onclick="xuOqQosh()">+ Yangi o'qituvchi</button>
+      <button class="xu-btn" type="button" onclick="xuOqQosh()">+ Yangi o'qituvchi</button>
     </div>
     <div id="xu-kim-bor" style="display:none;gap:12px;flex-wrap:wrap;align-items:center">
       <b style="font-size:15px" id="xu-kim-fio"></b>
-      <span id="xu-kim-fan" style="font-size:12.5px;color:#8892b0"></span>
-      <span id="xu-kim-rol" style="font-size:11.5px;padding:3px 9px;border-radius:999px;background:rgba(124,92,255,.2);color:#c7b8ff"></span>
+      <span id="xu-kim-fan" class="xu-mu"></span>
+      <span id="xu-kim-rol" style="font-size:11.5px;padding:3px 9px;border-radius:999px;background:var(--s3);color:var(--mu2)"></span>
       <span style="flex:1"></span>
-      <button class="btn-sm" type="button" style="opacity:.75" onclick="xuChiqish()">Chiqish</button>
+      <button class="xu-btn" type="button" onclick="xuOqQosh()">+ Yangi o'qituvchi</button>
+      <button class="xu-btn" type="button" onclick="xuChiqish()">Chiqish</button>
     </div>
   </div>
 
-  <!-- ══ TAB: forma ══ -->
   <div id="xu-pane-form">
     <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
 
-      <!-- ro'yxat -->
       <div style="flex:1;min-width:280px;max-width:380px">
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-          <button class="btn-sm" type="button" onclick="xuYangi()">+ Yangi xulosa</button>
-          <button class="btn-sm" type="button" style="opacity:.8" onclick="xuRoyxat()">🔄 Yangilash</button>
-          <button class="btn-sm" type="button" style="opacity:.8" onclick="xuExcel()">📊 Excel (sinf)</button>
+          <button class="xu-btn pri" type="button" onclick="xuYangi()">+ Yangi xulosa</button>
+          <button class="xu-btn" type="button" onclick="xuRoyxat()">🔄 Yangilash</button>
+          <button class="xu-btn" type="button" onclick="xuExcel()">📊 Excel</button>
         </div>
         <div id="xu-filtr" style="display:none;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-          <input id="xu-f-sinf" placeholder="Sinf" style="width:80px;padding:7px 9px;border-radius:8px;border:1px solid rgba(124,92,255,.35);background:rgba(255,255,255,.06);color:#cdd3ea" onchange="xuRoyxat()">
-          <input id="xu-f-fan" placeholder="Fan" style="flex:1;min-width:110px;padding:7px 9px;border-radius:8px;border:1px solid rgba(124,92,255,.35);background:rgba(255,255,255,.06);color:#cdd3ea" onchange="xuRoyxat()">
+          <input id="xu-f-sinf" placeholder="Sinf" style="width:80px;margin:0" onchange="xuRoyxat()">
+          <input id="xu-f-fan" placeholder="Fan" style="flex:1;min-width:110px;margin:0" onchange="xuRoyxat()">
         </div>
         <div id="xu-list" style="max-height:560px;overflow:auto"></div>
       </div>
 
-      <!-- forma -->
       <div style="flex:2;min-width:320px">
         <div id="xu-form" style="display:none">
           <div class="xu-grid">
-            <div><label class="xu-l">O'quvchi</label><select id="xu-oq" onchange="xuOqTanla()"></select></div>
+            <div>
+              <label class="xu-l">O'quvchi</label>
+              <select id="xu-oq" onchange="xuOqTanla()"></select>
+              <input id="xu-oq-yangi" placeholder="F.I.Sh. to'liq yozing" style="display:none" oninput="XU.dirty=true">
+              <button type="button" class="xu-link" id="xu-oq-btn" onclick="xuQolToggle()">➕ Ro'yxatda yo'q — qo'lda qo'shish</button>
+            </div>
             <div><label class="xu-l">Sinf</label><input id="xu-sinf" placeholder="5-A"></div>
             <div><label class="xu-l">Oqim</label><input id="xu-oqim" placeholder="uz / ru"></div>
             <div><label class="xu-l">Fan</label><input id="xu-fan" placeholder="Matematika"></div>
-            <div><label class="xu-l">O'qituvchi</label><input id="xu-oqit" readonly style="opacity:.75"></div>
+            <div><label class="xu-l">O'qituvchi</label><input id="xu-oqit" readonly></div>
             <div><label class="xu-l">Sana</label><input id="xu-sana" type="date"></div>
           </div>
 
@@ -2099,7 +2111,7 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
             <textarea id="xu-qiyn" rows="2"></textarea>
           </div>
 
-          <div class="xu-sec"><b>2. Ko'nikmalar</b> <span style="font-size:12px;color:#8892b0">(1 — past, 5 — yuqori)</span>
+          <div class="xu-sec"><b>2. Ko'nikmalar</b> <span class="xu-mu">(1 — past, 5 — yuqori)</span>
             <div id="xu-kon" style="margin-top:8px"></div>
           </div>
 
@@ -2119,38 +2131,36 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
             <textarea id="xu-qiziq" rows="2"></textarea>
           </div>
 
-          <div class="xu-sec" style="border-color:rgba(124,92,255,.45)"><b>7. Yangi o'qituvchiga tavsiya</b>
-            <div style="font-size:12px;color:#8892b0;margin:4px 0 6px">Eng muhim band. Rasmiy gap emas — yangi o'qituvchi shu bolaga qanday yondashishini yozing. Kamida 40 ta belgi.</div>
+          <div class="xu-sec" style="border-color:var(--ac)"><b>7. Yangi o'qituvchiga tavsiya</b>
+            <div class="xu-mu" style="margin:4px 0 6px">Eng muhim band. Rasmiy gap emas — yangi o'qituvchi shu bolaga qanday yondashishini yozing. Kamida 40 ta belgi.</div>
             <textarea id="xu-tavsiya" rows="4" oninput="xuTavsiyaSanoq()"></textarea>
-            <div id="xu-tav-sanoq" style="font-size:12px;color:#8892b0;margin-top:4px"></div>
+            <div id="xu-tav-sanoq" class="xu-mu" style="margin-top:4px"></div>
           </div>
 
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center">
-            <button class="btn-sm" type="button" onclick="xuSaqla('qoralama')">💾 Qoralama saqlash</button>
-            <button class="btn-sm" type="button" style="background:#1E8E4E;border-color:#1E8E4E" onclick="xuSaqla('tayyor')">✅ Tayyor</button>
-            <button class="btn-sm" type="button" style="opacity:.85" onclick="xuPdf()">🖨 PDF (A4)</button>
-            <button class="btn-sm" type="button" id="xu-ochir" style="display:none;opacity:.8" onclick="xuOchir()">🗑 O'chirish</button>
-            <span id="xu-holat" style="font-size:12.5px;color:#8892b0"></span>
+            <button class="xu-btn" type="button" onclick="xuSaqla('qoralama')">💾 Qoralama saqlash</button>
+            <button class="xu-btn ok" type="button" onclick="xuSaqla('tayyor')">✅ Tayyor</button>
+            <button class="xu-btn" type="button" onclick="xuPdf()">🖨 PDF (A4)</button>
+            <button class="xu-btn" type="button" id="xu-ochir" style="display:none" onclick="xuOchir()">🗑 O'chirish</button>
+            <span id="xu-holat" class="xu-mu"></span>
           </div>
         </div>
-        <div id="xu-bosh" style="text-align:center;padding:40px 16px;color:#8892b0">
-          PIN kiriting va «+ Yangi xulosa» tugmasini bosing
+        <div id="xu-bosh" class="xu-mu" style="text-align:center;padding:40px 16px">
+          «+ Yangi xulosa» tugmasini bosing
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ══ TAB: o'quvchi kartasi ══ -->
   <div id="xu-pane-karta" style="display:none">
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
       <b style="font-size:14px">O'quvchi:</b>
-      <select id="xu-k-oq" onchange="xuKarta()" style="min-width:260px"></select>
-      <span id="xu-k-msg" style="font-size:12.5px;color:#8892b0"></span>
+      <select id="xu-k-oq" onchange="xuKarta()" style="min-width:260px;margin:0"></select>
+      <span id="xu-k-msg" class="xu-mu"></span>
     </div>
     <div id="xu-k-box"></div>
   </div>
 </div>
-
 
 <!-- ═══════ SHARTNOMA TUZISH ═══════ -->
 <div class="admin-panel" id="ap-shartnoma">
@@ -9534,7 +9544,7 @@ function msImNusxa(){
 
 <script>
 /* ══════════ O'QUVCHI XULOSASI ══════════ */
-var XU={me:null, boss:false, cur:null, students:[], list:[], timer:null, dirty:false, yil:'2025-2026'};
+var XU={me:null, boss:false, cur:null, students:[], list:[], timer:null, dirty:false, qol:false, yil:'2025-2026'};
 var XU_KON=[['oqish',"O'qish"],['yozuv','Yozuv'],['hisob','Hisob-mantiq'],['nutq','Nutq'],
             ['diqqat','Diqqat'],['mustaqillik','Mustaqillik'],['uy_vazifa','Uy vazifasi']];
 
@@ -9615,6 +9625,18 @@ function xuStudents(cb){
   });
 }
 function xuTop(key){ for(var i=0;i<XU.students.length;i++){ if(XU.students[i].manba+':'+XU.students[i].id===key)return XU.students[i]; } return null; }
+function xuQolToggle(){
+  XU.qol=!XU.qol;
+  document.getElementById('xu-oq').style.display=XU.qol?'none':'';
+  document.getElementById('xu-oq-yangi').style.display=XU.qol?'':'none';
+  document.getElementById('xu-oq-btn').textContent=XU.qol
+    ? '\u21A9 Ro\u2018yxatdan tanlash'
+    : '\u2795 Ro\u2018yxatda yo\u2018q \u2014 qo\u2018lda qo\u2018shish';
+  XU.dirty=true;
+}
+function xuSlug(s){
+  return String(s||'').toLowerCase().replace(/\s+/g,'_').replace(/[^0-9a-z_\u0400-\u04FF\u2018\u2019']/g,'').slice(0,60);
+}
 function xuOqTanla(){
   var s=xuTop(xuV('xu-oq')); if(!s)return;
   if(!xuV('xu-sinf'))xuSet('xu-sinf',s.sinf||'');
@@ -9643,7 +9665,8 @@ function xuYangi(){
   document.getElementById('xu-bosh').style.display='none';
   document.getElementById('xu-ochir').style.display='none';
   ['xu-sinf','xu-oqim','xu-qiyn','xu-xulq','xu-kuch1','xu-kuch2','xu-kuch3','xu-ish1','xu-ish2','xu-qiziq','xu-tavsiya'].forEach(function(i){xuSet(i,'');});
-  xuSet('xu-oq',''); xuSet('xu-fan',XU.me.fan||'');
+  xuSet('xu-oq',''); xuSet('xu-oq-yangi',''); xuSet('xu-fan',XU.me.fan||'');
+  if(XU.qol)xuQolToggle();
   xuSet('xu-oqit',XU.me.fio||''); xuSet('xu-sana',new Date().toISOString().slice(0,10));
   document.querySelectorAll('input[name="xu-ozl"]').forEach(function(r){r.checked=false;});
   XU_KON.forEach(function(k){ xuSet('xu-k-'+k[0],3); var b=document.getElementById('xu-kv-'+k[0]); if(b)b.textContent='3'; });
@@ -9656,13 +9679,14 @@ function xuFormaYop(){
 function xuYig(holat){
   var kon={}; XU_KON.forEach(function(k){ kon[k[0]]=parseInt(xuV('xu-k-'+k[0]),10)||3; });
   var oz=document.querySelector('input[name="xu-ozl"]:checked');
-  var key=xuV('xu-oq'), s=xuTop(key);
+  var key=xuV('xu-oq'), s=XU.qol? null : xuTop(key);
+  var qolIsm=xuV('xu-oq-yangi');
   return {
     id: XU.cur&&XU.cur.id? String(XU.cur.id):'',
     o_yili: XU.yil,
     manba: s? s.manba : 'qol',
-    oquvchi_id: s? s.id : '',
-    oquvchi_ism: s? s.ism : '',
+    oquvchi_id: s? s.id : xuSlug(qolIsm),
+    oquvchi_ism: s? s.ism : qolIsm,
     sinf: xuV('xu-sinf'), oqim: xuV('xu-oqim'), fan: xuV('xu-fan'),
     oqituvchi_id: XU.me&&XU.me.id? String(XU.me.id):'',
     oqituvchi_ism: XU.me? XU.me.fio : '',
@@ -9678,8 +9702,8 @@ function xuYig(holat){
 function xuSaqla(holat,jim){
   if(!XU.me){if(!jim)alert('Avval PIN bilan kiring');return;}
   var p=xuYig(holat);
-  if(!p.oquvchi_ism){ if(!jim)xuMsg("O'quvchi tanlanmagan",'#f87171'); return; }
-  if(!p.fan){ if(!jim)xuMsg('Fan kiritilmagan','#f87171'); return; }
+  if(!p.oquvchi_ism){ if(!jim)xuMsg(XU.qol?"O'quvchi F.I.Sh. yozilmagan":"O'quvchi tanlanmagan",'#C0392B'); return; }
+  if(!p.fan){ if(!jim)xuMsg('Fan kiritilmagan','#C0392B'); return; }
   xuMsg(jim?'avtosaqlash\u2026':'saqlanmoqda\u2026');
   sb.rpc('xulosa_saqla',{p:p}).then(function(r){
     var d=r.data;
@@ -9694,23 +9718,23 @@ function xuAvto(){
   if(!XU.dirty||!XU.me)return;
   var f=document.getElementById('xu-form');
   if(!f||f.style.display==='none')return;
-  if(!xuV('xu-oq')||!xuV('xu-fan'))return;
+  if(!(XU.qol? xuV('xu-oq-yangi') : xuV('xu-oq'))||!xuV('xu-fan'))return;
   xuSaqla('qoralama',true);
 }
 function xuRoyxat(){
   var box=document.getElementById('xu-list'); if(!box)return;
-  if(!XU.me){ box.innerHTML='<div style="color:#8892b0;font-size:13px;padding:10px">PIN kiriting</div>'; return; }
+  if(!XU.me){ box.innerHTML='<div class="xu-mu" style="padding:10px">PIN kiriting</div>'; return; }
   var a={p_yil:XU.yil};
   if(!XU.boss)a.p_oqituvchi_id=XU.me.id;
   if(XU.boss){ a.p_sinf=xuV('xu-f-sinf'); a.p_fan=xuV('xu-f-fan'); }
   sb.rpc('xulosa_royxat',a).then(function(r){
     var L=Array.isArray(r.data)?r.data:[]; XU.list=L;
-    if(!L.length){ box.innerHTML='<div style="color:#8892b0;font-size:13px;padding:10px">Hali xulosa yo\u2018q</div>'; return; }
+    if(!L.length){ box.innerHTML='<div class="xu-mu" style="padding:10px">Hali xulosa yo\u2018q</div>'; return; }
     box.innerHTML=L.map(function(x){
       var ok=x.holat==='tayyor';
-      return '<div onclick="xuOch('+x.id+')" style="cursor:pointer;background:rgba(255,255,255,.05);border:1px solid rgba(124,92,255,.25);border-left:3px solid '+(ok?'#1E8E4E':'#C98A1B')+';border-radius:10px;padding:9px 11px;margin-bottom:6px">'+
+      return '<div onclick="xuOch('+x.id+')" class="xu-item" style="border-left:3px solid '+(ok?'#1E8E4E':'#C98A1B')+'">'+
         '<div style="font-weight:600;font-size:13.5px">'+xuEsc(x.oquvchi_ism)+'</div>'+
-        '<div style="font-size:11.5px;color:#8892b0;margin-top:2px">'+xuEsc(x.sinf||'?')+' \u00B7 '+xuEsc(x.fan)+' \u00B7 '+(ok?'tayyor':'qoralama')+
+        '<div class="xu-mu" style="margin-top:2px">'+xuEsc(x.sinf||'?')+' \u00B7 '+xuEsc(x.fan)+' \u00B7 '+(ok?'tayyor':'qoralama')+
         (XU.boss?(' \u00B7 '+xuEsc(x.oqituvchi_ism)):'')+'</div></div>';
     }).join('');
   });
@@ -9722,7 +9746,8 @@ function xuOch(id){
     document.getElementById('xu-form').style.display='';
     document.getElementById('xu-bosh').style.display='none';
     document.getElementById('xu-ochir').style.display='';
-    xuSet('xu-oq',(d.manba||'')+':'+(d.oquvchi_id||''));
+    if(d.manba==='qol'){ if(!XU.qol)xuQolToggle(); xuSet('xu-oq-yangi',d.oquvchi_ism); }
+    else { if(XU.qol)xuQolToggle(); xuSet('xu-oq',(d.manba||'')+':'+(d.oquvchi_id||'')); }
     xuSet('xu-sinf',d.sinf); xuSet('xu-oqim',d.oqim); xuSet('xu-fan',d.fan);
     xuSet('xu-oqit',d.oqituvchi_ism); xuSet('xu-sana',(d.sana||'').slice(0,10));
     document.querySelectorAll('input[name="xu-ozl"]').forEach(function(r2){r2.checked=(r2.value===d.ozlashtirish);});
@@ -9743,7 +9768,22 @@ function xuOchir(){
 }
 
 /* ── o'quvchi kartasi ── */
-function xuKartaOptions(){ var b=document.getElementById('xu-k-oq'); if(b&&!b.options.length)xuStudents(function(){}); }
+function xuKartaOptions(){
+  var b=document.getElementById('xu-k-oq'); if(!b)return;
+  sb.rpc('xulosa_royxat',{p_yil:XU.yil}).then(function(r){
+    var L=Array.isArray(r.data)?r.data:[], seen={}, extra=[];
+    L.forEach(function(x){
+      if(x.manba!=='qol')return;
+      var k=x.manba+':'+(x.oquvchi_id||'');
+      if(seen[k])return; seen[k]=1;
+      if(!xuTop(k)){ extra.push({manba:x.manba,id:x.oquvchi_id||'',ism:x.oquvchi_ism,sinf:x.sinf||'',oqim:x.oqim||''}); }
+    });
+    if(extra.length)XU.students=XU.students.concat(extra);
+    b.innerHTML='<option value="">\u2014 tanlang \u2014</option>'+XU.students.map(function(s){
+      return '<option value="'+s.manba+':'+s.id+'">'+xuEsc(s.ism)+(s.sinf?(' \u00B7 '+xuEsc(s.sinf)+'-sinf'):'')+'</option>';
+    }).join('');
+  });
+}
 function xuKarta(){
   var key=xuV('xu-k-oq'), box=document.getElementById('xu-k-box'), msg=document.getElementById('xu-k-msg');
   if(!key){box.innerHTML='';msg.textContent='';return;}
@@ -9752,24 +9792,24 @@ function xuKarta(){
   sb.rpc('xulosa_oquvchi',{p_manba:s.manba,p_oquvchi_id:s.id,p_yil:XU.yil}).then(function(r){
     var d=r.data||{}; var L=d.xulosalar||[], O=d.orta||{};
     msg.textContent=(d.soni||0)+' ta xulosa';
-    var h='<div style="background:rgba(255,255,255,.05);border:1px solid rgba(124,92,255,.3);border-radius:14px;padding:14px 16px;margin-bottom:12px">'+
+    var h='<div class="xu-card">'+
       '<div style="font-size:17px;font-weight:700">'+xuEsc(s.ism)+'</div>'+
-      '<div style="font-size:12.5px;color:#8892b0;margin-top:2px">'+xuEsc(s.sinf||'?')+'-sinf \u00B7 '+XU.yil+'</div></div>';
+      '<div class="xu-mu" style="margin-top:2px">'+xuEsc(s.sinf||'?')+'-sinf \u00B7 '+XU.yil+'</div></div>';
     if(Object.keys(O).length){
       h+='<div style="overflow-x:auto;margin-bottom:12px"><table style="width:100%;border-collapse:collapse;font-size:13px">'+
-        '<thead><tr>'+XU_KON.map(function(k){return '<th style="padding:7px 6px;border-bottom:1px solid rgba(124,92,255,.3);color:#8892b0;font-weight:600;font-size:11.5px">'+k[1]+'</th>';}).join('')+'</tr></thead>'+
+        '<thead><tr>'+XU_KON.map(function(k){return '<th style="padding:7px 6px;border-bottom:1px solid var(--brd);color:var(--mu2);font-weight:600;font-size:11.5px">'+k[1]+'</th>';}).join('')+'</tr></thead>'+
         '<tbody><tr>'+XU_KON.map(function(k){
           var v=O[k[0]], col=v==null?'#8892b0':(v>=4?'#22c55e':v>=3?'#e0a020':'#f87171');
           return '<td style="padding:9px 6px;text-align:center;font-weight:700;font-size:15px;color:'+col+'">'+(v==null?'\u2014':v)+'</td>';
         }).join('')+'</tr></tbody></table>'+
-        '<div style="font-size:11.5px;color:#8892b0;margin-top:4px">Barcha fanlar bo\u2018yicha o\u2018rtacha ball (1\u20135)</div></div>';
+        '<div class="xu-mu" style="margin-top:4px">Barcha fanlar bo\u2018yicha o\u2018rtacha ball (1\u20135)</div></div>';
     }
-    if(!L.length){ h+='<div style="color:#8892b0;padding:14px">Bu o\u2018quvchiga hali xulosa yozilmagan</div>'; }
+    if(!L.length){ h+='<div class="xu-mu" style="padding:14px">Bu o\u2018quvchiga hali xulosa yozilmagan</div>'; }
     else h+=L.map(function(x,i){
-      return '<div style="border:1px solid rgba(124,92,255,.25);border-radius:12px;margin-bottom:8px;overflow:hidden">'+
-        '<div onclick="var b=document.getElementById(\'xuk'+i+'\');b.style.display=b.style.display===\'none\'?\'block\':\'none\'" style="cursor:pointer;padding:11px 14px;background:rgba(255,255,255,.05);display:flex;gap:10px;align-items:center">'+
+      return '<div style="border:1px solid var(--brd);border-radius:12px;margin-bottom:8px;overflow:hidden;background:var(--s)">'+
+        '<div onclick="var b=document.getElementById(\'xuk'+i+'\');b.style.display=b.style.display===\'none\'?\'block\':\'none\'" style="cursor:pointer;padding:11px 14px;background:var(--s2);display:flex;gap:10px;align-items:center">'+
           '<b style="flex:1;font-size:14px">'+xuEsc(x.fan)+'</b>'+
-          '<span style="font-size:12px;color:#8892b0">'+xuEsc(x.oqituvchi_ism)+'</span>'+
+          '<span class="xu-mu">'+xuEsc(x.oqituvchi_ism)+'</span>'+
           '<span style="font-size:11px;padding:2px 8px;border-radius:999px;background:'+(x.holat==='tayyor'?'rgba(30,142,78,.25);color:#7ee2a8':'rgba(201,138,27,.25);color:#e8c07a')+'">'+(x.holat==='tayyor'?'tayyor':'qoralama')+'</span>'+
         '</div>'+
         '<div id="xuk'+i+'" style="display:none;padding:12px 14px;font-size:13px;line-height:1.55">'+
@@ -9780,7 +9820,7 @@ function xuKarta(){
           ((x.kuchli||[]).length?'<div style="margin-top:6px"><b>Kuchli:</b> '+x.kuchli.map(xuEsc).join('; ')+'</div>':'')+
           ((x.ishlash||[]).length?'<div><b>Ishlash kerak:</b> '+x.ishlash.map(xuEsc).join('; ')+'</div>':'')+
           (x.qiziqish?'<div><b>Qiziqishi:</b> '+xuEsc(x.qiziqish)+'</div>':'')+
-          (x.tavsiya?'<div style="margin-top:8px;padding:10px 12px;background:rgba(124,92,255,.12);border-radius:10px"><b>Yangi o\u2018qituvchiga:</b> '+xuEsc(x.tavsiya)+'</div>':'')+
+          (x.tavsiya?'<div style="margin-top:8px;padding:10px 12px;background:var(--s3);border-radius:10px"><b>Yangi o\u2018qituvchiga:</b> '+xuEsc(x.tavsiya)+'</div>':'')+
         '</div></div>';
     }).join('');
     box.innerHTML=h;
