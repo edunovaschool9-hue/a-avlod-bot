@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="theme-color" content="#F6F1E6">
 <meta name="robots" content="noindex,nofollow">
-<title>EduNova · O'qituvchi kabineti</title>
+<title>EduNova · Ota-ona kabineti</title>
 <style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--s:#F6F1E6;--c:#FFFFFF;--tx:#1C1C1C;--mu:#6E6A61;--brd:#DED7C7;--ac:#FF6B1A;--acd:#E85400;--gn:#1F9D55;--rd:#D93838;--am:#C77700;--bl:#2563EB;--r:12px}
 html,body{margin:0;padding:0}
@@ -102,8 +102,8 @@ label{display:block;font-size:12px;color:var(--mu);margin:0 0 4px}
 <div id="kirish" class="kirish" style="display:none">
   <div class="kbox">
     <div class="til" style="display:inline-flex;margin-bottom:14px"><button class="til-btn" data-lang="uz">UZ</button><button class="til-btn" data-lang="ru">RU</button></div>
-    <h1 data-tl="oq_sarlavha"></h1>
-    <p data-tl="oq_kirish_izoh"></p>
+    <h1 data-tl="ota_sarlavha"></h1>
+    <p data-tl="ota_kirish_izoh"></p>
     <input id="pin" inputmode="numeric" autocomplete="off" maxlength="9" placeholder="•••••">
     <div class="pad">
       <b data-v="1">1</b><b data-v="2">2</b><b data-v="3">3</b>
@@ -121,13 +121,13 @@ label{display:block;font-size:12px;color:var(--mu);margin:0 0 4px}
     <div class="til"><button class="til-btn" data-lang="uz">UZ</button><button class="til-btn" data-lang="ru">RU</button></div>
   </div></div>
   <div class="wrap"><div id="cont"></div></div>
-  <div class="nav"><b data-tab="bugun" onclick="ochTab('bugun')"><i>📅</i><span data-tl="n_bugun">n_bugun</span></b><b data-tab="jadval" onclick="ochTab('jadval')"><i>🗓</i><span data-tl="n_jadval">n_jadval</span></b><b data-tab="oquvchilar" onclick="ochTab('oquvchilar')"><i>👥</i><span data-tl="n_oquvchilar">n_oquvchilar</span></b><b data-tab="profil" onclick="ochTab('profil')"><i>⭐</i><span data-tl="n_profil">n_profil</span></b></div>
+  <div class="nav"><b data-tab="darslar" onclick="ochTab('darslar')"><i>📖</i><span data-tl="n_darslar">n_darslar</span></b><b data-tab="natija" onclick="ochTab('natija')"><i>🏅</i><span data-tl="n_natija">n_natija</span></b><b data-tab="tolov" onclick="ochTab('tolov')"><i>💳</i><span data-tl="n_tolov">n_tolov</span></b></div>
 </div>
 
 <div id="toast" class="toast"></div>
 
 <script>
-const ROLE='oqituvchi';
+const ROLE='ota';
 const I18N={uz:{
 oylar:['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr'],
 kunlar:['Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba','Yakshanba'],
@@ -293,450 +293,185 @@ async function ishga(){
   if(!T){ $('kirish').style.display='flex'; $('ilova').style.display='none'; }
 }
 
-let JAD=[];
-let P=null, KUN=null, SANA=ymd(new Date()), TAB='bugun', SINF=null, OQL=[], KARTA=null;
+let B=null, BOLA=null, D=null, TAB='darslar';
 
 async function boshla(){
   $('kirish').style.display='none';
   $('ilova').style.display='block';
   $('yuk').style.display='flex';
   try{
-    P=await rpc('ep_oq_profil',{p_token:T});
-    if(!P||!P.ok) throw new Error('SESSIYA');
-    SANA=P.bugun;
-    try{ const j=await rpc('ep_oq_jadval_ol',{p_token:T}); JAD=j.jadval||[]; }catch(e){}
-    $('logo').innerHTML=esc(P.ism)+'<small>'+esc(P.maktab)+'</small>';
-    await ochTab('bugun');
+    B=await rpc('ep_ota_bolalar',{p_token:T});
+    if(!B||!B.ok) throw new Error('SESSIYA');
+    $('logo').innerHTML=esc(B.ism)+'<small>'+esc(B.maktab)+'</small>';
+    if(!(B.bolalar||[]).length){ $('cont').innerHTML='<div class="empty">'+t('bola_yoq')+'</div><div class="center"><button class="btn sec" onclick="chiqish()">'+t('chiqish')+'</button></div>'; return; }
+    if(!BOLA||!B.bolalar.some(x=>x.id===BOLA)) BOLA=B.bolalar[0].id;
+    await bolaYuk();
   }catch(e){ xabar(xatoMatn(e),'xato'); }
   finally{ $('yuk').style.display='none'; }
 }
-function qaytaChiz(){ if(P) ochTab(TAB); }
+function qaytaChiz(){ if(B) chiz(); }
 
-function navChiz(){
-  document.querySelectorAll('.nav b').forEach(b=>b.classList.toggle('on',b.dataset.tab===TAB));
-}
-async function ochTab(x){
-  TAB=x; navChiz();
-  const c=$('cont'); c.innerHTML='<div class="empty">'+t('yuklanmoqda')+'</div>';
+async function bolaYuk(){
+  $('cont').innerHTML='<div class="empty">'+t('yuklanmoqda')+'</div>';
   try{
-    if(x==='bugun') await chizBugun();
-    else if(x==='jadval') await chizJadval();
-    else if(x==='oquvchilar') await chizOquvchilar();
-    else await chizProfil();
-  }catch(e){ c.innerHTML='<div class="empty">'+esc(xatoMatn(e))+'</div>'; }
+    D=await rpc('ep_ota_bola',{p_token:T,p_oquvchi_id:BOLA,p_kun:45});
+    if(!D.ok){ xabar(xatoMatn(new Error(D.xato)),'xato'); return; }
+    chiz();
+  }catch(e){ $('cont').innerHTML='<div class="empty">'+esc(xatoMatn(e))+'</div>'; }
+}
+function bolaTanla(id){ BOLA=id; bolaYuk(); }
+function navChiz(){ document.querySelectorAll('.nav b').forEach(b=>b.classList.toggle('on',b.dataset.tab===TAB)); }
+function ochTab(x){ TAB=x; navChiz(); chiz(); }
+
+function tolovPill(m){
+  if(!m||!m.holat) return '';
+  const k={tolangan:'gn',qarz:'rd',yaqin:'am',kelajak:'mu'}[m.holat]||'mu';
+  return '<span class="pill '+k+'">'+t(m.holat)+'</span>';
+}
+function chiz(){
+  navChiz();
+  let h='';
+  if((B.bolalar||[]).length>1){
+    h+='<div class="tabs">';
+    B.bolalar.forEach(b=>{ h+='<button class="tab'+(b.id===BOLA?' on':'')+'" onclick="bolaTanla('+b.id+')">'+esc(b.ism)+'</button>'; });
+    h+='</div>';
+  }
+  const o=D.oquvchi, tl=D.tolov||{}, m=tl.muhim;
+  h+='<div class="card"><div class="row"><div style="flex:1"><h2>'+esc(o.ism)+'</h2><div class="sm mu">'+esc(o.sinf||'')+'</div></div>'+tolovPill(m)+'</div>';
+  if(m&&m.holat!=='tolangan'&&m.holat!=='kelajak'){
+    const kun=+m.kun;
+    h+='<div class="it mt" style="border-color:'+(m.holat==='qarz'?'#EFB4B4':'#E7C588')+';background:'+(m.holat==='qarz'?'#FCE9E9':'#FDF2DC')+'">'+
+      '<div class="b">'+oyMatn(m.oy)+' · '+pul(m.qoldiq)+'</div>'+
+      '<div class="sm">'+t('muddat')+': '+sanaMatn(m.muddat)+' · '+(kun>0?kun+' '+t('kun_qoldi'):(kun===0?t('bugun_muddat'):(-kun)+' '+t('kun_otdi')))+'</div></div>';
+  }
+  h+='</div>';
+  if(TAB==='darslar') h+=tabDarslar();
+  else if(TAB==='natija') h+=tabNatija();
+  else h+=tabTolov();
+  $('cont').innerHTML=h;
 }
 
-/* ---------------- BUGUN ---------------- */
-function vaqtOl(n){ const v=(P.dars_vaqtlari||[]).find(x=>x.n===n); return v?(v.b+'–'+v.o):''; }
-function sinfNom(id){ const s=(P.sinflar||[]).find(x=>x.id===id); return s?s.nom:''; }
-
-async function chizBugun(){
-  KUN=await rpc('ep_oq_kun',{p_token:T,p_sana:SANA});
-  const bugun=pd(P.bugun), sel=pd(SANA);
-  const kunlar=[];
-  for(let i=6;i>=0;i--){ const d=new Date(bugun); d.setDate(d.getDate()-i); kunlar.push(d); }
-  let h='<div class="tabs">';
-  kunlar.forEach(d=>{
-    const s=ymd(d), w=(d.getDay()+6)%7;
-    h+='<button class="tab'+(s===SANA?' on':'')+'" onclick="sanaTanla(\''+s+'\')">'+t('kunlar_q')[w]+' '+d2(d.getDate())+'</button>';
+function tabDarslar(){
+  const om=D.oy_belgilari||{}, jb=D.jami_belgilari||{};
+  let h='<div class="card"><h3>'+t('oy_belgi')+'</h3><div class="grid g3">'+
+    '<div class="it center"><div class="xs mu">'+t('ragbat')+'</div><div class="b" style="font-size:20px;color:var(--gn)">'+(om.ragbat||0)+'</div></div>'+
+    '<div class="it center"><div class="xs mu">'+t('tanbeh')+'</div><div class="b" style="font-size:20px;color:var(--am)">'+(om.tanbeh||0)+'</div></div>'+
+    '<div class="it center"><div class="xs mu">'+t('kelmadi')+'</div><div class="b" style="font-size:20px;color:var(--rd)">'+(om.kelmadi||0)+'</div></div></div>'+
+    '<div class="xs mu mt">'+t('jami_belgi')+': '+(jb.ragbat||0)+' / '+(jb.tanbeh||0)+' / '+(jb.kelmadi||0)+'</div></div>';
+  const l=D.darslar||[];
+  if(!l.length) return h+'<div class="empty">'+t('bosh')+'</div>';
+  const kunlar={};
+  l.forEach(d=>{ (kunlar[d.sana]=kunlar[d.sana]||[]).push(d); });
+  Object.keys(kunlar).sort().reverse().forEach(s=>{
+    const w=(pd(s).getDay()+6)%7;
+    h+='<div class="card"><h3>'+t('kunlar')[w]+', '+sanaMatn(s)+'</h3><ul class="lst">';
+    kunlar[s].sort((a,b)=>a.raqam-b.raqam).forEach(d=>{
+      h+='<li class="it"><div class="hd"><span class="pill bl">'+d.raqam+'</span><span class="b">'+esc(d.fan||'')+'</span>'+
+        (d.ragbat?'<span class="pill gn">'+t('ragbat')+'</span>':'')+
+        (d.tanbeh?'<span class="pill am">'+t('tanbeh')+'</span>':'')+
+        (d.kelmadi?'<span class="pill rd">'+t('kelmadi')+'</span>':'')+'</div>'+
+        '<div class="sm b mt">'+esc(d.mavzu||'')+'</div>'+
+        '<div class="sm">'+esc(d.matn||'')+'</div>'+
+        '<div class="xs mu mt">'+t('oqituvchi')+': '+esc(d.oqituvchi||'')+'</div></li>';
+    });
+    h+='</ul></div>';
   });
-  h+='</div>';
-  const q=KUN.qulf;
-  h+='<div class="card"><div class="row"><div style="flex:1"><div class="b">'+t('kunlar')[(sel.getDay()+6)%7]+', '+sanaMatn(SANA)+'</div>'+
-     '<div class="xs mu">'+(q?t('qulf_izoh'):(KUN.darslar.length+' '+t('dars')))+'</div></div>'+
-     (SANA===P.bugun?davomatBtn():'')+'</div></div>';
-  if(!KUN.darslar.length){
-    h+='<div class="empty">'+t('dars_yoq')+'</div>';
-  }else{
+  return h;
+}
+
+function tabNatija(){
+  let h='';
+  const tst=D.testlar||[];
+  h+='<div class="card"><h3>'+t('testlar')+'</h3>';
+  if(!tst.length) h+='<div class="empty">'+t('bosh')+'</div>';
+  else{
     h+='<ul class="lst">';
-    KUN.darslar.forEach((d,i)=>{
-      const yoz=!!d.xulosa_id;
-      h+='<li class="it"><div class="hd"><span class="pill bl">'+d.raqam+'-'+t('dars')+'</span>'+
-        '<span class="b">'+esc(d.sinf)+'</span><span class="mu sm">'+esc(d.fan||'')+'</span>'+
-        '<span class="xs mu" style="margin-left:auto">'+vaqtOl(d.raqam)+'</span></div>'+
-        '<div class="row mt"><span class="pill '+(yoz?'gn':'am')+'">'+(yoz?t('yozilgan'):t('yozilmagan'))+'</span>'+
-        (yoz?'<span class="xs mu">'+esc(d.mavzu||'')+'</span>':'')+
-        (q?'':'<button class="btn sm" style="margin-left:auto" onclick="darsOch('+i+')">'+(yoz?t('karta'):t('xulosa'))+'</button>')+
-        (q&&yoz?'<button class="btn sec sm" style="margin-left:auto" onclick="darsOch('+i+')">'+t('karta')+'</button>':'')+'</div></li>';
+    tst.forEach(x=>{
+      const p=Math.round(100*x.ball/(x.max_ball||100));
+      h+='<li class="it"><div class="hd"><span class="b">'+esc(x.fan)+'</span>'+(x.nomi?'<span class="sm mu">'+esc(x.nomi)+'</span>':'')+
+        '<span class="pill '+(p>=80?'gn':p>=60?'am':'rd')+'" style="margin-left:auto">'+x.ball+'/'+x.max_ball+'</span></div>'+
+        '<div class="bar mt"><i style="width:'+p+'%"></i></div>'+
+        '<div class="xs mu mt">'+sanaMatn(x.sana)+' · '+esc(x.oqituvchi||'')+'</div></li>';
     });
     h+='</ul>';
   }
-  if(!q) h+='<div class="center"><button class="btn sec sm" onclick="darsOch(-1)">+ '+t('dars_qosh')+'</button></div>';
-  $('cont').innerHTML=h;
-}
-function davomatBtn(){
-  const d=P.davomat_bugun||{};
-  if(d.ketdi) return '<span class="pill gn">'+t('ketdi_v')+' '+vaqtMatn(d.ketdi)+'</span>';
-  if(d.keldi) return '<button class="btn sec sm" onclick="davomat(\'ketdi\')">'+t('ketdi')+' · '+vaqtMatn(d.keldi)+'</button>';
-  return '<button class="btn sm" onclick="davomat(\'keldi\')">'+t('keldi')+'</button>';
-}
-async function davomat(x){
-  try{
-    const d=await rpc('ep_oq_davomat',{p_token:T,p_turi:x});
-    P.davomat_bugun={keldi:d.keldi,ketdi:d.ketdi};
-    xabar(t('tayyor')); ochTab('bugun');
-  }catch(e){ xabar(xatoMatn(e),'xato'); }
-}
-function sanaTanla(s){ SANA=s; ochTab('bugun'); }
-
-let DARS=null;
-async function darsOch(i){
-  if(i>=0){ DARS=JSON.parse(JSON.stringify(KUN.darslar[i])); }
-  else{
-    DARS={raqam:null,sinf_id:null,sinf:'',fan:'',mavzu:'',matn:'',oquvchilar:[],yangi:true};
-  }
-  const q=KUN.qulf;
-  const band=KUN.darslar.map(d=>d.raqam);
-  let raqamlar='';
-  for(let n=1;n<=12;n++){
-    if(DARS.raqam!==n && band.indexOf(n)>=0) continue;
-    raqamlar+='<option value="'+n+'"'+(DARS.raqam===n?' selected':'')+'>'+n+'-'+t('dars')+' '+vaqtOl(n)+'</option>';
-  }
-  let sinflar='<option value="">—</option>';
-  (P.sinflar||[]).forEach(s=>{ sinflar+='<option value="'+s.id+'"'+(DARS.sinf_id===s.id?' selected':'')+'>'+esc(s.nom)+'</option>'; });
-  let fanlar='<option value="">—</option>';
-  (P.fanlar||[]).forEach(f=>{ fanlar+='<option'+(DARS.fan===f?' selected':'')+'>'+esc(f)+'</option>'; });
-  let h='<div class="mh"><h2>'+(DARS.raqam?DARS.raqam+'-'+t('dars'):t('dars_qosh'))+'</h2><button class="x" onclick="modalYop()">×</button></div>';
-  if(DARS.yangi||!DARS.raqam){
-    h+='<div class="grid g3"><div class="fld"><label>'+t('dars_raqami')+'</label><select id="d_raqam">'+raqamlar+'</select></div>'+
-       '<div class="fld"><label>'+t('sinf')+'</label><select id="d_sinf" onchange="darsSinf()">'+sinflar+'</select></div>'+
-       '<div class="fld"><label>'+t('fan')+'</label><select id="d_fan">'+fanlar+'</select></div></div>';
-  }else{
-    h+='<div class="row"><span class="pill">'+esc(DARS.sinf)+'</span><span class="pill mu">'+esc(DARS.fan||'')+'</span><span class="xs mu">'+sanaMatn(SANA)+'</span></div>';
-    h+='<input type="hidden" id="d_raqam" value="'+DARS.raqam+'"><input type="hidden" id="d_sinf" value="'+DARS.sinf_id+'"><input type="hidden" id="d_fan" value="'+esc(DARS.fan||'')+'">';
-  }
-  h+='<div class="fld mt"><label>'+t('mavzu')+'</label><input id="d_mavzu" value="'+esc(DARS.mavzu||'')+'" '+(q?'disabled':'')+'></div>';
-  h+='<div class="fld"><label>'+t('xulosa')+'</label><textarea id="d_matn" data-tlp="xulosa_ph" placeholder="'+esc(t('xulosa_ph'))+'" '+(q?'disabled':'')+'>'+esc(DARS.matn||'')+'</textarea></div>';
-  h+='<div id="d_belgi"></div>';
-  if(!q) h+='<div class="row mt"><button class="btn" style="flex:1" onclick="darsSaqla()">'+t('saqlash')+'</button>'+
-            (DARS.xulosa_id?'<button class="btn dan" onclick="darsOchir('+DARS.xulosa_id+')">'+t('ochirish')+'</button>':'')+'</div>';
-  modalOch(h);
-  belgiChiz();
-}
-function darsSinf(){
-  const id=+$('d_sinf').value||null;
-  DARS.sinf_id=id; DARS.oquvchilar=[];
-  belgiChiz();
-  if(id) rpc('ep_oq_oquvchilar',{p_token:T,p_sinf_id:id}).then(d=>{
-    if(!$('d_belgi')) return;
-    DARS.oquvchilar=(d.oquvchilar||[]).map(o=>({id:o.id,ism:o.ism,ragbat:false,tanbeh:false,kelmadi:false}));
-    belgiChiz();
-  }).catch(()=>{});
-}
-function belgiChiz(){
-  const el=$('d_belgi'); if(!el) return;
-  const l=DARS.oquvchilar||[];
-  if(!l.length){ el.innerHTML=''; return; }
-  let h='<label>'+t('belgilar')+'</label>';
-  l.forEach((o,i)=>{
-    h+='<div class="it" style="padding:8px"><div class="b sm">'+esc(o.ism)+'</div><div class="chk mt">'+
-      '<b class="g'+(o.ragbat?' on':'')+'" onclick="bTog('+i+',\'ragbat\')">'+t('ragbat')+'</b>'+
-      '<b class="r'+(o.tanbeh?' on':'')+'" onclick="bTog('+i+',\'tanbeh\')">'+t('tanbeh')+'</b>'+
-      '<b class="k'+(o.kelmadi?' on':'')+'" onclick="bTog('+i+',\'kelmadi\')">'+t('kelmadi')+'</b></div></div>';
-  });
-  el.innerHTML=h;
-}
-function bTog(i,k){
-  const o=DARS.oquvchilar[i];
-  o[k]=!o[k];
-  if(o[k]&&k==='kelmadi'){ o.ragbat=false; o.tanbeh=false; }
-  if(o[k]&&k!=='kelmadi') o.kelmadi=false;
-  belgiChiz();
-}
-async function darsSaqla(){
-  const raqam=+$('d_raqam').value, sinf=+$('d_sinf').value, fan=$('d_fan').value;
-  const mavzu=$('d_mavzu').value.trim(), matn=$('d_matn').value.trim();
-  if(!raqam){ xabar(t('x_raqam'),'xato'); return; }
-  if(!sinf){ xabar(t('x_sinf'),'xato'); return; }
-  if(mavzu.length<2){ xabar(t('x_mavzu'),'xato'); return; }
-  if(matn.length<10){ xabar(t('x_matn'),'xato'); return; }
-  const belgilar=[];
-  (DARS.oquvchilar||[]).forEach(o=>{ ['ragbat','tanbeh','kelmadi'].forEach(k=>{ if(o[k]) belgilar.push({oquvchi_id:o.id,turi:k}); }); });
-  try{
-    const d=await rpc('ep_oq_xulosa_saqla',{p_token:T,p_sana:SANA,p_raqam:raqam,p_sinf_id:sinf,p_fan:fan,p_mavzu:mavzu,p_matn:matn,p_belgilar:belgilar});
-    if(!d.ok){ xabar(xatoMatn(new Error(d.xato)),'xato'); return; }
-    xabar(t('tayyor')); modalYop(); ochTab('bugun');
-  }catch(e){ xabar(xatoMatn(e),'xato'); }
-}
-async function darsOchir(id){
-  if(!confirm(t('tasdiq'))) return;
-  try{ await rpc('ep_oq_ochir',{p_token:T,p_jadval:'dars',p_id:id}); modalYop(); ochTab('bugun'); }catch(e){ xabar(xatoMatn(e),'xato'); }
-}
-
-/* ---------------- JADVAL ---------------- */
-async function chizJadval(){
-  const d=await rpc('ep_oq_jadval_ol',{p_token:T});
-  JAD=d.jadval||[];
-  let h='<div class="card"><div class="sm mu">'+t('jadval_izoh')+'</div></div><div class="tabs">';
-  for(let k=1;k<=6;k++) h+='<button class="tab'+(k===JKUN?' on':'')+'" onclick="jKun('+k+')">'+t('kunlar_q')[k-1]+'</button>';
-  h+='</div><div id="j_body"></div><div class="row mt"><button class="btn" style="flex:1" onclick="jadvalSaqla()">'+t('jadval_saqla')+'</button></div>';
-  $('cont').innerHTML=h;
-  jBody();
-}
-let JKUN=1;
-function jKun(k){ jOqi(); JKUN=k; document.querySelectorAll('#cont .tab').forEach((b,i)=>b.classList.toggle('on',i+1===k)); jBody(); }
-function jBody(){
-  let sinflar='<option value="">—</option>';
-  (P.sinflar||[]).forEach(s=>{ sinflar+='<option value="'+s.id+'">'+esc(s.nom)+'</option>'; });
-  let fanlar='<option value="">—</option>';
-  (P.fanlar||[]).forEach(f=>{ fanlar+='<option value="'+esc(f)+'">'+esc(f)+'</option>'; });
-  let h='<div class="card"><h3>'+t('kunlar')[JKUN-1]+'</h3>';
-  const vaq=(P.dars_vaqtlari||[]);
-  const maxn=Math.max(8,vaq.length);
-  for(let n=1;n<=maxn;n++){
-    const r=JAD.find(x=>x.kun===JKUN&&x.raqam===n)||{};
-    h+='<div class="row" style="margin-bottom:7px;flex-wrap:nowrap"><span class="pill" style="flex:none;min-width:34px;text-align:center">'+n+'</span>'+
-       '<select data-j="s" data-n="'+n+'" style="flex:1">'+sinflar+'</select>'+
-       '<select data-j="f" data-n="'+n+'" style="flex:1.3">'+fanlar+'</select></div>';
-  }
-  h+='<div class="xs mu">'+t('dars_vaqtlari')+': '+vaq.map(v=>v.n+') '+v.b).join(' · ')+'</div></div>';
-  $('j_body').innerHTML=h;
-  for(let n=1;n<=maxn;n++){
-    const r=JAD.find(x=>x.kun===JKUN&&x.raqam===n);
-    if(!r) continue;
-    const s=document.querySelector('[data-j="s"][data-n="'+n+'"]'), f=document.querySelector('[data-j="f"][data-n="'+n+'"]');
-    if(s) s.value=r.sinf_id||'';
-    if(f){ if(r.fan&&!Array.prototype.some.call(f.options,o=>o.value===r.fan)) f.add(new Option(r.fan,r.fan)); f.value=r.fan||''; }
-  }
-}
-function jOqi(){
-  JAD=JAD.filter(x=>x.kun!==JKUN);
-  document.querySelectorAll('[data-j="s"]').forEach(s=>{
-    const n=+s.dataset.n, f=document.querySelector('[data-j="f"][data-n="'+n+'"]');
-    if(s.value&&f&&f.value) JAD.push({kun:JKUN,raqam:n,sinf_id:+s.value,fan:f.value});
-  });
-}
-async function jadvalSaqla(){
-  jOqi();
-  try{
-    const d=await rpc('ep_oq_jadval_saqla',{p_token:T,p_jadval:JAD.map(x=>({kun:x.kun,raqam:x.raqam,sinf_id:x.sinf_id,fan:x.fan}))});
-    xabar(t('tayyor')+' · '+d.soni);
-    P.jadval_soni=d.soni;
-  }catch(e){ xabar(xatoMatn(e),'xato'); }
-}
-
-/* ---------------- O'QUVCHILAR ---------------- */
-function meningSinflarim(){
-  const own=[], other=[], ids={};
-  JAD.forEach(j=>{ ids[j.sinf_id]=1; });
-  (P.sinflar||[]).forEach(s=>{ (ids[s.id]?own:other).push(s); });
-  return own.concat(other);
-}
-async function chizOquvchilar(){
-  const lst=meningSinflarim();
-  if((!SINF||!lst.some(s=>s.id===SINF))&&lst.length) SINF=lst[0].id;
-  let h='<div class="tabs">';
-  lst.forEach(s=>{ h+='<button class="tab'+(s.id===SINF?' on':'')+'" onclick="sinfTanla('+s.id+')">'+esc(s.nom)+'</button>'; });
-  h+='</div><div id="o_body"><div class="empty">'+t('yuklanmoqda')+'</div></div>';
-  $('cont').innerHTML=h;
-  await oquvchiYuk();
-}
-function sinfTanla(id){ SINF=id; chizOquvchilar(); }
-async function oquvchiYuk(){
-  const d=await rpc('ep_oq_oquvchilar',{p_token:T,p_sinf_id:SINF});
-  OQL=d.oquvchilar||[];
-  let h='<div class="row" style="margin:0 0 10px"><button class="btn sm" onclick="oquvchiQoshOch()">+ '+t('oquvchi_qosh')+'</button><span class="xs mu">'+OQL.length+'</span></div>';
-  if(!OQL.length){ h+='<div class="empty">'+t('oquvchi_yoq')+'</div>'; }
-  else{
-    h+='<ul class="lst">';
-    OQL.forEach(o=>{
-      h+='<li class="it"><div class="hd"><span class="b">'+esc(o.ism)+'</span>'+
-        (o.ragbat?'<span class="pill gn">'+o.ragbat+'</span>':'')+
-        (o.tanbeh?'<span class="pill am">'+o.tanbeh+'</span>':'')+
-        (o.kelmadi?'<span class="pill rd">'+o.kelmadi+'</span>':'')+
-        '<button class="btn sec sm" style="margin-left:auto" onclick="kartaOch('+o.id+')">'+t('karta')+'</button></div></li>';
-    });
-    h+='</ul>';
-  }
-  $('o_body').innerHTML=h;
-}
-function oquvchiQoshOch(){
-  modalOch('<div class="mh"><h2>'+t('oquvchi_qosh')+'</h2><button class="x" onclick="modalYop()">×</button></div>'+
-    '<div class="fld"><label>'+t('ism')+'</label><input id="n_ism"></div>'+
-    '<div class="fld"><label>'+t('sinf')+'</label><input value="'+esc(sinfNom(SINF))+'" disabled></div>'+
-    '<button class="btn" style="width:100%" onclick="oquvchiQosh()">'+t('qoshish')+'</button>');
-}
-async function oquvchiQosh(){
-  const ism=$('n_ism').value.trim();
-  if(ism.length<2){ xabar(t('x_ism'),'xato'); return; }
-  try{
-    const d=await rpc('ep_oq_oquvchi_qosh',{p_token:T,p_ism:ism,p_sinf_id:SINF});
-    if(!d.ok){ xabar(xatoMatn(new Error(d.xato)),'xato'); return; }
-    modalYop(); xabar(t('tayyor')); oquvchiYuk();
-  }catch(e){ xabar(xatoMatn(e),'xato'); }
-}
-
-async function kartaOch(id){
-  try{
-    KARTA=await rpc('ep_oq_oquvchi_kartasi',{p_token:T,p_oquvchi_id:id});
-    if(!KARTA.ok){ xabar(xatoMatn(new Error(KARTA.xato)),'xato'); return; }
-    kartaChiz();
-  }catch(e){ xabar(xatoMatn(e),'xato'); }
-}
-function kartaChiz(){
-  const o=KARTA.oquvchi, b=KARTA.dars_belgilari||{};
-  let h='<div class="mh"><h2>'+esc(o.ism)+'</h2><button class="x" onclick="modalYop()">×</button></div>';
-  h+='<div class="row"><span class="pill">'+esc(o.sinf||'')+'</span>'+
-     '<span class="pill gn">'+t('ragbat')+': '+(b.ragbat||0)+'</span>'+
-     '<span class="pill am">'+t('tanbeh')+': '+(b.tanbeh||0)+'</span>'+
-     '<span class="pill rd">'+t('kelmadi')+': '+(b.kelmadi||0)+'</span></div>';
-  h+='<div class="tabs">'+
-     '<button class="tab on" onclick="kTab(this,\'k1\')">'+t('umumiy_xulosa')+'</button>'+
-     '<button class="tab" onclick="kTab(this,\'k2\')">'+t('mukofotlar')+'</button>'+
-     '<button class="tab" onclick="kTab(this,\'k3\')">'+t('testlar')+'</button></div>';
-  h+='<div id="k1">'+
-     '<div class="fld"><label>'+t('fan')+'</label><input id="x_fan" value="'+esc(kartaFan())+'"></div>'+
-     '<div class="fld"><label>'+t('umumiy_xulosa')+'</label><textarea id="x_umumiy" placeholder="'+esc(t('umumiy_ph'))+'"></textarea></div>'+
-     '<div class="grid g2"><div class="fld"><label>'+t('kuchli')+'</label><input id="x_kuchli"></div>'+
-     '<div class="fld"><label>'+t('kuchsiz')+'</label><input id="x_kuchsiz"></div></div>'+
-     '<div class="fld"><label>'+t('tavsiya')+'</label><input id="x_tavsiya"></div>'+
-     '<button class="btn" style="width:100%" onclick="xulosaSaqla()">'+t('saqlash')+'</button>'+
-     xulosaRoyxat()+'</div>';
-  h+='<div id="k2" style="display:none">'+
-     '<div class="fld"><label>'+t('mukofot')+' / '+t('tanbeh')+'</label>'+
-     '<select id="b_turi"><option value="mukofot">'+t('mukofot')+'</option><option value="tanbeh">'+t('tanbeh')+'</option></select></div>'+
-     '<div class="fld"><input id="b_matn" placeholder="'+esc(t('mukofot_ph'))+'"></div>'+
-     '<button class="btn" style="width:100%" onclick="belgiSaqla()">'+t('qoshish')+'</button>'+
-     belgiRoyxat()+'</div>';
-  h+='<div id="k3" style="display:none">'+
-     '<div class="grid g2"><div class="fld"><label>'+t('fan')+'</label><input id="tt_fan" value="'+esc(kartaFan())+'"></div>'+
-     '<div class="fld"><label>'+t('test_nomi')+'</label><input id="tt_nomi"></div></div>'+
-     '<div class="grid g3"><div class="fld"><label>'+t('sana')+'</label><input id="tt_sana" type="date" value="'+P.bugun+'"></div>'+
-     '<div class="fld"><label>'+t('ball')+'</label><input id="tt_ball" inputmode="decimal"></div>'+
-     '<div class="fld"><label>'+t('max_ball')+'</label><input id="tt_max" inputmode="decimal" value="100"></div></div>'+
-     '<button class="btn" style="width:100%" onclick="testSaqla()">'+t('saqlash')+'</button>'+
-     testRoyxat()+'</div>';
-  modalOch(h);
-}
-function kartaFan(){
-  const j=(JAD&&JAD.length?JAD:[]).find(x=>x.sinf_id===KARTA.oquvchi.sinf_id);
-  if(j) return j.fan;
-  const d=(KUN&&KUN.darslar||[]).find(x=>x.sinf_id===KARTA.oquvchi.sinf_id);
-  return d?(d.fan||''):'';
-}
-function kTab(b,id){
-  b.parentNode.querySelectorAll('.tab').forEach(x=>x.classList.remove('on')); b.classList.add('on');
-  ['k1','k2','k3'].forEach(x=>{ const e=$(x); if(e) e.style.display=(x===id?'block':'none'); });
-}
-function xulosaRoyxat(){
-  const l=KARTA.xulosalar||[];
-  if(!l.length) return '<div class="empty">'+t('bosh')+'</div>';
-  let h='<ul class="lst mt">';
-  l.forEach(x=>{
-    h+='<li class="it"><div class="hd"><span class="pill mu">'+esc(x.fan||'')+'</span><span class="xs mu">'+sanaMatn(x.sana)+' · '+esc(x.oqituvchi)+'</span>'+
-      (x.meniki?'<button class="btn dan sm" style="margin-left:auto" onclick="ochir(\'xulosa\','+x.id+')">×</button>':'')+'</div>'+
-      '<div class="sm mt">'+esc(x.umumiy)+'</div>'+
-      (x.kuchli?'<div class="xs mu">+ '+esc(x.kuchli)+'</div>':'')+
-      (x.kuchsiz?'<div class="xs mu">− '+esc(x.kuchsiz)+'</div>':'')+
-      (x.tavsiya?'<div class="xs mu">→ '+esc(x.tavsiya)+'</div>':'')+'</li>';
-  });
-  return h+'</ul>';
-}
-function belgiRoyxat(){
-  const l=KARTA.belgilar||[];
-  if(!l.length) return '<div class="empty">'+t('bosh')+'</div>';
-  let h='<ul class="lst mt">';
-  l.forEach(x=>{
-    h+='<li class="it"><div class="hd"><span class="pill '+(x.turi==='mukofot'?'gn':'am')+'">'+t(x.turi==='mukofot'?'mukofot':'tanbeh')+'</span>'+
-      '<span class="sm">'+esc(x.matn)+'</span>'+
-      (x.meniki?'<button class="btn dan sm" style="margin-left:auto" onclick="ochir(\'belgi\','+x.id+')">×</button>':'')+'</div>'+
-      '<div class="xs mu">'+sanaMatn(x.sana)+' · '+esc(x.oqituvchi||'')+'</div></li>';
-  });
-  return h+'</ul>';
-}
-function testRoyxat(){
-  const l=KARTA.testlar||[];
-  if(!l.length) return '<div class="empty">'+t('bosh')+'</div>';
-  let h='<ul class="lst mt">';
-  l.forEach(x=>{
-    const p=Math.round(100*x.ball/(x.max_ball||100));
-    h+='<li class="it"><div class="hd"><span class="b">'+x.ball+'/'+x.max_ball+'</span><span class="pill '+(p>=80?'gn':p>=60?'am':'rd')+'">'+p+'%</span>'+
-      '<span class="sm">'+esc(x.fan)+(x.nomi?' · '+esc(x.nomi):'')+'</span>'+
-      (x.meniki?'<button class="btn dan sm" style="margin-left:auto" onclick="ochir(\'test\','+x.id+')">×</button>':'')+'</div>'+
-      '<div class="xs mu">'+sanaMatn(x.sana)+'</div></li>';
-  });
-  return h+'</ul>';
-}
-async function xulosaSaqla(){
-  const u=$('x_umumiy').value.trim();
-  if(u.length<10){ xabar(t('x_matn'),'xato'); return; }
-  try{
-    const d=await rpc('ep_oq_oquvchi_xulosa_saqla',{p_token:T,p_oquvchi_id:KARTA.oquvchi.id,p_fan:$('x_fan').value,p_umumiy:u,
-      p_kuchli:$('x_kuchli').value,p_kuchsiz:$('x_kuchsiz').value,p_tavsiya:$('x_tavsiya').value});
-    if(!d.ok){ xabar(xatoMatn(new Error(d.xato)),'xato'); return; }
-    xabar(t('tayyor')); await kartaOch(KARTA.oquvchi.id);
-  }catch(e){ xabar(xatoMatn(e),'xato'); }
-}
-async function belgiSaqla(){
-  const m=$('b_matn').value.trim();
-  if(m.length<3){ xabar(t('x_matn'),'xato'); return; }
-  try{
-    const d=await rpc('ep_oq_belgi_qosh',{p_token:T,p_oquvchi_id:KARTA.oquvchi.id,p_turi:$('b_turi').value,p_matn:m});
-    if(!d.ok){ xabar(xatoMatn(new Error(d.xato)),'xato'); return; }
-    xabar(t('tayyor')); await kartaOch(KARTA.oquvchi.id); kTab(document.querySelectorAll('#modal .tab')[1],'k2');
-  }catch(e){ xabar(xatoMatn(e),'xato'); }
-}
-async function testSaqla(){
-  const ball=$('tt_ball').value.replace(',','.');
-  if(!ball||isNaN(+ball)){ xabar(t('x_raqam'),'xato'); return; }
-  const max=$('tt_max').value.replace(',','.')||100;
-  try{
-    const d=await rpc('ep_oq_test_saqla',{p_token:T,p_fan:$('tt_fan').value,p_nomi:$('tt_nomi').value,p_sana:$('tt_sana').value,p_max:+max,
-      p_natijalar:[{oquvchi_id:KARTA.oquvchi.id,ball:ball}]});
-    if(!d.ok){ xabar(xatoMatn(new Error(d.xato)),'xato'); return; }
-    xabar(t('tayyor')); await kartaOch(KARTA.oquvchi.id); kTab(document.querySelectorAll('#modal .tab')[2],'k3');
-  }catch(e){ xabar(xatoMatn(e),'xato'); }
-}
-async function ochir(j,id){
-  if(!confirm(t('tasdiq'))) return;
-  try{ await rpc('ep_oq_ochir',{p_token:T,p_jadval:j,p_id:id}); await kartaOch(KARTA.oquvchi.id); }catch(e){ xabar(xatoMatn(e),'xato'); }
-}
-
-/* ---------------- PROFIL ---------------- */
-async function chizProfil(){
-  P=await rpc('ep_oq_profil',{p_token:T});
-  const r=P.reyting;
-  let h='<div class="card"><h2>'+esc(P.ism)+'</h2><div class="sm mu">'+esc(P.telefon||'')+'</div>'+
-    '<div class="grid g3 mt">'+
-    '<div class="it center"><div class="xs mu">'+t('orin')+'</div><div class="b" style="font-size:22px">'+(r&&r.orin?r.orin:'—')+'</div></div>'+
-    '<div class="it center"><div class="xs mu">'+t('ball')+'</div><div class="b" style="font-size:22px">'+(r?r.ball:0)+'</div></div>'+
-    '<div class="it center"><div class="xs mu">'+t('balans')+'</div><div class="b" style="font-size:22px">'+(P.balans||0)+'</div></div></div>'+
-    '<div class="xs mu mt">'+t('balans_izoh')+'</div>'+
-    (r&&r.izoh?'<div class="sm mt">'+esc(r.izoh)+'</div>':'')+'</div>';
-  h+='<div class="card"><h3>'+t('hafta_reyting')+(P.hafta?' · '+sanaMatn(P.hafta):'')+'</h3>';
-  if(!(P.hafta_reytingi||[]).length) h+='<div class="empty">'+t('reyting_yoq')+'</div>';
-  else{
-    h+='<div class="scroll"><table class="tbl"><tr><th>'+t('orin')+'</th><th>'+t('ism')+'</th><th>'+t('ball')+'</th></tr>';
-    P.hafta_reytingi.forEach(x=>{ h+='<tr'+(x.men?' style="background:#FDF0E6"':'')+'><td>'+(x.orin||'—')+'</td><td>'+esc(x.ism)+(x.men?' · '+t('men'):'')+'</td><td>'+x.ball+'</td></tr>'; });
-    h+='</table></div>';
-  }
   h+='</div>';
-  h+='<div class="card"><h3>'+t('mavsum_reyting')+'</h3><div class="scroll"><table class="tbl"><tr><th>#</th><th>'+t('ism')+'</th><th>'+t('balans')+'</th></tr>';
-  (P.mavsum_reytingi||[]).forEach((x,i)=>{ h+='<tr'+(x.men?' style="background:#FDF0E6"':'')+'><td>'+(i+1)+'</td><td>'+esc(x.ism)+'</td><td>'+x.jami+'</td></tr>'; });
-  h+='</table></div></div>';
+  const es=D.eski_testlar||[];
+  if(es.length){
+    h+='<div class="card"><h3>'+t('n_natija')+' · '+t('manba')+'</h3><ul class="lst">';
+    es.forEach(x=>{
+      const b=x.umumiy_ball!=null?x.umumiy_ball:(x.ball!=null?x.ball:(x.score!=null?x.score:null));
+      h+='<li class="it"><div class="hd"><span class="pill mu">'+esc(x.turi||'test')+'</span>'+(b!=null?'<span class="b">'+esc(b)+'</span>':'')+
+        '<span class="xs mu" style="margin-left:auto">'+esc(sanaMatn((x.sana||x.created_at||'').slice(0,10)))+'</span></div>'+
+        (x.tavsiya?'<div class="sm mt">'+esc(x.tavsiya)+'</div>':'')+'</li>';
+    });
+    h+='</ul></div>';
+  }
   h+='<div class="card"><h3>'+t('mukofotlar')+'</h3>';
-  if(!(P.belgilar||[]).length) h+='<div class="empty">'+t('bosh')+'</div>';
+  const mk=D.mukofotlar||[];
+  if(!mk.length) h+='<div class="empty">'+t('bosh')+'</div>';
   else{
     h+='<ul class="lst">';
-    P.belgilar.forEach(b=>{ h+='<li class="it"><div class="hd"><span class="pill '+(b.turi==='mukofot'?'gn':'rd')+'">'+t(b.turi==='mukofot'?'mukofot':'shikoyat')+'</span><span class="xs mu">'+sanaMatn(b.sana)+'</span></div><div class="sm mt">'+esc(b.matn)+'</div></li>'; });
+    mk.forEach(x=>{ h+='<li class="it"><div class="hd"><span class="pill '+(x.turi==='mukofot'?'gn':'am')+'">'+t(x.turi==='mukofot'?'mukofot':'tanbeh')+'</span><span class="xs mu">'+sanaMatn(x.sana)+'</span></div><div class="sm mt">'+esc(x.matn)+'</div><div class="xs mu">'+esc(x.oqituvchi||'')+'</div></li>'; });
     h+='</ul>';
   }
   h+='</div>';
-  h+='<div class="card"><h3>'+t('davomat')+'</h3><div class="scroll"><table class="tbl"><tr><th>'+t('sana')+'</th><th>'+t('keldi_v')+'</th><th>'+t('ketdi_v')+'</th></tr>';
-  (P.davomat||[]).forEach(d=>{ h+='<tr><td>'+sanaMatn(d.sana)+'</td><td>'+vaqtMatn(d.keldi)+'</td><td>'+vaqtMatn(d.ketdi)+'</td></tr>'; });
-  h+='</table></div>'+(!(P.davomat||[]).length?'<div class="empty">'+t('bosh')+'</div>':'')+'</div>';
-  h+='<div class="center mt"><button class="btn sec" onclick="chiqish()">'+t('chiqish')+'</button></div>';
-  $('cont').innerHTML=h;
+  h+='<div class="card"><h3>'+t('xulosalar')+'</h3>';
+  const xl=D.xulosalar||[];
+  if(!xl.length) h+='<div class="empty">'+t('bosh')+'</div>';
+  else{
+    h+='<ul class="lst">';
+    xl.forEach(x=>{
+      h+='<li class="it"><div class="hd"><span class="pill mu">'+esc(x.fan||'')+'</span><span class="xs mu">'+sanaMatn(x.sana)+' · '+esc(x.oqituvchi)+'</span></div>'+
+        '<div class="sm mt">'+esc(x.umumiy)+'</div>'+
+        (x.kuchli?'<div class="xs mu">+ '+esc(x.kuchli)+'</div>':'')+
+        (x.kuchsiz?'<div class="xs mu">− '+esc(x.kuchsiz)+'</div>':'')+
+        (x.tavsiya?'<div class="xs mu">→ '+esc(x.tavsiya)+'</div>':'')+'</li>';
+    });
+    h+='</ul>';
+  }
+  return h+'</div>';
 }
 
-function modalOch(h){
-  let m=$('modal');
-  if(!m){ m=document.createElement('div'); m.id='modal'; m.className='modal'; document.body.appendChild(m);
-    m.addEventListener('click',e=>{ if(e.target===m) modalYop(); }); }
-  m.innerHTML='<div class="box">'+h+'</div>';
-  m.style.display='flex';
+function tabTolov(){
+  const tl=D.tolov||{}, oy=tl.oylar||[];
+  let h='<div class="card"><h3>'+t('tolov_holat')+'</h3>'+
+    '<div class="row"><span class="pill">'+t('narx')+': '+pul(tl.narx)+'</span>'+
+    (tl.qarz?'<span class="pill rd">'+t('qarz')+': '+pul(tl.qarz)+'</span>':'')+'</div>'+
+    '<div class="scroll mt"><table class="tbl"><tr><th>'+t('oy')+'</th><th>'+t('muddat')+'</th><th>'+t('tolangan')+'</th><th></th></tr>';
+  oy.forEach(o=>{
+    h+='<tr><td>'+oyMatn(o.oy)+'</td><td>'+sanaMatn(o.muddat)+'</td><td>'+(o.tolangan?pul(o.tolangan):'—')+'</td><td>'+tolovPill(o)+'</td></tr>';
+  });
+  h+='</table></div></div>';
+  h+='<div class="card"><h3>'+t('tolov_tarix')+'</h3>';
+  const tv=D.tolovlar||[];
+  if(!tv.length) h+='<div class="empty">'+t('tolov_yoq')+'</div>';
+  else{
+    h+='<ul class="lst">';
+    tv.forEach(x=>{ h+='<li class="it"><div class="hd"><span class="b">'+pul(x.summa)+'</span><span class="pill mu">'+oyMatn(x.oy)+'</span><span class="xs mu" style="margin-left:auto">'+sanaMatn(x.sana)+(x.usul?' · '+esc(x.usul):'')+'</span></div></li>'; });
+    h+='</ul>';
+  }
+  h+='</div>';
+  h+='<div class="card"><h3>'+t('tg_ulash')+'</h3>'+
+    (B.tg_ulangan?'<div class="row"><span class="pill gn">'+t('tg_ulangan')+'</span></div>':
+    '<div class="sm mu">'+t('tg_izoh')+'</div><div id="tg_box" class="mt"><button class="btn sec sm" onclick="tgKod()">'+t('tg_ulash')+'</button></div>')+'</div>';
+  h+='<div class="center mt"><button class="btn sec" onclick="chiqish()">'+t('chiqish')+'</button></div>';
+  return h;
 }
-function modalYop(){ const m=$('modal'); if(m) m.style.display='none'; }
+async function tgKod(){
+  try{
+    const d=await rpc('ep_ota_tg_kod',{p_token:T});
+    if(!d.ok) return;
+    const bot=(d.bot||'').replace('@','');
+    $('tg_box').innerHTML='<div class="it"><div class="kod center" style="font-size:19px">'+esc(d.kod)+'</div>'+
+      '<div class="row mt"><button class="btn sec sm" onclick="nusxa(\''+esc(d.kod)+'\')">'+t('kod_nusxa')+'</button>'+
+      (bot?'<a class="btn sm" href="https://t.me/'+esc(bot)+'" target="_blank" rel="noopener">@'+esc(bot)+'</a>':'')+'</div></div>';
+  }catch(e){ xabar(xatoMatn(e),'xato'); }
+}
+function nusxa(s){
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(s).then(()=>xabar(t('nusxalandi'))).catch(()=>{});
+  else{ const i=document.createElement('input'); i.value=s; document.body.appendChild(i); i.select(); try{document.execCommand('copy'); xabar(t('nusxalandi'));}catch(e){} i.remove(); }
+}
 
 ishga();
 </script>
