@@ -94,6 +94,8 @@ label{display:block;font-size:12px;color:var(--mu);margin:0 0 4px}
 .chk b.on.r{background:#FDF2DC;border-color:#E7C588;color:#8A5A00}
 .chk b.on.k{background:#FCE9E9;border-color:#EFB4B4;color:#991B1B}
 .kod{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;letter-spacing:.12em}
+
+.pill.sari{background:#FFF3D6;color:#8a5b00;border:1px solid #f0d9a0}
 </style>
 </head>
 <body>
@@ -150,7 +152,7 @@ ad_sarlavha:'Boshqaruv paneli',ad_kirish_izoh:'Administrator PIN kodini kiriting
 n_kun:'Kun',n_oqituvchilar:'O\'qituvchilar',n_reyting:'Reyting',n_sozlama:'Sozlama',
 kun_manzara:'Kun manzarasi',kim_yozdi:'Kim xulosa yozdi',hammasi_yozildi:'Hamma darslar yozilgan',qongiroq:'To\'lov uchun qo\'ng\'iroq',qongiroq_yoq:'Bugun qo\'ng\'iroq qilish shart emas',bugungi_xulosalar:'Bugungi xulosalar',
 oqituvchi_qosh:'O\'qituvchi qo\'shish',pin_yangi:'Yangi PIN',pin_yangila:'PIN ni yangilash',pin_yangila_izoh:'Eski PIN ishlamay qoladi',faol:'Faol',nofaol:'Faol emas',oxirgi_kirish:'Oxirgi kirish',hech_qachon:'Hech qachon',
-oquvchilar_royxati:'O\'quvchilar',import:'Import',import_izoh:'Har bir qatorda: Ism; Sinf; Ota-ona; Telefon. Excel dan nusxalab qo\'ying.',import_bajar:'Import qilish',manba:'Eski bazadan',manba_izoh:'qab_oquvchi va students jadvallaridagi hali qo\'shilmagan o\'quvchilar',manba_yoq:'Yangi yozuv yo\'q',tanlangan:'tanlandi',ota_ism:'Ota-ona ismi',ota_pin:'Ota-ona PIN',shaxsiy_narx:'Shaxsiy narx (bo\'sh — umumiy narx)',
+oquvchilar_royxati:'O\'quvchilar',import:'Import',import_izoh:'Har bir qatorda: Ism; Sinf; Ota-ona; Telefon. Excel dan nusxalab qo\'ying.',import_bajar:'Import qilish',manba:'Eski bazadan',manba_izoh:'qab_oquvchi va students jadvallaridagi hali qo\'shilmagan o\'quvchilar',manba_yoq:'Yangi yozuv yo\'q',tanlangan:'tanlandi',ota_ism:'Ota-ona ismi',ota_pin:'Ota-ona PIN',oq_yozdi:'O\'qituvchi yozib qo\'ygan',ixtiyoriy:'ixtiyoriy',ota_tel:'Ota-ona telefoni',shaxsiy_narx:'Shaxsiy narx (bo\'sh — umumiy narx)',
 tolov_kirit:'To\'lov kiritish',summa:'Summa',usul:'To\'lov usuli',naqd:'Naqd',karta_p:'Karta',otkazma:'O\'tkazma',oy:'Oy',
 reyting_izoh:'Har dushanba ball va o\'rinni yozing — o\'qituvchilar o\'z kabinetida ko\'radi',hafta_tanla:'Hafta',
 sozlama:'Sozlamalar',maktab_nomi:'Maktab nomi',narx_umumiy:'Oylik to\'lov (umumiy)',tolov_kuni:'To\'lov kuni (oyning nechinchi kuni)',eslatma_kun:'Necha kun oldin eslatish',oquv_yili:'O\'quv yili boshi',oy_soni:'Necha oy to\'lanadi',mavsum_boshi:'Reyting mavsumi boshi',tg_bot:'Telegram bot nomi (@siz)',dars_vaqtlari:'Dars vaqtlari',fanlar:'Fanlar',sinflar:'Sinflar',sinf_qosh:'Sinf qo\'shish',admin_pin:'Administrator PIN',
@@ -177,7 +179,7 @@ ad_sarlavha:'Панель управления',ad_kirish_izoh:'Введите P
 n_kun:'День',n_oqituvchilar:'Учителя',n_reyting:'Рейтинг',n_sozlama:'Настройки',
 kun_manzara:'Картина дня',kim_yozdi:'Кто написал итоги',hammasi_yozildi:'Все уроки записаны',qongiroq:'Обзвон по оплате',qongiroq_yoq:'Сегодня звонить не нужно',bugungi_xulosalar:'Итоги за день',
 oqituvchi_qosh:'Добавить учителя',pin_yangi:'Новый PIN',pin_yangila:'Обновить PIN',pin_yangila_izoh:'Старый PIN перестанет работать',faol:'Активен',nofaol:'Не активен',oxirgi_kirish:'Последний вход',hech_qachon:'Никогда',
-oquvchilar_royxati:'Ученики',import:'Импорт',import_izoh:'В каждой строке: Имя; Класс; Родитель; Телефон. Можно вставить из Excel.',import_bajar:'Импортировать',manba:'Из старой базы',manba_izoh:'Ученики из qab_oquvchi и students, которых ещё нет здесь',manba_yoq:'Новых записей нет',tanlangan:'выбрано',ota_ism:'Имя родителя',ota_pin:'PIN родителя',shaxsiy_narx:'Своя цена (пусто — общая)',
+oquvchilar_royxati:'Ученики',import:'Импорт',import_izoh:'В каждой строке: Имя; Класс; Родитель; Телефон. Можно вставить из Excel.',import_bajar:'Импортировать',manba:'Из старой базы',manba_izoh:'Ученики из qab_oquvchi и students, которых ещё нет здесь',manba_yoq:'Новых записей нет',tanlangan:'выбрано',ota_ism:'Имя родителя',ota_pin:'PIN родителя',oq_yozdi:'Внёс учитель',ixtiyoriy:'необязательно',ota_tel:'Телефон родителя',shaxsiy_narx:'Своя цена (пусто — общая)',
 tolov_kirit:'Внести оплату',summa:'Сумма',usul:'Способ оплаты',naqd:'Наличные',karta_p:'Карта',otkazma:'Перевод',oy:'Месяц',
 reyting_izoh:'Каждый понедельник впишите баллы и место — учителя видят это в своём кабинете',hafta_tanla:'Неделя',
 sozlama:'Настройки',maktab_nomi:'Название школы',narx_umumiy:'Оплата в месяц (общая)',tolov_kuni:'День оплаты (число месяца)',eslatma_kun:'За сколько дней напоминать',oquv_yili:'Начало учебного года',oy_soni:'Сколько месяцев оплаты',mavsum_boshi:'Начало сезона рейтинга',tg_bot:'Имя Telegram-бота (без @)',dars_vaqtlari:'Время уроков',fanlar:'Предметы',sinflar:'Классы',sinf_qosh:'Добавить класс',admin_pin:'PIN администратора',
