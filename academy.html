@@ -9056,6 +9056,25 @@ function msNarxFmt(v){
 function msSanaUz(iso){if(!iso)return '\u00AB____\u00BB _____________ 202___-yil';var p=iso.split('-');return '\u00AB'+parseInt(p[2],10)+'\u00BB '+XJ_MON[parseInt(p[1],10)-1]+' '+p[0]+'-yil';}
 function msSanaQ(iso){if(!iso)return '202___-yil \u00AB____\u00BB _____________';var p=iso.split('-');return p[0]+'-yil \u00AB'+parseInt(p[2],10)+'\u00BB '+XJ_MON[parseInt(p[1],10)-1];}
 
+/* ---------- to\u2018lov rekvizitlari ---------- */
+var MS_REK_SARLAVHA='To\u2018lov rekvizitlari';
+var MS_REK=[
+  {ind:0,p:[['Maktab uchun to\u2018lovni quyidagicha amalga oshirsangiz bo\u2018ladi:',0]]},
+  {ind:0,p:[['1. NAQD \u2014 maktabga kelib.',0]]},
+  {ind:0,p:[['2. Bank hisob raqamiga:',0]]},
+  {ind:1,p:[['Bank: ',0],['ALOQA BANK',1]]},
+  {ind:1,p:[['Hisob raqam: ',0],['20208000907292972001',1]]},
+  {ind:1,p:[['INN: ',0],['200829053',1],['          MFO: ',0],['00401',1]]}
+];
+function msRekMatn(){
+  var L=[],i,j,s;
+  for(i=0;i<MS_REK.length;i++){
+    s=''; for(j=0;j<MS_REK[i].p.length;j++)s+=MS_REK[i].p[j][0];
+    L.push((MS_REK[i].ind?'   ':'')+s);
+  }
+  return L;
+}
+
 /* ---------- shartnoma matni ---------- */
 function msBlocks(d,raqam){
   var B=[]; function P(t,o){o=o||{};B.push({k:'p',t:t,s:o.s||27,b:!!o.b,i:!!o.i,a:o.a||'just',lh:o.lh||36,sa:(o.sa!==undefined?o.sa:10)});}
@@ -9141,6 +9160,7 @@ function msBlocks(d,raqam){
   P('10.2. Maktabning ichki tartib qoidalari mazkur shartnomaga ilova qilinadi va uning ajralmas qismi hisoblanadi. Ularga kiritilgan o\u2018zgartishlar Buyurtmachiga oldindan ma\u2019lum qilinadi.');
   P('10.3. Shartnoma imzolangan kundan kuchga kiradi va bir xil kuchga ega bo\u2018lgan ikki nusxada tuzildi.');
   B.push({k:'sig'});
+  B.push({k:'rek'});
   return B;
 }
 
@@ -9240,6 +9260,28 @@ function msRenderPages(d,raqam,imzoImg){
       xf(ctx,26,false,false);
       ctx.fillText(msSanaUz(d['ms-sana']),rx,bot-24);
       y=bot+20;
+      continue;
+    }
+    if(o.k==='rek'){
+      var RH=32+MS_REK.length*36+22;
+      if(y+52+RH+40>BOT)newPage();
+      y+=16; xf(ctx,30,true,false);
+      var rt=MS_REK_SARLAVHA, rw2=ctx.measureText(rt).width;
+      ctx.fillText(rt,(XL+XR)/2-rw2/2,y+30); y+=52;
+      var rtop=y;
+      ctx.strokeStyle='#444'; ctx.lineWidth=2;
+      ctx.strokeRect(XL,rtop,XR-XL,RH);
+      var ry2=rtop+32;
+      for(var ri=0;ri<MS_REK.length;ri++){
+        var cx=XL+22+(MS_REK[ri].ind?46:0), pp=MS_REK[ri].p;
+        for(var pj=0;pj<pp.length;pj++){
+          xf(ctx,26,!!pp[pj][1],false);
+          ctx.fillText(pp[pj][0],cx,ry2);
+          cx+=ctx.measureText(pp[pj][0]).width;
+        }
+        ry2+=36;
+      }
+      y=rtop+RH+20;
       continue;
     }
   }
@@ -9471,6 +9513,9 @@ function msShMatn(){
     else if(b.k==='h'){ L.push(''); L.push(b.t); }
     else if(b.k==='p'){ L.push(b.t); }
   }
+  L.push('');
+  L.push(MS_REK_SARLAVHA);
+  L=L.concat(msRekMatn());
   L.push('');
   L.push('Maktab: FERGHANA EDU NOVA SCHOOL mchj, direktor Xolmatov D.');
   L.push('Buyurtmachi: '+(d['ms-otafio']||'____________________'));
