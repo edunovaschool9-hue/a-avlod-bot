@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>EduNova School — Kirish</title>
+<meta property="og:title" content="EduNova School — kabinetga kirish">
+<meta property="og:description" content="O'qituvchi va ota-onalar uchun shaxsiy kabinet. PIN kodingiz bilan kiring.">
+<meta name="theme-color" content="#F6F1E6">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#F6F1E6;color:#1C1C1C;font:16px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+ min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.wrap{width:100%;max-width:420px}
+.top{text-align:center;margin-bottom:26px}
+.logo{width:64px;height:64px;border-radius:18px;background:#FF6B1A;color:#fff;display:flex;align-items:center;justify-content:center;
+ font-size:28px;font-weight:800;margin:0 auto 14px;letter-spacing:-1px}
+h1{font-size:24px;font-weight:800;letter-spacing:-.4px}
+.sub{color:#8A8175;font-size:14px;margin-top:6px}
+.btn{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid #E7DFCF;border-radius:18px;
+ padding:18px 18px;margin-bottom:12px;transition:transform .12s ease,box-shadow .12s ease}
+.btn:active{transform:scale(.985)}
+.btn .row{display:flex;align-items:center;gap:14px}
+.ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex:0 0 auto}
+.ic.a{background:#FFEDE0}
+.ic.b{background:#E6F2EA}
+.tt{font-size:17px;font-weight:700}
+.dd{font-size:13px;color:#8A8175;margin-top:2px}
+.ar{margin-left:auto;color:#C7BCA8;font-size:20px}
+.note{background:#FFF6E8;border:1px solid #F0DFC0;border-radius:14px;padding:12px 14px;font-size:13px;color:#6B6055;margin-top:18px}
+.ft{text-align:center;color:#A79C8B;font-size:12px;margin-top:18px}
+.lang{display:flex;gap:6px;justify-content:center;margin-bottom:18px}
+.lang button{border:1px solid #E7DFCF;background:#fff;color:#8A8175;border-radius:10px;padding:6px 14px;font:inherit;font-size:13px;cursor:pointer}
+.lang button.on{background:#FF6B1A;border-color:#FF6B1A;color:#fff;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="lang">
+    <button id="l_uz" class="on" onclick="til('uz')">UZ</button>
+    <button id="l_ru" onclick="til('ru')">RU</button>
+  </div>
+  <div class="top">
+    <div class="logo">EN</div>
+    <h1 id="t_h1">EduNova School</h1>
+    <div class="sub" id="t_sub">Shaxsiy kabinetga kirish</div>
+  </div>
+
+  <a class="btn" href="./oqituvchi.html">
+    <div class="row">
+      <div class="ic a">👩‍🏫</div>
+      <div>
+        <div class="tt" id="t_o1">Men — o'qituvchi</div>
+        <div class="dd" id="t_o2">Jadval, dars xulosasi, reyting</div>
+      </div>
+      <div class="ar">›</div>
+    </div>
+  </a>
+
+  <a class="btn" href="./ota-ona.html">
+    <div class="row">
+      <div class="ic b">👨‍👩‍👧</div>
+      <div>
+        <div class="tt" id="t_p1">Men — ota-ona</div>
+        <div class="dd" id="t_p2">Farzandim darslari, natijalari, to'lov</div>
+      </div>
+      <div class="ar">›</div>
+    </div>
+  </a>
+
+  <div class="note" id="t_note">PIN kodni maktab bergan. Kodingiz bo'lmasa — administratorga murojaat qiling.</div>
+  <div class="ft">EduNova School · Farg'ona</div>
+</div>
+<script>
+var TX={
+ uz:{sub:"Shaxsiy kabinetga kirish",o1:"Men — o'qituvchi",o2:"Jadval, dars xulosasi, reyting",
+     p1:"Men — ota-ona",p2:"Farzandim darslari, natijalari, to'lov",
+     note:"PIN kodni maktab bergan. Kodingiz bo'lmasa — administratorga murojaat qiling."},
+ ru:{sub:"Вход в личный кабинет",o1:"Я — учитель",o2:"Расписание, итоги уроков, рейтинг",
+     p1:"Я — родитель",p2:"Уроки, результаты и оплата ребёнка",
+     note:"PIN выдаёт школа. Нет кода — обратитесь к администратору."}
+};
+function til(l){
+  var x=TX[l]; if(!x) return;
+  document.getElementById('t_sub').textContent=x.sub;
+  document.getElementById('t_o1').textContent=x.o1;
+  document.getElementById('t_o2').textContent=x.o2;
+  document.getElementById('t_p1').textContent=x.p1;
+  document.getElementById('t_p2').textContent=x.p2;
+  document.getElementById('t_note').textContent=x.note;
+  document.getElementById('l_uz').className = l==='uz'?'on':'';
+  document.getElementById('l_ru').className = l==='ru'?'on':'';
+  document.documentElement.lang=l;
+  try{ localStorage.setItem('ep_til',l); }catch(e){}
+}
+try{ var s=localStorage.getItem('ep_til'); if(s) til(s); }catch(e){}
+</script>
+</body>
+</html>
