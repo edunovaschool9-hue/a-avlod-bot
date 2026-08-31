@@ -8895,16 +8895,26 @@ function xjTile(id,icon,label,son,izoh,rang){
     +'<div style="font-size:30px;font-weight:900;color:'+rang+';line-height:1.15">'+son+'</div>'
     +'<div style="font-size:11.5px;color:#8892b0">'+izoh+'</div></div>';
 }
+function xjTozala(){
+  if(!confirm('Har bir o\u2018quvchida eng oxirgi talon qoldiriladi, eski nusxalar bekor qilinadi. Davom etamizmi?'))return;
+  xjMsg('Tozalanmoqda\u2026');
+  sb.rpc('hujjat_tozala',{p_oquv:xjOquvYili()}).then(function(r){
+    if(r.error||!r.data||!r.data.ok){xjMsg('Tozalash ishlamadi \u2014 SQL o\u2018rnatilganmi?','#f59e0b');return;}
+    var n=r.data.bekor_qilindi||0;
+    xjMsg(n?('\u2713 '+n+' ta eski talon bekor qilindi'):'Tozalanadigan dublikat topilmadi','#22c55e');
+    xjRoyxat();
+  })["catch"](function(){xjMsg('Aloqa yo\u2018q','#f59e0b');});
+}
 function xjHisobot(){
   var box=document.getElementById('xj-itog'); if(!box)return;
   return sb.rpc('hujjat_hisobot',{p_oquv:xjOquvYili()}).then(function(r){
     if(r.error||!r.data){box.innerHTML='<div style="color:#f59e0b;font-size:13px;padding:8px">Itog hisoboti mavjud emas \u2014 hujjat_hisobot.sql ishga tushirilmagan</div>';return;}
     var d=r.data;
-    var farq=(d.keldi_tasdiq||0)-(d.ketdi_tasdiq||0);
+    var farq=(d.keldi!==undefined?d.keldi:(d.keldi_tasdiq||0))-(d.ketdi!==undefined?d.ketdi:(d.ketdi_tasdiq||0));
     var h='<div style="font-weight:800;color:#cdd3ea;margin-bottom:8px">\uD83D\uDCCA Itog \u00B7 '+(d.oquv_yili||'')+' <span style="font-weight:500;color:#8892b0;font-size:12.5px">\u2014 bir o\u2018quvchi bir marta sanaladi</span></div>'
       +'<div style="display:flex;gap:10px;flex-wrap:wrap">'
-      +xjTile('keldi','\uD83D\uDCE5','KELDI',(d.keldi_tasdiq||0),'buyruq bilan tasdiqlangan'+((d.keldi_kutilmoq||0)?' \u00B7 +'+d.keldi_kutilmoq+' talon kutilmoqda':''),'#22c55e')
-      +xjTile('ketdi','\uD83D\uDCE4','KETDI',(d.ketdi_tasdiq||0),'buyruq bilan tasdiqlangan'+((d.ketdi_kutilmoq||0)?' \u00B7 +'+d.ketdi_kutilmoq+' talon kutilmoqda':''),'#ef4444')
+      +xjTile('keldi','\uD83D\uDCE5','KELDI',(d.keldi!==undefined?d.keldi:(d.keldi_tasdiq||0)),'talon bo\u2018yicha \u00B7 '+(d.keldi_buyruq||0)+' tasi buyruq bilan','#22c55e')
+      +xjTile('ketdi','\uD83D\uDCE4','KETDI',(d.ketdi!==undefined?d.ketdi:(d.ketdi_tasdiq||0)),'talon bo\u2018yicha \u00B7 '+(d.ketdi_buyruq||0)+' tasi buyruq bilan','#ef4444')
       +'<div style="flex:1;min-width:150px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:12px 14px">'
         +'<div style="font-size:12px;color:#8892b0;font-weight:700">\u2696\uFE0F FARQ</div>'
         +'<div style="font-size:30px;font-weight:900;color:'+(farq>=0?'#22c55e':'#ef4444')+';line-height:1.15">'+(farq>0?'+':'')+farq+'</div>'
@@ -8924,7 +8934,8 @@ function xjHisobot(){
             +' <span style="color:#8892b0;font-size:11.5px">('+(x.raqamlar||'')+')</span></div>';
         }).join('')
         :'<div style="color:#8892b0;font-size:12.5px;padding:6px 2px">Dublikat topilmadi \u2014 hisob toza</div>')
-        +'<div style="color:#8892b0;font-size:11.5px;margin-top:6px">Keraksiz nusxani ro\u2018yxatdan \u2715 tugmasi bilan bekor qiling \u2014 hisobdan chiqadi.</div>';
+        +'<div style="margin-top:8px"><button class="xj-btn" style="background:linear-gradient(135deg,#f59e0b,#b45309);color:#fff;padding:9px 14px;font-size:13px" onclick="xjTozala()">\uD83E\uDDF9 Eski dublikatlarni avto-tozalash</button></div>'
+        +'<div style="color:#8892b0;font-size:11.5px;margin-top:6px">Har bir o\u2018quvchida eng oxirgi talon qoladi, eskilari bekor qilinadi (raqam qayta ishlatilmaydi).</div>';
       var sh=d.shubhalar||[];
       if(sh.length){
         h+='<div style="margin-top:10px;border-top:1px dashed rgba(245,158,11,.35);padding-top:8px">'
