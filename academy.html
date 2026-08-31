@@ -2011,12 +2011,13 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
   <div id="xj-itog" style="margin-top:18px"></div>
   <div id="xj-reyestr" style="margin-top:16px">
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
-      <div style="font-weight:800;color:var(--tx);font-size:15px">📚 Reyestr</div>
+      <div id="xj-rtitle" style="font-weight:800;color:var(--tx);font-size:15px">📚 Reyestr</div>
       <div id="xj-oxirgi" style="font-size:13px;color:var(--mu2);font-weight:600"></div>
       <div id="xj-arxinfo" style="font-size:12.5px;color:#B4400A;font-weight:800"></div>
-      <button class="xj-btn" style="background:rgba(255,255,255,.08);color:#cdd3ea;padding:7px 12px;font-size:12.5px" onclick="xjRoyxat()">🔄 Yangilash</button>
+      <label style="font-size:12.5px;color:var(--mu2);font-weight:600;display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="xj-bekorli" onchange="xjRoyxat()" style="width:auto;margin:0"> bekor qilinganlarni ham ko‘rsatish</label>
+      <button class="xj-btn" style="background:var(--glass-hi);color:var(--tx);border:1px solid var(--brd);padding:7px 12px;font-size:12.5px" onclick="xjRoyxat()">🔄 Yangilash</button>
     </div>
-    <div id="xj-list" style="max-height:320px;overflow:auto"></div>
+    <div id="xj-list" style="max-height:460px;overflow:auto"></div>
   </div>
   <canvas id="xj-canvas" width="1654" height="2339"></canvas>
 </div>
@@ -8400,6 +8401,7 @@ function xjTab(t){
   var ib=document.getElementById('xj-imzobox');
   if(ib){ib.style.display=(t==='chb'||t==='qb')?'':'none'; if(t==='chb'||t==='qb')xjPadInit();}
   if(typeof xjKeyingi==='function'){var n=document.getElementById('xj-num'); if(n&&!xjManual)n.value=''; xjKeyingi().then(xjRender);} else {xjRender();}
+  if(xjInited&&typeof xjRoyxat==='function')xjRoyxat();
 }
 function xjHududUI(){
   var b=xjVal('xj-hudud')==='b';
@@ -8961,27 +8963,31 @@ function xjHisobot(){
 
 function xjRoyxat(){
   var box=document.getElementById('xj-list');
-  if(box)box.innerHTML='<div style="color:#8892b0;font-size:13px;padding:8px">Yuklanmoqda\u2026</div>';
-  return sb.rpc('hujjat_royxat',{p_oquv:xjOquvYili(),p_limit:40}).then(function(r){
-    if(r.error){if(box)box.innerHTML='<div style="color:#f59e0b;font-size:13px;padding:8px">Reyestr jadvali topilmadi \u2014 SQL ishga tushirilmagan bo\u2018lishi mumkin</div>';return;}
+  if(box)box.innerHTML='<div style="color:var(--mu2);font-size:13px;padding:8px">Yuklanmoqda\u2026</div>';
+  var bek=document.getElementById('xj-bekorli'); var bekorli=!!(bek&&bek.checked);
+  var TURN={kelish:'Kelish talonlari',ketish:'Ketish talonlari',chb:'Chiqarish buyruqlari',qb:'Qabul buyruqlari'};
+  var rt=document.getElementById('xj-rtitle'); if(rt)rt.textContent='\uD83D\uDCDA '+(TURN[xjType]||'Reyestr');
+  sb.rpc('hujjat_oxirgi',{p_oquv:xjOquvYili()}).then(function(q){
+    var oe=document.getElementById('xj-oxirgi'); var L=(q&&q.data)||{};
+    if(oe&&!q.error)oe.textContent='oxirgi: '+(L.T||0)+'/T \u00B7 '+(L.KT||0)+'/KT \u00B7 '+(L.OQ||0)+"/O\u2018Q  \u2014  "+xjOquvYili();
+  })["catch"](function(){});
+  xjHisobot();
+  return sb.rpc('hujjat_royxat_turi',{p_oquv:xjOquvYili(),p_turi:xjType,p_bekor:bekorli,p_limit:500}).then(function(r){
+    if(r.error){if(box)box.innerHTML='<div style="color:#b45309;font-size:13px;padding:8px">Reyestr funksiyasi topilmadi \u2014 SQL ishga tushirilmagan bo\u2018lishi mumkin</div>';return;}
     xjRoyxatCache=r.data||[];
-    var last={T:0,KT:0,OQ:0};
-    xjRoyxatCache.forEach(function(x){if(x.raqam>last[x.seriya])last[x.seriya]=x.raqam;});
-    var oe=document.getElementById('xj-oxirgi');
-    if(oe)oe.textContent='oxirgi: '+last.T+'/T \u00B7 '+last.KT+'/KT \u00B7 '+last.OQ+"/O\u2018Q  \u2014  "+xjOquvYili();
-    xjHisobot();
+    if(rt)rt.textContent='\uD83D\uDCDA '+(TURN[xjType]||'Reyestr')+' \u2014 '+xjRoyxatCache.length+' ta';
     sb.rpc('hujjat_arxiv_hajmi',{}).then(function(q){
       var ae=document.getElementById('xj-arxinfo');
       if(ae&&q&&q.data)ae.textContent='\uD83D\uDDC4 arxiv: '+q.data.soni+' ta \u00B7 '+q.data.jami_mb+' MB';
     })["catch"](function(){});
     if(!box)return;
-    if(!xjRoyxatCache.length){box.innerHTML='<div style="color:#8892b0;font-size:13px;padding:8px">Hozircha yozuv yo\u2018q</div>';return;}
+    if(!xjRoyxatCache.length){box.innerHTML='<div style="color:var(--mu2);font-size:13.5px;font-weight:600;padding:10px 8px">Bu turda hozircha hujjat yo\u2018q</div>';return;}
     var TUR={kelish:'Kelish talon',ketish:'Ketish talon',chb:'Buyruq \u00B7 chiqarish',qb:'Buyruq \u00B7 qabul'};
     box.innerHTML=xjRoyxatCache.map(function(x,i){
       return '<div style="display:flex;gap:12px;align-items:center;padding:10px 10px;border-bottom:1px solid var(--brd);'+(x.bekor?'opacity:.5;text-decoration:line-through':'')+'">'
         +'<div style="min-width:78px;font-weight:900;color:#E85400;font-size:14px">\u2116 '+x.raqam+'/'+(x.seriya==='OQ'?'O\u2018Q':x.seriya)+'</div>'
         +'<div style="flex:1;min-width:0"><div style="color:var(--tx);font-size:14.5px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(x.fio||'')+'</div>'
-        +'<div style="color:var(--mu2);font-size:12.5px;font-weight:600">'+(TUR[x.turi]||x.turi)+' \u00B7 '+(x.sana||'')+' \u00B7 '+(x.sinf?x.sinf+'-sinf':'')+'</div></div>'
+        +'<div style="color:var(--mu2);font-size:12.5px;font-weight:600">'+(x.sana||'')+(x.sinf?' \u00B7 '+x.sinf+'-sinf':'')+(x.maktab?' \u00B7 '+x.maktab:'')+(x.bekor&&x.izoh?' \u00B7 <span style="color:#b45309">'+x.izoh+'</span>':'')+'</div></div>'
         +(x.fayl_bor?'<button class="xj-btn" style="background:rgba(232,84,0,.14);color:#B4400A;border:1px solid var(--brd);padding:6px 10px;font-size:12.5px" onclick="xjArxivOch('+i+')">\uD83D\uDDBC Arxiv</button>':'')
         +'<button class="xj-btn" style="background:var(--glass-hi);color:var(--tx);border:1px solid var(--brd);padding:6px 10px;font-size:12.5px" onclick="xjQayta('+i+')">\u21A9 Ochish</button>'
         +(x.bekor?'':'<button class="xj-btn" style="background:rgba(185,28,28,.12);color:#b91c1c;border:1px solid var(--brd);padding:6px 10px;font-size:12.5px" onclick="xjBekor('+x.id+')">\u2715</button>')
@@ -9090,7 +9096,6 @@ function loadXujjatIshlar(){
     var today=new Date().toISOString().slice(0,10);
     document.getElementById('xj-sana').value=today;
     xjTab('kelish');
-    xjRoyxat();
   } else {
     xjRoyxat();
     xjRender();
