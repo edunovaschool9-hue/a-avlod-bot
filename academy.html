@@ -1866,7 +1866,7 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
 #ap-xujjatlar .xj-inum{font-size:34px;font-weight:900;line-height:1.1;margin:2px 0}
 #ap-xujjatlar .xj-isub{font-size:12px;color:var(--mu2)}
 #ap-xujjatlar .xj-box{margin-top:10px;border-radius:12px;padding:11px 13px;border:1px solid var(--brd);background:var(--glass-hi)}
-#ap-xujjatlar .xj-row{display:flex;gap:10px;align-items:center;padding:7px 2px;border-bottom:1px solid var(--brd)}
+#ap-xujjatlar .xj-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 2px;border-bottom:1px solid var(--brd)}
 #ap-xujjatlar .xj-nm{color:var(--tx);font-size:14.5px;font-weight:650;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #ap-xujjatlar .xj-mt{color:var(--mu2);font-size:12.5px;font-weight:600}
 </style>
@@ -8896,7 +8896,10 @@ function xjOdamList(arr,rang){
       +'<span class="xj-mt" style="min-width:26px;text-align:right">'+(i+1)+'.</span>'
       +'<span class="xj-nm">'+(x.fio||'')+'</span>'
       +'<span class="xj-mt">'+(x.sinf?x.sinf+'-sinf':'')+'</span>'
-      +'<span class="xj-mt" style="min-width:86px;text-align:right">'+(x.sana||'')+'</span></div>';
+      +'<span class="xj-mt" style="min-width:86px;text-align:right">'+(x.sana||'')+'</span>'
+      +(x.id?'<button class="xj-btn" style="background:var(--glass-hi);color:var(--tx);border:1px solid var(--brd);padding:5px 10px;font-size:12px;font-weight:700" onclick="xjHujjatYukla('+x.id+')">\u2B07\uFE0F '+(x.raqam?x.raqam+'/'+x.seriya:'Talon')+'</button>':'')
+      +(x.b_id?'<button class="xj-btn" style="background:rgba(232,84,0,.14);color:#B4400A;border:1px solid var(--brd);padding:5px 10px;font-size:12px;font-weight:700" onclick="xjHujjatYukla('+x.b_id+')">\u2B07\uFE0F Buyruq'+(x.b_raqam?' '+x.b_raqam+'/O\u2018Q':'')+'</button>':'')
+    +'</div>';
   }).join('')+'</div>';
 }
 function xjTile(id,icon,label,son,izoh,rang){
@@ -8904,6 +8907,38 @@ function xjTile(id,icon,label,son,izoh,rang){
     +'<div class="xj-ilab">'+icon+' '+label+'</div>'
     +'<div class="xj-inum" style="color:'+rang+'">'+son+'</div>'
     +'<div class="xj-isub">'+izoh+'</div></div>';
+}
+function xjHujjatYukla(id){
+  if(!id)return;
+  xjMsg('Tayyorlanmoqda\u2026');
+  sb.rpc('hujjat_bitta',{p_id:id}).then(function(r){
+    var x=(r.data&&r.data[0])||null;
+    if(r.error||!x){xjMsg('Hujjat topilmadi','#b45309');return;}
+    var fam=(x.fio||'hujjat').split(/\s+/)[0].replace(/[^A-Za-z0-9\-]+/g,'');
+    var base={kelish:'KELISH_TALON',ketish:'KETISH_TALON',chb:'BUYRUQ_CHIQARISH',qb:'BUYRUQ_QABUL'}[x.turi]||'HUJJAT';
+    if(x.fayl_bor){
+      sb.rpc('hujjat_png_ol',{p_id:id}).then(function(q){
+        if(q.error||!q.data){xjQaytaChiz(x);return;}
+        var ext=(String(q.data).indexOf('application/pdf')>=0)?'.pdf':'.png';
+        msDurlYukla(q.data, base+'_'+x.raqam+x.seriya+'_'+fam+ext);
+        xjMsg('\u2713 Arxivdan yuklab olindi','#15803d');
+      })["catch"](function(){xjQaytaChiz(x);});
+    } else { xjQaytaChiz(x); }
+  })["catch"](function(){xjMsg('Aloqa yo\u2018q','#b45309');});
+}
+function xjQaytaChiz(x){
+  xjMsg('Arxivda nusxa yo\u2018q \u2014 qayta chizilmoqda\u2026');
+  var m=x.malumot||{};
+  xjTab(x.turi);
+  ['xj-sana','xj-fio','xj-tug','xj-sinf','xj-til','xj-oquv','xj-mk','xj-hudud','xj-mkfull','xj-hline','xj-ktnum','xj-ktsana','xj-ourkt','xj-arnum','xj-arsana'].forEach(function(id){
+    var el=document.getElementById(id); if(el&&m[id]!==undefined)el.value=m[id];
+  });
+  var n=document.getElementById('xj-num'); if(n)n.value=x.raqam;
+  xjManual=true; if(typeof xjNumTouched==='function')xjNumTouched(); xjHududUI();
+  setTimeout(function(){
+    xjRender();
+    setTimeout(function(){ xjYukla(xjFileName(x.turi,x.raqam)); xjMsg('\u2713 Yuklab olindi','#15803d'); }, 600);
+  }, 350);
 }
 function xjBirlashtir(eski,yangi){
   if(!confirm('Bu bitta o\u2018quvchimi? Eski hujjat bekor qilinadi, yangisi qoladi.'))return;
