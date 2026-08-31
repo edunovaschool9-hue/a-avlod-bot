@@ -1853,14 +1853,22 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
 
 <style>
 #ap-xujjatlar .xj-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
-#ap-xujjatlar .xj-tab{padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#cdd3ea;font-weight:700;cursor:pointer;font-size:13.5px}
+#ap-xujjatlar .xj-tab{padding:10px 14px;border-radius:12px;border:1px solid var(--brd);background:var(--glass);color:var(--tx);font-weight:700;cursor:pointer;font-size:13.5px}
 #ap-xujjatlar .xj-tab.on{background:linear-gradient(135deg,#7c5cff,#5b3df0);color:#fff;border-color:transparent}
 #ap-xujjatlar .xj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:14px}
 #ap-xujjatlar select,#ap-xujjatlar input{width:100%}
 #ap-xujjatlar .xj-btn{padding:12px 18px;border:none;border-radius:12px;font-weight:800;cursor:pointer;font-size:14px}
 #ap-xujjatlar .xj-go{background:linear-gradient(135deg,#22c55e,#15803d);color:#fff}
 #ap-xujjatlar .xj-dl{background:linear-gradient(135deg,#7c5cff,#5b3df0);color:#fff}
-#ap-xujjatlar #xj-canvas{width:100%;max-width:620px;border:1px solid rgba(255,255,255,.18);border-radius:14px;background:#fff;display:block;margin-top:14px}
+#ap-xujjatlar #xj-canvas{width:100%;max-width:620px;border:1px solid var(--brd);border-radius:14px;background:#fff;display:block;margin-top:14px}
+#ap-xujjatlar .xj-itile{cursor:pointer;flex:1;min-width:158px;background:var(--glass);border:1px solid var(--brd);border-radius:14px;padding:13px 15px}
+#ap-xujjatlar .xj-ilab{font-size:12.5px;color:var(--mu2);font-weight:800;letter-spacing:.3px}
+#ap-xujjatlar .xj-inum{font-size:34px;font-weight:900;line-height:1.1;margin:2px 0}
+#ap-xujjatlar .xj-isub{font-size:12px;color:var(--mu2)}
+#ap-xujjatlar .xj-box{margin-top:10px;border-radius:12px;padding:11px 13px;border:1px solid var(--brd);background:var(--glass-hi)}
+#ap-xujjatlar .xj-row{display:flex;gap:10px;align-items:center;padding:7px 2px;border-bottom:1px solid var(--brd)}
+#ap-xujjatlar .xj-nm{color:var(--tx);font-size:14.5px;font-weight:650;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#ap-xujjatlar .xj-mt{color:var(--mu2);font-size:12.5px;font-weight:600}
 </style>
 
 <style>
@@ -1998,14 +2006,14 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
     <button class="xj-btn xj-go" onclick="xjRender()">👁 Ko&#8216;rish</button>
     <button class="xj-btn xj-dl" onclick="xjSaqlaYukla()">⬇️ Raqam berib PDF yuklash</button>
     <button class="xj-btn" style="background:rgba(255,255,255,.08);color:#cdd3ea" onclick="xjDownload()">PDF (reyestrsiz)</button>
-    <span id="xj-msg" style="font-size:13px;color:#8892b0"></span>
+    <span id="xj-msg" style="font-size:13.5px;color:var(--mu2);font-weight:600"></span>
   </div>
   <div id="xj-itog" style="margin-top:18px"></div>
   <div id="xj-reyestr" style="margin-top:16px">
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
-      <div style="font-weight:800;color:#cdd3ea">📚 Reyestr</div>
-      <div id="xj-oxirgi" style="font-size:13px;color:#8892b0"></div>
-      <div id="xj-arxinfo" style="font-size:12.5px;color:#7c5cff;font-weight:700"></div>
+      <div style="font-weight:800;color:var(--tx);font-size:15px">📚 Reyestr</div>
+      <div id="xj-oxirgi" style="font-size:13px;color:var(--mu2);font-weight:600"></div>
+      <div id="xj-arxinfo" style="font-size:12.5px;color:#B4400A;font-weight:800"></div>
       <button class="xj-btn" style="background:rgba(255,255,255,.08);color:#cdd3ea;padding:7px 12px;font-size:12.5px" onclick="xjRoyxat()">🔄 Yangilash</button>
     </div>
     <div id="xj-list" style="max-height:320px;overflow:auto"></div>
@@ -8880,20 +8888,20 @@ function xjKeyingi(){
 var xjItogOch={keldi:false,ketdi:false,dub:false};
 function xjItogToggle(k){xjItogOch[k]=!xjItogOch[k];xjHisobot();}
 function xjOdamList(arr,rang){
-  if(!arr||!arr.length)return '<div style="color:#8892b0;font-size:12.5px;padding:6px 2px">Ro\u2018yxat bo\u2018sh</div>';
-  return '<div style="margin-top:6px">'+arr.map(function(x){
-    var t=(x.holat==='tasdiq');
-    return '<div style="display:flex;gap:8px;align-items:center;padding:5px 2px;border-bottom:1px solid rgba(255,255,255,.05)">'
-      +'<span style="font-size:11px;font-weight:800;color:'+(t?rang:'#f59e0b')+';min-width:88px">'+(t?'\u2713 BUYRUQ':'\u25CB talon')+'</span>'
-      +'<span style="color:#e6e9f5;font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(x.fio||'')+'</span>'
-      +'<span style="color:#8892b0;font-size:11.5px">'+(x.sinf?x.sinf+'-sinf':'')+'</span></div>';
+  if(!arr||!arr.length)return '<div class="xj-mt" style="padding:7px 2px">Ro\u2018yxat bo\u2018sh</div>';
+  return '<div style="margin-top:7px">'+arr.map(function(x,i){
+    return '<div class="xj-row">'
+      +'<span class="xj-mt" style="min-width:26px;text-align:right">'+(i+1)+'.</span>'
+      +'<span class="xj-nm">'+(x.fio||'')+'</span>'
+      +'<span class="xj-mt">'+(x.sinf?x.sinf+'-sinf':'')+'</span>'
+      +'<span class="xj-mt" style="min-width:86px;text-align:right">'+(x.sana||'')+'</span></div>';
   }).join('')+'</div>';
 }
 function xjTile(id,icon,label,son,izoh,rang){
-  return '<div onclick="xjItogToggle(\''+id+'\')" style="cursor:pointer;flex:1;min-width:150px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:12px 14px">'
-    +'<div style="font-size:12px;color:#8892b0;font-weight:700">'+icon+' '+label+'</div>'
-    +'<div style="font-size:30px;font-weight:900;color:'+rang+';line-height:1.15">'+son+'</div>'
-    +'<div style="font-size:11.5px;color:#8892b0">'+izoh+'</div></div>';
+  return '<div class="xj-itile" onclick="xjItogToggle(\''+id+'\')">'
+    +'<div class="xj-ilab">'+icon+' '+label+'</div>'
+    +'<div class="xj-inum" style="color:'+rang+'">'+son+'</div>'
+    +'<div class="xj-isub">'+izoh+'</div></div>';
 }
 function xjTozala(){
   if(!confirm('Har bir o\u2018quvchida eng oxirgi talon qoldiriladi, eski nusxalar bekor qilinadi. Davom etamizmi?'))return;
@@ -8910,38 +8918,40 @@ function xjHisobot(){
   return sb.rpc('hujjat_hisobot',{p_oquv:xjOquvYili()}).then(function(r){
     if(r.error||!r.data){box.innerHTML='<div style="color:#f59e0b;font-size:13px;padding:8px">Itog hisoboti mavjud emas \u2014 hujjat_hisobot.sql ishga tushirilmagan</div>';return;}
     var d=r.data;
-    var farq=(d.keldi!==undefined?d.keldi:(d.keldi_tasdiq||0))-(d.ketdi!==undefined?d.ketdi:(d.ketdi_tasdiq||0));
-    var h='<div style="font-weight:800;color:#cdd3ea;margin-bottom:8px">\uD83D\uDCCA Itog \u00B7 '+(d.oquv_yili||'')+' <span style="font-weight:500;color:#8892b0;font-size:12.5px">\u2014 bir o\u2018quvchi bir marta sanaladi</span></div>'
+    var kel=(d.keldi_talon!==undefined?d.keldi_talon:(d.keldi||0));
+    var ket=(d.ketdi_talon!==undefined?d.ketdi_talon:(d.ketdi||0));
+    var farq=kel-ket;
+    var h='<div style="font-weight:800;color:var(--tx);font-size:15px;margin-bottom:9px">\uD83D\uDCCA Itog \u00B7 '+(d.oquv_yili||'')+' <span style="font-weight:600;color:var(--mu2);font-size:13px">\u2014 talon bo\u2018yicha, bir o\u2018quvchi bir marta</span></div>'
       +'<div style="display:flex;gap:10px;flex-wrap:wrap">'
-      +xjTile('keldi','\uD83D\uDCE5','KELDI',(d.keldi!==undefined?d.keldi:(d.keldi_tasdiq||0)),'talon bo\u2018yicha \u00B7 '+(d.keldi_buyruq||0)+' tasi buyruq bilan','#22c55e')
-      +xjTile('ketdi','\uD83D\uDCE4','KETDI',(d.ketdi!==undefined?d.ketdi:(d.ketdi_tasdiq||0)),'talon bo\u2018yicha \u00B7 '+(d.ketdi_buyruq||0)+' tasi buyruq bilan','#ef4444')
-      +'<div style="flex:1;min-width:150px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:12px 14px">'
-        +'<div style="font-size:12px;color:#8892b0;font-weight:700">\u2696\uFE0F FARQ</div>'
-        +'<div style="font-size:30px;font-weight:900;color:'+(farq>=0?'#22c55e':'#ef4444')+';line-height:1.15">'+(farq>0?'+':'')+farq+'</div>'
-        +'<div style="font-size:11.5px;color:#8892b0">'+(d.odam_soni||0)+' o\u2018quvchi \u00B7 '+(d.hujjat_soni||0)+' hujjat</div></div>'
-      +xjTile('dub','\u26A0\uFE0F','DUBLIKAT',((d.dub_soni||0)+(d.shubha_soni||0)),(((d.dub_soni||0)+(d.shubha_soni||0))?'tekshirish kerak':'dublikat yo\u2018q'),(((d.dub_soni||0)+(d.shubha_soni||0))?'#f59e0b':'#8892b0'))
+      +xjTile('keldi','\uD83D\uDCE5','KELDI',kel,'kelish taloni berilgan','#15803d')
+      +xjTile('ketdi','\uD83D\uDCE4','KETDI',ket,'ketish taloni berilgan','#b91c1c')
+      +'<div class="xj-itile" style="cursor:default">'
+        +'<div class="xj-ilab">\u2696\uFE0F FARQ</div>'
+        +'<div class="xj-inum" style="color:'+(farq>=0?'#15803d':'#b91c1c')+'">'+(farq>0?'+':'')+farq+'</div>'
+        +'<div class="xj-isub">'+(d.odam_soni||0)+' o\u2018quvchi \u00B7 '+(d.hujjat_soni||0)+' hujjat</div></div>'
+      +xjTile('dub','\u26A0\uFE0F','DUBLIKAT',((d.dub_soni||0)+(d.shubha_soni||0)),(((d.dub_soni||0)+(d.shubha_soni||0))?'tekshirish kerak':'dublikat yo\u2018q'),(((d.dub_soni||0)+(d.shubha_soni||0))?'#b45309':'var(--mu2)'))
       +'</div>';
-    if(xjItogOch.keldi)h+='<div style="margin-top:10px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.25);border-radius:12px;padding:10px 12px"><div style="font-weight:800;color:#22c55e;font-size:13px">\uD83D\uDCE5 Kelganlar</div>'+xjOdamList(d.keldi_royxat,'#22c55e')+'</div>';
-    if(xjItogOch.ketdi)h+='<div style="margin-top:10px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:10px 12px"><div style="font-weight:800;color:#ef4444;font-size:13px">\uD83D\uDCE4 Ketganlar</div>'+xjOdamList(d.ketdi_royxat,'#ef4444')+'</div>';
+    if(xjItogOch.keldi)h+='<div class="xj-box"><div style="font-weight:800;color:#15803d;font-size:14px">\uD83D\uDCE5 Kelganlar \u2014 '+kel+' ta</div>'+xjOdamList(d.keldi_royxat)+'</div>';
+    if(xjItogOch.ketdi)h+='<div class="xj-box"><div style="font-weight:800;color:#b91c1c;font-size:14px">\uD83D\uDCE4 Ketganlar \u2014 '+ket+' ta</div>'+xjOdamList(d.ketdi_royxat)+'</div>';
     if(xjItogOch.dub){
       var dl=d.dublikatlar||[];
       var TUR={kelish:'kelish talon',ketish:'ketish talon',chb:'chiqarish buyrug\u2018i',qb:'qabul buyrug\u2018i'};
-      h+='<div style="margin-top:10px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:10px 12px">'
-        +'<div style="font-weight:800;color:#f59e0b;font-size:13px">\u26A0\uFE0F Takrorlangan hujjatlar</div>'
+      h+='<div class="xj-box">'
+        +'<div style="font-weight:800;color:#b45309;font-size:14px">\u26A0\uFE0F Takrorlangan hujjatlar</div>'
         +(dl.length?dl.map(function(x){
-          return '<div style="padding:6px 2px;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px;color:#e6e9f5">'
-            +(x.fio||'')+' \u2014 <span style="color:#f59e0b">'+(TUR[x.turi]||x.turi)+' '+x.soni+' marta</span>'
-            +' <span style="color:#8892b0;font-size:11.5px">('+(x.raqamlar||'')+')</span></div>';
+          return '<div style="padding:7px 2px;border-bottom:1px solid var(--brd);font-size:14px;color:var(--tx);font-weight:600">'
+            +(x.fio||'')+' \u2014 <span style="color:#b45309">'+(TUR[x.turi]||x.turi)+' '+x.soni+' marta</span>'
+            +' <span class="xj-mt">('+(x.raqamlar||'')+')</span></div>';
         }).join('')
-        :'<div style="color:#8892b0;font-size:12.5px;padding:6px 2px">Dublikat topilmadi \u2014 hisob toza</div>')
+        :'<div class="xj-mt" style="padding:7px 2px">Dublikat topilmadi \u2014 hisob toza</div>')
         +'<div style="margin-top:8px"><button class="xj-btn" style="background:linear-gradient(135deg,#f59e0b,#b45309);color:#fff;padding:9px 14px;font-size:13px" onclick="xjTozala()">\uD83E\uDDF9 Eski dublikatlarni avto-tozalash</button></div>'
-        +'<div style="color:#8892b0;font-size:11.5px;margin-top:6px">Har bir o\u2018quvchida eng oxirgi talon qoladi, eskilari bekor qilinadi (raqam qayta ishlatilmaydi).</div>';
+        +'<div class="xj-mt" style="margin-top:7px">Har bir o\u2018quvchida eng oxirgi talon qoladi, eskilari bekor qilinadi (raqam qayta ishlatilmaydi).</div>';
       var sh=d.shubhalar||[];
       if(sh.length){
-        h+='<div style="margin-top:10px;border-top:1px dashed rgba(245,158,11,.35);padding-top:8px">'
-          +'<div style="font-weight:800;color:#f59e0b;font-size:13px">\uD83D\uDD0E Bir odam, ikki xil yozilishi mumkin</div>'
-          +sh.map(function(x){return '<div style="padding:5px 2px;font-size:13px;color:#e6e9f5">'+(x.ismlar||'')+'</div>';}).join('')
-          +'<div style="color:#8892b0;font-size:11.5px;margin-top:4px">Agar bu bitta o\u2018quvchi bo\u2018lsa \u2014 ortiqcha hujjatni bekor qiling, aks holda hisobda 2 ta bo\u2018lib ko\u2018rinadi.</div></div>';
+        h+='<div style="margin-top:10px;border-top:1px dashed var(--brd2);padding-top:9px">'
+          +'<div style="font-weight:800;color:#b45309;font-size:14px">\uD83D\uDD0E Bir odam, ikki xil yozilishi mumkin</div>'
+          +sh.map(function(x){return '<div style="padding:6px 2px;font-size:14px;color:var(--tx);font-weight:600">'+(x.ismlar||'')+'</div>';}).join('')
+          +'<div class="xj-mt" style="margin-top:5px">Agar bu bitta o\u2018quvchi bo\u2018lsa \u2014 ortiqcha hujjatni bekor qiling, aks holda hisobda 2 ta bo\u2018lib ko\u2018rinadi.</div></div>';
       }
       h+='</div>';
     }
@@ -8968,13 +8978,13 @@ function xjRoyxat(){
     if(!xjRoyxatCache.length){box.innerHTML='<div style="color:#8892b0;font-size:13px;padding:8px">Hozircha yozuv yo\u2018q</div>';return;}
     var TUR={kelish:'Kelish talon',ketish:'Ketish talon',chb:'Buyruq \u00B7 chiqarish',qb:'Buyruq \u00B7 qabul'};
     box.innerHTML=xjRoyxatCache.map(function(x,i){
-      return '<div style="display:flex;gap:12px;align-items:center;padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.07);'+(x.bekor?'opacity:.45;text-decoration:line-through':'')+'">'
-        +'<div style="min-width:74px;font-weight:800;color:#7c5cff">\u2116 '+x.raqam+'/'+(x.seriya==='OQ'?'O\u2018Q':x.seriya)+'</div>'
-        +'<div style="flex:1;min-width:0"><div style="color:#e6e9f5;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(x.fio||'')+'</div>'
-        +'<div style="color:#8892b0;font-size:11.5px">'+(TUR[x.turi]||x.turi)+' \u00B7 '+(x.sana||'')+' \u00B7 '+(x.sinf?x.sinf+'-sinf':'')+'</div></div>'
-        +(x.fayl_bor?'<button class="xj-btn" style="background:rgba(124,92,255,.18);color:#c9bcff;padding:6px 10px;font-size:12px" onclick="xjArxivOch('+i+')">\uD83D\uDDBC Arxiv</button>':'')
-        +'<button class="xj-btn" style="background:rgba(255,255,255,.08);color:#cdd3ea;padding:6px 10px;font-size:12px" onclick="xjQayta('+i+')">\u21A9 Ochish</button>'
-        +(x.bekor?'':'<button class="xj-btn" style="background:rgba(239,68,68,.15);color:#fca5a5;padding:6px 10px;font-size:12px" onclick="xjBekor('+x.id+')">\u2715</button>')
+      return '<div style="display:flex;gap:12px;align-items:center;padding:10px 10px;border-bottom:1px solid var(--brd);'+(x.bekor?'opacity:.5;text-decoration:line-through':'')+'">'
+        +'<div style="min-width:78px;font-weight:900;color:#E85400;font-size:14px">\u2116 '+x.raqam+'/'+(x.seriya==='OQ'?'O\u2018Q':x.seriya)+'</div>'
+        +'<div style="flex:1;min-width:0"><div style="color:var(--tx);font-size:14.5px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(x.fio||'')+'</div>'
+        +'<div style="color:var(--mu2);font-size:12.5px;font-weight:600">'+(TUR[x.turi]||x.turi)+' \u00B7 '+(x.sana||'')+' \u00B7 '+(x.sinf?x.sinf+'-sinf':'')+'</div></div>'
+        +(x.fayl_bor?'<button class="xj-btn" style="background:rgba(232,84,0,.14);color:#B4400A;border:1px solid var(--brd);padding:6px 10px;font-size:12.5px" onclick="xjArxivOch('+i+')">\uD83D\uDDBC Arxiv</button>':'')
+        +'<button class="xj-btn" style="background:var(--glass-hi);color:var(--tx);border:1px solid var(--brd);padding:6px 10px;font-size:12.5px" onclick="xjQayta('+i+')">\u21A9 Ochish</button>'
+        +(x.bekor?'':'<button class="xj-btn" style="background:rgba(185,28,28,.12);color:#b91c1c;border:1px solid var(--brd);padding:6px 10px;font-size:12.5px" onclick="xjBekor('+x.id+')">\u2715</button>')
       +'</div>';
     }).join('');
   })["catch"](function(){});
