@@ -8905,6 +8905,14 @@ function xjTile(id,icon,label,son,izoh,rang){
     +'<div class="xj-inum" style="color:'+rang+'">'+son+'</div>'
     +'<div class="xj-isub">'+izoh+'</div></div>';
 }
+function xjBirlashtir(eski,yangi){
+  if(!confirm('Bu bitta o\u2018quvchimi? Eski hujjat bekor qilinadi, yangisi qoladi.'))return;
+  sb.rpc('hujjat_birlashtir',{p_eski:eski,p_yangi:yangi}).then(function(r){
+    if(r.error||!r.data||!r.data.ok){xjMsg('Birlashtirilmadi','#f59e0b');return;}
+    xjMsg('\u2713 Birlashtirildi \u2014 '+r.data.qoldi+' qoldi','#22c55e');
+    xjRoyxat();
+  })["catch"](function(){xjMsg('Aloqa yo\u2018q','#f59e0b');});
+}
 function xjTozala(){
   if(!confirm('Har bir o\u2018quvchida eng oxirgi talon qoldiriladi, eski nusxalar bekor qilinadi. Davom etamizmi?'))return;
   xjMsg('Tozalanmoqda\u2026');
@@ -8952,8 +8960,15 @@ function xjHisobot(){
       if(sh.length){
         h+='<div style="margin-top:10px;border-top:1px dashed var(--brd2);padding-top:9px">'
           +'<div style="font-weight:800;color:#b45309;font-size:14px">\uD83D\uDD0E Bir odam, ikki xil yozilishi mumkin</div>'
-          +sh.map(function(x){return '<div style="padding:6px 2px;font-size:14px;color:var(--tx);font-weight:600">'+(x.ismlar||'')+'</div>';}).join('')
-          +'<div class="xj-mt" style="margin-top:5px">Agar bu bitta o\u2018quvchi bo\u2018lsa \u2014 ortiqcha hujjatni bekor qiling, aks holda hisobda 2 ta bo\u2018lib ko\u2018rinadi.</div></div>';
+          +sh.map(function(x){
+            var TR={kelish:'kelish',ketish:'ketish',chb:'chiqarish buyrug\u2018i',qb:'qabul buyrug\u2018i'};
+            return '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:7px 2px;border-bottom:1px solid var(--brd)">'
+              +'<div style="flex:1;min-width:220px"><div style="font-size:14px;color:var(--tx);font-weight:650">'+(x.eski||x.ismlar||'')+'</div>'
+              +(x.yangi?'<div style="font-size:14px;color:var(--tx);font-weight:650">'+x.yangi+'</div>':'')
+              +'<div class="xj-mt">'+(TR[x.turi]||x.turi||'')+(x.sim?' \u00B7 o\u2018xshashlik '+Math.round(x.sim*100)+'%':'')+(x.sinf_bir?' \u00B7 bir sinf':'')+'</div></div>'
+              +(x.eski_id&&x.yangi_id?'<button class="xj-btn" style="background:linear-gradient(135deg,#f59e0b,#b45309);color:#fff;padding:8px 12px;font-size:12.5px" onclick="xjBirlashtir('+x.eski_id+','+x.yangi_id+')">\uD83E\uDDF7 Bir odam \u2014 eskisini bekor qil</button>':'')
+            +'</div>';}).join('')
+          +'<div class="xj-mt" style="margin-top:6px">Agar bu bitta o\u2018quvchi bo\u2018lsa \u2014 tugmani bosing: eski hujjat bekor bo\u2018ladi, yangisi qoladi. Aka-uka bo\u2018lsa \u2014 tegmang.</div></div>';
       }
       h+='</div>';
     }
