@@ -2000,6 +2000,7 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
     <button class="xj-btn" style="background:rgba(255,255,255,.08);color:#cdd3ea" onclick="xjDownload()">PDF (reyestrsiz)</button>
     <span id="xj-msg" style="font-size:13px;color:#8892b0"></span>
   </div>
+  <div id="xj-itog" style="margin-top:18px"></div>
   <div id="xj-reyestr" style="margin-top:16px">
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
       <div style="font-weight:800;color:#cdd3ea">📚 Reyestr</div>
@@ -8874,6 +8875,69 @@ function xjKeyingi(){
       return n;
     })["catch"](function(){xjMsg('Reyestr bilan aloqa yo\u2018q','#f59e0b');return null;});
 }
+
+/* ---------- ITOG: kelgan / ketgan (dublikatlarsiz) ---------- */
+var xjItogOch={keldi:false,ketdi:false,dub:false};
+function xjItogToggle(k){xjItogOch[k]=!xjItogOch[k];xjHisobot();}
+function xjOdamList(arr,rang){
+  if(!arr||!arr.length)return '<div style="color:#8892b0;font-size:12.5px;padding:6px 2px">Ro\u2018yxat bo\u2018sh</div>';
+  return '<div style="margin-top:6px">'+arr.map(function(x){
+    var t=(x.holat==='tasdiq');
+    return '<div style="display:flex;gap:8px;align-items:center;padding:5px 2px;border-bottom:1px solid rgba(255,255,255,.05)">'
+      +'<span style="font-size:11px;font-weight:800;color:'+(t?rang:'#f59e0b')+';min-width:88px">'+(t?'\u2713 BUYRUQ':'\u25CB talon')+'</span>'
+      +'<span style="color:#e6e9f5;font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(x.fio||'')+'</span>'
+      +'<span style="color:#8892b0;font-size:11.5px">'+(x.sinf?x.sinf+'-sinf':'')+'</span></div>';
+  }).join('')+'</div>';
+}
+function xjTile(id,icon,label,son,izoh,rang){
+  return '<div onclick="xjItogToggle(\''+id+'\')" style="cursor:pointer;flex:1;min-width:150px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:12px 14px">'
+    +'<div style="font-size:12px;color:#8892b0;font-weight:700">'+icon+' '+label+'</div>'
+    +'<div style="font-size:30px;font-weight:900;color:'+rang+';line-height:1.15">'+son+'</div>'
+    +'<div style="font-size:11.5px;color:#8892b0">'+izoh+'</div></div>';
+}
+function xjHisobot(){
+  var box=document.getElementById('xj-itog'); if(!box)return;
+  return sb.rpc('hujjat_hisobot',{p_oquv:xjOquvYili()}).then(function(r){
+    if(r.error||!r.data){box.innerHTML='<div style="color:#f59e0b;font-size:13px;padding:8px">Itog hisoboti mavjud emas \u2014 hujjat_hisobot.sql ishga tushirilmagan</div>';return;}
+    var d=r.data;
+    var farq=(d.keldi_tasdiq||0)-(d.ketdi_tasdiq||0);
+    var h='<div style="font-weight:800;color:#cdd3ea;margin-bottom:8px">\uD83D\uDCCA Itog \u00B7 '+(d.oquv_yili||'')+' <span style="font-weight:500;color:#8892b0;font-size:12.5px">\u2014 bir o\u2018quvchi bir marta sanaladi</span></div>'
+      +'<div style="display:flex;gap:10px;flex-wrap:wrap">'
+      +xjTile('keldi','\uD83D\uDCE5','KELDI',(d.keldi_tasdiq||0),'buyruq bilan tasdiqlangan'+((d.keldi_kutilmoq||0)?' \u00B7 +'+d.keldi_kutilmoq+' talon kutilmoqda':''),'#22c55e')
+      +xjTile('ketdi','\uD83D\uDCE4','KETDI',(d.ketdi_tasdiq||0),'buyruq bilan tasdiqlangan'+((d.ketdi_kutilmoq||0)?' \u00B7 +'+d.ketdi_kutilmoq+' talon kutilmoqda':''),'#ef4444')
+      +'<div style="flex:1;min-width:150px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:12px 14px">'
+        +'<div style="font-size:12px;color:#8892b0;font-weight:700">\u2696\uFE0F FARQ</div>'
+        +'<div style="font-size:30px;font-weight:900;color:'+(farq>=0?'#22c55e':'#ef4444')+';line-height:1.15">'+(farq>0?'+':'')+farq+'</div>'
+        +'<div style="font-size:11.5px;color:#8892b0">'+(d.odam_soni||0)+' o\u2018quvchi \u00B7 '+(d.hujjat_soni||0)+' hujjat</div></div>'
+      +xjTile('dub','\u26A0\uFE0F','DUBLIKAT',((d.dub_soni||0)+(d.shubha_soni||0)),(((d.dub_soni||0)+(d.shubha_soni||0))?'tekshirish kerak':'dublikat yo\u2018q'),(((d.dub_soni||0)+(d.shubha_soni||0))?'#f59e0b':'#8892b0'))
+      +'</div>';
+    if(xjItogOch.keldi)h+='<div style="margin-top:10px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.25);border-radius:12px;padding:10px 12px"><div style="font-weight:800;color:#22c55e;font-size:13px">\uD83D\uDCE5 Kelganlar</div>'+xjOdamList(d.keldi_royxat,'#22c55e')+'</div>';
+    if(xjItogOch.ketdi)h+='<div style="margin-top:10px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:10px 12px"><div style="font-weight:800;color:#ef4444;font-size:13px">\uD83D\uDCE4 Ketganlar</div>'+xjOdamList(d.ketdi_royxat,'#ef4444')+'</div>';
+    if(xjItogOch.dub){
+      var dl=d.dublikatlar||[];
+      var TUR={kelish:'kelish talon',ketish:'ketish talon',chb:'chiqarish buyrug\u2018i',qb:'qabul buyrug\u2018i'};
+      h+='<div style="margin-top:10px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:10px 12px">'
+        +'<div style="font-weight:800;color:#f59e0b;font-size:13px">\u26A0\uFE0F Takrorlangan hujjatlar</div>'
+        +(dl.length?dl.map(function(x){
+          return '<div style="padding:6px 2px;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px;color:#e6e9f5">'
+            +(x.fio||'')+' \u2014 <span style="color:#f59e0b">'+(TUR[x.turi]||x.turi)+' '+x.soni+' marta</span>'
+            +' <span style="color:#8892b0;font-size:11.5px">('+(x.raqamlar||'')+')</span></div>';
+        }).join('')
+        :'<div style="color:#8892b0;font-size:12.5px;padding:6px 2px">Dublikat topilmadi \u2014 hisob toza</div>')
+        +'<div style="color:#8892b0;font-size:11.5px;margin-top:6px">Keraksiz nusxani ro\u2018yxatdan \u2715 tugmasi bilan bekor qiling \u2014 hisobdan chiqadi.</div>';
+      var sh=d.shubhalar||[];
+      if(sh.length){
+        h+='<div style="margin-top:10px;border-top:1px dashed rgba(245,158,11,.35);padding-top:8px">'
+          +'<div style="font-weight:800;color:#f59e0b;font-size:13px">\uD83D\uDD0E Bir odam, ikki xil yozilishi mumkin</div>'
+          +sh.map(function(x){return '<div style="padding:5px 2px;font-size:13px;color:#e6e9f5">'+(x.ismlar||'')+'</div>';}).join('')
+          +'<div style="color:#8892b0;font-size:11.5px;margin-top:4px">Agar bu bitta o\u2018quvchi bo\u2018lsa \u2014 ortiqcha hujjatni bekor qiling, aks holda hisobda 2 ta bo\u2018lib ko\u2018rinadi.</div></div>';
+      }
+      h+='</div>';
+    }
+    box.innerHTML=h;
+  })["catch"](function(){});
+}
+
 function xjRoyxat(){
   var box=document.getElementById('xj-list');
   if(box)box.innerHTML='<div style="color:#8892b0;font-size:13px;padding:8px">Yuklanmoqda\u2026</div>';
@@ -8884,6 +8948,7 @@ function xjRoyxat(){
     xjRoyxatCache.forEach(function(x){if(x.raqam>last[x.seriya])last[x.seriya]=x.raqam;});
     var oe=document.getElementById('xj-oxirgi');
     if(oe)oe.textContent='oxirgi: '+last.T+'/T \u00B7 '+last.KT+'/KT \u00B7 '+last.OQ+"/O\u2018Q  \u2014  "+xjOquvYili();
+    xjHisobot();
     sb.rpc('hujjat_arxiv_hajmi',{}).then(function(q){
       var ae=document.getElementById('xj-arxinfo');
       if(ae&&q&&q.data)ae.textContent='\uD83D\uDDC4 arxiv: '+q.data.soni+' ta \u00B7 '+q.data.jami_mb+' MB';
