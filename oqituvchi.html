@@ -245,7 +245,9 @@ function yubor(){
         durl=doc.output('datauristring');}catch(e){durl=null;}}
       var fam=d.fio.split(/\s+/)[0].replace(/[^A-Za-z0-9\-]+/g,'');
       if(durl){yuklaDurl(durl,'MEHNAT_SHARTNOMA_'+raqam+'M_'+fam+'.pdf');
-        if(hid)SB.rpc('hujjat_png_saqla',{p_id:hid,p_png:durl});}
+        if(hid)SB.rpc('hujjat_png_saqla',{p_id:hid,p_png:durl}).then(function(q){
+          if(q&&q.error)console.log('arxiv xato',q.error.message);
+        })["catch"](function(){});}
       else{pages.forEach(function(p,i){setTimeout(function(){
         try{yuklaDurl(p.toDataURL('image/png'),'MEHNAT_SHARTNOMA_'+raqam+'M_'+fam+'_'+(i+1)+'.png');}catch(e){}},i*400);});}
       document.getElementById('form').style.display='none';
