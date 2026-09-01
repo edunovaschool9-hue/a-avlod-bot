@@ -10167,10 +10167,12 @@ function oqKorsat(){
   box.innerHTML='<div style="background:var(--glass-hi);border:1px solid var(--brd);border-radius:14px;padding:12px 14px">'
     +'<div style="font-weight:800;color:var(--tx);font-size:15px;margin-bottom:6px">'+s.sinf+' \u2014 '+s.soni+' o\u2018quvchi</div>'
     +(s.oquvchilar||[]).map(function(x,i){
-      return '<div class="oq-row"><span class="oq-mt" style="min-width:26px;text-align:right">'+(i+1)+'.</span>'
+      var q=function(v){return String(v||'').replace(/'/g,"\\u2019").replace(/"/g,'');};
+      return '<div class="oq-row" id="oq-r'+x.id+'"><span class="oq-mt" style="min-width:26px;text-align:right">'+(i+1)+'.</span>'
         +'<span class="oq-nm">'+(x.fio||'')+'</span>'
         +(x.yangi?'<span class="oq-new">yangi</span>':'')
         +'<span class="oq-mt" style="min-width:120px">'+(x.tel||'')+'</span>'
+        +'<button class="oq-btn" style="background:var(--glass-hi);color:var(--tx);border:1px solid var(--brd);padding:5px 10px;font-size:12px" onclick="oqTahrirUI('+x.id+',\''+q(x.fio)+'\',\''+q(s.sinf)+'\',\''+q(x.tel)+'\')">\u270F\uFE0F</button>'
         +'<button class="oq-btn" style="background:rgba(185,28,28,.12);color:#b91c1c;border:1px solid var(--brd);padding:5px 10px;font-size:12px" onclick="oqOchir('+x.id+')">\u2715</button></div>';
     }).join('')+'</div>';
 }
@@ -10189,6 +10191,26 @@ function oqQosh(){
     if(r.error||!r.data||!r.data.ok){oqMsg('Qo\u2018shilmadi','#b45309');return;}
     oqMsg('\u2713 Qo\u2018shildi','#15803d');
     ['oq-f-fio','oq-f-tel'].forEach(function(id){var e=document.getElementById(id); if(e)e.value='';});
+    oqRoyxat();
+  })["catch"](function(){oqMsg('Aloqa yo\u2018q','#b45309');});
+}
+function oqTahrirUI(id,fio,sinf,tel){
+  var row=document.getElementById('oq-r'+id); if(!row)return;
+  row.innerHTML='<input id="oq-e-fio" value="'+fio+'" style="flex:2;min-width:170px;padding:8px 10px;border:1px solid var(--brd);border-radius:10px;background:#fff;color:var(--tx);font-size:14px">'
+    +'<input id="oq-e-sinf" value="'+sinf+'" style="width:80px;padding:8px 10px;border:1px solid var(--brd);border-radius:10px;background:#fff;color:var(--tx);font-size:14px">'
+    +'<input id="oq-e-tel" value="'+(tel||'')+'" placeholder="telefon" style="width:150px;padding:8px 10px;border:1px solid var(--brd);border-radius:10px;background:#fff;color:var(--tx);font-size:14px">'
+    +'<button class="oq-btn" style="background:linear-gradient(135deg,#22c55e,#15803d);color:#fff;padding:7px 13px;font-size:12.5px" onclick="oqTahrirSaqla('+id+')">\u2713 Saqlash</button>'
+    +'<button class="oq-btn" style="background:var(--glass-hi);color:var(--tx);border:1px solid var(--brd);padding:7px 13px;font-size:12.5px" onclick="oqKorsat()">Bekor</button>';
+  var f=document.getElementById('oq-e-fio'); if(f)f.focus();
+}
+function oqTahrirSaqla(id){
+  var fio=xjVal('oq-e-fio'), sinf=xjVal('oq-e-sinf'), tel=xjVal('oq-e-tel');
+  if(!fio||!sinf){alert('F.I.Sh. va sinf bo\u2018sh bo\u2018lmasin');return;}
+  oqMsg('Saqlanmoqda\u2026');
+  sb.rpc('oquvchi_tahrir',{p_id:id,p_fio:fio,p_sinf:sinf,p_tel:tel}).then(function(r){
+    if(r.error||!r.data||!r.data.ok){oqMsg((r.data&&r.data.xato)||'Saqlanmadi','#b45309');return;}
+    oqMsg('\u2713 '+r.data.fio+' \u2014 '+r.data.sinf,'#15803d');
+    if(oqOchiq&&oqOchiq!==r.data.sinf)oqOchiq=r.data.sinf;
     oqRoyxat();
   })["catch"](function(){oqMsg('Aloqa yo\u2018q','#b45309');});
 }
