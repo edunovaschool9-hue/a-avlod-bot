@@ -1,0 +1,432 @@
+<!doctype html><html lang="uz"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>EduNova School — Shartnoma</title>
+<meta name="theme-color" content="#F6F1E6">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+ background:#F6F1E6;color:#1A2238;font-size:16px;line-height:1.45}
+.wrap{max-width:560px;margin:0 auto;padding:14px 14px 40px}
+.top{display:flex;align-items:center;gap:10px;padding:6px 0 12px}
+.logo{font-weight:800;letter-spacing:.3px}
+.lang{margin-left:auto;display:flex;gap:4px}
+.lang button{border:1px solid #d9cfba;background:#fff;color:#1A2238;border-radius:8px;padding:5px 9px;font-size:13px;font-weight:600}
+.lang button.on{background:#1A2238;color:#fff;border-color:#1A2238}
+.steps{display:flex;gap:6px;margin-bottom:14px}
+.steps i{height:4px;flex:1;background:#e3d9c6;border-radius:3px}
+.steps i.on{background:#FF7A00}
+h1{font-size:20px;margin:0 0 4px}
+.sub{color:#6b6355;font-size:14px;margin:0 0 14px}
+.card{background:#fff;border:1px solid #e6dcc8;border-radius:14px;padding:14px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cls{background:#fff;border:1px solid #e0d5bf;border-radius:12px;padding:12px 6px;text-align:center;font-weight:700;font-size:16px}
+.cls small{display:block;font-weight:500;color:#8b8271;font-size:11px;margin-top:2px}
+.cls:active{background:#fff3e6}
+label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px;color:#4a4436}
+input,select{width:100%;padding:12px;border:1px solid #d9cfba;border-radius:10px;font-size:16px;background:#fff;color:#1A2238}
+input:focus,select:focus{outline:2px solid #FF7A00;border-color:#FF7A00}
+.btn{display:block;width:100%;padding:14px;border:0;border-radius:12px;background:#FF7A00;color:#fff;
+ font-size:16px;font-weight:700;margin-top:14px}
+.btn[disabled]{background:#d8cfbe;color:#8b8271}
+.btn.sec{background:#fff;color:#1A2238;border:1px solid #d9cfba}
+.lst{list-style:none;margin:0;padding:0}
+.lst li{padding:13px 12px;border:1px solid #e6dcc8;border-radius:11px;background:#fff;margin-bottom:7px;
+ display:flex;align-items:center;gap:8px;font-size:16px}
+.lst li b{font-weight:600}
+.pill{font-size:11px;padding:2px 7px;border-radius:20px;background:#eee6d6;color:#7a7161;margin-left:auto;white-space:nowrap}
+.pill.ok{background:#dcfce7;color:#166534}
+.doc{max-height:46vh;overflow:auto;background:#fff;border:1px solid #e6dcc8;border-radius:12px;
+ padding:14px;font-size:13.5px;white-space:pre-wrap;line-height:1.5}
+.chk{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:14px}
+.chk input{width:22px;height:22px;flex:0 0 22px;margin-top:1px}
+canvas{width:100%;height:190px;background:#fff;border:1px dashed #c9bfa8;border-radius:12px;touch-action:none;display:block}
+.pin{font-size:44px;font-weight:800;letter-spacing:9px;text-align:center;color:#1A2238;
+ background:#fff;border:2px solid #FF7A00;border-radius:14px;padding:16px 8px;margin:8px 0}
+.warn{background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px;font-size:14px;margin-bottom:12px}
+.err{color:#b91c1c;font-size:14px;margin-top:8px;min-height:18px}
+.mu{color:#8b8271}.sm{font-size:13px}.center{text-align:center}.mt{margin-top:10px}
+.hid{display:none}
+a.tg{display:block;text-align:center;background:#229ED9;color:#fff;text-decoration:none;padding:14px;
+ border-radius:12px;font-weight:700;margin-top:10px}
+.srch{margin-bottom:8px}
+</style></head><body><div class="wrap">
+<div class="top"><span class="logo">EduNova School</span>
+<span class="lang"><button id="lu" class="on" onclick="setTil('uz')">UZ</button><button id="lr" onclick="setTil('ru')">RU</button></span></div>
+<div class="steps"><i id="s1" class="on"></i><i id="s2"></i><i id="s3"></i><i id="s4"></i></div>
+<div id="app"></div>
+</div>
+<script>
+var XJ_MON=['yanvar','fevral','mart','aprel','may','iyun','iyul','avgust','sentabr','oktabr','noyabr','dekabr'];
+function uzf(s){return String(s).replace(/([oOgG])'/g,'$1\u2018').replace(/'/g,'\u2019');}
+function msNarxFmt(v){
+  var d=String(v||'').replace(/[^0-9]/g,'');
+  if(!d)return '____________________';
+  return d.replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+}
+function msSanaUz(iso){if(!iso)return '\u00AB____\u00BB _____________ 202___-yil';var p=iso.split('-');return '\u00AB'+parseInt(p[2],10)+'\u00BB '+XJ_MON[parseInt(p[1],10)-1]+' '+p[0]+'-yil';}
+var MS_REK_SARLAVHA='To\u2018lov rekvizitlari';
+var MS_REK=[
+  {ind:0,p:[['Maktab uchun to\u2018lovni quyidagicha amalga oshirsangiz bo\u2018ladi:',0]]},
+  {ind:0,p:[['1. NAQD \u2014 maktabga kelib.',0]]},
+  {ind:0,p:[['2. Bank hisob raqamiga:',0]]},
+  {ind:1,p:[['Bank: ',0],['ALOQA BANK',1]]},
+  {ind:1,p:[['Hisob raqam: ',0],['20208000907292972001',1]]},
+  {ind:1,p:[['INN: ',0],['200829053',1],['          MFO: ',0],['00401',1]]}
+];
+function msRekMatn(){
+  var L=[],i,j,s;
+  for(i=0;i<MS_REK.length;i++){
+    s=''; for(j=0;j<MS_REK[i].p.length;j++)s+=MS_REK[i].p[j][0];
+    L.push((MS_REK[i].ind?'   ':'')+s);
+  }
+  return L;
+}
+
+function msBlocks(d,raqam){
+  var B=[]; function P(t,o){o=o||{};B.push({k:'p',t:t,s:o.s||27,b:!!o.b,i:!!o.i,a:o.a||'just',lh:o.lh||36,sa:(o.sa!==undefined?o.sa:10)});}
+  function H(t){B.push({k:'h',t:t});}
+  var blank='__________________';
+  var otafio=d['ms-otafio']||'_______________________________________________';
+  var oquv=d['ms-oquvchi']||'_______________________________________________';
+  B.push({k:'title',raqam:raqam,sana:d['ms-sana']});
+  P('1. FERGHANA EDU NOVA SCHOOL mchj nomidan Nizom asosida faoliyat yurituvchi direktor Xolmatov Dostonbek Abdujabbor o\u2018g\u2018li, keyingi o\u2018rinlarda \u00ABMaktab\u00BB deb yuritiladi, bir tomondan;');
+  P('2. O\u2018quvchining ota-onasi (qonuniy vakili) '+otafio+', pasport (ID) '+(d['ms-pasport']||'________________')+', telefon '+(d['ms-tel']||'______________________')+', keyingi o\u2018rinlarda \u00ABBuyurtmachi\u00BB deb yuritiladi, ikkinchi tomondan;');
+  P('3. O\u2018quvchi '+oquv+', '+(d['ms-sinf']||'______')+'-sinf, tug\u2018ilgan yili '+(d['ms-tugyil']||'________')+', keyingi o\u2018rinlarda \u00ABO\u2018quvchi\u00BB deb yuritiladi,');
+  P('quyidagilar to\u2018g\u2018risida mazkur shartnomani tuzdilar.');
+  H('1. Shartnomaning predmeti');
+  P('1.1. Maktab O\u2018quvchiga umumiy o\u2018rta ta\u2019lim dasturi hamda maktabning qo\u2018shimcha yo\u2018nalishlari (matematika, ingliz tili, koreys tili, AI va dasturlash, shaxmat, robototexnika, gimnastika, psixologiya) bo\u2018yicha ta\u2019lim va tarbiya beradi, Buyurtmachi esa belgilangan to\u2018lovni amalga oshiradi.');
+  var oy1=parseInt(String(d['ms-oyil']||'').replace(/[^0-9]/g,''),10);
+  var oyTxt = oy1 ? (oy1+'-yil 1-sentabrdan '+(oy1+1)+'-yil 30-iyungacha') : '202___-yil 1-sentabrdan 202___-yil 30-iyungacha';
+  P('1.2. O\u2018quv yili muddati: '+oyTxt+'. O\u2018quv yilining davomiyligi \u2014 10 (o\u2018n) o\u2018quv oyi.');
+  P('1.3. Ta\u2019lim tili: '+(d['ms-til']||'________________')+'.');
+  H('2. Maktabning majburiyatlari');
+  P('2.1. Davlat ta\u2019lim standartlari va maktabning ichki o\u2018quv dasturi asosida sifatli dars o\u2018tishni ta\u2019minlash.');
+  P('2.2. Har bir darsning sifatini \u00ABDARS SVETOFORI\u00BB tizimi orqali kunlik nazorat qilish va zaif darslarni bartaraf etish.');
+  P('2.3. O\u2018quvchi uchun elektron platformada shaxsiy kabinet ochish, Buyurtmachiga login va parol berish.');
+  P('2.4. Platformada muntazam ravishda joylab borish: darsning mavzusi, kunlik hisobot, test natijalari, davomat va O\u2018quvchining darsdagi faolligi.');
+  P('2.5. O\u2018quvchining sog\u2018lig\u2018i va xavfsizligini dars vaqtida ta\u2019minlash, xodimlarning majburiy tibbiy ko\u2018rikdan o\u2018tishini nazorat qilish.');
+  P('2.6. O\u2018quvchi va Buyurtmachi to\u2018g\u2018risidagi ma\u2019lumotlarning maxfiyligini saqlash, ularni uchinchi shaxslarga bermaslik.');
+  P('2.7. O\u2018quvchining bilim darajasi keskin pasaygani aniqlansa, bu haqda Buyurtmachini xabardor qilish va qo\u2018shimcha yordam tashkil etish.');
+  H('3. Buyurtmachining (ota-onaning) majburiyatlari');
+  P('3.1. To\u2018lovni mazkur shartnomaning 5-bo\u2018limida belgilangan tartibda va muddatda amalga oshirish.');
+  P('3.2. O\u2018quvchining darslarga o\u2018z vaqtida, to\u2018liq shaklda va zarur o\u2018quv qurollari bilan kelishini ta\u2019minlash.');
+  P('3.3. Elektron platformaga muntazam kirib turish, farzandining natijalari va o\u2018qituvchi hisobotlari bilan tanishib borish.');
+  P('3.4. O\u2018quvchi kasal bo\u2018lganda yoki darsga kelmaydigan bo\u2018lsa, maktabni o\u2018sha kuni xabardor qilish.');
+  P('3.5. O\u2018quvchida yuqumli kasallik aniqlansa, darhol maktabni ogohlantirish va tibbiy xulosa olinmaguncha uni darsga yubormaslik.');
+  P('3.6. Maktabning ichki tartib qoidalariga hurmat bilan yondashish, o\u2018qituvchi va xodimlar bilan muloqotda odob doirasida bo\u2018lish.');
+  P('3.7. Barcha murojaat va shikoyatlarni elektron platforma yoki HR bo\u2018limi orqali rasmiy tartibda bildirish.');
+  H('4. O\u2018quvchining majburiyatlari');
+  P('4.1. Darslarga o\u2018z vaqtida qatnashish va faol ishtirok etish.');
+  P('4.2. Uy vazifalari va o\u2018qituvchi bergan topshiriqlarni bajarish.');
+  P('4.3. O\u2018qituvchilar, xodimlar va boshqa o\u2018quvchilarga nisbatan hurmat bilan munosabatda bo\u2018lish.');
+  P('4.4. Maktab mulkiga ehtiyotkorona munosabatda bo\u2018lish, dars jarayoniga xalaqit bermaslik.');
+  H('5. To\u2018lov tartibi, chegirma va grantlar');
+  P('5.1. Bir oylik o\u2018qish to\u2018lovi: '+msNarxFmt(d['ms-narx'])+' so\u2018m. To\u2018lov o\u2018quv yili davomida 10 (o\u2018n) oy uchun amalga oshiriladi.');
+  P('5.2. To\u2018lov har oyning '+(d['ms-tkun']||'______')+' sanasigacha amalga oshiriladi.');
+  P('5.3. To\u2018lov naqd yoki bank o\u2018tkazmasi orqali qabul qilinadi, har bir to\u2018lov platformada qayd etiladi.');
+  P('5.4. Ta\u2019lim nazorati bo\u2018limi operatorlari to\u2018lov muddati yaqinlashganda Buyurtmachiga oldindan eslatib boradi.');
+  P('5.5. To\u2018lov '+(d['ms-kkun']||'______')+' kundan ortiq kechiktirilsa, maktab O\u2018quvchini darslarga qo\u2018ymaslik huquqiga ega. Buyurtmachi moliyaviy qiyinchilikka duch kelsa, muddatidan oldin yozma murojaat qilishi mumkin va masala kelishuv yo\u2018li bilan hal etiladi.');
+  P('5.6. O\u2018quvchi darsga kelmagan kunlar uchun to\u2018lov qaytarilmaydi va qayta hisoblanmaydi. Oy davomida qisman darsga qatnashmaslik, jumladan 15\u201320 kun kelmaslik ham, oylik to\u2018lovni kamaytirish yoki to\u2018lamaslik uchun asos bo\u2018lmaydi \u2014 to\u2018lov to\u2018liq hajmda amalga oshiriladi.');
+  P('5.7. Faqat O\u2018quvchi to\u2018liq bir (1) o\u2018quv oyi davomida darslarga umuman qatnashmagan taqdirdagina o\u2018sha oy uchun to\u2018lov olinmasligi mumkin. Buning uchun Buyurtmachi oy boshlanishidan oldin maktabni yozma ravishda ogohlantirishi va maktab rahbariyatining yozma roziligi bo\u2018lishi shart.');
+  P('5.8. O\u2018quvchining sertifikat, diplom, medal yoki boshqa yutuqlarga ega bo\u2018lishi (IELTS, TOPIK, olimpiada natijalari va shu kabilar) o\u2018qish to\u2018lovidan chegirma olish uchun asos bo\u2018lmaydi. Chegirma faqat maktabning rasmiy grant tanlovlari orqali beriladi.');
+  P('5.9. Maktabning maxsus grant (chegirma) tanlovi g\u2018oliblari har chorak yakunida qayta ko\u2018rib chiqiladi. Baholash mezonlari: intizom va xulq-atvor, darslarga davomat, maktabning ichki tartib qoidalariga rioya qilish.');
+  P('5.10. Quyidagi hollarda O\u2018quvchi grant (chegirma) dasturidan chiqariladi:');
+  P('a) mazkur shartnomaning 7-bo\u2018limiga muvofiq \u00ABQora yulduz\u00BB olinishi yoki boshqa intizomiy qoidabuzarliklar, yomon xulq-atvor;',{sa:4});
+  P('b) chorak davomida '+(d['ms-gkun']||'______')+' kundan ortiq sababsiz darsdan qolish;',{sa:4});
+  P('v) maktabning ichki tartib qoidalariga rioya qilmaslik.',{sa:10});
+  P('5.11. Grantdan chiqarish to\u2018g\u2018risidagi qaror maktab komissiyasi tomonidan chorak yakunida qabul qilinadi va Buyurtmachiga platforma orqali yozma ravishda ma\u2019lum qilinadi. Bunday holatda O\u2018quvchi keyingi oydan boshlab o\u2018qish to\u2018lovini to\u2018liq hajmda amalga oshiradi. Keyingi chorak qoidabuzarliklarsiz yakunlansa, O\u2018quvchi grant tanlovida qayta ishtirok etishi mumkin.');
+  H('6. Darslarning audio yozuvi va shaxsiy ma\u2019lumotlar');
+  P('6.1. Maktabda ta\u2019lim sifatini nazorat qilish maqsadida darslarning audio yozuvi olib boriladi. Buyurtmachi mazkur shartnomani imzolash orqali O\u2018quvchining ovozi dars davomida yozib olinishiga rozilik bildiradi.');
+  P('a) yozuv faqat dars jadvaliga muvofiq, dars vaqtida amalga oshiriladi; tanaffus, koridor va dam olish xonalari yozib olinmaydi;',{sa:4});
+  P('b) video yozuv olib borilmaydi, faqat ovoz yozib olinadi;',{sa:4});
+  P('v) audio yozuv 30 (o\u2018ttiz) kun saqlanadi va shundan so\u2018ng o\u2018chiriladi;',{sa:4});
+  P('g) yozuv faqat dars sifatini baholash uchun ishlatiladi, uchinchi shaxslarga berilmaydi va ommaviy joylashtirilmaydi;',{sa:4});
+  P('d) Buyurtmachi o\u2018z farzandiga tegishli ma\u2019lumotlar bilan tanishish huquqiga ega.',{sa:10});
+  P('6.2. Buyurtmachi elektron platformada faqat o\u2018z farzandining ma\u2019lumotlarini ko\u2018radi. Boshqa o\u2018quvchilar, o\u2018qituvchilar reytingi va ichki baholash natijalari Buyurtmachiga taqdim etilmaydi.');
+  H('7. O\u2018quvchi intizomi \u2014 \u00ABQORA YULDUZ\u00BB tizimi');
+  P('7.1. O\u2018quvchining intizomi platformada qayd etib boriladi. Quyidagi hollarda O\u2018quvchiga \u00ABQora yulduz\u00BB beriladi:');
+  P('a) o\u2018qituvchi bergan topshiriq va uy vazifalarini muntazam bajarmaslik;',{sa:4});
+  P('b) darsni va boshqa o\u2018quvchilarning o\u2018qishini ataylab buzadigan xatti-harakatlar;',{sa:4});
+  P('v) o\u2018qituvchi, xodim yoki boshqa o\u2018quvchiga nisbatan qo\u2018pol muomala yoki zo\u2018ravonlik;',{sa:4});
+  P('g) maktab mulkiga ataylab zarar yetkazish.',{sa:10});
+  P('7.2. \u00ABQora yulduz\u00BB past test natijasi uchun berilmaydi. Bilim darajasining pastligi jazo emas, balki maktab tomonidan qo\u2018shimcha yordam ko\u2018rsatilishi uchun asos hisoblanadi.');
+  P('7.3. Har bir \u00ABQora yulduz\u00BB haqida Buyurtmachi o\u2018sha kuni platforma orqali xabardor qilinadi. Ikkinchi \u00ABQora yulduz\u00BBdan so\u2018ng Buyurtmachi, sinf rahbari va HR bo\u2018limi ishtirokida suhbat o\u2018tkaziladi.');
+  P('7.4. 90 (to\u2018qson) kun davomida yangi qoidabuzarlik qayd etilmasa, \u00ABQora yulduz\u00BB avtomatik ravishda bekor qilinadi.');
+  P('7.5. Bir o\u2018quv yili davomida 3 (uchta) \u00ABQora yulduz\u00BB to\u2018plansa, maktab mazkur shartnomani bekor qilish huquqiga ega. Bunday holatda qaror yozma shaklda asoslantiriladi va Buyurtmachiga topshiriladi.');
+  H('8. Shartnomani bekor qilish');
+  P('8.1. Shartnoma tomonlarning o\u2018zaro kelishuvi asosida istalgan vaqtda bekor qilinishi mumkin.');
+  P('8.2. Buyurtmachi shartnomani bekor qilmoqchi bo\u2018lsa, kamida 15 (o\u2018n besh) kun oldin yozma ravishda xabar beradi.');
+  P('8.3. Maktab shartnomani quyidagi hollarda bekor qilishi mumkin: to\u2018lovning uzoq muddat amalga oshirilmasligi; mazkur shartnomaning 7.5-bandida ko\u2018rsatilgan holat; Buyurtmachi tomonidan maktab xodimlariga nisbatan haqorat yoki bosim o\u2018tkazish.');
+  P('8.4. Shartnoma bekor qilinganda oldindan to\u2018langan va foydalanilmagan oylar uchun to\u2018lov Buyurtmachiga qaytariladi.');
+  H('9. Fors-major holatlari');
+  P('9.1. Karantin, tabiiy ofat, epidemiya, favqulodda holat va tomonlarning irodasiga bog\u2018liq bo\u2018lmagan boshqa vaziyatlarda dars jarayoni masofaviy shaklda davom ettiriladi yoki muddati siljitiladi.');
+  P('9.2. Bunday holatlarda tomonlarning moliyaviy munosabatlari 40 (qirq) kun ichida o\u2018zaro kelishuv yo\u2018li bilan hal qilinadi.');
+  H('10. Yakuniy qoidalar');
+  P('10.1. Nizolar dastlab muzokara yo\u2018li bilan, kelishuvga erishilmasa amaldagi qonunchilik asosida hal qilinadi.');
+  P('10.2. Maktabning ichki tartib qoidalari mazkur shartnomaga ilova qilinadi va uning ajralmas qismi hisoblanadi. Ularga kiritilgan o\u2018zgartishlar Buyurtmachiga oldindan ma\u2019lum qilinadi.');
+  P('10.3. Shartnoma imzolangan kundan kuchga kiradi va bir xil kuchga ega bo\u2018lgan ikki nusxada tuzildi.');
+  B.push({k:'sig'});
+  B.push({k:'rek'});
+  return B;
+}
+
+/* ---------- sahifalarga joylash ---------- */
+
+/* ===== EduNova — ota-ona shartnomasi (QR oqimi) ===== */
+var SB_URL="https://unaodltahuevrfnarfha.supabase.co";
+var SB_KEY="sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP";
+var KALIT=(new URLSearchParams(location.search)).get('k')||'';
+var TIL=localStorage.getItem('sh_til')||'uz';
+var ST={sinf:null,sinfNom:'',oquvchi:null,oquvchiIsm:'',narx:0,tkun:5,bot:'',sinflar:[],royxat:[]};
+var IMZO=null, CHIZDI=false;
+
+var TX={
+ uz:{q1:'Farzandingiz sinfini tanlang',q1s:'Sinfni bosing — keyin ro\u2018yxatdan bolangizni tanlaysiz',
+  q2:'Ro\u2018yxatdan farzandingizni tanlang',q2s:'Ismi ro\u2018yxatda bo\u2018lmasa — pastdagi tugmani bosing',
+  yoq:'Ro\u2018yxatda yo\u2018q \u2014 qo\u2018lda yozaman',qidir:'Qidirish\u2026',band:'shartnoma bor',
+  qol:'Farzandingizning ism va familiyasi',qols:'Qolgan ma\u2019lumotlarni maktab keyin to\u2018ldiradi',
+  saqla:'Davom etish',orqa:'Orqaga',
+  q3:'Ota-ona ma\u2019lumotlari',q3s:'Shartnoma shu ma\u2019lumotlar asosida tuziladi',
+  fio:'F.I.Sh. (to\u2018liq)',pas:'Pasport / ID raqami',man:'Yashash manzili',tel:'Telefon raqamingiz',
+  tugyil:'Farzand tug\u2018ilgan yili',til:'Ta\u2019lim tili',narx:'Bir oylik to\u2018lov (so\u2018m)',
+  tkun:'To\u2018lov sanasi (har oyning)',yil:'O\u2018quv yili boshi',
+  q4:'Shartnomani o\u2018qing va imzolang',q4s:'Imzoni barmoq bilan chizing',
+  oqidim:'Shartnoma matnini o\u2018qib chiqdim va shartlariga roziman',
+  tozala:'Imzoni tozalash',imzola:'Imzolash va yakunlash',
+  q5:'Shartnoma imzolandi',pinmat:'Bu \u2014 shaxsiy kabinetingiz uchun PIN kod',
+  skrin:'Ekrandan surat oling yoki quyidagi Telegram tugmasini bosing \u2014 bot PIN kodni sizga yuboradi',
+  tgbtn:'Telegramga yuborish',kabinet:'Kabinetga kirish',pinsaqla:'PIN kodni hech kimga bermang',
+  yuk:'Yuklanmoqda\u2026',xato:'Xatolik. Qayta urining.',
+  e_fio:'F.I.Sh. to\u2018liq yozilsin',e_pas:'Pasport (ID) raqamini kiriting',e_tel:'Telefon raqamini to\u2018liq kiriting',
+  e_imzo:'Imzo chizilmagan',e_chk:'Shartlarga rozilikni belgilang',e_ism:'Ism va familiyani yozing',
+  e_kalit:'Havola noto\u2018g\u2018ri yoki eskirgan. Administratorga murojaat qiling.',
+  raqam:'Shartnoma raqami'},
+ ru:{q1:'Выберите класс ребёнка',q1s:'Нажмите класс — дальше выберете ребёнка из списка',
+  q2:'Выберите своего ребёнка',q2s:'Если имени нет в списке — нажмите кнопку внизу',
+  yoq:'Нет в списке — впишу вручную',qidir:'Поиск…',band:'договор есть',
+  qol:'Имя и фамилия ребёнка',qols:'Остальное школа заполнит позже',
+  saqla:'Продолжить',orqa:'Назад',
+  q3:'Данные родителя',q3s:'Договор составляется по этим данным',
+  fio:'Ф.И.О. полностью',pas:'Паспорт / ID номер',man:'Адрес проживания',tel:'Ваш телефон',
+  tugyil:'Год рождения ребёнка',til:'Язык обучения',narx:'Оплата за месяц (сум)',
+  tkun:'День оплаты (каждого месяца)',yil:'Начало учебного года',
+  q4:'Прочитайте и подпишите договор',q4s:'Подпись рисуется пальцем',
+  oqidim:'Я прочитал(а) текст договора и согласен(на) с условиями',
+  tozala:'Очистить подпись',imzola:'Подписать и завершить',
+  q5:'Договор подписан',pinmat:'Это PIN-код от вашего личного кабинета',
+  skrin:'Сделайте скриншот или нажмите кнопку Telegram — бот пришлёт вам PIN',
+  tgbtn:'Отправить в Telegram',kabinet:'Войти в кабинет',pinsaqla:'Никому не сообщайте PIN',
+  yuk:'Загрузка…',xato:'Ошибка. Попробуйте ещё раз.',
+  e_fio:'Впишите Ф.И.О. полностью',e_pas:'Введите номер паспорта (ID)',e_tel:'Введите телефон полностью',
+  e_imzo:'Подпись не нарисована',e_chk:'Отметьте согласие с условиями',e_ism:'Впишите имя и фамилию',
+  e_kalit:'Ссылка неверна или устарела. Обратитесь к администратору.',
+  raqam:'Номер договора'}
+};
+function t(k){return (TX[TIL]&&TX[TIL][k])||TX.uz[k]||k;}
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function setTil(v){TIL=v;localStorage.setItem('sh_til',v);$('lu').className=v==='uz'?'on':'';$('lr').className=v==='ru'?'on':'';render();}
+function bosqich(n){for(var i=1;i<=4;i++){var e=$('s'+i);if(e)e.className=(i<=n?'on':'');}}
+function rpc(fn,args){
+ return fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',
+   headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},
+   body:JSON.stringify(args||{})}).then(function(r){return r.json();});
+}
+/* --- qoralama (svet o'chsa yo'qolmasin) --- */
+function qora(){try{localStorage.setItem('sh_qoralama',JSON.stringify({s:ST.sinf,sn:ST.sinfNom,o:ST.oquvchi,oi:ST.oquvchiIsm,
+ f:val('f_fio'),p:val('f_pas'),m:val('f_man'),tl:val('f_tel'),ty:val('f_tugyil')}));}catch(e){}}
+function qoraOl(){try{return JSON.parse(localStorage.getItem('sh_qoralama')||'{}');}catch(e){return {};}}
+function val(id){var e=$(id);return e?e.value.trim():'';}
+
+/* ---------- 1: sinflar ---------- */
+function ekran1(){
+ bosqich(1);
+ var h='<h1>'+t('q1')+'</h1><p class="sub">'+t('q1s')+'</p><div class="grid">';
+ ST.sinflar.forEach(function(s){
+  h+='<button class="cls" onclick="pickSinf('+s.id+',\''+esc(s.nom)+'\')">'+esc(s.nom)+
+     '<small>'+s.soni+'</small></button>';
+ });
+ h+='</div>';
+ $('app').innerHTML=h;
+}
+function pickSinf(id,nom){
+ ST.sinf=id;ST.sinfNom=nom;ST.oquvchi=null;ST.oquvchiIsm='';qora();
+ $('app').innerHTML='<p class="sub">'+t('yuk')+'</p>';
+ rpc('ep_sh_oquvchilar',{p_kalit:KALIT,p_sinf_id:id}).then(function(d){
+  if(!d||!d.ok){$('app').innerHTML='<div class="warn">'+t('xato')+'</div>';return;}
+  ST.royxat=d.royxat||[];ekran2();
+ })["catch"](function(){$('app').innerHTML='<div class="warn">'+t('xato')+'</div>';});
+}
+/* ---------- 2: o'quvchi ---------- */
+function ekran2(){
+ bosqich(2);
+ var h='<h1>'+esc(ST.sinfNom)+' \u2014 '+t('q2')+'</h1><p class="sub">'+t('q2s')+'</p>';
+ h+='<input class="srch" id="qq" placeholder="'+t('qidir')+'" oninput="filtr()">';
+ h+='<ul class="lst" id="ul"></ul>';
+ h+='<button class="btn sec" onclick="qolda()">'+t('yoq')+'</button>';
+ h+='<button class="btn sec" onclick="ekran1()">'+t('orqa')+'</button>';
+ $('app').innerHTML=h;filtr();
+}
+function filtr(){
+ var q=(val('qq')||'').toLowerCase(), h='';
+ ST.royxat.forEach(function(o){
+  if(q && o.ism.toLowerCase().indexOf(q)<0) return;
+  h+='<li onclick="pickOquvchi('+o.id+',\''+esc(o.ism).replace(/'/g,"\\'")+'\')"><b>'+esc(o.ism)+'</b>'+
+     (o.band?'<span class="pill ok">'+t('band')+'</span>':'')+'</li>';
+ });
+ if(!h)h='<li class="mu">\u2014</li>';
+ $('ul').innerHTML=h;
+}
+function qolda(){
+ bosqich(2);
+ $('app').innerHTML='<h1>'+t('qol')+'</h1><p class="sub">'+esc(ST.sinfNom)+' \u2014 '+t('qols')+'</p>'+
+  '<div class="card"><label>'+t('qol')+'</label><input id="q_ism" autocomplete="off"></div>'+
+  '<div class="err" id="e"></div>'+
+  '<button class="btn" onclick="qoldaSaqla()">'+t('saqla')+'</button>'+
+  '<button class="btn sec" onclick="ekran2()">'+t('orqa')+'</button>';
+}
+function qoldaSaqla(){
+ var ism=val('q_ism');
+ if(ism.length<4){$('e').textContent=t('e_ism');return;}
+ $('e').textContent='';
+ rpc('ep_sh_qol',{p_kalit:KALIT,p_sinf_id:ST.sinf,p_ism:ism}).then(function(d){
+  if(!d||!d.ok){$('e').textContent=t('xato');return;}
+  pickOquvchi(d.id,d.ism);
+ })["catch"](function(){$('e').textContent=t('xato');});
+}
+function pickOquvchi(id,ism){ST.oquvchi=id;ST.oquvchiIsm=ism;qora();ekran3();}
+/* ---------- 3: ota-ona ---------- */
+function ekran3(){
+ bosqich(3);
+ var q=qoraOl(), yil=new Date().getFullYear();
+ var h='<h1>'+t('q3')+'</h1><p class="sub">'+esc(ST.oquvchiIsm)+' \u00B7 '+esc(ST.sinfNom)+'</p><div class="card">';
+ h+='<label>'+t('fio')+' *</label><input id="f_fio" value="'+esc(q.f||'')+'" autocomplete="name">';
+ h+='<label>'+t('pas')+' *</label><input id="f_pas" value="'+esc(q.p||'')+'" autocomplete="off" placeholder="AA 1234567">';
+ h+='<label>'+t('tel')+' *</label><input id="f_tel" type="tel" value="'+esc(q.tl||'')+'" placeholder="+998 __ ___ __ __">';
+ h+='<label>'+t('man')+'</label><input id="f_man" value="'+esc(q.m||'')+'">';
+ h+='<label>'+t('tugyil')+'</label><input id="f_tugyil" inputmode="numeric" value="'+esc(q.ty||'')+'" placeholder="2015">';
+ h+='<label>'+t('til')+'</label><select id="f_til"><option value="o\u2018zbek">O\u2018zbek</option><option value="rus">Rus / Русский</option></select>';
+ h+='<label>'+t('narx')+' *</label><input id="f_narx" inputmode="numeric" value="'+(ST.narx||'')+'">';
+ h+='<label>'+t('tkun')+'</label><input id="f_tkun" inputmode="numeric" value="'+(ST.tkun||5)+'">';
+ h+='<label>'+t('yil')+'</label><input id="f_yil" inputmode="numeric" value="'+yil+'">';
+ h+='</div><div class="err" id="e"></div>';
+ h+='<button class="btn" onclick="keyingi()">'+t('saqla')+'</button>';
+ h+='<button class="btn sec" onclick="ekran2()">'+t('orqa')+'</button>';
+ $('app').innerHTML=h;
+ if(/B$/.test(ST.sinfNom))$('f_til').value='rus';
+ ['f_fio','f_pas','f_man','f_tel','f_tugyil'].forEach(function(id){var e=$(id);if(e)e.addEventListener('blur',qora);});
+}
+function keyingi(){
+ var e=$('e');
+ if(val('f_fio').length<6){e.textContent=t('e_fio');return;}
+ if(val('f_pas').replace(/[^A-Za-z0-9]/g,'').length<7){e.textContent=t('e_pas');return;}
+ if(val('f_tel').replace(/[^0-9]/g,'').length<9){e.textContent=t('e_tel');return;}
+ e.textContent='';qora();ekran4();
+}
+
+/* ---------- 4: shartnoma + imzo ---------- */
+function shData(){
+ var d={};
+ d['ms-otafio']=val('f_fio')||ST.f_fio; d['ms-pasport']=val('f_pas')||ST.f_pas;
+ d['ms-tel']=val('f_tel')||ST.f_tel;    d['ms-oquvchi']=ST.oquvchiIsm;
+ d['ms-sinf']=(ST.sinfNom||'').split('-')[0]; d['ms-tugyil']=val('f_tugyil')||ST.f_tugyil;
+ d['ms-oyil']=val('f_yil')||ST.f_yil;   d['ms-til']=val('f_til')||ST.f_til;
+ d['ms-narx']=val('f_narx')||ST.f_narx; d['ms-tkun']=val('f_tkun')||ST.f_tkun;
+ d['ms-kkun']='15'; d['ms-sana']=new Date().toISOString().slice(0,10);
+ return d;
+}
+function shMatn(){
+ var d=shData(), B=msBlocks(d,'____'), L=[], i, b;
+ for(i=0;i<B.length;i++){ b=B[i];
+  if(b.k==='title'){L.push('S H A R T N O M A');L.push('\u2116 ____/SH   '+msSanaUz(d['ms-sana']));L.push('');}
+  else if(b.k==='h'){L.push('');L.push(b.t);}
+  else if(b.k==='p'){L.push(b.t);}
+ }
+ L.push(''); L.push(MS_REK_SARLAVHA); L=L.concat(msRekMatn()); L.push('');
+ L.push('Maktab: FERGHANA EDU NOVA SCHOOL mchj, direktor Xolmatov D.');
+ L.push('Buyurtmachi: '+(d['ms-otafio']||'____'));
+ return L.join('\n');
+}
+function ekran4(){
+ bosqich(4);
+ ST.f_fio=val('f_fio');ST.f_pas=val('f_pas');ST.f_tel=val('f_tel');ST.f_man=val('f_man');
+ ST.f_tugyil=val('f_tugyil');ST.f_til=val('f_til');ST.f_narx=val('f_narx');
+ ST.f_tkun=val('f_tkun');ST.f_yil=val('f_yil');
+ var h='<h1>'+t('q4')+'</h1><p class="sub">'+t('q4s')+'</p>';
+ h+='<div class="doc" id="doc">'+esc(shMatn())+'</div>';
+ h+='<label class="chk"><input type="checkbox" id="ok1"><span>'+t('oqidim')+'</span></label>';
+ h+='<div class="card mt"><canvas id="pad"></canvas>'+
+    '<button class="btn sec" onclick="padTozala()">'+t('tozala')+'</button></div>';
+ h+='<div class="err" id="e"></div>';
+ h+='<button class="btn" id="go" onclick="yakunla()">'+t('imzola')+'</button>';
+ h+='<button class="btn sec" onclick="ekran3()">'+t('orqa')+'</button>';
+ $('app').innerHTML=h; padInit();
+}
+var PAD,PCTX;
+function padInit(){
+ PAD=$('pad'); var r=PAD.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+ PAD.width=Math.round(r.width*dpr); PAD.height=Math.round(190*dpr);
+ PCTX=PAD.getContext('2d'); PCTX.scale(dpr,dpr);
+ PCTX.lineWidth=2.4; PCTX.lineCap='round'; PCTX.lineJoin='round'; PCTX.strokeStyle='#111';
+ CHIZDI=false;
+ var draw=false,lx=0,ly=0;
+ function pos(ev){var b=PAD.getBoundingClientRect(),p=ev.touches?ev.touches[0]:ev;
+  return {x:p.clientX-b.left,y:p.clientY-b.top};}
+ function down(ev){ev.preventDefault();draw=true;var p=pos(ev);lx=p.x;ly=p.y;}
+ function move(ev){if(!draw)return;ev.preventDefault();var p=pos(ev);
+  PCTX.beginPath();PCTX.moveTo(lx,ly);PCTX.lineTo(p.x,p.y);PCTX.stroke();lx=p.x;ly=p.y;CHIZDI=true;}
+ function up(){draw=false;}
+ PAD.addEventListener('touchstart',down,{passive:false});PAD.addEventListener('touchmove',move,{passive:false});
+ PAD.addEventListener('touchend',up);PAD.addEventListener('mousedown',down);
+ PAD.addEventListener('mousemove',move);window.addEventListener('mouseup',up);
+}
+function padTozala(){if(PCTX&&PAD){PCTX.clearRect(0,0,PAD.width,PAD.height);CHIZDI=false;}}
+function yakunla(){
+ var e=$('e');
+ if(!$('ok1').checked){e.textContent=t('e_chk');return;}
+ if(!CHIZDI){e.textContent=t('e_imzo');return;}
+ e.textContent=''; var b=$('go'); b.disabled=true; b.textContent=t('yuk');
+ IMZO=PAD.toDataURL('image/png');
+ rpc('ep_sh_saqla',{p_kalit:KALIT,p_oquvchi_id:ST.oquvchi,p_ota_ism:ST.f_fio,p_pasport:ST.f_pas,
+   p_manzil:ST.f_man,p_telefon:ST.f_tel,p_tugyil:ST.f_tugyil,
+   p_narx:parseInt(String(ST.f_narx).replace(/[^0-9]/g,''),10)||null,
+   p_tolov_kuni:parseInt(ST.f_tkun,10)||5,p_oquv_yili:parseInt(ST.f_yil,10)||null,
+   p_til:(ST.f_til==='rus'?'ru':'uz'),p_imzo:IMZO,p_matn:shMatn(),
+   p_qurilma:navigator.userAgent}).then(function(d){
+  b.disabled=false;b.textContent=t('imzola');
+  if(!d||!d.ok){e.textContent=t('xato')+(d&&d.xato?(' ['+d.xato+']'):'');return;}
+  try{localStorage.removeItem('sh_qoralama');}catch(x){}
+  ekran5(d);
+ })["catch"](function(){b.disabled=false;b.textContent=t('imzola');e.textContent=t('xato');});
+}
+/* ---------- 5: PIN ---------- */
+function ekran5(d){
+ var baza=location.href.replace(/[^/]*$/,'');
+ var h='<div class="warn">'+t('skrin')+'</div>';
+ h+='<h1 class="center">'+t('q5')+'</h1>';
+ h+='<p class="sub center">'+t('raqam')+': \u2116 '+d.raqam+'/SH</p>';
+ h+='<div class="card center"><div class="sm mu">'+t('pinmat')+'</div>';
+ h+='<div class="pin">'+esc(d.pin)+'</div>';
+ h+='<div class="sm mu">'+esc(d.oquvchi)+' \u00B7 '+esc(d.sinf)+'</div>';
+ h+='<div class="sm mu mt">'+t('pinsaqla')+'</div></div>';
+ if(d.bot){h+='<a class="tg" target="_blank" rel="noopener" href="https://t.me/'+esc(String(d.bot).replace('@',''))+'?start='+esc(d.kod)+'">'+t('tgbtn')+'</a>';}
+ h+='<a class="btn sec" style="text-decoration:none;display:block;text-align:center" href="'+baza+'ota-ona.html">'+t('kabinet')+'</a>';
+ $('app').innerHTML=h;
+ try{window.scrollTo(0,0);}catch(x){}
+}
+/* ---------- boshlash ---------- */
+function render(){
+ if(!ST.sinflar.length){boshla();return;}
+ if(!ST.sinf)ekran1(); else if(!ST.oquvchi)ekran2(); else ekran3();
+}
+function boshla(){
+ $('app').innerHTML='<p class="sub">'+t('yuk')+'</p>';
+ rpc('ep_sh_boshla',{p_kalit:KALIT}).then(function(d){
+  if(!d||!d.ok){$('app').innerHTML='<div class="warn">'+t('e_kalit')+'</div>';return;}
+  ST.sinflar=d.sinflar||[];ST.narx=d.narx||'';ST.tkun=d.tolov_kuni||5;ST.bot=d.bot||'';
+  ekran1();
+ })["catch"](function(){$('app').innerHTML='<div class="warn">'+t('xato')+'</div>';});
+}
+setTil(TIL);
+
+</script></body></html>
