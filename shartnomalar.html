@@ -1,0 +1,151 @@
+<!doctype html><html lang="uz"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>EduNova — Shartnomalar</title><meta name="theme-color" content="#F6F1E6">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+ background:#F6F1E6;color:#1A2238;font-size:16px;line-height:1.45}
+.wrap{max-width:720px;margin:0 auto;padding:14px 14px 48px}
+.top{display:flex;align-items:center;gap:10px;padding:4px 0 12px}
+.logo{font-weight:800}.out{margin-left:auto;font-size:13px;color:#8b8271;text-decoration:underline}
+h1{font-size:19px;margin:0 0 10px}
+.card{background:#fff;border:1px solid #e6dcc8;border-radius:14px;padding:14px;margin-bottom:12px}
+input,select{width:100%;padding:12px;border:1px solid #d9cfba;border-radius:10px;font-size:16px;background:#fff;color:#1A2238}
+.btn{display:block;width:100%;padding:13px;border:0;border-radius:12px;background:#FF7A00;color:#fff;font-size:16px;font-weight:700;margin-top:12px}
+.btn.sec{background:#fff;color:#1A2238;border:1px solid #d9cfba}
+.stat{display:flex;gap:8px;margin-bottom:12px}
+.stat div{flex:1;background:#fff;border:1px solid #e6dcc8;border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font-size:22px}.stat small{color:#8b8271;font-size:11px}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tabs button{flex:1;padding:10px;border:1px solid #d9cfba;background:#fff;border-radius:10px;font-weight:700;font-size:14px;color:#1A2238}
+.tabs button.on{background:#1A2238;color:#fff;border-color:#1A2238}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{border:1px solid #e0d5bf;background:#fff;border-radius:20px;padding:6px 11px;font-size:13px;font-weight:600}
+.chip.on{background:#FF7A00;color:#fff;border-color:#FF7A00}
+.chip.full{background:#dcfce7;border-color:#86efac;color:#166534}
+.row{background:#fff;border:1px solid #e6dcc8;border-radius:12px;padding:11px 12px;margin-bottom:7px}
+.row b{font-weight:700}
+.mu{color:#8b8271}.sm{font-size:13px}.center{text-align:center}
+.pin{font-family:ui-monospace,monospace;font-weight:800;letter-spacing:2px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:2px 8px}
+.tg{font-size:11px;padding:2px 7px;border-radius:20px;background:#e0f2fe;color:#075985;margin-left:6px}
+.err{color:#b91c1c;font-size:14px;min-height:18px;margin-top:6px}
+.doc{max-height:50vh;overflow:auto;background:#fff;border:1px solid #e6dcc8;border-radius:12px;padding:12px;font-size:13px;white-space:pre-wrap}
+img.sig{max-width:100%;border:1px dashed #c9bfa8;border-radius:10px;background:#fff;margin-top:8px}
+a{color:#1A2238}
+</style></head><body><div class="wrap">
+<div class="top"><span class="logo">EduNova · Shartnomalar</span><a class="out" href="#" onclick="chiq();return false;">Chiqish</a></div>
+<div id="app"></div></div>
+<script>
+var SB_URL="https://unaodltahuevrfnarfha.supabase.co", SB_KEY="sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP";
+var TOK=sessionStorage.getItem('adm_tok')||'', D=null, TAB='imzo', SINF=0, Q='';
+function $(i){return document.getElementById(i);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function rpc(fn,a){return fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',
+ headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},
+ body:JSON.stringify(a||{})}).then(function(r){return r.json();});}
+function chiq(){sessionStorage.removeItem('adm_tok');TOK='';D=null;kirishEkran();}
+function kirishEkran(){
+ $('app').innerHTML='<h1>Kirish</h1><div class="card"><label>PIN kod</label>'+
+  '<input id="pin" type="password" inputmode="numeric" autocomplete="off">'+
+  '<div class="err" id="e"></div><button class="btn" onclick="kir()">Kirish</button></div>';
+ var p=$('pin'); if(p){p.focus();p.addEventListener('keydown',function(ev){if(ev.key==='Enter')kir();});}
+}
+function kir(){
+ var v=($('pin').value||'').trim(); if(!v){return;}
+ $('e').textContent='';
+ rpc('ep_kirish',{p_pin:v}).then(function(d){
+  if(!d||!d.token){$('e').textContent='PIN noto\u2018g\u2018ri';return;}
+  if(d.rol!=='admin'&&d.rol!=='oqituvchi'){$('e').textContent='Ruxsat yo\u2018q';return;}
+  TOK=d.token;sessionStorage.setItem('adm_tok',TOK);yukla();
+ })["catch"](function(){$('e').textContent='Xatolik';});
+}
+function yukla(){
+ $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
+ rpc('ep_sh_royxat',{p_token:TOK}).then(function(d){
+  if(!d||!d.ok){chiq();return;}
+  D=d;chiz();
+ })["catch"](function(){$('app').innerHTML='<p class="mu">Xatolik</p>';});
+}
+
+function chiz(){
+ var h='<div class="stat"><div><b>'+D.jami+'</b><small>SHARTNOMA</small></div>'+
+   '<div><b>'+D.imzosiz.length+'</b><small>QOLDI</small></div>'+
+   '<div><b>'+D.oquvchi+'</b><small>O\u2018QUVCHI</small></div></div>';
+ h+='<div class="tabs"><button id="t1" class="'+(TAB==='imzo'?'on':'')+'" onclick="setTab(\'imzo\')">Imzolanganlar</button>'+
+    '<button id="t2" class="'+(TAB==='yoq'?'on':'')+'" onclick="setTab(\'yoq\')">Imzolamaganlar</button></div>';
+ h+='<div class="chips" id="chips"></div>';
+ h+='<input id="q" placeholder="Ism yoki telefon bo\u2018yicha qidirish\u2026" value="'+esc(Q)+'" oninput="Q=this.value;lst()">';
+ h+='<div id="lst" style="margin-top:10px"></div>';
+ $('app').innerHTML=h;
+ chips();lst();
+}
+function setTab(t){TAB=t;SINF=0;chiz();}
+function chips(){
+ var h='<button class="chip'+(SINF===0?' on':'')+'" onclick="setSinf(0)">Hammasi</button>';
+ D.sinflar.forEach(function(s){
+  var full=(s.soni>0&&s.imzo>=s.soni);
+  h+='<button class="chip'+(SINF===s.id?' on':'')+(full?' full':'')+'" onclick="setSinf('+s.id+')">'+
+     esc(s.nom)+' '+s.imzo+'/'+s.soni+'</button>';
+ });
+ $('chips').innerHTML=h;
+}
+function setSinf(id){SINF=id;chips();lst();}
+function sinfNom(id){var r='';D.sinflar.forEach(function(s){if(s.id===id)r=s.nom;});return r;}
+function lst(){
+ var q=(Q||'').toLowerCase(), h='', n=0;
+ if(TAB==='imzo'){
+  var nom=SINF?sinfNom(SINF):'';
+  D.royxat.forEach(function(r){
+   if(nom && r.sinf!==nom) return;
+   if(q && (r.bola+' '+r.ota+' '+(r.tel||'')).toLowerCase().indexOf(q)<0) return;
+   n++;
+   h+='<div class="row" onclick="ochish('+r.raqam+')">'+
+      '<div><b>\u2116'+r.raqam+' \u00B7 '+esc(r.hozir||r.bola)+'</b> <span class="mu sm">'+esc(r.sinf)+'</span>'+
+      (r.tg?'<span class="tg">TG</span>':'')+'</div>'+
+      '<div class="sm mu">'+esc(r.ota)+' \u00B7 '+esc(r.tel||'')+'</div>'+
+      '<div class="sm" style="margin-top:4px">'+(r.pin?'PIN <span class="pin">'+esc(r.pin)+'</span>':'')+
+      ' <span class="mu">'+esc(r.vaqt)+'</span></div></div>';
+  });
+ }else{
+  D.imzosiz.forEach(function(o){
+   if(SINF && o.sinf_id!==SINF) return;
+   if(q && o.ism.toLowerCase().indexOf(q)<0) return;
+   n++;
+   h+='<div class="row"><b>'+esc(o.ism)+'</b> <span class="mu sm">'+esc(o.sinf)+'</span>'+
+      '<button class="btn sec" style="margin-top:8px;padding:8px" onclick="ismTuzat('+o.id+',\''+esc(o.ism).replace(/'/g,"\\'")+'\')">Ismni tuzatish</button></div>';
+  });
+ }
+ $('lst').innerHTML=h||'<p class="mu center">\u2014</p>';
+}
+function ismTuzat(id,eski){
+ var yangi=prompt('Ismni tuzating:',eski);
+ if(!yangi||yangi.trim()===eski)return;
+ rpc('ep_sh_ism',{p_token:TOK,p_oquvchi_id:id,p_ism:yangi.trim()}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik: '+((d&&d.xato)||'server'));return;}
+  yukla();
+ });
+}
+function ochish(raqam){
+ $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
+ rpc('ep_sh_matn',{p_token:TOK,p_raqam:raqam}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik');chiz();return;}
+  var r=null;D.royxat.forEach(function(x){if(x.raqam===raqam)r=x;});
+  var h='<h1>\u2116'+d.raqam+'/SH</h1><div class="card">'+
+   '<div><b>'+esc(d.bola)+'</b> <span class="mu">'+esc(d.sinf)+'</span></div>'+
+   '<div class="sm">Ota-ona: '+esc(d.ota)+'</div>'+
+   '<div class="sm">Telefon: '+esc(d.tel||'')+'</div>'+
+   (d.pasport?'<div class="sm">Pasport: '+esc(d.pasport)+'</div>':'')+
+   (d.manzil?'<div class="sm">Manzil: '+esc(d.manzil)+'</div>':'')+
+   '<div class="sm">To\u2018lov: '+esc(d.narx||'-')+' so\u2018m</div>'+
+   (d.pin?'<div class="sm" style="margin-top:6px">Kabinet PIN: <span class="pin">'+esc(d.pin)+'</span></div>':'')+
+   '</div>';
+  if(r){h+='<button class="btn sec" onclick="ismTuzat('+r.id+',\''+esc(r.hozir||r.bola).replace(/'/g,"\\'")+'\')">O\u2018quvchi ismini tuzatish</button>';}
+  if(d.imzo){h+='<div class="card"><div class="sm mu">Imzo</div><img class="sig" src="'+d.imzo+'"></div>';}
+  h+='<div class="doc">'+esc(d.matn||'')+'</div>';
+  h+='<button class="btn" onclick="chiz()">Orqaga</button>';
+  $('app').innerHTML=h;window.scrollTo(0,0);
+ });
+}
+if(TOK) yukla(); else kirishEkran();
+
+</script></body></html>
