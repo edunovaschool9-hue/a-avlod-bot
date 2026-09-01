@@ -1953,6 +1953,45 @@ input::placeholder,textarea::placeholder{color:#9a927f!important;opacity:1}
   <canvas id="ms-canvas" width="1654" height="2339"></canvas>
 </div>
 
+
+<style>
+#ap-oquvchilar .oq-top{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+#ap-oquvchilar .oq-tile{flex:1;min-width:150px;background:var(--glass);border:1px solid var(--brd);border-radius:14px;padding:13px 15px}
+#ap-oquvchilar .oq-lab{font-size:12.5px;color:var(--mu2);font-weight:800}
+#ap-oquvchilar .oq-num{font-size:34px;font-weight:900;line-height:1.1;margin:2px 0}
+#ap-oquvchilar .oq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+#ap-oquvchilar .oq-card{background:var(--glass);border:1px solid var(--brd);border-radius:14px;padding:12px 14px;cursor:pointer}
+#ap-oquvchilar .oq-card.on{border-color:#E85400;background:var(--glass-hi)}
+#ap-oquvchilar .oq-sinf{font-size:20px;font-weight:900;color:var(--tx)}
+#ap-oquvchilar .oq-cnt{font-size:12.5px;color:var(--mu2);font-weight:700}
+#ap-oquvchilar .oq-row{display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:8px 2px;border-bottom:1px solid var(--brd)}
+#ap-oquvchilar .oq-nm{color:var(--tx);font-size:14.5px;font-weight:650;flex:1;min-width:150px}
+#ap-oquvchilar .oq-mt{color:var(--mu2);font-size:12.5px;font-weight:600}
+#ap-oquvchilar .oq-new{font-size:10.5px;font-weight:800;color:#15803d;background:rgba(21,128,61,.12);border-radius:20px;padding:2px 8px}
+#ap-oquvchilar input,#ap-oquvchilar select{width:100%}
+#ap-oquvchilar .oq-btn{padding:10px 15px;border:none;border-radius:12px;font-weight:800;cursor:pointer;font-size:13.5px}
+</style>
+<!-- ======= HOZIRGI O'QUVCHILAR ======= -->
+<div class="admin-panel" id="ap-oquvchilar">
+  <div class="ap-head"><div><div class="ap-title">\U0001F465 Hozirgi o&#8216;quvchilar</div><div class="ap-sub">Sinflar kesimida ro&#8216;yxat \u2014 talonlar bo&#8216;yicha avtomatik yangilanadi</div></div></div>
+  <div class="oq-top" id="oq-top"></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+    <button class="oq-btn" style="background:linear-gradient(135deg,#22c55e,#15803d);color:#fff" onclick="oqYangila()">\U0001F504 Talonlar bo&#8216;yicha yangilash</button>
+    <button class="oq-btn" style="background:var(--glass-hi);color:var(--tx);border:1px solid var(--brd)" onclick="oqQoshUI()">\u2795 Qo&#8216;lda qo&#8216;shish</button>
+    <span id="oq-msg" style="font-size:13.5px;color:var(--mu2);font-weight:600"></span>
+  </div>
+  <div id="oq-qoshbox" style="display:none;margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+      <div class="field"><label>Sinf</label><input id="oq-f-sinf" placeholder="5-A"></div>
+      <div class="field"><label>F.I.Sh.</label><input id="oq-f-fio" placeholder="Ismoilov Mustafo"></div>
+      <div class="field"><label>Telefon</label><input id="oq-f-tel" placeholder="90-123-45-67"></div>
+    </div>
+    <button class="oq-btn" style="background:linear-gradient(135deg,#E85400,#FF8A47);color:#fff" onclick="oqQosh()">Saqlash</button>
+  </div>
+  <div class="oq-grid" id="oq-grid"></div>
+  <div id="oq-list" style="margin-top:14px"></div>
+</div>
+
 <!-- ======= XUJJAT ISHLAR ======= -->
 <div class="admin-panel" id="ap-xujjatlar">
   <div class="ap-head"><div><div class="ap-title">🗂 Xujjat ishlar</div><div class="ap-sub">Kelish/ketish talonlari va buyruqlar — 90% tayyor, PNG yuklab olinadi</div></div></div>
@@ -2857,8 +2896,8 @@ const POSITIONS = {
 };
 
 // ── ROLE MENUS ── (Variant B: everyone sees ALL sections; only timer differs)
-const FULL_MENU=['svodka','qabul','hujjat','dash','shartnoma','xujjatlar','mshartnoma','davomat','jadval','xulosa','hrtest','oqkab','qabnat','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
-const MARKETING_MENU=['svodka','qabul','testnat','hujjat','dash','shartnoma','xujjatlar','mshartnoma','davomat','jadval','xulosa','hrtest','oqkab','qabnat','hisobkitob','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
+const FULL_MENU=['svodka','qabul','hujjat','dash','shartnoma','xujjatlar','mshartnoma','oquvchilar','davomat','jadval','xulosa','hrtest','oqkab','qabnat','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
+const MARKETING_MENU=['svodka','qabul','testnat','hujjat','dash','shartnoma','xujjatlar','mshartnoma','oquvchilar','davomat','jadval','xulosa','hrtest','oqkab','qabnat','hisobkitob','control','students','tez','notif','activate','leads','mleads','saytlead','nolavoy','otaona','calls','meet','teachers','operatorquv'];
 const MENUS = {
   admin:     FULL_MENU,
   marketing: MARKETING_MENU,
@@ -2886,6 +2925,7 @@ const MENU_META = {
   qabul:    {label:'🎯 Qabul',           fn:'loadQabul'},
   shartnoma:{label:'📄 Shartnoma tuzish', fn:'loadShartnoma'},
   xujjatlar:{label:'🗂 Xujjat ishlar', fn:'loadXujjatIshlar'},
+  oquvchilar:{label:'👥 Hozirgi o‘quvchilar', fn:'loadOquvchilar'},
   mshartnoma:{label:'🏫 Maktab shartnomasi', fn:'loadMShartnoma'},
   davomat:  {label:'🕘 Davomat',          fn:'loadOqituvchi'},
   jadval:   {label:'📅 Dars jadvali',    fn:'loadJadval'},
@@ -10089,6 +10129,79 @@ function xuExcel(){
   }
 }
 </script>
+
+
+<script>
+/* ================= HOZIRGI O'QUVCHILAR ================= */
+var oqData=null, oqOchiq=null;
+function oqMsg(t,c){var e=document.getElementById('oq-msg'); if(e){e.textContent=t||''; e.style.color=c||'var(--mu2)';}}
+function oqQoshUI(){var b=document.getElementById('oq-qoshbox'); if(b)b.style.display=(b.style.display==='none')?'':'none';}
+function oqTile(lab,num,izoh,rang){
+  return '<div class="oq-tile"><div class="oq-lab">'+lab+'</div>'
+    +'<div class="oq-num" style="color:'+rang+'">'+num+'</div>'
+    +'<div class="oq-mt">'+izoh+'</div></div>';
+}
+function oqRoyxat(){
+  return sb.rpc('oquvchilar_royxat',{}).then(function(r){
+    var g=document.getElementById('oq-grid'), t=document.getElementById('oq-top');
+    if(r.error||!r.data){ if(g)g.innerHTML='<div style="color:#b45309;font-size:13.5px;padding:8px">Jadval topilmadi \u2014 oquvchilar.sql ishga tushirilmagan</div>'; return; }
+    oqData=r.data;
+    if(t)t.innerHTML=oqTile('\U0001F465 JAMI O\u2018QUVCHI',(oqData.jami||0),(oqData.sinf_soni||0)+' ta sinf','#15803d')
+      +oqTile('\u2795 YANGI KELGAN',(oqData.yangi||0),'talon yoki qo\u2018lda qo\u2018shilgan','#E85400')
+      +oqTile('\u2796 RO\u2018YXATDAN CHIQQAN',(oqData.nofaol||0),'ketish taloni berilgan','#b91c1c');
+    var S=oqData.sinflar||[];
+    if(g)g.innerHTML=S.map(function(x){
+      return '<div class="oq-card'+(oqOchiq===x.sinf?' on':'')+'" onclick="oqOch(\''+x.sinf+'\')">'
+        +'<div class="oq-sinf">'+x.sinf+'</div>'
+        +'<div class="oq-cnt">'+x.soni+' o\u2018quvchi</div></div>';
+    }).join('');
+    oqKorsat();
+  })["catch"](function(){});
+}
+function oqOch(sinf){ oqOchiq=(oqOchiq===sinf?null:sinf); oqRoyxat(); }
+function oqKorsat(){
+  var box=document.getElementById('oq-list'); if(!box)return;
+  if(!oqOchiq||!oqData){box.innerHTML='';return;}
+  var s=(oqData.sinflar||[]).filter(function(x){return x.sinf===oqOchiq;})[0];
+  if(!s){box.innerHTML='';return;}
+  box.innerHTML='<div style="background:var(--glass-hi);border:1px solid var(--brd);border-radius:14px;padding:12px 14px">'
+    +'<div style="font-weight:800;color:var(--tx);font-size:15px;margin-bottom:6px">'+s.sinf+' \u2014 '+s.soni+' o\u2018quvchi</div>'
+    +(s.oquvchilar||[]).map(function(x,i){
+      return '<div class="oq-row"><span class="oq-mt" style="min-width:26px;text-align:right">'+(i+1)+'.</span>'
+        +'<span class="oq-nm">'+(x.fio||'')+'</span>'
+        +(x.yangi?'<span class="oq-new">yangi</span>':'')
+        +'<span class="oq-mt" style="min-width:120px">'+(x.tel||'')+'</span>'
+        +'<button class="oq-btn" style="background:rgba(185,28,28,.12);color:#b91c1c;border:1px solid var(--brd);padding:5px 10px;font-size:12px" onclick="oqOchir('+x.id+')">\u2715</button></div>';
+    }).join('')+'</div>';
+}
+function oqYangila(){
+  oqMsg('Talonlar tekshirilmoqda\u2026');
+  sb.rpc('oquvchilar_yangilash',{p_oquv:(typeof xjOquvYili==='function'?xjOquvYili():'2026-2027')}).then(function(r){
+    if(r.error||!r.data||!r.data.ok){oqMsg('Yangilanmadi \u2014 SQL o\u2018rnatilganmi?','#b45309');return;}
+    oqMsg('\u2713 '+(r.data.ketgan||0)+' ta chiqarildi, '+(r.data.qoshilgan||0)+' ta qo\u2018shildi','#15803d');
+    oqRoyxat();
+  })["catch"](function(){oqMsg('Aloqa yo\u2018q','#b45309');});
+}
+function oqQosh(){
+  var sinf=xjVal('oq-f-sinf'), fio=xjVal('oq-f-fio'), tel=xjVal('oq-f-tel');
+  if(!sinf||!fio){alert('Sinf va F.I.Sh. kiritilmagan');return;}
+  sb.rpc('oquvchi_qosh',{p_sinf:sinf,p_fio:fio,p_tel:tel}).then(function(r){
+    if(r.error||!r.data||!r.data.ok){oqMsg('Qo\u2018shilmadi','#b45309');return;}
+    oqMsg('\u2713 Qo\u2018shildi','#15803d');
+    ['oq-f-fio','oq-f-tel'].forEach(function(id){var e=document.getElementById(id); if(e)e.value='';});
+    oqRoyxat();
+  })["catch"](function(){oqMsg('Aloqa yo\u2018q','#b45309');});
+}
+function oqOchir(id){
+  if(!confirm('Bu o\u2018quvchi ro\u2018yxatdan chiqarilsinmi?'))return;
+  sb.rpc('oquvchi_ochir',{p_id:id,p_izoh:'admin chiqardi'}).then(function(r){
+    if(r.error){oqMsg('Chiqarilmadi','#b45309');return;}
+    oqMsg('\u2713 Chiqarildi','#15803d'); oqRoyxat();
+  })["catch"](function(){});
+}
+function loadOquvchilar(){ oqRoyxat(); }
+</script>
+
 
 </body>
 </html>
