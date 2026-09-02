@@ -71,8 +71,9 @@ function chiz(){
  var h='<div class="stat"><div><b>'+D.jami+'</b><small>SHARTNOMA</small></div>'+
    '<div><b>'+D.imzosiz.length+'</b><small>QOLDI</small></div>'+
    '<div><b>'+D.oquvchi+'</b><small>O\u2018QUVCHI</small></div></div>';
- h+='<div class="tabs"><button id="t1" class="'+(TAB==='imzo'?'on':'')+'" onclick="setTab(\'imzo\')">Imzolanganlar</button>'+
-    '<button id="t2" class="'+(TAB==='yoq'?'on':'')+'" onclick="setTab(\'yoq\')">Imzolamaganlar</button></div>';
+ h+='<div class="tabs"><button class="'+(TAB==='imzo'?'on':'')+'" onclick="setTab(\'imzo\')">Shartnoma</button>'+
+    '<button class="'+(TAB==='yoq'?'on':'')+'" onclick="setTab(\'yoq\')">Qolganlar</button>'+
+    '<button class="'+(TAB==='teach'?'on':'')+'" onclick="teachEkran()">O\u2018qituvchi</button></div>';
  h+='<div class="chips" id="chips"></div>';
  h+='<input id="q" placeholder="Ism yoki telefon bo\u2018yicha qidirish\u2026" value="'+esc(Q)+'" oninput="Q=this.value;lst()">';
  h+='<div id="lst" style="margin-top:10px"></div>';
@@ -146,6 +147,68 @@ function ochish(raqam){
   $('app').innerHTML=h;window.scrollTo(0,0);
  });
 }
+
+var TD=null;
+function teachEkran(){
+ TAB='teach';
+ $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
+ rpc('ep_teach_panel',{p_token:TOK,p_kun:null}).then(function(d){
+  if(!d||!d.ok){alert('Ruxsat yo\u2018q');chiz();return;}
+  TD=d;teachChiz();
+ })["catch"](function(){$('app').innerHTML='<p class="mu">Xatolik</p>';});
+}
+function teachChiz(){
+ var d=TD, ich=0, jam=0;
+ d.oqituvchilar.forEach(function(o){ich+=o.ichkarida;jam+=o.slotlar;});
+ var h='<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
+   '<button class="on">O\u2018qituvchi</button></div>';
+ h+='<div class="stat"><div><b>'+d.arizalar.length+'</b><small>ARIZA</small></div>'+
+   '<div><b>'+d.oqituvchilar.length+'</b><small>O\u2018QITUVCHI</small></div>'+
+   '<div><b>'+ich+'/'+jam+'</b><small>BUGUN ICHKARIDA</small></div></div>';
+ h+='<div class="card"><div class="sm mu">Bot: @'+esc(d.maktab.bot||'-')+
+   '</div><div class="sm mu">Maktab nuqtasi: '+(d.maktab.lat?esc(d.maktab.lat)+', '+esc(d.maktab.lon)+' \u00B7 '+d.maktab.radius+' m':'<b>o\u2018rnatilmagan</b>')+'</div>'+
+   '<button class="btn" onclick="botUlash(this)">Botni ulash (webhook)</button>'+
+   '<div class="err" id="be"></div></div>';
+ if(d.arizalar.length){
+  h+='<h1>Yangi arizalar</h1>';
+  d.arizalar.forEach(function(a){
+   h+='<div class="row"><b>'+esc(a.ism)+'</b> <span class="mu sm">'+esc(a.tel||'')+'</span>'+
+      '<div class="sm mu">'+esc(a.vaqt)+'</div>'+
+      '<div style="display:flex;gap:8px;margin-top:8px">'+
+      '<button class="btn" style="margin:0;padding:9px" onclick="ariza('+a.id+',true,this)">Tasdiqlash</button>'+
+      '<button class="btn sec" style="margin:0;padding:9px" onclick="ariza('+a.id+',false,this)">Rad etish</button></div></div>';
+  });
+ }
+ h+='<h1>O\u2018qituvchilar \u00B7 bugun</h1>';
+ d.oqituvchilar.forEach(function(o){
+  h+='<div class="row"><b>'+esc(o.ism)+'</b>'+(o.tg?'<span class="tg">TG</span>':'')+
+     '<div class="sm mu">Belgi: '+o.ichkarida+'/'+o.slotlar+
+     (o.oxirgi?' \u00B7 oxirgi joylashuv '+esc(o.oxirgi):' \u00B7 joylashuv yo\u2018q')+'</div></div>';
+ });
+ $('app').innerHTML=h;window.scrollTo(0,0);
+}
+function botUlash(btn){
+ btn.disabled=true;var t=btn.textContent;btn.textContent='Ulanmoqda\u2026';
+ fetch('https://unaodltahuevrfnarfha.supabase.co/functions/v1/teach-bot?ulash=1',
+  {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:TOK})})
+ .then(function(r){return r.json();}).then(function(j){
+  btn.disabled=false;btn.textContent=t;
+  var ok=j&&j.setWebhook&&j.setWebhook.ok;
+  $('be').textContent=ok?('Ulandi \u2705 @'+(j.bot||'')):('Xatolik: '+JSON.stringify(j).slice(0,120));
+  if(ok)$('be').style.color='#166534';
+ })["catch"](function(e){btn.disabled=false;btn.textContent=t;$('be').textContent='Xatolik';});
+}
+function ariza(id,ok,btn){
+ btn.disabled=true;
+ fetch('https://unaodltahuevrfnarfha.supabase.co/functions/v1/teach-bot?admin=1',
+  {method:'POST',headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({token:TOK,ariza_id:id,ok:ok})})
+ .then(function(r){return r.json();}).then(function(j){
+  if(!j||!j.ok){alert('Xatolik: '+((j&&j.xato)||'server'));btn.disabled=false;return;}
+  teachEkran();
+ })["catch"](function(){btn.disabled=false;alert('Xatolik');});
+}
+
 if(TOK) yukla(); else kirishEkran();
 
 </script></body></html>
