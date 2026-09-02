@@ -42,12 +42,40 @@ input{width:100%;padding:13px;border:1px solid #d9cfba;border-radius:10px;font-s
 .stat{display:flex;gap:8px;margin-bottom:12px}
 .stat div{flex:1;background:#fff;border:1px solid #e6dcc8;border-radius:12px;padding:10px;text-align:center}
 .stat b{display:block;font-size:22px}.stat small{color:#8b8271;font-size:11px}
+
+.hafta{display:flex;gap:5px;margin-bottom:8px}
+.hafta .kun{flex:1;padding:8px 2px;border:1px solid #e0d5bf;background:#fff;border-radius:10px;
+ font-size:11px;font-weight:700;color:#8b8271;line-height:1.15}
+.hafta .kun b{display:block;font-size:17px;color:#1A2238;margin-top:2px}
+.hafta .kun.on{background:#1A2238;border-color:#1A2238;color:#fff}
+.hafta .kun.on b{color:#fff}
+.hafta .kun.bugun{border-color:#FF7A00}
+.hafta .kun.off{opacity:.35}
+.navh{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;color:#6b6355}
+.navh span{flex:1;text-align:center;font-weight:700}
+.navh button{width:40px;padding:6px;border:1px solid #d9cfba;background:#fff;border-radius:9px;font-size:17px;color:#1A2238}
+.bar .wk{background:#eee6d6;color:#1A2238;flex:0 0 74px}
+.tblwrap{overflow-x:auto;background:#fff;border:1px solid #e6dcc8;border-radius:12px}
+.tbl{border-collapse:collapse;width:100%;font-size:13px}
+.tbl th{padding:7px 3px;font-size:11px;color:#8b8271;border-bottom:1px solid #e6dcc8;font-weight:700}
+.tbl th span{font-size:14px;color:#1A2238}
+.tbl th.bg{color:#FF7A00}
+.tbl td{padding:8px 3px;text-align:center;border-bottom:1px solid #f0e9db}
+.tbl .nmc{text-align:left;padding-left:10px;font-weight:600;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.tbl .c{width:34px;font-weight:800}
+.tbl .c.keldi{background:#dcfce7;color:#166534}
+.tbl .c.kelmadi{background:#fee2e2;color:#b91c1c}
+.tbl .c.kech{background:#fff7ed;color:#c2410c}
+.tbl .c.yoq{color:#d6cdbb}
+.tbl .jam td{font-weight:800;background:#faf6ec;border-top:1px solid #e6dcc8}
 </style></head><body><div class="wrap">
 <div class="top"><span class="logo">EduNova · Davomat</span><a class="out" href="#" onclick="chiq();return false;">Chiqish</a></div>
 <div id="app"></div></div><div id="bar"></div>
 <script>
 var SB_URL="https://unaodltahuevrfnarfha.supabase.co", SB_KEY="sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP";
 var TOK=sessionStorage.getItem('dav_tok')||'', D=null, L=null, SINF=0, SINFNOM='';
+var KUN=null, HAF=null;
+var KN=['Du','Se','Ch','Pa','Ju','Sh','Ya'];
 var SIKL=['keldi','kelmadi','kech'];
 function $(i){return document.getElementById(i);}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -74,16 +102,45 @@ function kir(){
 function sinflar(){
  SINF=0;$('bar').innerHTML='';
  $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
- rpc('ep_dav_sinflar',{p_token:TOK,p_kun:null}).then(function(d){
+ rpc('ep_dav_sinflar',{p_token:TOK,p_kun:KUN}).then(function(d){
   if(!d||!d.ok){chiq();return;}
   D=d;sinfChiz();
  })["catch"](function(){$('app').innerHTML='<p class="mu">Xatolik</p>';});
 }
+function haftaBosh(iso){
+ var d=new Date(iso+'T00:00:00'); var w=(d.getDay()+6)%7;
+ d.setDate(d.getDate()-w); return d;
+}
+function iso(d){var m=('0'+(d.getMonth()+1)).slice(-2),g=('0'+d.getDate()).slice(-2);
+ return d.getFullYear()+'-'+m+'-'+g;}
+function kunlarChiz(){
+ var bugun=D.bugun||D.kun, tanlangan=KUN||D.kun;
+ var b=haftaBosh(tanlangan), h='<div class="hafta">';
+ for(var i=0;i<7;i++){
+  var d=new Date(b); d.setDate(b.getDate()+i); var s=iso(d);
+  var kel=s>bugun, on=(s===tanlangan);
+  h+='<button class="kun'+(on?' on':'')+(kel?' off':'')+(s===bugun?' bugun':'')+'"'+
+     (kel?' disabled':' onclick="kunTanla(\''+s+'\')"')+'>'+
+     KN[i]+'<b>'+d.getDate()+'</b></button>';
+ }
+ h+='</div>';
+ h+='<div class="navh"><button onclick="haftaSurish(-7)">\u2039</button>'+
+    '<span>'+esc(tanlangan)+(tanlangan===bugun?' \u00B7 bugun':'')+'</span>'+
+    '<button onclick="haftaSurish(7)">\u203A</button></div>';
+ return h;
+}
+function kunTanla(s){KUN=s;sinflar();}
+function haftaSurish(n){
+ var d=new Date((KUN||D.kun)+'T00:00:00'); d.setDate(d.getDate()+n);
+ var s=iso(d); if(s>(D.bugun||D.kun)) s=(D.bugun||D.kun);
+ KUN=s; sinflar();
+}
 function sinfChiz(){
- var h='<div class="stat"><div><b>'+D.keldi+'</b><small>KELDI</small></div>'+
+ var h=kunlarChiz();
+ h+='<div class="stat"><div><b>'+D.keldi+'</b><small>KELDI</small></div>'+
    '<div><b>'+(D.belgilangan-D.keldi)+'</b><small>KELMADI</small></div>'+
    '<div><b>'+(D.jami-D.belgilangan)+'</b><small>BELGILANMAGAN</small></div></div>';
- h+='<h1>Sinfni tanlang \u00B7 '+esc(D.kun)+'</h1><div class="grid">';
+ h+='<div class="grid">';
  D.sinflar.forEach(function(s){
   var cl=s.jami>0&&s.belgi>=s.jami?' done':(s.belgi>0?' part':'');
   h+='<button class="cls'+cl+'" onclick="ochish('+s.id+',\''+esc(s.nom)+'\')">'+esc(s.nom)+
@@ -96,7 +153,7 @@ function sinfChiz(){
 function ochish(id,nom){
  SINF=id;SINFNOM=nom;
  $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
- rpc('ep_dav_royxat',{p_token:TOK,p_sinf_id:id,p_kun:null}).then(function(d){
+ rpc('ep_dav_royxat',{p_token:TOK,p_sinf_id:id,p_kun:KUN}).then(function(d){
   if(!d||!d.ok){alert('Xatolik');sinflar();return;}
   L=d;lstChiz();
  })["catch"](function(){alert('Xatolik');sinflar();});
@@ -109,6 +166,7 @@ function sanoq(){
 function lstChiz(){
  var s=sanoq();
  var h='<div class="hdr"><b>'+esc(SINFNOM)+'</b>'+
+   '<span class="sm mu">'+esc(L.kun)+'</span>'+
    '<span class="cnt">'+s.k+'/'+L.royxat.length+' <small>keldi</small></span></div>';
  L.royxat.forEach(function(o){
   var cl=o.holat?(' '+o.holat):'';
@@ -120,7 +178,8 @@ function lstChiz(){
  $('app').innerHTML=h;
  $('bar').innerHTML='<div class="bar"><button class="back" onclick="sinflar()">\u2039 Sinflar</button>'+
    '<button class="all" onclick="hammasi()">Hammasi keldi</button>'+
-   '<button class="add" onclick="qolda()">+ Qo\u2018shish</button></div>';
+   '<button class="add" onclick="qolda()">+ Qo\u2018shish</button>'+
+   '<button class="wk" onclick="hafta()">Hafta</button></div>';
  window.scrollTo(0,0);
 }
 function belgi(id){
@@ -134,13 +193,13 @@ function belgi(id){
  var s=sanoq();
  var c=document.querySelector('.cnt');
  if(c)c.innerHTML=s.k+'/'+L.royxat.length+' <small>keldi</small>';
- rpc('ep_dav_belgi',{p_token:TOK,p_oquvchi_id:id,p_holat:yangi,p_kun:null}).then(function(d){
+ rpc('ep_dav_belgi',{p_token:TOK,p_oquvchi_id:id,p_holat:yangi,p_kun:KUN}).then(function(d){
   if(!d||!d.ok){el.style.opacity='0.45';}
  })["catch"](function(){el.style.opacity='0.45';});
 }
 function hammasi(){
  if(!confirm(SINFNOM+' \u2014 hammasini "keldi" deb belgilaymizmi?'))return;
- rpc('ep_dav_hammasi',{p_token:TOK,p_sinf_id:SINF,p_holat:'keldi',p_kun:null}).then(function(d){
+ rpc('ep_dav_hammasi',{p_token:TOK,p_sinf_id:SINF,p_holat:'keldi',p_kun:KUN}).then(function(d){
   if(!d||!d.ok){alert('Xatolik');return;}
   ochish(SINF,SINFNOM);
  })["catch"](function(){alert('Xatolik');});
@@ -150,9 +209,46 @@ function qolda(){
  if(!ism||ism.trim().length<4)return;
  rpc('ep_dav_qol',{p_token:TOK,p_sinf_id:SINF,p_ism:ism.trim()}).then(function(d){
   if(!d||!d.ok){alert('Xatolik: '+((d&&d.xato)||'server'));return;}
-  return rpc('ep_dav_belgi',{p_token:TOK,p_oquvchi_id:d.id,p_holat:'keldi',p_kun:null});
+  return rpc('ep_dav_belgi',{p_token:TOK,p_oquvchi_id:d.id,p_holat:'keldi',p_kun:KUN});
  }).then(function(){ ochish(SINF,SINFNOM); })
  ["catch"](function(){alert('Xatolik');});
+}
+function hafta(){
+ $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
+ rpc('ep_dav_hafta',{p_token:TOK,p_sinf_id:SINF,p_kun:KUN}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik');ochish(SINF,SINFNOM);return;}
+  HAF=d;haftaChiz();
+ })["catch"](function(){alert('Xatolik');ochish(SINF,SINFNOM);});
+}
+function belgiHarf(h){
+ if(h==='keldi')return '+'; if(h==='kelmadi')return '\u2013';
+ if(h==='kech')return 'K'; if(h==='sababli')return 'S'; return '';
+}
+function haftaChiz(){
+ var d=HAF;
+ var h='<div class="hdr"><b>'+esc(SINFNOM)+'</b><span class="sm mu">hafta</span></div>';
+ h+='<div class="tblwrap"><table class="tbl"><thead><tr><th class="nmc">O\u2018quvchi</th>';
+ for(var i=0;i<7;i++){
+  var s=d.kunlar[i], dd=new Date(s+'T00:00:00');
+  h+='<th'+(s===d.bugun?' class="bg"':'')+'>'+KN[i]+'<br><span>'+dd.getDate()+'</span></th>';
+ }
+ h+='</tr></thead><tbody>';
+ d.royxat.forEach(function(o){
+  h+='<tr><td class="nmc">'+esc(o.ism)+'</td>';
+  for(var i=0;i<7;i++){
+   var v=o.holatlar[i]||'';
+   h+='<td class="c '+(v||'yoq')+'">'+belgiHarf(v)+'</td>';
+  }
+  h+='</tr>';
+ });
+ h+='<tr class="jam"><td class="nmc">Keldi</td>';
+ for(var i=0;i<7;i++){ h+='<td class="c">'+d.kun_hisob[i].keldi+'</td>'; }
+ h+='</tr></tbody></table></div>';
+ h+='<p class="sm mu">+ keldi \u00B7 \u2013 kelmadi \u00B7 K kech</p>';
+ $('app').innerHTML=h;
+ $('bar').innerHTML='<div class="bar"><button class="back" onclick="ochish('+SINF+',\''+esc(SINFNOM)+'\')">\u2039 Kun</button>'+
+   '<button class="back" onclick="sinflar()">Sinflar</button></div>';
+ window.scrollTo(0,0);
 }
 if(TOK) sinflar(); else kirishEkran();
 
