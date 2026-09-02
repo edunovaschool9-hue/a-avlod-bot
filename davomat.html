@@ -1,0 +1,159 @@
+<!doctype html><html lang="uz"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>EduNova — Davomat</title><meta name="theme-color" content="#F6F1E6">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+ background:#F6F1E6;color:#1A2238;font-size:16px;line-height:1.4}
+.wrap{max-width:620px;margin:0 auto;padding:12px 12px 90px}
+.top{display:flex;align-items:center;gap:10px;padding:2px 0 10px}
+.logo{font-weight:800;font-size:17px}.out{margin-left:auto;font-size:13px;color:#8b8271;text-decoration:underline}
+h1{font-size:19px;margin:0 0 10px}
+.card{background:#fff;border:1px solid #e6dcc8;border-radius:14px;padding:14px;margin-bottom:12px}
+input{width:100%;padding:13px;border:1px solid #d9cfba;border-radius:10px;font-size:17px;background:#fff;color:#1A2238}
+.btn{display:block;width:100%;padding:14px;border:0;border-radius:12px;background:#FF7A00;color:#fff;font-size:16px;font-weight:700;margin-top:10px}
+.btn.sec{background:#fff;color:#1A2238;border:1px solid #d9cfba}
+.btn.red{background:#fff;color:#b91c1c;border:1px solid #fecaca}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cls{background:#fff;border:1px solid #e0d5bf;border-radius:12px;padding:13px 6px;text-align:center;font-weight:800;font-size:17px}
+.cls small{display:block;font-weight:600;color:#8b8271;font-size:11px;margin-top:3px}
+.cls.done{background:#dcfce7;border-color:#86efac}
+.cls.part{background:#fff7ed;border-color:#fed7aa}
+.hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.hdr b{font-size:22px}
+.cnt{margin-left:auto;font-weight:800;font-size:20px}
+.cnt small{font-weight:600;color:#8b8271;font-size:12px}
+.row{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid #e6dcc8;
+ border-radius:12px;padding:14px 12px;margin-bottom:8px;font-size:17px;font-weight:600}
+.row .nm{flex:1}
+.row.keldi{background:#dcfce7;border-color:#22c55e}
+.row.kelmadi{background:#fee2e2;border-color:#ef4444}
+.row.kech{background:#fff7ed;border-color:#fb923c}
+.tag{font-size:12px;font-weight:800;padding:3px 9px;border-radius:20px;background:#eee6d6;color:#7a7161}
+.row.keldi .tag{background:#22c55e;color:#fff}
+.row.kelmadi .tag{background:#ef4444;color:#fff}
+.row.kech .tag{background:#fb923c;color:#fff}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#F6F1E6;border-top:1px solid #e0d5bf;
+ padding:10px 12px;display:flex;gap:8px;max-width:620px;margin:0 auto}
+.bar button{flex:1;padding:13px;border:0;border-radius:11px;font-weight:700;font-size:15px}
+.bar .all{background:#22c55e;color:#fff}.bar .add{background:#1A2238;color:#fff}.bar .back{background:#fff;border:1px solid #d9cfba;color:#1A2238}
+.err{color:#b91c1c;font-size:14px;min-height:18px}
+.mu{color:#8b8271}.sm{font-size:13px}.center{text-align:center}
+.stat{display:flex;gap:8px;margin-bottom:12px}
+.stat div{flex:1;background:#fff;border:1px solid #e6dcc8;border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font-size:22px}.stat small{color:#8b8271;font-size:11px}
+</style></head><body><div class="wrap">
+<div class="top"><span class="logo">EduNova · Davomat</span><a class="out" href="#" onclick="chiq();return false;">Chiqish</a></div>
+<div id="app"></div></div><div id="bar"></div>
+<script>
+var SB_URL="https://unaodltahuevrfnarfha.supabase.co", SB_KEY="sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP";
+var TOK=sessionStorage.getItem('dav_tok')||'', D=null, L=null, SINF=0, SINFNOM='';
+var SIKL=['keldi','kelmadi','kech'];
+function $(i){return document.getElementById(i);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function rpc(fn,a){return fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',
+ headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},
+ body:JSON.stringify(a||{})}).then(function(r){return r.json();});}
+function chiq(){sessionStorage.removeItem('dav_tok');TOK='';D=null;$('bar').innerHTML='';kirishEkran();}
+function kirishEkran(){
+ $('bar').innerHTML='';
+ $('app').innerHTML='<h1>Kirish</h1><div class="card"><label class="sm mu">PIN kod</label>'+
+  '<input id="pin" type="password" inputmode="numeric" autocomplete="off">'+
+  '<div class="err" id="e"></div><button class="btn" onclick="kir()">Kirish</button></div>';
+ var p=$('pin'); if(p){p.focus();p.addEventListener('keydown',function(ev){if(ev.key==='Enter')kir();});}
+}
+function kir(){
+ var v=($('pin').value||'').trim(); if(!v)return;
+ $('e').textContent='';
+ rpc('ep_kirish',{p_pin:v}).then(function(d){
+  if(!d||!d.token){$('e').textContent='PIN noto\u2018g\u2018ri';return;}
+  if(d.rol!=='admin'&&d.rol!=='oqituvchi'){$('e').textContent='Ruxsat yo\u2018q';return;}
+  TOK=d.token;sessionStorage.setItem('dav_tok',TOK);sinflar();
+ })["catch"](function(){$('e').textContent='Xatolik';});
+}
+function sinflar(){
+ SINF=0;$('bar').innerHTML='';
+ $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
+ rpc('ep_dav_sinflar',{p_token:TOK,p_kun:null}).then(function(d){
+  if(!d||!d.ok){chiq();return;}
+  D=d;sinfChiz();
+ })["catch"](function(){$('app').innerHTML='<p class="mu">Xatolik</p>';});
+}
+function sinfChiz(){
+ var h='<div class="stat"><div><b>'+D.keldi+'</b><small>KELDI</small></div>'+
+   '<div><b>'+(D.belgilangan-D.keldi)+'</b><small>KELMADI</small></div>'+
+   '<div><b>'+(D.jami-D.belgilangan)+'</b><small>BELGILANMAGAN</small></div></div>';
+ h+='<h1>Sinfni tanlang \u00B7 '+esc(D.kun)+'</h1><div class="grid">';
+ D.sinflar.forEach(function(s){
+  var cl=s.jami>0&&s.belgi>=s.jami?' done':(s.belgi>0?' part':'');
+  h+='<button class="cls'+cl+'" onclick="ochish('+s.id+',\''+esc(s.nom)+'\')">'+esc(s.nom)+
+     '<small>'+s.keldi+'/'+s.jami+'</small></button>';
+ });
+ h+='</div><button class="btn sec" onclick="sinflar()">Yangilash</button>';
+ $('app').innerHTML=h;
+}
+
+function ochish(id,nom){
+ SINF=id;SINFNOM=nom;
+ $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
+ rpc('ep_dav_royxat',{p_token:TOK,p_sinf_id:id,p_kun:null}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik');sinflar();return;}
+  L=d;lstChiz();
+ })["catch"](function(){alert('Xatolik');sinflar();});
+}
+function sanoq(){
+ var k=0,n=0,b=0;
+ L.royxat.forEach(function(o){ if(o.holat==='keldi')k++; else if(o.holat)n++; else b++; });
+ return {k:k,n:n,b:b};
+}
+function lstChiz(){
+ var s=sanoq();
+ var h='<div class="hdr"><b>'+esc(SINFNOM)+'</b>'+
+   '<span class="cnt">'+s.k+'/'+L.royxat.length+' <small>keldi</small></span></div>';
+ L.royxat.forEach(function(o){
+  var cl=o.holat?(' '+o.holat):'';
+  var tg=o.holat==='keldi'?'KELDI':(o.holat==='kelmadi'?'KELMADI':(o.holat==='kech'?'KECH':'\u2014'));
+  h+='<div class="row'+cl+'" id="r'+o.id+'" onclick="belgi('+o.id+')">'+
+     '<span class="nm">'+esc(o.ism)+'</span><span class="tag">'+tg+'</span></div>';
+ });
+ if(!L.royxat.length)h+='<p class="mu center">Bu sinfda o\u2018quvchi yo\u2018q</p>';
+ $('app').innerHTML=h;
+ $('bar').innerHTML='<div class="bar"><button class="back" onclick="sinflar()">\u2039 Sinflar</button>'+
+   '<button class="all" onclick="hammasi()">Hammasi keldi</button>'+
+   '<button class="add" onclick="qolda()">+ Qo\u2018shish</button></div>';
+ window.scrollTo(0,0);
+}
+function belgi(id){
+ var o=null; L.royxat.forEach(function(x){if(x.id===id)o=x;});
+ if(!o)return;
+ var i=SIKL.indexOf(o.holat||''); var yangi=SIKL[(i+1)%SIKL.length];
+ o.holat=yangi;
+ var el=$('r'+id);
+ el.className='row '+yangi;
+ el.querySelector('.tag').textContent=yangi.toUpperCase();
+ var s=sanoq();
+ var c=document.querySelector('.cnt');
+ if(c)c.innerHTML=s.k+'/'+L.royxat.length+' <small>keldi</small>';
+ rpc('ep_dav_belgi',{p_token:TOK,p_oquvchi_id:id,p_holat:yangi,p_kun:null}).then(function(d){
+  if(!d||!d.ok){el.style.opacity='0.45';}
+ })["catch"](function(){el.style.opacity='0.45';});
+}
+function hammasi(){
+ if(!confirm(SINFNOM+' \u2014 hammasini "keldi" deb belgilaymizmi?'))return;
+ rpc('ep_dav_hammasi',{p_token:TOK,p_sinf_id:SINF,p_holat:'keldi',p_kun:null}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik');return;}
+  ochish(SINF,SINFNOM);
+ })["catch"](function(){alert('Xatolik');});
+}
+function qolda(){
+ var ism=prompt(SINFNOM+' \u2014 o\u2018quvchining ism va familiyasi:');
+ if(!ism||ism.trim().length<4)return;
+ rpc('ep_dav_qol',{p_token:TOK,p_sinf_id:SINF,p_ism:ism.trim()}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik: '+((d&&d.xato)||'server'));return;}
+  return rpc('ep_dav_belgi',{p_token:TOK,p_oquvchi_id:d.id,p_holat:'keldi',p_kun:null});
+ }).then(function(){ ochish(SINF,SINFNOM); })
+ ["catch"](function(){alert('Xatolik');});
+}
+if(TOK) sinflar(); else kirishEkran();
+
+</script></body></html>
