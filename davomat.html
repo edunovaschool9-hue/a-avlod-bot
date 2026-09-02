@@ -104,6 +104,15 @@ input{width:100%;padding:13px;border:1px solid #d9cfba;border-radius:10px;font-s
 .qrow.done .qn{color:#166534}
 .bar .pdf{background:#b91c1c;color:#fff;flex:0 0 62px}
 .bar .add{flex:0 0 68px}
+
+.row .del{width:34px;height:34px;flex:0 0 34px;border-radius:9px;background:#fff;
+ border:1px solid #f3d0d0;color:#b91c1c;font-size:15px;font-weight:700}
+.undo{position:fixed;left:12px;right:12px;bottom:78px;max-width:596px;margin:0 auto;
+ background:#1A2238;color:#fff;border-radius:12px;padding:12px 14px;display:flex;
+ align-items:center;gap:10px;font-size:14px;z-index:50;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.undo span{flex:1}
+.undo button{background:#FF7A00;color:#fff;border:0;border-radius:9px;padding:9px 14px;font-weight:700}
+@media print{ .undo{display:none!important} .row .del{display:none!important} }
 </style></head><body><div class="wrap">
 <div class="top"><span class="logo">EduNova · Davomat</span><a class="out" href="#" onclick="chiq();return false;">Chiqish</a></div>
 <div id="app"></div></div><div id="bar"></div>
@@ -215,7 +224,8 @@ function lstChiz(){
      '<span class="nm" onclick="belgi('+o.id+')">'+esc(o.ism)+
      (o.tel?'<span class="tl">'+esc(o.tel)+'</span>':'')+'</span>'+
      (o.tel?'<a class="call" href="'+('tel:'+String(o.tel).replace(/[^0-9+]/g,''))+'" onclick="event.stopPropagation()">\u260E</a>':'')+
-     '<span class="tag" onclick="belgi('+o.id+')">'+tg+'</span></div>';
+     '<span class="tag" onclick="belgi('+o.id+')">'+tg+'</span>'+
+     '<button class="del" onclick="event.stopPropagation();ochirOquvchi('+o.id+')">\u2715</button></div>';
  });
  if(!L.royxat.length)h+='<p class="mu center">Bu sinfda o\u2018quvchi yo\u2018q</p>';
  $('app').innerHTML=h;
@@ -256,6 +266,41 @@ function qolda(){
  }).then(function(){ ochish(SINF,SINFNOM); })
  ["catch"](function(){alert('Xatolik');});
 }
+
+/* ---------- o'quvchini ro'yxatdan chiqarish ---------- */
+var OXIRGI_OCHIRILGAN=null;
+function ochirOquvchi(id){
+ var o=null; (L&&L.royxat||[]).forEach(function(x){if(x.id===id)o=x;});
+ if(!o)return;
+ if(!confirm(o.ism+'\n\nShu o\u2018quvchi ro\u2018yxatdan chiqarilsinmi?\nU davomat va obzvon ro\u2018yxatidan yo\u2018qoladi.')) return;
+ rpc('ep_dav_ochir',{p_token:TOK,p_oquvchi_id:id}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik: '+((d&&d.xato)||'server'));return;}
+  OXIRGI_OCHIRILGAN={id:id,ism:d.ism};
+  L.royxat=L.royxat.filter(function(x){return x.id!==id;});
+  lstChiz(); qaytarPanel();
+ })["catch"](function(){alert('Xatolik');});
+}
+function qaytarPanel(){
+ if(!OXIRGI_OCHIRILGAN)return;
+ var e=document.createElement('div');
+ e.className='undo'; e.id='undo';
+ e.innerHTML='<span>'+esc(OXIRGI_OCHIRILGAN.ism)+' chiqarildi</span>'+
+   '<button onclick="qaytar()">Qaytarish</button>';
+ var old=$('undo'); if(old)old.remove();
+ document.body.appendChild(e);
+ setTimeout(function(){var x=$('undo'); if(x)x.remove();},15000);
+}
+function qaytar(){
+ if(!OXIRGI_OCHIRILGAN)return;
+ var id=OXIRGI_OCHIRILGAN.id;
+ rpc('ep_dav_tikla',{p_token:TOK,p_oquvchi_id:id}).then(function(d){
+  var x=$('undo'); if(x)x.remove();
+  if(!d||!d.ok){alert('Qaytarilmadi');return;}
+  OXIRGI_OCHIRILGAN=null;
+  ochish(SINF,SINFNOM);
+ })["catch"](function(){alert('Xatolik');});
+}
+
 function hafta(){
  $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
  rpc('ep_dav_hafta',{p_token:TOK,p_sinf_id:SINF,p_kun:KUN}).then(function(d){
