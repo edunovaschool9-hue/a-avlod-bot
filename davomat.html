@@ -68,6 +68,11 @@ input{width:100%;padding:13px;border:1px solid #d9cfba;border-radius:10px;font-s
 .tbl .c.kech{background:#fff7ed;color:#c2410c}
 .tbl .c.yoq{color:#d6cdbb}
 .tbl .jam td{font-weight:800;background:#faf6ec;border-top:1px solid #e6dcc8}
+
+.xls{display:flex;gap:8px;margin:10px 0}
+.xls button{flex:1;padding:12px;border:1px solid #1A2238;background:#1A2238;color:#fff;
+ border-radius:11px;font-weight:700;font-size:14px}
+.xls button:disabled{opacity:.5}
 </style></head><body><div class="wrap">
 <div class="top"><span class="logo">EduNova · Davomat</span><a class="out" href="#" onclick="chiq();return false;">Chiqish</a></div>
 <div id="app"></div></div><div id="bar"></div>
@@ -146,7 +151,10 @@ function sinfChiz(){
   h+='<button class="cls'+cl+'" onclick="ochish('+s.id+',\''+esc(s.nom)+'\')">'+esc(s.nom)+
      '<small>'+s.keldi+'/'+s.jami+'</small></button>';
  });
- h+='</div><button class="btn sec" onclick="sinflar()">Yangilash</button>';
+ h+='</div>';
+ h+='<div class="xls"><button onclick="kunExcel(this)">\u2b07 Kun \u2014 Excel</button>'+
+    '<button onclick="haftaExcel(this)">\u2b07 Hafta \u2014 Excel</button></div>';
+ h+='<button class="btn sec" onclick="sinflar()">Yangilash</button>';
  $('app').innerHTML=h;
 }
 
@@ -245,11 +253,93 @@ function haftaChiz(){
  for(var i=0;i<7;i++){ h+='<td class="c">'+d.kun_hisob[i].keldi+'</td>'; }
  h+='</tr></tbody></table></div>';
  h+='<p class="sm mu">+ keldi \u00B7 \u2013 kelmadi \u00B7 K kech</p>';
+ h+='<div class="xls"><button onclick="haftaExcel(this)">\u2b07 Hafta \u2014 Excel</button></div>';
  $('app').innerHTML=h;
  $('bar').innerHTML='<div class="bar"><button class="back" onclick="ochish('+SINF+',\''+esc(SINFNOM)+'\')">\u2039 Kun</button>'+
    '<button class="back" onclick="sinflar()">Sinflar</button></div>';
  window.scrollTo(0,0);
 }
 if(TOK) sinflar(); else kirishEkran();
+
+/* ---------- Excel yuklab olish ---------- */
+function xlsxYukla(){
+ if(window.XLSX) return Promise.resolve(true);
+ return new Promise(function(res){
+  var s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  s.onload=function(){res(!!window.XLSX);};
+  s.onerror=function(){res(false);};
+  document.head.appendChild(s);
+  setTimeout(function(){res(!!window.XLSX);},9000);
+ });
+}
+function csvTushir(aoa,nom){
+ var sep=';';
+ var txt=aoa.map(function(r){
+  return r.map(function(c){
+   var v=(c==null?'':String(c));
+   if(v.indexOf(sep)>=0||v.indexOf('"')>=0||v.indexOf('\n')>=0) v='"'+v.replace(/"/g,'""')+'"';
+   return v;
+  }).join(sep);
+ }).join('\r\n');
+ var blob=new Blob(['\ufeff'+txt],{type:'text/csv;charset=utf-8;'});
+ var a=document.createElement('a');
+ a.href=URL.createObjectURL(blob); a.download=nom+'.csv';
+ document.body.appendChild(a); a.click();
+ setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1500);
+}
+function tushir(aoa,nom,varaq){
+ return xlsxYukla().then(function(bor){
+  if(!bor){ csvTushir(aoa,nom); return 'csv'; }
+  var ws=window.XLSX.utils.aoa_to_sheet(aoa);
+  var w=[]; for(var i=0;i<aoa[0].length;i++){ w.push({wch: i===1?28:(i===0?8:11)}); }
+  ws['!cols']=w;
+  var wb=window.XLSX.utils.book_new();
+  window.XLSX.utils.book_append_sheet(wb,ws,varaq||'Davomat');
+  window.XLSX.writeFile(wb,nom+'.xlsx');
+  return 'xlsx';
+ });
+}
+function soz(h){
+ if(h==='keldi')return 'Keldi'; if(h==='kelmadi')return 'Kelmadi';
+ if(h==='kech')return 'Kech qoldi'; if(h==='sababli')return 'Sababli'; return 'Belgilanmagan';
+}
+function kunExcel(btn){
+ var t=btn.textContent; btn.disabled=true; btn.textContent='\u2026';
+ var kun=KUN||(D&&D.kun);
+ rpc('ep_dav_export',{p_token:TOK,p_kun:kun}).then(function(d){
+  if(!d||!d.ok) throw new Error('rpc');
+  var aoa=[['EduNova School \u2014 kunlik davomat'],
+           ['Sana', d.kun],
+           ['Keldi', d.keldi+' / '+d.jami],
+           [],
+           ['Sinf','O\u2018quvchi','Holat','Vaqt']];
+  d.qatorlar.forEach(function(r){ aoa.push([r.sinf,r.ism,soz(r.holat),r.vaqt]); });
+  return tushir(aoa,'davomat_'+d.kun,'Kun');
+ }).then(function(tur){
+  btn.disabled=false; btn.textContent=t;
+  if(tur==='csv') alert('Excel kutubxonasi yuklanmadi \u2014 CSV fayl saqlandi. Uni Excel bemalol ochadi.');
+ })["catch"](function(){ btn.disabled=false; btn.textContent=t; alert('Xatolik'); });
+}
+function haftaExcel(btn){
+ var t=btn.textContent; btn.disabled=true; btn.textContent='\u2026';
+ var kun=KUN||(D&&D.kun);
+ rpc('ep_dav_export_hafta',{p_token:TOK,p_kun:kun}).then(function(d){
+  if(!d||!d.ok) throw new Error('rpc');
+  var bosh=['Sinf','O\u2018quvchi'];
+  for(var i=0;i<7;i++){ bosh.push(KN[i]+' '+d.kunlar[i].slice(8)); }
+  var aoa=[['EduNova School \u2014 haftalik davomat'],
+           ['Hafta boshi', d.boshi],[],bosh];
+  d.qatorlar.forEach(function(r){
+   var q=[r.sinf,r.ism];
+   for(var i=0;i<7;i++){ q.push(soz(r.holatlar[i]||'')==='Belgilanmagan'?'':soz(r.holatlar[i])); }
+   aoa.push(q);
+  });
+  return tushir(aoa,'davomat_hafta_'+d.boshi,'Hafta');
+ }).then(function(tur){
+  btn.disabled=false; btn.textContent=t;
+  if(tur==='csv') alert('Excel kutubxonasi yuklanmadi \u2014 CSV fayl saqlandi.');
+ })["catch"](function(){ btn.disabled=false; btn.textContent=t; alert('Xatolik'); });
+}
 
 </script></body></html>
