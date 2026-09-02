@@ -73,6 +73,30 @@ input{width:100%;padding:13px;border:1px solid #d9cfba;border-radius:10px;font-s
 .xls button{flex:1;padding:12px;border:1px solid #1A2238;background:#1A2238;color:#fff;
  border-radius:11px;font-weight:700;font-size:14px}
 .xls button:disabled{opacity:.5}
+
+.row .nm{display:flex;flex-direction:column}
+.row .tl{font-size:12px;font-weight:600;color:#8b8271;margin-top:2px}
+.row .call{width:42px;height:42px;flex:0 0 42px;border-radius:50%;background:#22c55e;color:#fff;
+ display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:19px}
+.btn.call{background:#1A2238;margin-bottom:4px}
+.sinfb{font-weight:800;font-size:13px;color:#8b8271;margin:14px 0 6px;letter-spacing:.5px}
+.qrow{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #e6dcc8;
+ border-radius:12px;padding:11px 12px;margin-bottom:7px}
+.qi{flex:1;min-width:0}
+.qn{font-weight:700;font-size:16px}
+.qt{font-size:14px;color:#1A2238;font-weight:600;margin-top:2px}
+.qt .yoq{color:#b91c1c;font-weight:600;font-size:13px}
+.qz{font-size:12px;color:#6b6355;margin-top:3px;font-style:italic}
+.qcall{width:44px;height:44px;flex:0 0 44px;border-radius:50%;background:#22c55e;color:#fff;
+ display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:20px}
+.qnote{width:44px;height:44px;flex:0 0 44px;border-radius:50%;background:#fff;
+ border:1px solid #d9cfba;color:#1A2238;font-size:17px}
+@media print{
+ .bar,.xls,.btn,.hafta,.navh,.top{display:none!important}
+ .qrow{break-inside:avoid;border:1px solid #999}
+ .qcall,.qnote{display:none!important}
+ body{background:#fff}
+}
 </style></head><body><div class="wrap">
 <div class="top"><span class="logo">EduNova · Davomat</span><a class="out" href="#" onclick="chiq();return false;">Chiqish</a></div>
 <div id="app"></div></div><div id="bar"></div>
@@ -152,6 +176,7 @@ function sinfChiz(){
      '<small>'+s.keldi+'/'+s.jami+'</small></button>';
  });
  h+='</div>';
+ h+='<button class="btn call" onclick="kelmadi()">\u260E Kelmaganlar \u2014 obzvon</button>';
  h+='<div class="xls"><button onclick="kunExcel(this)">\u2b07 Kun \u2014 Excel</button>'+
     '<button onclick="haftaExcel(this)">\u2b07 Hafta \u2014 Excel</button></div>';
  h+='<button class="btn sec" onclick="sinflar()">Yangilash</button>';
@@ -179,8 +204,11 @@ function lstChiz(){
  L.royxat.forEach(function(o){
   var cl=o.holat?(' '+o.holat):'';
   var tg=o.holat==='keldi'?'KELDI':(o.holat==='kelmadi'?'KELMADI':(o.holat==='kech'?'KECH':'\u2014'));
-  h+='<div class="row'+cl+'" id="r'+o.id+'" onclick="belgi('+o.id+')">'+
-     '<span class="nm">'+esc(o.ism)+'</span><span class="tag">'+tg+'</span></div>';
+  h+='<div class="row'+cl+'" id="r'+o.id+'">'+
+     '<span class="nm" onclick="belgi('+o.id+')">'+esc(o.ism)+
+     (o.tel?'<span class="tl">'+esc(o.tel)+'</span>':'')+'</span>'+
+     (o.tel?'<a class="call" href="'+('tel:'+String(o.tel).replace(/[^0-9+]/g,''))+'" onclick="event.stopPropagation()">\u260E</a>':'')+
+     '<span class="tag" onclick="belgi('+o.id+')">'+tg+'</span></div>';
  });
  if(!L.royxat.length)h+='<p class="mu center">Bu sinfda o\u2018quvchi yo\u2018q</p>';
  $('app').innerHTML=h;
@@ -339,6 +367,65 @@ function haftaExcel(btn){
  }).then(function(tur){
   btn.disabled=false; btn.textContent=t;
   if(tur==='csv') alert('Excel kutubxonasi yuklanmadi \u2014 CSV fayl saqlandi.');
+ })["catch"](function(){ btn.disabled=false; btn.textContent=t; alert('Xatolik'); });
+}
+
+/* ---------- Kelmaganlar: qo'ng'iroq ro'yxati ---------- */
+var KM=null;
+function telHref(t){ return 'tel:'+String(t||'').replace(/[^0-9+]/g,''); }
+function kelmadi(){
+ $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
+ rpc('ep_dav_kelmadi',{p_token:TOK,p_kun:KUN}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik');sinflar();return;}
+  KM=d;kelmadiChiz();
+ })["catch"](function(){alert('Xatolik');sinflar();});
+}
+function kelmadiChiz(){
+ var d=KM, telsiz=0;
+ d.royxat.forEach(function(o){ if(!o.tel) telsiz++; });
+ var h='<div class="hdr"><b>Kelmaganlar</b><span class="cnt">'+d.royxat.length+
+   ' <small>'+esc(d.kun)+'</small></span></div>';
+ if(telsiz) h+='<p class="sm mu">'+telsiz+' ta o\u2018quvchining telefoni yo\u2018q</p>';
+ var oxirgi='';
+ d.royxat.forEach(function(o){
+  if(o.sinf!==oxirgi){ h+='<div class="sinfb">'+esc(o.sinf)+'</div>'; oxirgi=o.sinf; }
+  h+='<div class="qrow" id="q'+o.id+'">'+
+     '<div class="qi"><div class="qn">'+esc(o.ism)+'</div>'+
+     '<div class="qt">'+(o.tel?esc(o.tel):'<span class="yoq">telefon yo\u2018q</span>')+'</div>'+
+     (o.izoh?'<div class="qz">'+esc(o.izoh)+'</div>':'')+'</div>'+
+     (o.tel?'<a class="qcall" href="'+telHref(o.tel)+'">\u260E</a>':'')+
+     '<button class="qnote" onclick="izohYoz('+o.id+')">\u270E</button>'+
+     '</div>';
+ });
+ if(!d.royxat.length)h+='<p class="mu center">Hamma keldi \u2705</p>';
+ $('app').innerHTML=h;
+ $('bar').innerHTML='<div class="bar"><button class="back" onclick="sinflar()">\u2039 Sinflar</button>'+
+   '<button class="all" onclick="kelmadi()">Yangilash</button>'+
+   '<button class="add" onclick="kelmadiExcel(this)">\u2b07 Excel</button></div>';
+ window.scrollTo(0,0);
+}
+function izohYoz(id){
+ var o=null; KM.royxat.forEach(function(x){if(x.id===id)o=x;});
+ if(!o)return;
+ var v=prompt(o.ism+' \u2014 qo\u2018ng\u2018iroq natijasi:', o.izoh||'');
+ if(v===null)return;
+ rpc('ep_dav_izoh',{p_token:TOK,p_oquvchi_id:id,p_izoh:v,p_kun:KUN}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik');return;}
+  o.izoh=v.trim(); kelmadiChiz();
+ })["catch"](function(){alert('Xatolik');});
+}
+function kelmadiExcel(btn){
+ var t=btn.textContent; btn.disabled=true; btn.textContent='\u2026';
+ rpc('ep_dav_kelmadi',{p_token:TOK,p_kun:KUN}).then(function(d){
+  if(!d||!d.ok) throw new Error('rpc');
+  var aoa=[['EduNova School \u2014 kelmaganlar (obzvon)'],
+           ['Sana', d.kun],['Jami', d.royxat.length],[],
+           ['#','Sinf','O\u2018quvchi','Telefon','Natija','Izoh (qo\u2018lda)']];
+  d.royxat.forEach(function(r,i){ aoa.push([i+1,r.sinf,r.ism,r.tel||'',r.izoh||'','']); });
+  return tushir(aoa,'kelmaganlar_'+d.kun,'Obzvon');
+ }).then(function(tur){
+  btn.disabled=false; btn.textContent=t;
+  if(tur==='csv') alert('CSV saqlandi \u2014 Excel ochadi.');
  })["catch"](function(){ btn.disabled=false; btn.textContent=t; alert('Xatolik'); });
 }
 
