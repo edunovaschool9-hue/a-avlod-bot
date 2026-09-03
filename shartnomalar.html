@@ -32,6 +32,8 @@ input,select{width:100%;padding:12px;border:1px solid #d9cfba;border-radius:10px
 .doc{max-height:50vh;overflow:auto;background:#fff;border:1px solid #e6dcc8;border-radius:12px;padding:12px;font-size:13px;white-space:pre-wrap}
 img.sig{max-width:100%;border:1px dashed #c9bfa8;border-radius:10px;background:#fff;margin-top:8px}
 a{color:#1A2238}
+.tabs button{font-size:13px;padding:9px 4px}
+.pill{font-size:11px;padding:2px 7px;border-radius:20px;background:#eee6d6;color:#7a7161;margin-left:6px}
 </style></head><body><div class="wrap">
 <div class="top"><span class="logo">EduNova · Shartnomalar</span><a class="out" href="#" onclick="chiq();return false;">Chiqish</a></div>
 <div id="app"></div></div>
@@ -73,7 +75,8 @@ function chiz(){
    '<div><b>'+D.oquvchi+'</b><small>O\u2018QUVCHI</small></div></div>';
  h+='<div class="tabs"><button class="'+(TAB==='imzo'?'on':'')+'" onclick="setTab(\'imzo\')">Shartnoma</button>'+
     '<button class="'+(TAB==='yoq'?'on':'')+'" onclick="setTab(\'yoq\')">Qolganlar</button>'+
-    '<button class="'+(TAB==='teach'?'on':'')+'" onclick="teachEkran()">O\u2018qituvchi</button></div>';
+    '<button class="'+(TAB==='teach'?'on':'')+'" onclick="teachEkran()">O\u2018qituvchi</button>'+
+    '<button class="'+(TAB==='rahbar'?'on':'')+'" onclick="rahbarEkran()">Rahbariyat</button></div>';
  h+='<div class="chips" id="chips"></div>';
  h+='<input id="q" placeholder="Ism yoki telefon bo\u2018yicha qidirish\u2026" value="'+esc(Q)+'" oninput="Q=this.value;lst()">';
  h+='<div id="lst" style="margin-top:10px"></div>';
@@ -161,7 +164,8 @@ function teachChiz(){
  var d=TD, ich=0, jam=0;
  d.oqituvchilar.forEach(function(o){ich+=o.ichkarida;jam+=o.slotlar;});
  var h='<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
-   '<button class="on">O\u2018qituvchi</button></div>';
+   '<button class="on">O\u2018qituvchi</button>'+
+   '<button onclick="rahbarEkran()">Rahbariyat</button></div>';
  h+='<div class="stat"><div><b>'+d.arizalar.length+'</b><small>ARIZA</small></div>'+
    '<div><b>'+d.oqituvchilar.length+'</b><small>O\u2018QITUVCHI</small></div>'+
    '<div><b>'+ich+'/'+jam+'</b><small>BUGUN ICHKARIDA</small></div></div>';
@@ -207,6 +211,76 @@ function ariza(id,ok,btn){
   if(!j||!j.ok){alert('Xatolik: '+((j&&j.xato)||'server'));btn.disabled=false;return;}
   teachEkran();
  })["catch"](function(){btn.disabled=false;alert('Xatolik');});
+}
+
+
+var RH=null;
+function rahbarEkran(){
+ TAB='rahbar';
+ $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
+ rpc('ep_rahbar_royxat',{p_token:TOK}).then(function(d){
+  if(!d||!d.ok){alert('Ruxsat yo\u2018q');chiz();return;}
+  RH=d;rahbarChiz();
+ })["catch"](function(){$('app').innerHTML='<p class="mu">Xatolik</p>';});
+}
+function rahbarChiz(){
+ var d=RH, faol=d.royxat.filter(function(x){return x.faol;});
+ var ulangan=faol.filter(function(x){return x.tg;}).length;
+ var h='<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
+   '<button onclick="teachEkran()">O\u2018qituvchi</button>'+
+   '<button class="on">Rahbariyat</button></div>';
+ h+='<div class="stat"><div><b>'+faol.length+'</b><small>RAHBAR</small></div>'+
+   '<div><b>'+ulangan+'</b><small>TELEGRAMDA</small></div></div>';
+ if(ulangan<faol.length){
+   h+='<div class="card" style="border-color:#fed7aa;background:#fff7ed"><b>Diqqat.</b> '+
+      'Telegramga ulanmagan rahbarga hech qanday xabar bormaydi. '+
+      'Ulash: botda <b>/admin</b> \u2192 PIN.</div>';
+ }
+ h+='<div class="card"><label>Yangi rahbar F.I.Sh.</label>'+
+   '<input id="rh_ism" placeholder="Masalan: Zavuch Nodira">'+
+   '<div class="err" id="rh_e"></div>'+
+   '<button class="btn" onclick="rahbarQosh(this)">Qo\u2018shish va PIN berish</button></div>';
+ h+='<h1>Rahbariyat</h1>';
+ d.royxat.forEach(function(r){
+  if(!r.faol)return;
+  h+='<div class="row"><div><b>'+esc(r.ism)+'</b>'+(r.id===d.men?' <span class="pill">siz</span>':'')+
+     (r.tg?'<span class="tg">TG</span>':'<span class="pill">TG yo\u2018q</span>')+'</div>'+
+     '<div class="sm" style="margin-top:4px">PIN <span class="pin">'+esc(r.pin)+'</span>'+
+     (r.oxirgi?' <span class="mu">\u00B7 '+esc(r.oxirgi)+'</span>':'')+'</div>'+
+     '<div style="display:flex;gap:8px;margin-top:8px">'+
+     '<button class="btn sec" style="margin:0;padding:8px" onclick="rahbarPin('+r.id+',\''+esc(r.ism).replace(/'/g,"\\'")+'\')">Yangi PIN</button>'+
+     (r.id===d.men?'':'<button class="btn sec" style="margin:0;padding:8px;color:#b91c1c" onclick="rahbarOchir('+r.id+',\''+esc(r.ism).replace(/'/g,"\\'")+'\')">O\u2018chirish</button>')+
+     '</div></div>';
+ });
+ $('app').innerHTML=h;window.scrollTo(0,0);
+}
+function rahbarQosh(btn){
+ var ism=(document.getElementById('rh_ism').value||'').trim();
+ if(ism.length<3){$('rh_e').textContent='Ism qisqa';return;}
+ btn.disabled=true;
+ rpc('ep_rahbar_qosh',{p_token:TOK,p_ism:ism}).then(function(d){
+  btn.disabled=false;
+  if(!d||!d.ok){$('rh_e').textContent=(d&&d.xato==='bor')?'Bunday rahbar bor':'Xatolik';return;}
+  alert(d.ism+'\n\nPIN: '+d.pin+'\n\nShu PIN bilan: botda /admin \u2192 PIN.');
+  rahbarEkran();
+ })["catch"](function(){btn.disabled=false;$('rh_e').textContent='Xatolik';});
+}
+function rahbarPin(id,ism){
+ if(!confirm(ism+'\n\nYangi PIN berilsinmi? Eski PIN ishlamay qoladi.'))return;
+ rpc('ep_rahbar_pin',{p_token:TOK,p_id:id}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik');return;}
+  alert(d.ism+'\n\nYangi PIN: '+d.pin);
+  rahbarEkran();
+ })["catch"](function(){alert('Xatolik');});
+}
+function rahbarOchir(id,ism){
+ if(!confirm(ism+'\n\nRahbariyatdan o\u2018chirilsinmi?'))return;
+ rpc('ep_rahbar_ochir',{p_token:TOK,p_id:id}).then(function(d){
+  if(!d||!d.ok){
+   alert(d&&d.xato==='oxirgi'?'Kamida ikkita rahbar qolishi kerak':(d&&d.xato==='ozim'?'O\u2018zingizni o\u2018chira olmaysiz':'Xatolik'));
+   return;}
+  rahbarEkran();
+ })["catch"](function(){alert('Xatolik');});
 }
 
 if(TOK) yukla(); else kirishEkran();
