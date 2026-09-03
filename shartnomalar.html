@@ -76,7 +76,8 @@ function chiz(){
  h+='<div class="tabs"><button class="'+(TAB==='imzo'?'on':'')+'" onclick="setTab(\'imzo\')">Shartnoma</button>'+
     '<button class="'+(TAB==='yoq'?'on':'')+'" onclick="setTab(\'yoq\')">Qolganlar</button>'+
     '<button class="'+(TAB==='teach'?'on':'')+'" onclick="teachEkran()">O\u2018qituvchi</button>'+
-    '<button class="'+(TAB==='rahbar'?'on':'')+'" onclick="rahbarEkran()">Rahbariyat</button></div>';
+    '<button class="'+(TAB==='rahbar'?'on':'')+'" onclick="rahbarEkran()">Rahbariyat</button>'+
+    '<button class="'+(TAB==='ota'?'on':'')+'" onclick="otaEkran()">Ota-ona</button></div>';
  h+='<div class="chips" id="chips"></div>';
  h+='<input id="q" placeholder="Ism yoki telefon bo\u2018yicha qidirish\u2026" value="'+esc(Q)+'" oninput="Q=this.value;lst()">';
  h+='<div id="lst" style="margin-top:10px"></div>';
@@ -281,6 +282,57 @@ function rahbarOchir(id,ism){
    return;}
   rahbarEkran();
  })["catch"](function(){alert('Xatolik');});
+}
+
+
+var OT=null, OTF='yoq';
+function otaEkran(){
+ TAB='ota';
+ $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
+ rpc('ep_ota_royxat',{p_token:TOK}).then(function(d){
+  if(!d||!d.ok){alert('Ruxsat yo\u2018q');chiz();return;}
+  OT=d;otaChiz();
+ })["catch"](function(){$('app').innerHTML='<p class="mu">Xatolik</p>';});
+}
+function otaChiz(){
+ var d=OT;
+ var h='<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
+   '<button onclick="teachEkran()">O\u2018qituvchi</button>'+
+   '<button onclick="rahbarEkran()">Rahbariyat</button>'+
+   '<button class="on">Ota-ona</button></div>';
+ h+='<div class="stat"><div><b>'+d.jami+'</b><small>OTA-ONA</small></div>'+
+   '<div><b>'+d.tg+'</b><small>BOTGA ULANGAN</small></div>'+
+   '<div><b>'+(d.jami-d.tg)+'</b><small>ULANMAGAN</small></div></div>';
+ h+='<div class="chips"><button class="chip'+(OTF==='yoq'?' on':'')+'" onclick="OTF=\'yoq\';otaChiz()">Ulanmagan</button>'+
+    '<button class="chip'+(OTF==='bor'?' on':'')+'" onclick="OTF=\'bor\';otaChiz()">Ulangan</button>'+
+    '<button class="chip'+(OTF==='hamma'?' on':'')+'" onclick="OTF=\'hamma\';otaChiz()">Hammasi</button></div>';
+ if(OTF==='yoq') h+='<p class="sm mu">Bu ota-onalarga farzandi haqida xabar <b>bormaydi</b>. \u00ABHavola\u00BB \u2014 yangi bir martalik havola, uni SMS yoki WhatsApp orqali yuboring.</p>';
+ var n=0;
+ d.royxat.forEach(function(o){
+  if(OTF==='yoq'&&o.tg)return; if(OTF==='bor'&&!o.tg)return; n++;
+  h+='<div class="row" id="o'+o.id+'"><div><b>'+esc(o.ism)+'</b>'+(o.tg?'<span class="tg">TG</span>':'<span class="pill">TG yo\u2018q</span>')+'</div>'+
+     '<div class="sm mu">'+esc(o.tel||'')+(o.shartnoma?' \u00B7 shartnoma '+esc(o.shartnoma):'')+'</div>'+
+     (o.bolalar?'<div class="sm">'+esc(o.bolalar)+'</div>':'')+
+     '<div class="sm" style="margin-top:4px">PIN <span class="pin">'+esc(o.pin)+'</span></div>'+
+     (o.tg?'':'<div style="display:flex;gap:8px;margin-top:8px">'+
+      (o.tel?'<a class="btn sec" style="margin:0;padding:8px;text-decoration:none;text-align:center;flex:0 0 46px" href="tel:'+esc(String(o.tel).replace(/[^0-9+]/g,''))+'">\u260E</a>':'')+
+      '<button class="btn" style="margin:0;padding:8px" onclick="otaKod('+o.id+')">Havola berish</button></div>')+
+     '<div class="sm" id="h'+o.id+'" style="margin-top:6px;word-break:break-all"></div></div>';
+ });
+ if(!n)h+='<p class="mu center">\u2014</p>';
+ $('app').innerHTML=h;window.scrollTo(0,0);
+}
+function otaKod(id){
+ rpc('ep_ota_kod_yangi',{p_token:TOK,p_id:id}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik');return;}
+  var e=$('h'+id);
+  e.innerHTML='<b>Havola:</b> <a href="'+esc(d.havola)+'" target="_blank">'+esc(d.havola)+'</a> '+
+    '<button class="btn sec" style="display:inline-block;width:auto;margin:6px 0 0;padding:6px 10px" onclick="nusxa(\''+esc(d.havola)+'\')">Nusxa</button>';
+ })["catch"](function(){alert('Xatolik');});
+}
+function nusxa(t){
+ if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){alert('Nusxalandi');});}
+ else{prompt('Nusxalang:',t);}
 }
 
 if(TOK) yukla(); else kirishEkran();
