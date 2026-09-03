@@ -1,0 +1,58 @@
+<!doctype html><html lang="uz"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>EduNova — Kabinet</title><meta name="theme-color" content="#F6F1E6">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#F6F1E6;color:#1A2238}
+.wrap{max-width:520px;margin:0 auto;padding:26px 16px}
+.logo{font-weight:800;font-size:20px;margin-bottom:4px}.sub{color:#6b6355;font-size:14px;margin-bottom:22px}
+.card{background:#fff;border:1px solid #e6dcc8;border-radius:14px;padding:16px;margin-bottom:12px}
+.btn{display:block;width:100%;padding:15px;border:0;border-radius:12px;background:#FF7A00;color:#fff;font-size:16px;font-weight:700;text-align:center;text-decoration:none;margin-top:10px}
+.btn.sec{background:#fff;color:#1A2238;border:1px solid #d9cfba}
+.mu{color:#8b8271;font-size:13px}.err{color:#b91c1c;font-size:14px;margin-top:8px}
+.spin{width:28px;height:28px;border:3px solid #e6dcc8;border-top-color:#FF7A00;border-radius:50%;animation:s .8s linear infinite;margin:14px auto}
+@keyframes s{to{transform:rotate(360deg)}}
+</style></head><body><div class="wrap">
+<div class="logo">EduNova School</div><div class="sub">Shaxsiy kabinet</div>
+<div class="card" id="box"><div class="spin"></div><div class="mu" style="text-align:center">Telegram orqali kirish…</div></div>
+</div>
+<script>
+var FN='https://unaodltahuevrfnarfha.supabase.co/functions/v1/teach-bot';
+var SAYT='https://edunovaschool9-hue.github.io/a-avlod-bot/';
+function $(i){return document.getElementById(i);}
+function qolda(msg){
+ $('box').innerHTML=(msg?'<div class="err">'+msg+'</div>':'')+
+  '<div class="mu" style="margin:6px 0 4px">PIN bilan kiring:</div>'+
+  '<a class="btn" href="'+SAYT+'shartnomalar.html">Rahbariyat — shartnoma va o‘qituvchilar</a>'+
+  '<a class="btn" href="'+SAYT+'davomat.html">O‘quvchilar davomati</a>'+
+  '<a class="btn sec" href="'+SAYT+'oqituvchi-kabinet.html">O‘qituvchi kabineti</a>'+
+  '<a class="btn sec" href="'+SAYT+'ota-ona.html">Ota-ona kabineti</a>';
+}
+function yonaltir(d){
+ try{
+  if(d.rol==='admin'){
+    sessionStorage.setItem('adm_tok',d.token); sessionStorage.setItem('dav_tok',d.token);
+    localStorage.setItem('ep_token_admin',d.token);
+    $('box').innerHTML='<div class="mu">Salom, <b>'+(d.ism||'')+'</b></div>'+
+     '<a class="btn" href="'+SAYT+'davomat.html">O‘quvchilar davomati</a>'+
+     '<a class="btn" href="'+SAYT+'shartnomalar.html">Shartnoma va o‘qituvchilar</a>'+
+     '<a class="btn sec" href="'+SAYT+'boshqaruv.html">Boshqaruv paneli</a>';
+    return;
+  }
+  if(d.rol==='oqituvchi'){ localStorage.setItem('ep_token_oqituvchi',d.token); location.replace(SAYT+'oqituvchi-kabinet.html'); return; }
+  if(d.rol==='ota'){ localStorage.setItem('ep_token_ota',d.token); location.replace(SAYT+'ota-ona.html'); return; }
+  qolda('Rol aniqlanmadi');
+ }catch(e){ qolda('Xatolik'); }
+}
+(function(){
+ var tg=window.Telegram&&window.Telegram.WebApp;
+ if(!tg||!tg.initData){ qolda(''); return; }
+ try{ tg.expand(); tg.ready(); }catch(e){}
+ var bot=/shartnomaedu/i.test(location.search)?'ota':'teach';
+ fetch(FN+'?webapp=1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({initData:tg.initData,bot:bot})})
+ .then(function(r){return r.json();}).then(function(d){
+   if(!d||!d.ok){ qolda(d&&d.xato==='ulanmagan'?'Telegram akkauntingiz kabinetga ulanmagan. Botda /start yoki /admin bosing.':'Kirish tasdiqlanmadi'); return; }
+   yonaltir(d);
+ })["catch"](function(){ qolda('Aloqa yo‘q'); });
+})();
+</script></body></html>
