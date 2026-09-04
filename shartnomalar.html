@@ -337,108 +337,20 @@ function nusxa(t){
 }
 
 
-var TL=null, TLF='';
+
 function talonEkran(){
  TAB='talon';
- $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
- rpc('ep_talon_royxat',{p_token:TOK,p_tur:TLF}).then(function(d){
-  if(!d||!d.ok){alert('Ruxsat yo\u2018q');chiz();return;}
-  TL=d;talonChiz();
- })["catch"](function(){$('app').innerHTML='<p class="mu">Xatolik</p>';});
-}
-function talonChiz(){
- var d=TL;
  var h='<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
    '<button onclick="teachEkran()">O\u2018qituvchi</button>'+
    '<button onclick="otaEkran()">Ota-ona</button>'+
    '<button class="on">Talon</button></div>';
- h+='<div class="stat"><div><b>'+d.kelish+'</b><small>KELISH</small></div>'+
-   '<div><b>'+d.ketish+'</b><small>KETISH</small></div>'+
-   '<div><b>'+d.buyruqsiz+'</b><small>BUYRUQSIZ</small></div></div>';
- h+='<div class="card"><b>Yangi talon</b>'+
-   '<label>Turi</label><select id="tl_tur" onchange="tlSinf()"><option value="ketish">Ketish taloni</option><option value="kelish">Kelish taloni</option></select>'+
-   '<label>Sinf</label><select id="tl_sinf" onchange="tlOquvchi()"></select>'+
-   '<label>O\u2018quvchi</label><select id="tl_oq"></select>'+
-   '<label>Sabab</label><input id="tl_sabab" placeholder="ota-onaning arizasi">'+
-   '<div class="err" id="tl_e"></div>'+
-   '<button class="btn" onclick="tlSaqla(this)">Talon berish</button></div>';
- h+='<div class="chips"><button class="chip'+(TLF===''?' on':'')+'" onclick="TLF=\'\';talonEkran()">Hammasi</button>'+
-    '<button class="chip'+(TLF==='kelish'?' on':'')+'" onclick="TLF=\'kelish\';talonEkran()">Kelish</button>'+
-    '<button class="chip'+(TLF==='ketish'?' on':'')+'" onclick="TLF=\'ketish\';talonEkran()">Ketish</button></div>';
- h+='<h1>Arxiv</h1>';
- if(!d.royxat.length)h+='<p class="mu center">\u2014</p>';
- d.royxat.forEach(function(t){
-  h+='<div class="row"><div><b>'+(t.tur==='ketish'?'\u{1F534}':'\u{1F7E2}')+' #'+t.raqam+' '+esc(t.ism)+'</b> <span class="mu sm">'+esc(t.sinf)+'</span></div>'+
-     '<div class="sm mu">'+esc(t.sana)+(t.kim?' \u00B7 '+esc(t.kim):'')+'</div>'+
-     (t.sabab?'<div class="sm">'+esc(t.sabab)+'</div>':'')+
-     (t.buyruq
-       ? '<div class="sm" style="margin-top:5px">\u{1F4C4} <b>Buyruq \u2116'+t.buyruq+'</b> \u00B7 '+esc(t.buyruq_sana||'')+
-         ' <button class="btn sec" style="display:inline-block;width:auto;margin:4px 0 0;padding:6px 10px" onclick="tlKor('+t.id+')">Ko\u2018rish</button></div>'
-       : '<button class="btn" style="margin-top:8px;padding:9px" onclick="tlBuyruq('+t.id+',this)">\u{1F4C4} Buyruq yaratish</button>')+
-     '<div id="bm'+t.id+'"></div></div>';
- });
- $('app').innerHTML=h;
- tlSinfToldir(); window.scrollTo(0,0);
-}
-function tlSinfToldir(){
- var sel=$('tl_sinf'); if(!sel||!D||!D.sinflar)return;
- sel.innerHTML=D.sinflar.map(function(s){return '<option value="'+s.id+'">'+esc(s.nom)+'</option>';}).join('');
- tlOquvchi();
-}
-function tlSinf(){ tlOquvchi(); }
-function tlOquvchi(){
- var sinf=$('tl_sinf')&&$('tl_sinf').value, tur=$('tl_tur')&&$('tl_tur').value;
- if(!sinf)return;
- $('tl_oq').innerHTML='<option>\u2026</option>';
- rpc('ep_oquvchi_qidir',{p_token:TOK,p_sinf_id:parseInt(sinf,10),p_faol:(tur==='ketish')}).then(function(d){
-  if(!d||!d.ok){$('tl_oq').innerHTML='';return;}
-  $('tl_oq').innerHTML=(d.royxat||[]).map(function(o){return '<option value="'+o.id+'">'+esc(o.ism)+'</option>';}).join('')
-    ||'<option value="">\u2014 o\u2018quvchi yo\u2018q</option>';
- });
-}
-function tlSaqla(btn){
- var oq=$('tl_oq').value, tur=$('tl_tur').value, sabab=$('tl_sabab').value;
- if(!oq){$('tl_e').textContent='O\u2018quvchi tanlanmagan';return;}
- var ism=$('tl_oq').options[$('tl_oq').selectedIndex].text;
- if(!confirm(ism+'\n\n'+(tur==='ketish'?'KETISH':'KELISH')+' taloni berilsinmi?\n\n'+
-   (tur==='ketish'?'O\u2018quvchi davomat va ota-ona xabarlaridan chiqariladi.\n\n':'')+
-   'Bu amal jurnalga sizning nomingiz bilan yoziladi. Siz javobgarsiz.'))return;
- btn.disabled=true;
- rpc('ep_talon_saqla',{p_token:TOK,p_tur:tur,p_oquvchi_id:parseInt(oq,10),p_sabab:sabab}).then(function(d){
-  btn.disabled=false;
-  if(!d||!d.ok){$('tl_e').textContent='Xatolik: '+((d&&d.xato)||'server');return;}
-  alert('Talon #'+d.raqam+' berildi: '+d.ism+' ('+d.sinf+')');
-  TLF=''; talonEkran();
- })["catch"](function(){btn.disabled=false;$('tl_e').textContent='Xatolik';});
-}
-function tlBuyruq(id,btn){
- if(!confirm('Shu talon bo\u2018yicha buyruq yaratilsinmi?\n\nBuyruq raqami avtomatik beriladi va bekor qilinmaydi.'))return;
- btn.disabled=true;
- rpc('ep_buyruq_saqla',{p_token:TOK,p_talon_id:id}).then(function(d){
-  btn.disabled=false;
-  if(!d||!d.ok){alert(d&&d.xato==='bor'?('Buyruq allaqachon bor: \u2116'+d.raqam):'Xatolik');return;}
-  talonEkran();
-  setTimeout(function(){ tlKor(id); },600);
- })["catch"](function(){btn.disabled=false;alert('Xatolik');});
-}
-function tlKor(id){
- var t=null; (TL&&TL.royxat||[]).forEach(function(x){if(x.id===id)t=x;});
- if(!t||!t.buyruq_matn){talonEkran();return;}
- var e=$('bm'+id); if(!e)return;
- if(e.innerHTML){e.innerHTML='';return;}
- e.innerHTML='<div class="doc" style="margin-top:8px">'+esc(t.buyruq_matn)+'</div>'+
-   '<button class="btn sec" style="margin-top:6px;padding:8px" onclick="tlChop('+id+')">\u{1F5A8} Chop etish</button>';
-}
-function tlChop(id){
- var t=null; (TL&&TL.royxat||[]).forEach(function(x){if(x.id===id)t=x;});
- if(!t)return;
- var w=window.open('','_blank');
- if(!w){alert('Brauzer yangi oynani bloklamoqda');return;}
- w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Buyruq '+t.buyruq+'</title>'+
-  '<style>@page{size:A4;margin:20mm}body{font-family:Times New Roman,serif;font-size:14pt;line-height:1.6;white-space:pre-wrap}</style>'+
-  '</head><body>'+esc(t.buyruq_matn)+'</body></html>');
- w.document.close();
- setTimeout(function(){try{w.focus();w.print();}catch(e){}},600);
+ h+='<div class="card"><b>\u{1F5C2} Xujjat ishlar</b><div class="sm mu" style="margin:6px 0 10px">Kelish/ketish talonlari va buyruqlar \u2014 akademiyadagi reyestr, bir xil blank, bir xil raqamlash (T / KT / OQ).</div>'+
+   '<a class="btn" style="text-decoration:none;text-align:center" href="hujjat.html?tur=kelish">\u{1F4E5} Kelish taloni</a>'+
+   '<a class="btn" style="text-decoration:none;text-align:center" href="hujjat.html?tur=ketish">\u{1F4E4} Ketish taloni</a>'+
+   '<a class="btn sec" style="text-decoration:none;text-align:center" href="hujjat.html?tur=chb">\u{1F4D5} Buyruq \u2014 chiqarish</a>'+
+   '<a class="btn sec" style="text-decoration:none;text-align:center" href="hujjat.html?tur=qb">\u{1F4D7} Buyruq \u2014 qabul</a>'+
+   '<div class="sm mu" style="margin-top:10px">Reyestr, arxiv va PNG yuklab olish \u2014 shu sahifaning pastida. Telegram botdan ochilsa, blank chatga ham yuboriladi.</div></div>';
+ $('app').innerHTML=h; window.scrollTo(0,0);
 }
 
 if(TOK) yukla(); else kirishEkran();
