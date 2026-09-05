@@ -441,6 +441,48 @@ async function oqitCallback(cq: any, k: string, a: string) {
   await ok();
 }
 
+
+// ---------- ota-ona boti ----------
+const KB_OTA_TEL = { keyboard: [[{ text: "📱 Telefon raqamimni yuborish", request_contact: true }]], resize_keyboard: true, one_time_keyboard: true };
+const KB_OTA = { keyboard: [[{ text: "👶 Farzandim" }, { text: "🔑 PIN" }]], resize_keyboard: true };
+const KB_OTA_APP = { inline_keyboard: [[{ text: "📱 Ota-ona kabineti", web_app: { url: APP + "?go=ota&bot=ota" } }]] };
+async function otaXabar(msg: any) {
+  const chat = msg.chat?.id as number; if (!chat) return;
+  const matn = (msg.text ?? "").trim();
+  const S = (t: string, extra: Record<string, unknown> = {}) => send(chat, t, extra, OTA);
+
+  if (msg.contact?.phone_number) {
+    const r = await rpc("ep_ota_tel_ulash", { p_chat_id: chat, p_tel: msg.contact.phone_number, p_ism: [msg.contact.first_name, msg.contact.last_name].filter(Boolean).join(" ") });
+    if (r?.ok) {
+      await S(`✅ <b>${esc(r.ism)}</b>, xush kelibsiz!\n\nFarzandingiz: <b>${esc(r.bolalar)}</b>\n\nEndi farzandingiz maktabga kelgani, dars xulosalari va to‘lov haqidagi xabarlar shu yerga keladi.\n\nKabinet PIN kodingiz: <code>${esc(r.pin)}</code>`, { reply_markup: KB_OTA });
+      await S("Kabinetni ochish — pastdagi tugma. PIN kerak emas.", { reply_markup: KB_OTA_APP });
+    } else if (r?.xato === "topilmadi") {
+      await S("Raqamingiz bazada topilmadi.\n\nShartnoma hali rasmiylashtirilmagan bo‘lishi mumkin — <b>administrator siz bilan bog‘lanadi</b>. Tashvishlanmang, ma’lumotlaringiz saqlandi.", { reply_markup: { remove_keyboard: true } });
+    } else {
+      await S("Raqamni o‘qib bo‘lmadi. Qaytadan urinib ko‘ring.", { reply_markup: KB_OTA_TEL });
+    }
+    return;
+  }
+
+  const rol = await rpc("ep_tg_rol", { p_chat_id: chat });
+  const ulangan = rol?.ok && rol.rol === "ota";
+
+  if (matn.startsWith("/start")) {
+    const kod = matn.split(" ")[1];
+    if (kod) {
+      const d = await rpc("ep_ota_tg_ulash", { p_chat_id: chat, p_kod: kod }).catch(() => null);
+      if (d?.ok) { await S(`✅ <b>${esc(d.ism ?? "")}</b>, xush kelibsiz!\nPIN: <code>${esc(d.pin ?? "")}</code>`, { reply_markup: KB_OTA }); await S("Kabinet:", { reply_markup: KB_OTA_APP }); return; }
+    }
+    if (ulangan) { await S(`Salom, <b>${esc(rol.ism)}</b>!`, { reply_markup: KB_OTA }); await S("Kabinet:", { reply_markup: KB_OTA_APP }); return; }
+    await S("Assalomu alaykum! Bu — <b>EduNova School</b> ota-onalar boti.\n\nFarzandingiz maktabga kelgani, dars xulosalari va to‘lov haqidagi xabarlarni shu yerdan olasiz.\n\nUlanish uchun pastdagi tugmani bosing — telefon raqamingiz orqali sizni topamiz.", { reply_markup: KB_OTA_TEL });
+    return;
+  }
+  if (!ulangan) { await S("Ulanish uchun telefon raqamingizni yuboring:", { reply_markup: KB_OTA_TEL }); return; }
+  if (/pin/i.test(matn)) { const p = await rpc("ep_tg_rol", { p_chat_id: chat }); void p; await S("Kabinet PIN kerak emas — tugma orqali kiring:", { reply_markup: KB_OTA_APP }); return; }
+  if (/farzand/i.test(matn)) { await S("Farzandingiz haqidagi ma’lumot kabinetda:", { reply_markup: KB_OTA_APP }); return; }
+  await S("Kabinetni ochish:", { reply_markup: KB_OTA_APP });
+}
+
 // ---------- xabarlar ----------
 async function xabar(msg: any) {
   const chat = msg.chat?.id as number; if (!chat) return;
@@ -527,7 +569,18 @@ async function xabar(msg: any) {
   }
   if (/davomat belgilash/i.test(matn)) { if (!isTeach && !isAdmin) { await send(chat, T.royxatda_yoq); return; } await sinfSora(chat, "Qaysi sinf davomatini belgilaysiz?", "dv_sinf"); return; }
   if (/xulosa yozish/i.test(matn)) { if (!isTeach) { await send(chat, T.royxatda_yoq); return; } await sinfSora(chat, "Qaysi sinf uchun xulosa yozasiz?", "xl_sinf"); return; }
-  if (/kabinet$/i.test(matn)) { await send(chat, "Kabinet ilova sifatida ochiladi — PIN kerak emas.", { reply_markup: KB_APP() }); return; }
+  if (/kabinet$/i.test(matn)) {
+    if (isAdmin) {
+      await send(chat, "📱 <b>Panellar</b> — ilova sifatida ochiladi, PIN kerak emas:", { reply_markup: { inline_keyboard: [
+        [{ text: "🏫 Boshqaruv paneli", web_app: { url: APP + "?go=boshqaruv" } }],
+        [{ text: "📄 Shartnoma va o‘qituvchilar", web_app: { url: APP + "?go=shartnomalar" } }],
+        [{ text: "✅ O‘quvchilar davomati", web_app: { url: APP + "?go=davomat" } }],
+        [{ text: "🗂 Xujjat ishlar", web_app: { url: SAYT + "hujjat.html" } }]] } });
+      return;
+    }
+    await send(chat, "Kabinet ilova sifatida ochiladi — PIN kerak emas.", { reply_markup: KB_APP() });
+    return;
+  }
 
   if (isAdmin) {
     if (/kim maktabda/i.test(matn)) { await send(chat, await kimMaktabda()); return; }
@@ -857,9 +910,19 @@ Deno.serve(async (req) => {
     if (d?.ok && d.chat_id) await send(Number(d.chat_id), d.holat === "tasdiqlandi" ? T.tasdiq(d.pin) : T.rad, d.holat === "tasdiqlandi" ? { reply_markup: KB_TEACH } : {});
     return jsonc(d ?? { ok: false });
   }
-  if (req.method !== "POST") return new Response("teach-bot v3.5 ok", { headers: CORS });
+  if (q("ota_setup") !== null) {
+    if (!(await cronOk(q("ota_setup")))) return no();
+    const r = await tg("setWebhook", { url: FN() + "?ota=1", secret_token: CRON, allowed_updates: ["message", "callback_query"], drop_pending_updates: true }, OTA);
+    const me = await tg("getMe", {}, OTA);
+    return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
+  }
+  if (req.method !== "POST") return new Response("teach-bot v3.6 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
+  if (q("ota") !== null) {
+    try { const m = upd.message ?? upd.edited_message; if (m) await otaXabar(m); } catch (e) { console.error("ota", String(e)); }
+    return new Response("ok");
+  }
   try {
     if (upd.callback_query) await callback(upd.callback_query);
     else { const msg = upd.message ?? upd.edited_message; if (msg) await xabar(msg); }
