@@ -30,7 +30,7 @@ const cronOk = async (k: string | null) => !!k && ((CRON && k === CRON) || (awai
 // ---------- klaviaturalar ----------
 const KB_LOK = { keyboard: [[{ text: "📍 Joylashuvni yuborish", request_location: true }]], resize_keyboard: true, one_time_keyboard: true };
 const KB_ADMIN = { keyboard: [[{ text: "🏫 Kim maktabda" }, { text: "📋 Davomat hisoboti" }], [{ text: "📣 Chaqirish" }, { text: "📝 Arizalar" }], [{ text: "👨‍👩‍👧 Ota-onalar" }, { text: "📢 Xabar" }], [{ text: "🎒 O‘quvchilar" }, { text: "🎫 Talonlar" }], [{ text: "📝 Xulosalar" }, { text: "👩‍🏫 O‘qituvchilar" }], [{ text: "📤 Davomat so‘rash" }], [{ text: "📱 Kabinet" }]], resize_keyboard: true };
-const KB_TEACH = { keyboard: [[{ text: "✅ Davomat belgilash" }, { text: "📝 Xulosa yozish" }], [{ text: "📍 Joylashuvni yuborish", request_location: true }], [{ text: "📊 Holatim" }, { text: "📱 Kabinet" }]], resize_keyboard: true };
+const KB_TEACH = { keyboard: [[{ text: "✅ Davomat belgilash" }, { text: "📝 Xulosa yozish" }], [{ text: "📊 Holatim" }, { text: "🔑 PIN" }], [{ text: "📱 Kabinet" }]], resize_keyboard: true };
 const KB_APP = (t = "📱 Kabinetni ochish") => ({ inline_keyboard: [[{ text: t, web_app: { url: APP } }]] });
 
 const T = {
@@ -54,14 +54,20 @@ const HOLAT_BELGI: Record<string, string> = { ichkarida: "🟢", tashqarida: "�
 async function kimMaktabda(): Promise<string> {
   const d = await rpc("ep_teach_hozir", {});
   if (!d?.ok) return "Xatolik";
-  if (!d.maktab) return "⚠️ Maktab nuqtasi o‘rnatilmagan — /maktab buyrug‘i bilan hovlida turib joylashuv yuboring.";
   const r: any[] = d.royxat ?? [];
-  const ich = r.filter((x: any) => x.holat === "ichkarida");
-  let t = `🏫 <b>Kim maktabda</b> · ${d.kun}\n<b>${ich.length}</b> / ${r.length} o‘qituvchi ichkarida\n`;
-  const gr = (nom: string, list: any[]) => { if (!list.length) return; t += `\n<b>${nom}</b>\n`; list.forEach((x: any) => {
-    t += `${HOLAT_BELGI[x.holat] ?? "⚪"} ${esc(x.ism)}` + (x.keldi ? ` · keldi ${x.keldi}` : "") + (x.ketdi ? ` · ketdi ${x.ketdi}` : "") + (x.holat === "tashqarida" && x.masofa ? ` · ${x.masofa} m` : "") + "\n"; }); };
-  gr("Ichkarida", ich); gr("Tashqarida", r.filter((x: any) => x.holat === "tashqarida"));
-  gr("Ketgan / joylashuv to‘xtagan", r.filter((x: any) => x.holat === "ketdi")); gr("Joylashuv yo‘q", r.filter((x: any) => x.holat === "yoq"));
+  const bor = r.filter((x: any) => x.holat === "ichkarida"), yoq = r.filter((x: any) => x.holat !== "ichkarida");
+  let t = `🏫 <b>Bugun ishda</b> · ${d.kun}\nDavomat yoki xulosa qilgan: <b>${bor.length}</b> / ${r.length} o‘qituvchi\n`;
+  if (bor.length) {
+    t += `\n<b>✅ Ishda</b>\n`;
+    bor.forEach((x: any) => {
+      t += `🟢 ${esc(x.ism)}` + (x.keldi ? ` · ${x.keldi}` : "") + (x.sinflar ? ` · ${esc(x.sinflar)}` : "") +
+        (Number(x.xulosa) ? ` · ${x.xulosa} xulosa` : "") + "\n";
+    });
+  }
+  if (yoq.length) {
+    t += `\n<b>❓ Hali belgi yo‘q</b>\n` + yoq.map((x: any) => `⚪ ${esc(x.ism)}` + (x.tg ? "" : " <i>(TG yo‘q)</i>")).join("\n") + "\n";
+  }
+  t += `\n<i>Holat 9:00 dagi sinf davomati va dars xulosalari bo‘yicha aniqlanadi.</i>`;
   return t;
 }
 async function davomatMatn(ismlar = false): Promise<string> {
@@ -504,6 +510,10 @@ async function xabar(msg: any) {
   const isTeach = rol?.ok && rol.rol === "oqituvchi";
 
   if (msg.location) {
+    if (!msg.edit_date) await send(chat, "Rahmat, lekin joylashuv endi kerak emas — davomat 9:00 da sinfni tanlash orqali belgilanadi.", { reply_markup: isAdmin ? KB_ADMIN : KB_TEACH });
+    return;
+  }
+  if (false && msg.location) {
     const { latitude, longitude, live_period } = msg.location;
     const nuq = await rpc("ep_maktab_nuqta", { p_chat_id: chat, p_lat: latitude, p_lon: longitude });
     if (nuq?.ok) { await send(chat, T.maktab_ok(latitude, longitude, nuq.radius), { reply_markup: isAdmin ? KB_ADMIN : KB_TEACH }); return; }
@@ -565,11 +575,7 @@ async function xabar(msg: any) {
     if (isTeach) { await send(chat, `Salom, <b>${esc(rol.ism)}</b>!`, { reply_markup: KB_TEACH }); return; }
     await rpc("ep_teach_boshla", { p_chat_id: chat }); await send(chat, T.salom); return;
   }
-  if (matn === "/maktab") {
-    const k = await rpc("ep_maktab_kutish", { p_chat_id: chat });
-    if (!k?.ok) { await send(chat, "Bu buyruq faqat rahbariyat uchun."); return; }
-    await send(chat, "Maktab hovlisida turib joylashuvingizni yuboring — u markaz bo‘ladi. 5 daqiqa vaqt bor.", { reply_markup: KB_LOK }); return;
-  }
+  if (matn === "/maktab") { await send(chat, "Joylashuv nazorati o‘chirilgan. Davomat 9:00 dagi sinf belgilash orqali yuritiladi."); return; }
   if (matn === "/pin" || /^\S*\s*pin$/i.test(matn)) {
     const p = await rpc("ep_teach_pin", { p_chat_id: chat });
     await send(chat, p?.ok ? `PIN: <b>${p.pin}</b>\n${SAYT}oqituvchi-kabinet.html` : T.royxatda_yoq); return;
@@ -924,7 +930,7 @@ Deno.serve(async (req) => {
     if (!(await cronOk(q("oqit_xulosa")))) return no();
     const t = await kimMaktabda(); let n = 0;
     const d = await rpc("ep_adminlar_chat", {});
-    for (const c of (Array.isArray(d) ? d : [])) { if (!QURUQ) await send(Number(c), "🕗 <b>Ertalabki hisobot</b>\n\n" + t); n++; }
+    for (const c of (Array.isArray(d) ? d : [])) { if (!QURUQ) await send(Number(c), "🕧 <b>Kunlik hisobot · o‘qituvchilar</b>\n\n" + t); n++; }
     return jsonc({ ok: true, yuborildi: n });
   }
   if (q("admin") !== null) {
@@ -939,7 +945,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v3.7 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v3.8 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
