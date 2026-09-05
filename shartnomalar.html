@@ -488,6 +488,21 @@ function ochPanel(sahifa){
  location.href=sahifa;
 }
 
+
+(function(){
+ try{
+  var h=location.hash||'', q=location.search||'';
+  var m=h.match(/[#&]t=([A-Za-z0-9]+)/)||q.match(/[?&]t=([A-Za-z0-9]+)/);
+  if(m&&m[1]){
+   TOK=m[1];
+   sessionStorage.setItem('adm_tok',TOK);
+   localStorage.setItem('ep_token_admin',TOK);
+   sessionStorage.setItem('dav_tok',TOK);
+   history.replaceState(null,'',location.pathname);
+  }
+ }catch(e){}
+})();
+
 if(TOK) yukla(); else kirishEkran();
 
 </script></body></html>
