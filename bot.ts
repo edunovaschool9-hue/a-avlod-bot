@@ -718,14 +718,29 @@ Deno.serve(async (req) => {
     if (!(await cronOk(q("xulosa_eslatma")))) return no();
     const d = await rpc("ep_xulosa_eslatma", {});
     const r: any[] = (d?.royxat ?? []) as any[]; let n = 0;
+    const LOGO = SAYT + "sifat.png";
     for (const t of r) {
       const soni = QURUQ ? 1 : Number((await rpc("ep_eslatma_inc", { p_chat_id: t.chat_id, p_tur: "xulosa" })) ?? 1);
+      const bosh = "🛡 <b>SIFAT NAZORATI</b> · EduNova School\n\n";
       let matn: string;
-      if (soni <= 1) matn = `📝 Hurmatli ${esc(t.ism)}, bugungi darslaringiz uchun xulosa hali yozilmagan. Iltimos, <b>📝 Xulosa yozish</b> tugmasini bosib, har bir sinf uchun qisqacha yozing — ota-onalar kutmoqda.`;
-      else if (soni <= 3) matn = `⚠️ ${esc(t.ism)}, bu ${soni}-eslatma. Xulosa hali ham yo‘q — ota-onalar bugungi dars haqida xabar olmayapti. Hoziroq 📝 Xulosa yozish tugmasini bosing.`;
-      else matn = `🚨 <b>Jiddiy ogohlantirish</b> — ${soni}-eslatma. ${esc(t.ism)}, xulosa yozilmagani rahbariyatga ko‘rinadi va intizom buzilishi sifatida hisobga olinadi. Hozir yozing.`;
+      if (soni <= 1) {
+        matn = bosh + `Hurmatli <b>${esc(t.ism)}</b>, siz bugungi <b>dars xulosasini yozmagansiz</b>.\n\n` +
+          `Iltimos, botga kiring va <b>📝 Xulosa yozish</b> tugmasi orqali xulosa yozing — <b>ota-onalar kutmoqda</b>.`;
+      } else if (soni <= 3) {
+        matn = bosh + `⚠️ <b>${soni}-eslatma.</b> ${esc(t.ism)}, dars xulosasi hali ham yozilmagan.\n\n` +
+          `Ota-onalar bugungi dars haqida xabar ololmayapti. Hoziroq botga kirib yozing.`;
+      } else {
+        matn = bosh + `🚨 <b>Jiddiy ogohlantirish · ${soni}-eslatma</b>\n\n${esc(t.ism)}, xulosa yozilmagani rahbariyat hisobotiga tushdi va intizom buzilishi sifatida qayd etiladi.\n\nOta-onalar kutmoqda — hozir yozing.`;
+      }
       if (QURUQ) { n++; continue; }
-      const r2 = await send(Number(t.chat_id), matn, { reply_markup: { inline_keyboard: [[{ text: "📝 Xulosa yozish", callback_data: "xl_menu" }]] } });
+      const kb = { inline_keyboard: [[{ text: "📝 Xulosa yozish", callback_data: "xl_menu" }]] };
+      let r2: any;
+      if (soni <= 1) {
+        r2 = await tg("sendPhoto", { chat_id: t.chat_id, photo: LOGO, caption: matn, parse_mode: "HTML", reply_markup: kb });
+        if (!r2?.ok) r2 = await send(Number(t.chat_id), matn, { reply_markup: kb });
+      } else {
+        r2 = await send(Number(t.chat_id), matn, { reply_markup: kb });
+      }
       if (r2?.ok) n++;
     }
     return jsonc({ ok: true, yuborildi: n, jami: r.length, quruq: QURUQ });
@@ -755,7 +770,7 @@ Deno.serve(async (req) => {
     if (d?.ok && d.chat_id) await send(Number(d.chat_id), d.holat === "tasdiqlandi" ? T.tasdiq(d.pin) : T.rad, d.holat === "tasdiqlandi" ? { reply_markup: KB_TEACH } : {});
     return jsonc(d ?? { ok: false });
   }
-  if (req.method !== "POST") return new Response("teach-bot v3.2 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v3.3 sifat ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   try {
