@@ -34,6 +34,11 @@ img.sig{max-width:100%;border:1px dashed #c9bfa8;border-radius:10px;background:#
 a{color:#1A2238}
 .tabs button{font-size:13px;padding:9px 4px}
 .pill{font-size:11px;padding:2px 7px;border-radius:20px;background:#eee6d6;color:#7a7161;margin-left:6px}
+
+.nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.nav a{flex:1 1 auto;text-align:center;padding:9px 8px;border:1px solid #d9cfba;border-radius:10px;
+ background:#fff;color:#1A2238;text-decoration:none;font-size:13px;font-weight:700;white-space:nowrap}
+.nav a:active{background:#eee6d6}
 </style></head><body><div class="wrap">
 <div class="top"><span class="logo">EduNova · Shartnomalar</span><a class="out" href="#" onclick="chiq();return false;">Chiqish</a></div>
 <div id="app"></div></div>
@@ -70,7 +75,7 @@ function yukla(){
 }
 
 function chiz(){
- var h='<div class="stat"><div><b>'+D.jami+'</b><small>SHARTNOMA</small></div>'+
+ var h=nav()+'<div class="stat"><div><b>'+D.jami+'</b><small>SHARTNOMA</small></div>'+
    '<div><b>'+D.imzosiz.length+'</b><small>QOLDI</small></div>'+
    '<div><b>'+D.oquvchi+'</b><small>O\u2018QUVCHI</small></div></div>';
  h+='<div class="tabs"><button class="'+(TAB==='imzo'?'on':'')+'" onclick="setTab(\'imzo\')">Shartnoma</button>'+
@@ -165,7 +170,7 @@ function teachEkran(){
 function teachChiz(){
  var d=TD, ich=0, jam=0;
  d.oqituvchilar.forEach(function(o){ich+=o.ichkarida;jam+=o.slotlar;});
- var h='<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
+ var h=nav()+'<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
    '<button class="on">O\u2018qituvchi</button>'+
    '<button onclick="rahbarEkran()">Rahbariyat</button></div>';
  h+='<div class="stat"><div><b>'+d.arizalar.length+'</b><small>ARIZA</small></div>'+
@@ -233,7 +238,7 @@ function rahbarEkran(){
 function rahbarChiz(){
  var d=RH, faol=d.royxat.filter(function(x){return x.faol;});
  var ulangan=faol.filter(function(x){return x.tg;}).length;
- var h='<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
+ var h=nav()+'<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
    '<button onclick="teachEkran()">O\u2018qituvchi</button>'+
    '<button class="on">Rahbariyat</button></div>';
  h+='<div class="stat"><div><b>'+faol.length+'</b><small>RAHBAR</small></div>'+
@@ -302,7 +307,7 @@ function otaEkran(){
 }
 function otaChiz(){
  var d=OT;
- var h='<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
+ var h=nav()+'<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
    '<button onclick="teachEkran()">O\u2018qituvchi</button>'+
    '<button onclick="rahbarEkran()">Rahbariyat</button>'+
    '<button class="on">Ota-ona</button></div>';
@@ -348,7 +353,7 @@ function nusxa(t){
 
 function talonEkran(){
  TAB='talon';
- var h='<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
+ var h=nav()+'<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
    '<button onclick="teachEkran()">O\u2018qituvchi</button>'+
    '<button onclick="otaEkran()">Ota-ona</button>'+
    '<button class="on">Talon</button></div>';
@@ -461,6 +466,26 @@ function sorovYop(id){
   if(!d||!d.ok){alert('Xatolik');return;}
   var e=$('sv'+id); if(e)e.remove();
  })["catch"](function(){alert('Xatolik');});
+}
+
+
+function nav(){
+ return '<div class="nav">'+
+  '<a href="#" onclick="ochPanel(\'boshqaruv.html\');return false;">\u{1F3EB} Boshqaruv</a>'+
+  '<a href="#" onclick="ochPanel(\'davomat.html\');return false;">\u2705 Davomat</a>'+
+  '<a href="#" onclick="ochPanel(\'hujjat.html\');return false;">\u{1F5C2} Xujjat</a>'+
+  '<a href="#" onclick="ochPanel(\'academy.html\');return false;">\u{1F393} Akademiya</a>'+
+  '</div>';
+}
+function ochPanel(sahifa){
+ try{
+  if(TOK){
+   localStorage.setItem('ep_token_admin',TOK);
+   sessionStorage.setItem('adm_tok',TOK);
+   sessionStorage.setItem('dav_tok',TOK);
+  }
+ }catch(e){}
+ location.href=sahifa;
 }
 
 if(TOK) yukla(); else kirishEkran();
