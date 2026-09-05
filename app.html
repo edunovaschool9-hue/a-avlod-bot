@@ -28,11 +28,22 @@ function qolda(msg){
   '<a class="btn sec" href="'+SAYT+'oqituvchi-kabinet.html">O‘qituvchi kabineti</a>'+
   '<a class="btn sec" href="'+SAYT+'ota-ona.html">Ota-ona kabineti</a>';
 }
+function goParam(){ try{ return (new URLSearchParams(location.search)).get('go')||''; }catch(e){ return ''; } }
+function goUrl(g){
+ if(g==='boshqaruv')return SAYT+'boshqaruv.html';
+ if(g==='shartnomalar')return SAYT+'shartnomalar.html';
+ if(g==='davomat')return SAYT+'davomat.html';
+ if(g==='hujjat')return SAYT+'hujjat.html';
+ if(g==='ota')return SAYT+'ota-ona.html';
+ if(g==='oqituvchi')return SAYT+'oqituvchi-kabinet.html';
+ return '';
+}
 function yonaltir(d){
  try{
   if(d.rol==='admin'){
     sessionStorage.setItem('adm_tok',d.token); sessionStorage.setItem('dav_tok',d.token);
     localStorage.setItem('ep_token_admin',d.token);
+    var g=goUrl(goParam()); if(g){ location.replace(g); return; }
     $('box').innerHTML='<div class="mu">Salom, <b>'+(d.ism||'')+'</b></div>'+
      '<a class="btn" href="'+SAYT+'davomat.html">O‘quvchilar davomati</a>'+
      '<a class="btn" href="'+SAYT+'shartnomalar.html">Shartnoma va o‘qituvchilar</a>'+
@@ -40,7 +51,7 @@ function yonaltir(d){
     return;
   }
   if(d.rol==='oqituvchi'){ localStorage.setItem('ep_token_oqituvchi',d.token); location.replace(SAYT+'oqituvchi-kabinet.html'); return; }
-  if(d.rol==='ota'){ localStorage.setItem('ep_token_ota',d.token); location.replace(SAYT+'ota-ona.html'); return; }
+  if(d.rol==='ota'){ localStorage.setItem('ep_token_ota',d.token); sessionStorage.setItem('ota_tok',d.token); location.replace(goUrl(goParam())||SAYT+'ota-ona.html'); return; }
   qolda('Rol aniqlanmadi');
  }catch(e){ qolda('Xatolik'); }
 }
@@ -48,7 +59,7 @@ function yonaltir(d){
  var tg=window.Telegram&&window.Telegram.WebApp;
  if(!tg||!tg.initData){ qolda(''); return; }
  try{ tg.expand(); tg.ready(); }catch(e){}
- var bot=/shartnomaedu/i.test(location.search)?'ota':'teach';
+ var bot=((new URLSearchParams(location.search)).get('bot')==='ota')?'ota':'teach';
  fetch(FN+'?webapp=1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({initData:tg.initData,bot:bot})})
  .then(function(r){return r.json();}).then(function(d){
    if(!d||!d.ok){ qolda(d&&d.xato==='ulanmagan'?'Telegram akkauntingiz kabinetga ulanmagan. Botda /start yoki /admin bosing.':'Kirish tasdiqlanmadi'); return; }
