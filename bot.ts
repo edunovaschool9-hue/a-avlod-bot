@@ -29,7 +29,7 @@ const cronOk = async (k: string | null) => !!k && ((CRON && k === CRON) || (awai
 
 // ---------- klaviaturalar ----------
 const KB_LOK = { keyboard: [[{ text: "📍 Joylashuvni yuborish", request_location: true }]], resize_keyboard: true, one_time_keyboard: true };
-const KB_ADMIN = { keyboard: [[{ text: "🏫 Kim maktabda" }, { text: "📋 Davomat hisoboti" }], [{ text: "📣 Chaqirish" }, { text: "📝 Arizalar" }], [{ text: "👨‍👩‍👧 Ota-onalar" }, { text: "📢 Xabar" }], [{ text: "🎒 O‘quvchilar" }, { text: "🎫 Talonlar" }], [{ text: "📝 Xulosalar" }, { text: "📤 Davomat so‘rash" }], [{ text: "📱 Kabinet" }]], resize_keyboard: true };
+const KB_ADMIN = { keyboard: [[{ text: "🏫 Kim maktabda" }, { text: "📋 Davomat hisoboti" }], [{ text: "📣 Chaqirish" }, { text: "📝 Arizalar" }], [{ text: "👨‍👩‍👧 Ota-onalar" }, { text: "📢 Xabar" }], [{ text: "🎒 O‘quvchilar" }, { text: "🎫 Talonlar" }], [{ text: "📝 Xulosalar" }, { text: "👩‍🏫 O‘qituvchilar" }], [{ text: "📤 Davomat so‘rash" }], [{ text: "📱 Kabinet" }]], resize_keyboard: true };
 const KB_TEACH = { keyboard: [[{ text: "✅ Davomat belgilash" }, { text: "📝 Xulosa yozish" }], [{ text: "📍 Joylashuvni yuborish", request_location: true }], [{ text: "📊 Holatim" }, { text: "📱 Kabinet" }]], resize_keyboard: true };
 const KB_APP = (t = "📱 Kabinetni ochish") => ({ inline_keyboard: [[{ text: t, web_app: { url: APP } }]] });
 
@@ -371,6 +371,59 @@ async function xulosaHisobot(chat: number, kun: string | null = null) {
   }
 }
 
+
+// ---------- o'qituvchilar ro'yxati ----------
+async function oqitRoyxat(chat: number) {
+  const d = await rpc("ep_oqit_royxat_tg", { p_chat_id: chat });
+  if (!d?.ok) { await send(chat, "Ruxsat yo‘q"); return; }
+  const r: any[] = d.royxat ?? [];
+  const t = r.map((x: any, i: number) => `${i + 1}. <b>${esc(x.ism)}</b>` + (x.tg ? " ✅" : " <i>TG yo‘q</i>") +
+    (x.tel ? ` · ${esc(x.tel)}` : "") + ` · PIN <code>${esc(x.pin)}</code>` +
+    (Number(x.xulosa) ? ` · bugun ${x.xulosa} xulosa` : "")).join("\n");
+  const rows: any[] = [[{ text: "➕ O‘qituvchi qo‘shish", callback_data: "oqt_add" }]];
+  for (let k = 0; k < r.length; k += 2) rows.push(r.slice(k, k + 2).map((x: any) => ({ text: `🗑 ${String(x.ism).split(" ")[0]}`, callback_data: `oqt_del:${x.id}` })));
+  await send(chat, `👩‍🏫 <b>O‘qituvchilar</b> · ${d.jami} ta · Telegramda ${d.tg}\n\n${t || "—"}`, { reply_markup: { inline_keyboard: rows.slice(0, 20) } });
+}
+async function oqitCallback(cq: any, k: string, a: string) {
+  const chat = cq.message.chat.id as number, mid = cq.message.message_id;
+  const ok = (text = "") => tg("answerCallbackQuery", { callback_query_id: cq.id, text });
+  if (k === "oqt_add") {
+    await ok();
+    await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: "oqit_ism", p_malumot: null });
+    await send(chat, "➕ Yangi o‘qituvchining <b>ism va familiyasini</b> yozing:");
+    return;
+  }
+  if (k === "oqt_del") {
+    await ok();
+    const d = await rpc("ep_oqit_royxat_tg", { p_chat_id: chat });
+    const x = ((d?.royxat ?? []) as any[]).find((y: any) => Number(y.id) === Number(a));
+    if (!x) { await send(chat, "Topilmadi"); return; }
+    await send(chat, `🗑 <b>${esc(x.ism)}</b> ishdan chiqarilsinmi?\nU botdan, davomatdan va chaqiruvlardan yo‘qoladi, PIN ishlamay qoladi.` + JAVOB_MATN,
+      { reply_markup: { inline_keyboard: [[{ text: "✅ Tasdiqlayman, javobgarman", callback_data: `oqt_del_ok:${a}` }], [{ text: "✖ Bekor", callback_data: "oq_bekor" }]] } });
+    return;
+  }
+  if (k === "oqt_del_ok") {
+    const r = await rpc("ep_oqit_ochir_tg", { p_chat_id: chat, p_id: Number(a) });
+    await ok(r?.ok ? "Chiqarildi" : "Xatolik");
+    await tg("editMessageText", { chat_id: chat, message_id: mid, parse_mode: "HTML",
+      text: r?.ok ? `🗑 <b>${esc(r.ism)}</b> ishdan chiqarildi. Jurnalga yozildi.` : "Xatolik" });
+    if (r?.ok) await oqitRoyxat(chat);
+    return;
+  }
+  if (k === "oqt_ok") {
+    const st = await rpc("ep_tg_holat_ol", { p_chat_id: chat }); const m = st?.malumot ?? {};
+    const r = await rpc("ep_oqit_qosh_tg", { p_chat_id: chat, p_ism: m.ism, p_tel: m.tel ?? null });
+    await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: null, p_malumot: null });
+    await ok(r?.ok ? "Qo‘shildi" : "Xatolik");
+    await tg("editMessageText", { chat_id: chat, message_id: mid, parse_mode: "HTML",
+      text: r?.ok ? `➕ <b>${esc(r.ism)}</b> qo‘shildi.\nPIN: <code>${esc(r.pin)}</code>\n\nO‘qituvchi botda <b>/start</b> bosib ro‘yxatdan o‘tsin — shunda unga xabarlar boradi.`
+        : (r?.xato === "bor" ? "Bunday o‘qituvchi allaqachon bor." : "Xatolik") });
+    if (r?.ok) await oqitRoyxat(chat);
+    return;
+  }
+  await ok();
+}
+
 // ---------- xabarlar ----------
 async function xabar(msg: any) {
   const chat = msg.chat?.id as number; if (!chat) return;
@@ -396,6 +449,20 @@ async function xabar(msg: any) {
     await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: null, p_malumot: null });
     const a = await rpc("ep_tg_admin_ulash", { p_chat_id: chat, p_pin: matn });
     if (a?.ok) await adminMenyu(chat, a.ism); else await send(chat, T.admin_xato);
+    return;
+  }
+  if (st?.holat === "oqit_ism" && !matn.startsWith("/")) {
+    const ism = matn.replace(/\s+/g, " ").trim();
+    if (ism.length < 5 || ism.indexOf(" ") < 0) { await send(chat, "Ism va familiyani to‘liq yozing."); return; }
+    await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: "oqit_tel", p_malumot: { ism } });
+    await send(chat, `<b>${esc(ism)}</b> — telefon raqamini yozing (yoki <b>yo‘q</b>):`);
+    return;
+  }
+  if (st?.holat === "oqit_tel" && !matn.startsWith("/")) {
+    const m = st.malumot ?? {}; const tel = /^(yo‘q|yoq|-)$/i.test(matn.trim()) ? null : matn.trim();
+    await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: "oqit_tasdiq", p_malumot: { ...m, tel } });
+    await send(chat, `➕ Yangi o‘qituvchi: <b>${esc(m.ism)}</b>` + (tel ? `\n${esc(tel)}` : "") + JAVOB_MATN,
+      { reply_markup: { inline_keyboard: [[{ text: "✅ Tasdiqlayman, javobgarman", callback_data: "oqt_ok" }], [{ text: "✖ Bekor", callback_data: "oq_bekor" }]] } });
     return;
   }
   if ((st?.holat === "oq_ism" || st?.holat === "oq_qosh") && !matn.startsWith("/")) {
@@ -450,6 +517,7 @@ async function xabar(msg: any) {
     if (/davomat hisoboti/i.test(matn) || matn === "📋 Davomat") { await send(chat, await davomatMatn(false), { reply_markup: { inline_keyboard: [[{ text: "👥 Kelmaganlar ismlari", callback_data: "kelmaganlar" }]] } }); return; }
     if (/chaqirish/i.test(matn)) { await chaqirishRoyxat(chat); return; }
     if (/arizalar/i.test(matn)) { await arizalar(chat); return; }
+    if (/o‘qituvchilar|o'qituvchilar|oqituvchilar/i.test(matn)) { await oqitRoyxat(chat); return; }
     if (/xulosalar/i.test(matn)) { await xulosaHisobot(chat); return; }
     if (/talon/i.test(matn)) { await talonMenyu(chat); return; }
     if (/davomat so/i.test(matn)) {
@@ -484,6 +552,7 @@ async function callback(cq: any) {
   const ok = (text = "") => tg("answerCallbackQuery", { callback_query_id: cq.id, text });
   const [k, a, b] = data.split(":");
   if (k.startsWith("dv_")) { await davCallback(cq, k, a, b); return; }
+  if (k.startsWith("oqt_")) { await oqitCallback(cq, k, a); return; }
   if (k.startsWith("oq_")) { await oqCallback(cq, k, a, b); return; }
   if (k.startsWith("hj_")) { await talonCallback(cq, k, a, b); return; }
   if (k === "xh") { await ok(); const kecha=new Date(Date.now()+5*3600*1000-(a==="kecha"?86400000:0)).toISOString().slice(0,10); await xulosaHisobot(chat, kecha); return; }
@@ -770,7 +839,7 @@ Deno.serve(async (req) => {
     if (d?.ok && d.chat_id) await send(Number(d.chat_id), d.holat === "tasdiqlandi" ? T.tasdiq(d.pin) : T.rad, d.holat === "tasdiqlandi" ? { reply_markup: KB_TEACH } : {});
     return jsonc(d ?? { ok: false });
   }
-  if (req.method !== "POST") return new Response("teach-bot v3.3 sifat ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v3.4 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   try {
