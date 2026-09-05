@@ -309,6 +309,9 @@ function otaChiz(){
  h+='<div class="stat"><div><b>'+d.jami+'</b><small>OTA-ONA</small></div>'+
    '<div><b>'+d.tg+'</b><small>BOTGA ULANGAN</small></div>'+
    '<div><b>'+(d.jami-d.tg)+'</b><small>ULANMAGAN</small></div></div>';
+ h+='<div class="card" style="border-color:#fed7aa;background:#fff7ed"><b>\u{1F195} Shartnomasiz murojaatlar</b>'+
+    '<div class="sm mu" style="margin:4px 0 8px">Botga kirgan, lekin shartnomasi yo\u2018q ota-onalar. Ular farzandi ismi va sinfini yozgan \u2014 qo\u2018ng\u2018iroq qilib shartnomaga taklif qiling.</div>'+
+    '<button class="btn" onclick="sorovRoy(this)">Ro\u2018yxatni ko\u2018rish</button><div id="sv_box"></div></div>';
  h+='<div class="chips"><button class="chip'+(OTF==='yoq'?' on':'')+'" onclick="OTF=\'yoq\';otaChiz()">Ulanmagan</button>'+
     '<button class="chip'+(OTF==='bor'?' on':'')+'" onclick="OTF=\'bor\';otaChiz()">Ulangan</button>'+
     '<button class="chip'+(OTF==='hamma'?' on':'')+'" onclick="OTF=\'hamma\';otaChiz()">Hammasi</button></div>';
@@ -428,6 +431,35 @@ function oqitOchir(id,ism){
  rpc('ep_oqit_ochir',{p_token:TOK,p_id:id}).then(function(d){
   if(!d||!d.ok){alert('Xatolik');return;}
   oqitRoy(null);
+ })["catch"](function(){alert('Xatolik');});
+}
+
+
+function sorovRoy(btn){
+ var t=btn?btn.textContent:''; if(btn){btn.disabled=true;btn.textContent='\u2026';}
+ rpc('ep_sorov_royxat',{p_token:TOK}).then(function(d){
+  if(btn){btn.disabled=false;btn.textContent=t;}
+  if(!d||!d.ok){$('sv_box').innerHTML='<div class="err">Xatolik</div>';return;}
+  var r=d.royxat||[];
+  if(!r.length){$('sv_box').innerHTML='<p class="mu center">\u2014 murojaat yo\u2018q</p>';return;}
+  var h='<div class="sm mu" style="margin:10px 0 6px"><b>'+d.jami+' ta murojaat</b></div>';
+  r.forEach(function(x){
+   h+='<div class="row" style="border-left:5px solid #FF7A00" id="sv'+x.id+'">'+
+      '<b>'+esc(x.bola||'\u2014')+'</b>'+(x.sinf?' <span class="pill">'+esc(x.sinf)+'</span>':'')+
+      '<div class="sm">'+esc(x.tel||'')+(x.ism?' \u00B7 '+esc(x.ism):'')+'</div>'+
+      '<div class="sm mu">'+esc(x.vaqt||'')+'</div>'+
+      '<div style="display:flex;gap:8px;margin-top:8px">'+
+      (x.tel?'<a class="btn" style="margin:0;padding:9px;text-decoration:none;text-align:center;flex:0 0 52px" href="tel:'+esc(String(x.tel).replace(/[^0-9+]/g,''))+'">\u260E</a>':'')+
+      '<button class="btn sec" style="margin:0;padding:9px" onclick="sorovYop('+x.id+')">\u2713 Hal qilindi</button></div></div>';
+  });
+  $('sv_box').innerHTML=h;
+ })["catch"](function(){ if(btn){btn.disabled=false;btn.textContent=t;} $('sv_box').innerHTML='<div class="err">Xatolik</div>';});
+}
+function sorovYop(id){
+ if(!confirm('Bu murojaat hal qilindi deb belgilansinmi?'))return;
+ rpc('ep_sorov_yop',{p_token:TOK,p_id:id}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik');return;}
+  var e=$('sv'+id); if(e)e.remove();
  })["catch"](function(){alert('Xatolik');});
 }
 
