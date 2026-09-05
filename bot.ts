@@ -457,13 +457,25 @@ async function otaXabar(msg: any) {
       await S(`✅ <b>${esc(r.ism)}</b>, xush kelibsiz!\n\nFarzandingiz: <b>${esc(r.bolalar)}</b>\n\nEndi farzandingiz maktabga kelgani, dars xulosalari va to‘lov haqidagi xabarlar shu yerga keladi.\n\nKabinet PIN kodingiz: <code>${esc(r.pin)}</code>`, { reply_markup: KB_OTA });
       await S("Kabinetni ochish — pastdagi tugma. PIN kerak emas.", { reply_markup: KB_OTA_APP });
     } else if (r?.xato === "topilmadi") {
-      await S("Raqamingiz bazada topilmadi.\n\nShartnoma hali rasmiylashtirilmagan bo‘lishi mumkin — <b>administrator siz bilan bog‘lanadi</b>. Tashvishlanmang, ma’lumotlaringiz saqlandi.", { reply_markup: { remove_keyboard: true } });
+      await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: "sorov_bola", p_malumot: null });
+      await S("Raqamingiz bazada topilmadi — shartnoma hali rasmiylashtirilmagan bo‘lishi mumkin.\n\nIltimos, <b>farzandingizning ism va familiyasini</b> yozing — ma’muriyat siz bilan bog‘lanadi.", { reply_markup: { remove_keyboard: true } });
     } else {
       await S("Raqamni o‘qib bo‘lmadi. Qaytadan urinib ko‘ring.", { reply_markup: KB_OTA_TEL });
     }
     return;
   }
 
+  const stO = await rpc("ep_tg_holat_ol", { p_chat_id: chat });
+  if (stO?.holat === "sorov_bola" && matn && !matn.startsWith("/")) {
+    const bola = matn.replace(/\s+/g, " ").trim();
+    if (bola.length < 4) { await S("Ism va familiyani to‘liq yozing:"); return; }
+    await rpc("ep_sorov_bola", { p_chat_id: chat, p_bola: bola, p_sinf_id: null });
+    await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: "sorov_sinf", p_malumot: { bola } });
+    const sinflar: any[] = (await rpc("ep_sinflar_qisqa", {})) ?? [];
+    const rows: any[] = []; for (let i = 0; i < sinflar.length; i += 4) rows.push(sinflar.slice(i, i + 4).map((x: any) => ({ text: x.nom, callback_data: `sv:${x.id}` })));
+    await S(`<b>${esc(bola)}</b> — qaysi sinfga bormoqchi (yoki bormoqda)?`, { reply_markup: { inline_keyboard: rows } });
+    return;
+  }
   const rol = await rpc("ep_tg_rol", { p_chat_id: chat });
   const ulangan = rol?.ok && rol.rol === "ota";
 
@@ -598,7 +610,7 @@ async function xabar(msg: any) {
       return;
     }
     if (/o‘quvchilar|o'quvchilar|oquvchilar/i.test(matn)) { await sinfSora(chat, "🎒 Qaysi sinf?", "oq_sinf"); return; }
-    if (/ota-onalar/i.test(matn)) { await send(chat, "Qaysi ro‘yxat?", { reply_markup: { inline_keyboard: [[{ text: "✅ Botda", callback_data: "ota_bor" }, { text: "❌ Botda emas", callback_data: "ota_yoq" }]] } }); return; }
+    if (/ota-onalar/i.test(matn)) { await send(chat, "Qaysi ro‘yxat?", { reply_markup: { inline_keyboard: [[{ text: "✅ Botda", callback_data: "ota_bor" }, { text: "❌ Botda emas", callback_data: "ota_yoq" }], [{ text: "🆕 Shartnomasiz murojaatlar", callback_data: "ota_sorov" }]] } }); return; }
     if (/^\S*\s*xabar$/i.test(matn)) { await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: "ommaviy", p_malumot: null }); await send(chat, "Barcha ota-onalarga yuboriladigan xabar matnini yozing:"); return; }
     await send(chat, "Menyudan tanlang 👇", { reply_markup: KB_ADMIN }); return;
   }
@@ -655,6 +667,17 @@ async function callback(cq: any) {
   }
   if (k === "xl_menu") { await ok(); await sinfSora(chat, "Qaysi sinf uchun xulosa yozasiz?", "xl_sinf"); return; }
   if (k === "ota_bor" || k === "ota_yoq") { await ok(); await otaRoyxat(chat, k === "ota_bor" ? "bor" : "yoq"); return; }
+  if (k === "ota_sorov") {
+    await ok();
+    const d = await rpc("ep_sorov_royxat_tg", { p_chat_id: chat });
+    if (!d?.ok) { await send(chat, "Ruxsat yo‘q"); return; }
+    const r: any[] = d.royxat ?? [];
+    if (!r.length) { await send(chat, "🆕 Shartnomasiz murojaat yo‘q."); return; }
+    const t = r.map((x: any, i: number) => `${i + 1}. <b>${esc(x.bola ?? "—")}</b>` + (x.sinf ? ` (${esc(x.sinf)})` : "") +
+      `\n   ☎️ <code>${esc(x.tel ?? "-")}</code>` + (x.ism ? ` · ${esc(x.ism)}` : "") + ` · ${esc(x.vaqt ?? "")}`).join("\n");
+    await send(chat, `🆕 <b>Shartnomasiz murojaatlar</b> · ${d.jami} ta\nBotga kirgan, lekin shartnomasi yo‘q ota-onalar:\n\n${t}`);
+    return;
+  }
   if (k === "omm_no") { await ok("Bekor"); await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: null, p_malumot: null }); await tg("editMessageText", { chat_id: chat, message_id: cq.message.message_id, text: "Bekor qilindi." }); return; }
   if (k === "omm_ok") {
     const st = await rpc("ep_tg_holat_ol", { p_chat_id: chat });
@@ -916,11 +939,26 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v3.6 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v3.7 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
-    try { const m = upd.message ?? upd.edited_message; if (m) await otaXabar(m); } catch (e) { console.error("ota", String(e)); }
+    try {
+      if (upd.callback_query) {
+        const cq = upd.callback_query, chat = cq.message?.chat?.id as number;
+        const [kk, aa] = String(cq.data ?? "").split(":");
+        await tg("answerCallbackQuery", { callback_query_id: cq.id }, OTA);
+        if (kk === "sv" && chat) {
+          const st = await rpc("ep_tg_holat_ol", { p_chat_id: chat });
+          const r = await rpc("ep_sorov_bola", { p_chat_id: chat, p_bola: st?.malumot?.bola ?? "", p_sinf_id: Number(aa) });
+          await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: null, p_malumot: null });
+          await tg("editMessageText", { chat_id: chat, message_id: cq.message.message_id, parse_mode: "HTML",
+            text: `✅ Rahmat! Ma’lumotlaringiz qabul qilindi.\n\nFarzand: <b>${esc(r?.bola ?? "")}</b>\nSinf: <b>${esc(r?.sinf ?? "")}</b>\n\nMa’muriyat tez orada siz bilan bog‘lanadi va shartnomani rasmiylashtiramiz.` }, OTA);
+          const adm = await rpc("ep_adminlar_chat", {});
+          for (const c of (Array.isArray(adm) ? adm : [])) await send(Number(c), `🆕 <b>Shartnomasiz murojaat</b>\nFarzand: <b>${esc(r?.bola ?? "")}</b> (${esc(r?.sinf ?? "-")})\nBotdan yozdi — ma’lumotlari «Ota-onalar» bo‘limida.`);
+        }
+      } else { const m = upd.message ?? upd.edited_message; if (m) await otaXabar(m); }
+    } catch (e) { console.error("ota", String(e)); }
     return new Response("ok");
   }
   try {
