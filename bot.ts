@@ -364,13 +364,30 @@ async function xulosaHisobot(chat: number, kun: string | null = null) {
   if (yoq.length) {
     t += `\n<b>❌ Yozmaganlar (${yoq.length})</b>\n` + yoq.map((x: any) => `• ${esc(x.ism)}` + (x.tg ? "" : " <i>(TG yo‘q)</i>")).join("\n");
   }
-  const rows = [[{ text: "🔄 Yangilash", callback_data: "xh:bugun" }, { text: "◀️ Kecha", callback_data: "xh:kecha" }]];
+  const rows: any[] = [];
+  for (let k = 0; k < yozgan.length; k += 2) rows.push(yozgan.slice(k, k + 2).map((x: any) => ({ text: `📖 ${String(x.ism).split(" ")[0]} (${x.soni})`, callback_data: `xr:${x.id}:${kun ? "k" : "b"}` })));
+  rows.push([{ text: "🔄 Yangilash", callback_data: "xh:bugun" }, { text: "◀️ Kecha", callback_data: "xh:kecha" }]);
   for (let i = 0; i < t.length; i += 3800) {
     const oxirgi = i + 3800 >= t.length;
     await send(chat, t.slice(i, i + 3800), oxirgi ? { reply_markup: { inline_keyboard: rows } } : {});
   }
 }
 
+
+
+async function xulosaOqi(chat: number, oqit: number, kecha: boolean) {
+  const kun = new Date(Date.now() + 5 * 3600 * 1000 - (kecha ? 86400000 : 0)).toISOString().slice(0, 10);
+  const d = await rpc("ep_xulosa_matn_tg", { p_chat_id: chat, p_oqituvchi_id: oqit, p_kun: kun });
+  if (!d?.ok) { await send(chat, "Ruxsat yo‘q"); return; }
+  const r: any[] = d.royxat ?? [];
+  if (!r.length) { await send(chat, `${esc(d.ism ?? "")} — ${kun} kuni xulosa yo‘q.`); return; }
+  let t = `📖 <b>${esc(d.ism ?? "")}</b> · ${d.kun} · ${r.length} ta dars\n`;
+  r.forEach((x: any) => {
+    t += `\n━━━━━━━━━━\n<b>${esc(x.sinf)} · ${esc(x.fan)}</b>` + (x.raqam ? ` · ${x.raqam}-dars` : "") + (x.vaqt ? ` · ${x.vaqt}` : "") + "\n" +
+      (x.mavzu ? `<b>${esc(x.mavzu)}</b>\n` : "") + esc(x.matn) + "\n";
+  });
+  for (let i = 0; i < t.length; i += 3800) await send(chat, t.slice(i, i + 3800));
+}
 
 // ---------- o'qituvchilar ro'yxati ----------
 async function oqitRoyxat(chat: number) {
@@ -555,6 +572,7 @@ async function callback(cq: any) {
   if (k.startsWith("oqt_")) { await oqitCallback(cq, k, a); return; }
   if (k.startsWith("oq_")) { await oqCallback(cq, k, a, b); return; }
   if (k.startsWith("hj_")) { await talonCallback(cq, k, a, b); return; }
+  if (k === "xr") { await ok(); await xulosaOqi(chat, Number(a), b === "k"); return; }
   if (k === "xh") { await ok(); const kecha=new Date(Date.now()+5*3600*1000-(a==="kecha"?86400000:0)).toISOString().slice(0,10); await xulosaHisobot(chat, kecha); return; }
   if (k === "dsora_no") { await ok("Bekor"); await tg("editMessageText", { chat_id: chat, message_id: cq.message.message_id, text: "Bekor qilindi." }); return; }
   if (k === "dsora_ok") {
@@ -839,7 +857,7 @@ Deno.serve(async (req) => {
     if (d?.ok && d.chat_id) await send(Number(d.chat_id), d.holat === "tasdiqlandi" ? T.tasdiq(d.pin) : T.rad, d.holat === "tasdiqlandi" ? { reply_markup: KB_TEACH } : {});
     return jsonc(d ?? { ok: false });
   }
-  if (req.method !== "POST") return new Response("teach-bot v3.4 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v3.5 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   try {
