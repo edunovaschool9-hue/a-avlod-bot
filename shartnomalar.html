@@ -187,6 +187,9 @@ function teachChiz(){
  }
  h+='<div class="card"><b>\u{1F4DD} Dars xulosalari</b><div class="sm mu" style="margin:4px 0 8px">Kim yozgan, kim yozmagan \u2014 bugungi holat.</div>'+
     '<button class="btn" onclick="xulosaHis(this)">Hisobotni ko\u2018rish</button><div id="xh_box"></div></div>';
+ h+='<div class="card"><b>\u{1F469}\u200D\u{1F3EB} O\u2018qituvchilar ro\u2018yxati</b>'+
+    '<div class="sm mu" style="margin:4px 0 8px">Qo\u2018shish, ishdan chiqarish, PIN ko\u2018rish.</div>'+
+    '<button class="btn" onclick="oqitRoy(this)">Ro\u2018yxatni ochish</button><div id="oq_box"></div></div>';
  h+='<h1>O\u2018qituvchilar \u00B7 bugun</h1>';
  d.oqituvchilar.forEach(function(o){
   h+='<div class="row"><b>'+esc(o.ism)+'</b>'+(o.tg?'<span class="tg">TG</span>':'')+
@@ -383,6 +386,49 @@ function xulosaHis(btn){
   }
   $('xh_box').innerHTML=h;
  })["catch"](function(){btn.disabled=false;btn.textContent=t;$('xh_box').innerHTML='<div class="err">Xatolik</div>';});
+}
+
+
+function oqitRoy(btn){
+ var t=btn?btn.textContent:''; if(btn){btn.disabled=true;btn.textContent='\u2026';}
+ rpc('ep_oqit_royxat',{p_token:TOK,p_kun:null}).then(function(d){
+  if(btn){btn.disabled=false;btn.textContent=t;}
+  if(!d||!d.ok){$('oq_box').innerHTML='<div class="err">Xatolik</div>';return;}
+  var h='<div class="stat" style="margin-top:10px"><div><b>'+d.jami+'</b><small>JAMI</small></div>'+
+    '<div><b>'+d.tg+'</b><small>TELEGRAMDA</small></div></div>';
+  h+='<div class="card" style="padding:12px"><label>Yangi o\u2018qituvchi F.I.Sh.</label>'+
+     '<input id="oq_ism" placeholder="Masalan: Aliyev Sardor">'+
+     '<label>Telefon</label><input id="oq_tel" placeholder="+998 90 123 45 67">'+
+     '<div class="err" id="oq_e"></div>'+
+     '<button class="btn" onclick="oqitQosh(this)">Qo\u2018shish va PIN berish</button></div>';
+  (d.royxat||[]).forEach(function(o){
+   h+='<div class="row"><b>'+esc(o.ism)+'</b>'+(o.tg?'<span class="tg">TG</span>':'<span class="pill">TG yo\u2018q</span>')+
+      (+o.xulosa?'<span class="pill">bugun '+o.xulosa+'</span>':'')+
+      '<div class="sm mu">'+esc(o.tel||'')+(o.oxirgi?' \u00B7 '+esc(o.oxirgi):'')+'</div>'+
+      '<div class="sm">PIN <span class="pin">'+esc(o.pin)+'</span></div>'+
+      '<button class="btn sec" style="margin-top:8px;padding:8px;color:#b91c1c" onclick="oqitOchir('+o.id+',\''+esc(o.ism).replace(/'/g,"\\'")+'\')">\u{1F5D1} Ishdan chiqarish</button></div>';
+  });
+  $('oq_box').innerHTML=h;
+ })["catch"](function(){ if(btn){btn.disabled=false;btn.textContent=t;} $('oq_box').innerHTML='<div class="err">Xatolik</div>';});
+}
+function oqitQosh(btn){
+ var ism=($('oq_ism').value||'').trim(), tel=($('oq_tel').value||'').trim();
+ if(ism.length<5||ism.indexOf(' ')<0){$('oq_e').textContent='Ism va familiyani to\u2018liq yozing';return;}
+ if(!confirm(ism+'\n\nO\u2018qituvchi qo\u2018shilsinmi?\n\nBu amal jurnalga sizning nomingiz bilan yoziladi.'))return;
+ btn.disabled=true;
+ rpc('ep_oqit_qosh',{p_token:TOK,p_ism:ism,p_tel:tel}).then(function(d){
+  btn.disabled=false;
+  if(!d||!d.ok){$('oq_e').textContent=(d&&d.xato==='bor')?'Bunday o\u2018qituvchi bor':'Xatolik';return;}
+  alert(d.ism+'\n\nPIN: '+d.pin+'\n\nBotda /start bosib ro\u2018yxatdan o\u2018tsin \u2014 shunda xabarlar boradi.');
+  oqitRoy(null);
+ })["catch"](function(){btn.disabled=false;$('oq_e').textContent='Xatolik';});
+}
+function oqitOchir(id,ism){
+ if(!confirm(ism+'\n\nIshdan chiqarilsinmi?\n\nU botdan, davomatdan va chaqiruvlardan yo\u2018qoladi, PIN ishlamay qoladi.\nBu amal jurnalga yoziladi \u2014 siz javobgarsiz.'))return;
+ rpc('ep_oqit_ochir',{p_token:TOK,p_id:id}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik');return;}
+  oqitRoy(null);
+ })["catch"](function(){alert('Xatolik');});
 }
 
 if(TOK) yukla(); else kirishEkran();
