@@ -589,11 +589,17 @@ async function xabar(msg: any) {
   if (/xulosa yozish/i.test(matn)) { if (!isTeach) { await send(chat, T.royxatda_yoq); return; } await sinfSora(chat, "Qaysi sinf uchun xulosa yozasiz?", "xl_sinf"); return; }
   if (/kabinet$/i.test(matn)) {
     if (isAdmin) {
-      await send(chat, "📱 <b>Panellar</b> — ilova sifatida ochiladi, PIN kerak emas:", { reply_markup: { inline_keyboard: [
-        [{ text: "🏫 Boshqaruv paneli", web_app: { url: APP + "?go=boshqaruv" } }],
-        [{ text: "📄 Shartnoma va o‘qituvchilar", web_app: { url: APP + "?go=shartnomalar" } }],
-        [{ text: "✅ O‘quvchilar davomati", web_app: { url: APP + "?go=davomat" } }],
-        [{ text: "🗂 Xujjat ishlar", web_app: { url: SAYT + "hujjat.html" } }]] } });
+      let ses: any = await rpc("ep_tg_sessiya", { p_chat_id: chat });
+      const tok = ses?.token ? String(ses.token) : "";
+      const link = (sahifa: string) => SAYT + sahifa + (tok ? "#t=" + tok : "");
+      const kb: any[] = [
+        [{ text: "🌐 To‘liq saytni ochish (brauzer)", url: link("shartnomalar.html") }],
+        [{ text: "🏫 Boshqaruv paneli", url: link("boshqaruv.html") }, { text: "🎓 Akademiya", url: link("academy.html") }],
+        [{ text: "✅ Davomat", url: link("davomat.html") }, { text: "🗂 Xujjat", url: link("hujjat.html") }],
+        [{ text: "📱 Telegram ichida ochish", web_app: { url: APP + "?go=shartnomalar" } }],
+      ];
+      await send(chat, "📱 <b>Panellar</b>\n\nBirinchi tugma — <b>to‘liq sayt</b> brauzerda ochiladi, PIN so‘ralmaydi.\nOxirgi tugma — Telegram ichida ixcham ko‘rinish.\n\n<i>Havola 1 marta ishlaydigan kirish kalitini o‘z ichiga oladi — birovga yubormang.</i>",
+        { reply_markup: { inline_keyboard: kb } });
       return;
     }
     await send(chat, "Kabinet ilova sifatida ochiladi — PIN kerak emas.", { reply_markup: KB_APP() });
@@ -945,7 +951,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v3.8 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v3.9 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
