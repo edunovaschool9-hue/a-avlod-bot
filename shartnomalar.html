@@ -185,6 +185,8 @@ function teachChiz(){
       '<button class="btn sec" style="margin:0;padding:9px" onclick="ariza('+a.id+',false,this)">Rad etish</button></div></div>';
   });
  }
+ h+='<div class="card"><b>\u{1F4DD} Dars xulosalari</b><div class="sm mu" style="margin:4px 0 8px">Kim yozgan, kim yozmagan \u2014 bugungi holat.</div>'+
+    '<button class="btn" onclick="xulosaHis(this)">Hisobotni ko\u2018rish</button><div id="xh_box"></div></div>';
  h+='<h1>O\u2018qituvchilar \u00B7 bugun</h1>';
  d.oqituvchilar.forEach(function(o){
   h+='<div class="row"><b>'+esc(o.ism)+'</b>'+(o.tg?'<span class="tg">TG</span>':'')+
@@ -351,6 +353,36 @@ function talonEkran(){
    '<a class="btn sec" style="text-decoration:none;text-align:center" href="hujjat.html?tur=qb">\u{1F4D7} Buyruq \u2014 qabul</a>'+
    '<div class="sm mu" style="margin-top:10px">Reyestr, arxiv va PNG yuklab olish \u2014 shu sahifaning pastida. Telegram botdan ochilsa, blank chatga ham yuboriladi.</div></div>';
  $('app').innerHTML=h; window.scrollTo(0,0);
+}
+
+
+function xulosaHis(btn){
+ var t=btn.textContent; btn.disabled=true; btn.textContent='\u2026';
+ rpc('ep_xulosa_hisobot',{p_token:TOK,p_kun:null}).then(function(d){
+  btn.disabled=false; btn.textContent=t;
+  if(!d||!d.ok){$('xh_box').innerHTML='<div class="err">Xatolik</div>';return;}
+  var r=d.royxat||[];
+  var yoz=r.filter(function(x){return +x.soni>0;}), yoq=r.filter(function(x){return !+x.soni;});
+  var h='<div class="stat" style="margin-top:10px"><div><b>'+d.yozgan+'</b><small>YOZGAN</small></div>'+
+    '<div><b>'+yoq.length+'</b><small>YOZMAGAN</small></div>'+
+    '<div><b>'+d.darslar+'</b><small>DARS</small></div></div>';
+  if(yoz.length){
+   h+='<div class="sm mu" style="margin:8px 0 4px"><b>\u2705 Yozganlar</b></div>';
+   yoz.forEach(function(x){
+    h+='<div class="row"><b>'+esc(x.ism)+'</b> <span class="pill">'+x.soni+' ta</span>'+
+       (x.oxirgi?' <span class="mu sm">'+esc(x.oxirgi)+'</span>':'')+
+       (x.darslar?'<div class="sm" style="margin-top:4px;white-space:pre-line">'+esc(x.darslar)+'</div>':'')+'</div>';
+   });
+  }
+  if(yoq.length){
+   h+='<div class="sm mu" style="margin:10px 0 4px"><b>\u274C Yozmaganlar</b></div>';
+   yoq.forEach(function(x){
+    h+='<div class="row" style="border-left:5px solid #ef4444"><b>'+esc(x.ism)+'</b>'+
+       (x.tg?'<span class="tg">TG</span>':'<span class="pill">TG yo\u2018q</span>')+'</div>';
+   });
+  }
+  $('xh_box').innerHTML=h;
+ })["catch"](function(){btn.disabled=false;btn.textContent=t;$('xh_box').innerHTML='<div class="err">Xatolik</div>';});
 }
 
 if(TOK) yukla(); else kirishEkran();
