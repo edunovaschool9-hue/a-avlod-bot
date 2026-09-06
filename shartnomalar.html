@@ -447,14 +447,19 @@ function sorovRoy(btn){
   if(!d||!d.ok){$('sv_box').innerHTML='<div class="err">Xatolik</div>';return;}
   var r=d.royxat||[];
   if(!r.length){$('sv_box').innerHTML='<p class="mu center">\u2014 murojaat yo\u2018q</p>';return;}
-  var h='<div class="sm mu" style="margin:10px 0 6px"><b>'+d.jami+' ta murojaat</b></div>';
+  var h='<div class="sm mu" style="margin:10px 0 6px"><b>'+d.jami+' ta murojaat</b></div>'+
+   '<div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">'+
+   '<button class="btn sec" style="margin:0;padding:9px;flex:1" onclick="sorovUser(this)">\u{1F504} Telegram nomlarini yangilash</button>'+
+   '<button class="btn sec" style="margin:0;padding:9px;flex:1" onclick="sorovSora(this)">\u2709 Bola ismini so\u2018rash</button></div>';
   r.forEach(function(x){
    h+='<div class="row" style="border-left:5px solid #FF7A00" id="sv'+x.id+'">'+
       '<b>'+esc(x.bola||'\u2014')+'</b>'+(x.sinf?' <span class="pill">'+esc(x.sinf)+'</span>':'')+
       '<div class="sm">'+esc(x.tel||'')+(x.ism?' \u00B7 '+esc(x.ism):'')+'</div>'+
       '<div class="sm mu">'+esc(x.vaqt||'')+'</div>'+
-      '<div style="display:flex;gap:8px;margin-top:8px">'+
+      '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">'+
       (x.tel?'<a class="btn" style="margin:0;padding:9px;text-decoration:none;text-align:center;flex:0 0 52px" href="tel:'+esc(String(x.tel).replace(/[^0-9+]/g,''))+'">\u260E</a>':'')+
+      (x.tguser?'<a class="btn" style="margin:0;padding:9px;text-decoration:none;text-align:center;background:#229ED9;border-color:#229ED9;flex:0 0 120px" target="_blank" href="https://t.me/'+esc(x.tguser)+'">\u{1F4AC} Telegram</a>'
+        :(x.chat?'<a class="btn" style="margin:0;padding:9px;text-decoration:none;text-align:center;background:#229ED9;border-color:#229ED9;flex:0 0 120px" href="tg://user?id='+x.chat+'">\u{1F4AC} Telegram</a>':''))+
       '<button class="btn sec" style="margin:0;padding:9px" onclick="sorovYop('+x.id+')">\u2713 Hal qilindi</button></div></div>';
   });
   $('sv_box').innerHTML=h;
@@ -502,6 +507,26 @@ function ochPanel(sahifa){
   }
  }catch(e){}
 })();
+
+
+function sorovUser(btn){
+ var t=btn.textContent; btn.disabled=true; btn.textContent='\u2026';
+ fetch('https://unaodltahuevrfnarfha.supabase.co/functions/v1/teach-bot?sorov_user=1',
+   {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:TOK})})
+ .then(function(r){return r.json();}).then(function(d){
+   btn.disabled=false; btn.textContent=t;
+   alert(d&&d.ok?('Yangilandi: '+d.yangilandi+' / '+d.tekshirildi):'Xatolik');
+   sorovRoy(null);
+ })["catch"](function(){btn.disabled=false;btn.textContent=t;alert('Xatolik');});
+}
+function sorovSora(btn){
+ if(!confirm('Farzand ismi ko\u2018rsatilmagan ota-onalarga botdan savol yuborilsinmi?'))return;
+ var t=btn.textContent; btn.disabled=true; btn.textContent='\u2026';
+ rpc('ep_sorov_bolasiz',{p_token:TOK}).then(function(d){
+  btn.disabled=false; btn.textContent=t;
+  alert(d&&d.ok?(d.soni+' ta ota-onaga savol yuborildi'):'Xatolik');
+ })["catch"](function(){btn.disabled=false;btn.textContent=t;alert('Xatolik');});
+}
 
 if(TOK) yukla(); else kirishEkran();
 
