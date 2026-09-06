@@ -458,8 +458,8 @@ function sorovRoy(btn){
       '<div class="sm mu">'+esc(x.vaqt||'')+'</div>'+
       '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">'+
       (x.tel?'<a class="btn" style="margin:0;padding:9px;text-decoration:none;text-align:center;flex:0 0 52px" href="tel:'+esc(String(x.tel).replace(/[^0-9+]/g,''))+'">\u260E</a>':'')+
-      (x.tguser?'<a class="btn" style="margin:0;padding:9px;text-decoration:none;text-align:center;background:#229ED9;border-color:#229ED9;flex:0 0 120px" target="_blank" href="https://t.me/'+esc(x.tguser)+'">\u{1F4AC} Telegram</a>'
-        :(x.chat?'<a class="btn" style="margin:0;padding:9px;text-decoration:none;text-align:center;background:#229ED9;border-color:#229ED9;flex:0 0 120px" href="tg://user?id='+x.chat+'">\u{1F4AC} Telegram</a>':''))+
+      (x.tguser?'<a class="btn" style="margin:0;padding:9px;text-decoration:none;text-align:center;background:#229ED9;border-color:#229ED9;flex:0 0 118px" target="_blank" href="https://t.me/'+esc(x.tguser)+'">\u{1F4AC} Telegram</a>':'')+
+      (x.chat?'<button class="btn" style="margin:0;padding:9px;background:#1A2238;border-color:#1A2238;flex:0 0 128px" onclick="sorovYoz('+x.chat+',\''+esc(x.bola||x.tel||'').replace(/'/g,"\\'")+'\')">\u270D Botdan yozish</button>':'')+
       '<button class="btn sec" style="margin:0;padding:9px" onclick="sorovYop('+x.id+')">\u2713 Hal qilindi</button></div></div>';
   });
   $('sv_box').innerHTML=h;
@@ -526,6 +526,15 @@ function sorovSora(btn){
   btn.disabled=false; btn.textContent=t;
   alert(d&&d.ok?(d.soni+' ta ota-onaga savol yuborildi'):'Xatolik');
  })["catch"](function(){btn.disabled=false;btn.textContent=t;alert('Xatolik');});
+}
+
+
+function sorovYoz(chat,kim){
+ var m=prompt((kim?kim+' \u2014 ':'')+'Ota-onaga yuboriladigan xabar:','Assalomu alaykum! EduNova School ma\u2019muriyati. Farzandingizni maktabimizga qabul qilish bo\u2019yicha siz bilan bog\u2019lanmoqchimiz. Qachon qo\u2019ng\u2019iroq qilsak qulay bo\u2019ladi?');
+ if(!m||m.trim().length<3)return;
+ rpc('ep_sorov_yubor',{p_token:TOK,p_chat_id:chat,p_matn:m.trim()}).then(function(d){
+  alert(d&&d.ok?'\u2713 Xabar yuborildi (1 daqiqada yetib boradi)':'Xatolik');
+ })["catch"](function(){alert('Xatolik');});
 }
 
 if(TOK) yukla(); else kirishEkran();
