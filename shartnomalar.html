@@ -192,6 +192,9 @@ function teachChiz(){
  }
  h+='<div class="card"><b>\u{1F4DD} Dars xulosalari</b><div class="sm mu" style="margin:4px 0 8px">Kim yozgan, kim yozmagan \u2014 bugungi holat.</div>'+
     '<button class="btn" onclick="xulosaHis(this)">Hisobotni ko\u2018rish</button><div id="xh_box"></div></div>';
+ h+='<div class="card"><b>\u{1F9EA} Test savollari</b>'+
+    '<div class="sm mu" style="margin:4px 0 8px">AI savol yaratadi, siz tekshirib tasdiqlaysiz. Tasdiqlanmagan savol o\u2018quvchiga chiqmaydi.</div>'+
+    '<button class="btn" onclick="savolHolat(this)">Savollar bazasi</button><div id="sv2_box"></div></div>';
  h+='<div class="card"><b>\u{1F469}\u200D\u{1F3EB} O\u2018qituvchilar ro\u2018yxati</b>'+
     '<div class="sm mu" style="margin:4px 0 8px">Qo\u2018shish, ishdan chiqarish, PIN ko\u2018rish.</div>'+
     '<button class="btn" onclick="oqitRoy(this)">Ro\u2018yxatni ochish</button><div id="oq_box"></div></div>';
@@ -534,6 +537,69 @@ function sorovYoz(chat,kim){
  if(!m||m.trim().length<3)return;
  rpc('ep_sorov_yubor',{p_token:TOK,p_chat_id:chat,p_matn:m.trim()}).then(function(d){
   alert(d&&d.ok?'\u2713 Xabar yuborildi (1 daqiqada yetib boradi)':'Xatolik');
+ })["catch"](function(){alert('Xatolik');});
+}
+
+
+var FANLAR=[];
+function savolHolat(btn){
+ var t=btn?btn.textContent:''; if(btn){btn.disabled=true;btn.textContent='\u2026';}
+ rpc('ep_savol_holat',{p_token:TOK}).then(function(d){
+  if(btn){btn.disabled=false;btn.textContent=t;}
+  if(!d||!d.ok){$('sv2_box').innerHTML='<div class="err">Xatolik</div>';return;}
+  FANLAR=d.fanlar||[];
+  var h='<div class="stat" style="margin-top:10px"><div><b>'+d.tasdiqlangan+'</b><small>TAYYOR</small></div>'+
+    '<div><b>'+d.kutmoqda+'</b><small>TEKSHIRISH</small></div></div>';
+  if(d.kutmoqda) h+='<button class="btn" onclick="savolKor(this)">\u{1F50E} Tekshirishga o\u2018tish ('+d.kutmoqda+')</button>';
+  h+='<div class="card" style="padding:12px"><label>Fan</label><select id="sv_fan">'+
+     FANLAR.map(function(f){return '<option value="'+f.id+'|'+esc(f.nom)+'|'+f.min+'|'+f.max+'">'+esc(f.nom)+' \u2014 '+f.tayyor+' ta</option>';}).join('')+
+     '</select><label>Sinf (daraja)</label><input id="sv_dar" type="number" min="1" max="11" value="5">'+
+     '<label>Nechta savol</label><input id="sv_son" type="number" min="5" max="20" value="10">'+
+     '<div class="err" id="sv_e"></div>'+
+     '<button class="btn" onclick="savolYarat(this)">\u2728 AI orqali yaratish</button></div>';
+  $('sv2_box').innerHTML=h;
+ })["catch"](function(){ if(btn){btn.disabled=false;btn.textContent=t;} });
+}
+function savolYarat(btn){
+ var v=($('sv_fan').value||'').split('|'), dar=parseInt($('sv_dar').value,10), son=parseInt($('sv_son').value,10);
+ if(!v[0]||!dar){$('sv_e').textContent='Fan va sinfni tanlang';return;}
+ if(dar<parseInt(v[2],10)||dar>parseInt(v[3],10)){$('sv_e').textContent='Bu fan '+v[2]+'-'+v[3]+' sinflar uchun';return;}
+ var t=btn.textContent; btn.disabled=true; btn.textContent='AI ishlayapti\u2026'; $('sv_e').textContent='';
+ fetch('https://unaodltahuevrfnarfha.supabase.co/functions/v1/teach-bot?savol_yarat=1',
+  {method:'POST',headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({token:TOK,fan_id:parseInt(v[0],10),fan:v[1],daraja:dar,soni:son})})
+ .then(function(r){return r.json();}).then(function(d){
+  btn.disabled=false; btn.textContent=t;
+  if(!d||!d.ok){$('sv_e').textContent='Xatolik: '+((d&&d.xato)||'server');return;}
+  alert(d.qoshildi+' ta savol yaratildi. Endi tekshirib tasdiqlang.');
+  savolHolat(null);
+ })["catch"](function(){btn.disabled=false;btn.textContent=t;$('sv_e').textContent='Xatolik';});
+}
+function savolKor(btn){
+ rpc('ep_savol_kutilmoqda',{p_token:TOK,p_fan_id:null,p_daraja:null}).then(function(d){
+  if(!d||!d.ok)return;
+  var r=d.royxat||[];
+  if(!r.length){alert('Tekshiriladigan savol yo\u2018q');savolHolat(null);return;}
+  var h='<h1>Savollarni tekshirish</h1><p class="sm mu">Tasdiqlangan savollargina o\u2018quvchiga chiqadi. Xato bo\u2018lsa \u2014 o\u2018chiring.</p>';
+  r.forEach(function(q){
+   h+='<div class="row" id="sq'+q.id+'"><div class="sm mu">'+esc(q.fan)+' \u00b7 '+q.daraja+'-sinf</div>'+
+      '<div style="margin:6px 0"><b>'+esc(q.savol)+'</b></div>';
+   ['a','b','c','d'].forEach(function(k){
+    h+='<div class="sm"'+(q.togri===k?' style="color:#15803d;font-weight:700"':'')+'>'+k.toUpperCase()+') '+esc(q[k])+(q.togri===k?' \u2713':'')+'</div>';
+   });
+   if(q.izoh)h+='<div class="sm mu" style="margin-top:4px"><i>'+esc(q.izoh)+'</i></div>';
+   h+='<div style="display:flex;gap:8px;margin-top:8px">'+
+      '<button class="btn" style="margin:0;padding:9px" onclick="savolOk('+q.id+',true)">\u2713 Tasdiqlash</button>'+
+      '<button class="btn sec" style="margin:0;padding:9px;color:#b91c1c" onclick="savolOk('+q.id+',false)">\u2715 O\u2018chirish</button></div></div>';
+  });
+  h+='<button class="btn sec" onclick="teachEkran()">\u2039 Orqaga</button>';
+  $('app').innerHTML=nav()+h; window.scrollTo(0,0);
+ });
+}
+function savolOk(id,ok){
+ rpc('ep_savol_tasdiq',{p_token:TOK,p_id:id,p_ok:ok}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik');return;}
+  var e=$('sq'+id); if(e)e.remove();
  })["catch"](function(){alert('Xatolik');});
 }
 
