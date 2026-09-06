@@ -454,6 +454,10 @@ const KB_OTA = { keyboard: [[{ text: "👶 Farzandim" }, { text: "🔑 PIN" }]],
 const KB_OTA_APP = { inline_keyboard: [[{ text: "📱 Ota-ona kabineti", web_app: { url: APP + "?go=ota&bot=ota" } }]] };
 async function otaXabar(msg: any) {
   const chat = msg.chat?.id as number; if (!chat) return;
+  if (msg.from) {
+    const ismTg = [msg.from.first_name, msg.from.last_name].filter(Boolean).join(" ");
+    await rpc("ep_sorov_user_saqla", { p_chat_id: chat, p_user: msg.from.username ?? null, p_ism: ismTg || null });
+  }
   const matn = (msg.text ?? "").trim();
   const S = (t: string, extra: Record<string, unknown> = {}) => send(chat, t, extra, OTA);
 
@@ -685,8 +689,11 @@ async function callback(cq: any) {
     if (!d?.ok) { await send(chat, "Ruxsat yo‘q"); return; }
     const r: any[] = d.royxat ?? [];
     if (!r.length) { await send(chat, "🆕 Shartnomasiz murojaat yo‘q."); return; }
-    const t = r.map((x: any, i: number) => `${i + 1}. <b>${esc(x.bola ?? "—")}</b>` + (x.sinf ? ` (${esc(x.sinf)})` : "") +
-      `\n   ☎️ <code>${esc(x.tel ?? "-")}</code>` + (x.ism ? ` · ${esc(x.ism)}` : "") + ` · ${esc(x.vaqt ?? "")}`).join("\n");
+    const t = r.map((x: any, i: number) => {
+      const lichka = x.tguser ? `<a href="https://t.me/${esc(x.tguser)}">💬 Telegram</a>` : (x.chat ? `<a href="tg://user?id=${x.chat}">💬 Telegram</a>` : "");
+      return `${i + 1}. <b>${esc(x.bola ?? "—")}</b>` + (x.sinf ? ` (${esc(x.sinf)})` : "") +
+        `\n   ☎️ <code>${esc(x.tel ?? "-")}</code>` + (x.ism ? ` · ${esc(x.ism)}` : "") + (lichka ? ` · ${lichka}` : "") + ` · ${esc(x.vaqt ?? "")}`;
+    }).join("\n");
     await send(chat, `🆕 <b>Shartnomasiz murojaatlar</b> · ${d.jami} ta\nBotga kirgan, lekin shartnomasi yo‘q ota-onalar:\n\n${t}`);
     return;
   }
@@ -805,6 +812,20 @@ Deno.serve(async (req) => {
       }
     }
     return jsonc(s ?? { ok: false });
+  }
+  if (q("sorov_user") !== null) {
+    const b = await req.json().catch(() => ({})) as any;
+    const a = await rpc("ep_admin_tekshir", { p_token: b.token ?? "" });
+    if (!a?.ok) return no();
+    const d = await rpc("ep_sorov_chatlar", { p_token: b.token });
+    const list: any[] = (d?.royxat ?? []) as any[]; let n = 0;
+    for (const c of list) {
+      const g = await tg("getChat", { chat_id: Number(c) }, OTA);
+      const u = g?.result?.username ?? null;
+      const ism = [g?.result?.first_name, g?.result?.last_name].filter(Boolean).join(" ");
+      if (u || ism) { await rpc("ep_sorov_user_saqla", { p_chat_id: Number(c), p_user: u, p_ism: ism || null }); n++; }
+    }
+    return jsonc({ ok: true, tekshirildi: list.length, yangilandi: n });
   }
   if (q("hujjat") !== null) {
     const b = await req.json().catch(() => ({})) as any;
@@ -951,7 +972,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v3.9 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v4.0 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
