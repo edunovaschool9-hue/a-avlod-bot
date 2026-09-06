@@ -855,9 +855,17 @@ Deno.serve(async (req) => {
     const KEY = Deno.env.get("DEEPSEEK_API_KEY") ?? "";
     if (!KEY) return jsonc({ ok: false, xato: "kalit yo‘q" });
     const fan = String(b.fan ?? ""), daraja = Number(b.daraja ?? 1), soni = Math.min(Number(b.soni ?? 10), 20);
-    const fanId = Number(b.fan_id ?? 0);
+    const fanId = Number(b.fan_id ?? 0); const til = (b.til === "ru") ? "ru" : "uz";
     if (!fanId || !fan) return jsonc({ ok: false, xato: "fan" });
-    const prompt = `Sen O‘zbekiston maktabi uchun test tuzuvchi metodistsan.\n` +
+    const prompt = til === "ru"
+      ? `Ты методист, составляешь тесты для школы в Узбекистане.\n` +
+        `Предмет: ${fan}. Класс: ${daraja}. Составь ${soni} тестовых вопросов.\n` +
+        `Требования:\n- Вопросы и ответы на русском языке, по программе ${daraja} класса\n` +
+        `- 4 варианта, верный только один\n- Неверные варианты правдоподобные\n` +
+        `- Верный ответ равномерно среди a,b,c,d\n- Вопросы не повторяются\n` +
+        `Верни только JSON-массив, без текста:\n` +
+        `[{"savol":"...","a":"...","b":"...","c":"...","d":"...","togri":"a","izoh":"краткое пояснение"}]`
+      : `Sen O‘zbekiston maktabi uchun test tuzuvchi metodistsan.\n` +
       `Fan: ${fan}. Sinf: ${daraja}-sinf. ${soni} ta test savoli tuz.\n` +
       `Talablar:\n- Savol va javoblar o‘zbek tilida (lotin), ${daraja}-sinf o‘quvchisi tushunadigan darajada\n` +
       `- Har savolda 4 ta variant, faqat bittasi to‘g‘ri\n- Noto‘g‘ri variantlar ishonarli bo‘lsin\n` +
@@ -877,7 +885,7 @@ Deno.serve(async (req) => {
       js = JSON.parse(txt);
     } catch (e) { return jsonc({ ok: false, xato: "ai", detal: String(e).slice(0, 120) }); }
     if (!Array.isArray(js) || !js.length) return jsonc({ ok: false, xato: "bo‘sh" });
-    const r = await rpc("ep_savol_qosh_tok", { p_token: b.token, p_fan_id: fanId, p_daraja: daraja, p_savollar: js });
+    const r = await rpc("ep_savol_qosh_tok", { p_token: b.token, p_fan_id: fanId, p_daraja: daraja, p_savollar: js, p_til: til });
     return jsonc({ ok: true, ai: js.length, qoshildi: r?.qoshildi ?? 0 });
   }
   if (q("hujjat") !== null) {
@@ -1025,7 +1033,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v4.3 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v4.4 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
