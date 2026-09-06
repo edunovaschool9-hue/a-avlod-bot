@@ -29,8 +29,8 @@ const cronOk = async (k: string | null) => !!k && ((CRON && k === CRON) || (awai
 
 // ---------- klaviaturalar ----------
 const KB_LOK = { keyboard: [[{ text: "📍 Joylashuvni yuborish", request_location: true }]], resize_keyboard: true, one_time_keyboard: true };
-const KB_ADMIN = { keyboard: [[{ text: "🏫 Kim maktabda" }, { text: "📋 Davomat hisoboti" }], [{ text: "📣 Chaqirish" }, { text: "📝 Arizalar" }], [{ text: "👨‍👩‍👧 Ota-onalar" }, { text: "📢 Xabar" }], [{ text: "🎒 O‘quvchilar" }, { text: "🎫 Talonlar" }], [{ text: "📝 Xulosalar" }, { text: "👩‍🏫 O‘qituvchilar" }], [{ text: "📤 Davomat so‘rash" }], [{ text: "📱 Kabinet" }]], resize_keyboard: true };
-const KB_TEACH = { keyboard: [[{ text: "✅ Davomat belgilash" }, { text: "📝 Xulosa yozish" }], [{ text: "📊 Holatim" }, { text: "🔑 PIN" }], [{ text: "📱 Kabinet" }]], resize_keyboard: true };
+const KB_ADMIN = { keyboard: [[{ text: "🏫 Kim maktabda" }, { text: "📋 Davomat hisoboti" }], [{ text: "📣 Chaqirish" }, { text: "📝 Arizalar" }], [{ text: "👨‍👩‍👧 Ota-onalar" }, { text: "📢 Xabar" }], [{ text: "🎒 O‘quvchilar" }, { text: "🎫 Talonlar" }], [{ text: "📝 Xulosalar" }, { text: "🧪 Natijalar" }], [{ text: "👩‍🏫 O‘qituvchilar" }], [{ text: "📤 Davomat so‘rash" }], [{ text: "📱 Kabinet" }]], resize_keyboard: true };
+const KB_TEACH = { keyboard: [[{ text: "✅ Davomat belgilash" }, { text: "📝 Xulosa yozish" }], [{ text: "🧪 Test" }, { text: "📊 Holatim" }], [{ text: "🔑 PIN" }, { text: "📱 Kabinet" }]], resize_keyboard: true };
 const KB_APP = (t = "📱 Kabinetni ochish") => ({ inline_keyboard: [[{ text: t, web_app: { url: APP } }]] });
 
 const T = {
@@ -591,6 +591,17 @@ async function xabar(msg: any) {
   }
   if (/davomat belgilash/i.test(matn)) { if (!isTeach && !isAdmin) { await send(chat, T.royxatda_yoq); return; } await sinfSora(chat, "Qaysi sinf davomatini belgilaysiz?", "dv_sinf"); return; }
   if (/xulosa yozish/i.test(matn)) { if (!isTeach) { await send(chat, T.royxatda_yoq); return; } await sinfSora(chat, "Qaysi sinf uchun xulosa yozasiz?", "xl_sinf"); return; }
+  if (/^\S*\s*test$/i.test(matn) || /test$/i.test(matn)) {
+    if (!isTeach && !isAdmin) { await send(chat, T.royxatda_yoq); return; }
+    let ses: any = await rpc("ep_tg_sessiya", { p_chat_id: chat });
+    if (!ses?.token) { const p = await rpc("ep_teach_pin", { p_chat_id: chat }); if (p?.ok) ses = await rpc("ep_kirish", { p_pin: p.pin }); }
+    const tok = ses?.token ? String(ses.token) : "";
+    await send(chat, "🧪 <b>Kunlik test</b>\n\nSinf → o‘quvchi → fan tanlaysiz, 5 ta savol. Natija ota-onaga va rahbariyatga boradi.\nO‘quvchi ro‘yxatda bo‘lmasa — qo‘shib qo‘yasiz.", {
+      reply_markup: { inline_keyboard: [
+        [{ text: "🌐 Testni ochish (brauzer)", url: SAYT + "test.html" + (tok ? "#t=" + tok : "") }],
+        [{ text: "📱 Telegram ichida", web_app: { url: SAYT + "test.html" + (tok ? "#t=" + tok : "") } }]] } });
+    return;
+  }
   if (/kabinet$/i.test(matn)) {
     if (isAdmin) {
       let ses: any = await rpc("ep_tg_sessiya", { p_chat_id: chat });
@@ -617,6 +628,16 @@ async function xabar(msg: any) {
     if (/arizalar/i.test(matn)) { await arizalar(chat); return; }
     if (/o‘qituvchilar|o'qituvchilar|oqituvchilar/i.test(matn)) { await oqitRoyxat(chat); return; }
     if (/xulosalar/i.test(matn)) { await xulosaHisobot(chat); return; }
+    if (/natija/i.test(matn)) {
+      let ses: any = await rpc("ep_tg_sessiya", { p_chat_id: chat });
+      const d = ses?.token ? await rpc("ep_test_royxat", { p_token: ses.token, p_kun: null }) : null;
+      if (!d?.ok) { await send(chat, "Xatolik"); return; }
+      const r: any[] = d.royxat ?? [];
+      if (!r.length) { await send(chat, `🧪 <b>Test natijalari</b> · ${d.kun}\n\nBugun test o‘tkazilmagan.`); return; }
+      const t = r.map((x: any) => `${Number(x.ball) >= 4 ? "🟢" : Number(x.ball) >= 3 ? "🟡" : "🔴"} <b>${esc(x.oquvchi)}</b> (${esc(x.sinf)}) · ${esc(x.fan)} · <b>${x.ball}/5</b>` + (x.vaqt ? ` · ${x.vaqt}` : "") + (x.oqituvchi ? `\n   <i>${esc(x.oqituvchi)}</i>` : "")).join("\n");
+      await send(chat, `🧪 <b>Test natijalari</b> · ${d.kun}\nJami: <b>${d.jami}</b> ta · o‘rtacha: <b>${d.ortacha ?? "-"}</b>/5\n\n${t}`.slice(0, 3900));
+      return;
+    }
     if (/talon/i.test(matn)) { await talonMenyu(chat); return; }
     if (/davomat so/i.test(matn)) {
       const h = await rpc("ep_teach_hozir", {});
@@ -972,7 +993,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v4.0 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v4.1 test ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
