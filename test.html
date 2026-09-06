@@ -34,13 +34,35 @@ input{width:100%;padding:12px;border:1px solid #d9cfba;border-radius:10px;font-s
 .res{background:#fff;border:1px solid #e6dcc8;border-radius:12px;padding:12px;margin-bottom:8px}
 .res .t{font-weight:700;margin-bottom:4px}
 .res .g{font-size:14px}
+
+/* --- bolalar rejimi (1-4 sinf) --- */
+body.kid{background:linear-gradient(160deg,#EEF6FF 0%,#F7F0FF 100%)}
+.kid .q{border:3px solid #7C3AED;border-radius:22px;box-shadow:0 6px 0 #DDD6FE}
+.kid .qt{font-size:30px;text-align:center;margin:14px 0 18px;color:#4C1D95}
+.kid .v{border:3px solid #C4B5FD;border-radius:18px;font-size:20px;padding:16px;
+ box-shadow:0 4px 0 #EDE9FE;transition:transform .12s, box-shadow .12s}
+.kid .v:active{transform:translateY(3px);box-shadow:0 1px 0 #EDE9FE}
+.kid .v.on{border-color:#7C3AED;background:#F5F3FF}
+.kid .v.togri{border-color:#16A34A;background:#DCFCE7;animation:pop .45s}
+.kid .v.xato{border-color:#DC2626;background:#FEE2E2;animation:shake .4s}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.09)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.dots{display:flex;gap:6px;justify-content:center;margin:6px 0 14px}
+.dots i{width:26px;height:10px;border-radius:6px;background:#DDD6FE;display:block}
+.dots i.ok{background:#16A34A}.dots i.no{background:#F87171}.dots i.now{background:#7C3AED}
+.yurak{text-align:center;font-size:22px;letter-spacing:3px;margin-bottom:6px}
+.kidmsg{text-align:center;font-size:22px;font-weight:800;margin:12px 0;min-height:30px}
+.kidmsg.ok{color:#16A34A;animation:pop .4s}.kidmsg.no{color:#DC2626}
+.kid .bar .go{background:#7C3AED;border-radius:16px;font-size:17px}
+.emoji{font-size:64px;text-align:center;margin:6px 0;animation:pop .6s}
+.conf{font-size:40px;text-align:center;letter-spacing:6px;animation:pop .8s}
 </style></head><body><div class="wrap">
 <div class="top"><span class="logo">EduNova · Test</span><a class="out" href="#" onclick="chiq();return false;">Chiqish</a></div>
 <div id="app"></div></div><div id="bar"></div>
 <script>
 var SB='https://unaodltahuevrfnarfha.supabase.co', KEY='sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP';
 var TOK=sessionStorage.getItem('test_tok')||localStorage.getItem('ep_token_oqituvchi')||'';
-var SINF=null, BOLA=null, T=null, JAV={}, IDX=0;
+var SINF=null, BOLA=null, T=null, JAV={}, IDX=0, KID=false, XATO=0, TEKSH=false;
 function $(i){return document.getElementById(i);}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function rpc(fn,a){return fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY,Authorization:'Bearer '+KEY},body:JSON.stringify(a||{})}).then(function(r){return r.json();});}
@@ -110,40 +132,98 @@ function fanlar(oid,ism){
 function boshla(fid){
  $('app').innerHTML='<p class="mu">Test tayyorlanmoqda\u2026</p>';
  rpc('ep_test_boshla',{p_token:TOK,p_oquvchi_id:BOLA.id,p_fan_id:fid}).then(function(d){
-  if(!d||!d.ok){alert(d&&d.xato==='savol_kam'?'Bu fan uchun savollar yetarli emas':'Xatolik');fanlar(BOLA.id,BOLA.ism);return;}
-  T=d; JAV={}; IDX=0; savol();
+  if(!d||!d.ok){
+    if(d&&d.xato==='bugun_bor'){
+      $('app').innerHTML='<div class="card center"><div class="emoji">\u{1F4C5}</div>'+
+       '<h1 style="text-align:center">Bugun test topshirilgan</h1>'+
+       '<p class="center"><b>'+esc(d.oquvchi)+'</b><br><span class="mu">'+esc(d.fan)+' \u00b7 '+d.ball+'/5 \u00b7 '+esc(d.vaqt||'')+'</span></p>'+
+       '<p class="sm mu center">Har bir o\u2018quvchi kuniga bitta test topshiradi. Ertaga yangi test bo\u2018ladi.</p></div>';
+      $('bar').innerHTML='<div class="bar"><button class="back" onclick="oquvchilar('+SINF.id+',\''+esc(SINF.nom)+'\')">\u2039 Boshqa o\u2018quvchi</button></div>';
+      return;
+    }
+    alert(d&&d.xato==='savol_kam'?'Bu fan uchun savollar yetarli emas':'Xatolik');fanlar(BOLA.id,BOLA.ism);return;}
+  T=d; JAV={}; IDX=0; XATO=0; TEKSH=false;
+  KID=(+(d.daraja||parseInt(SINF.nom,10))<=4);
+  document.body.className=KID?'kid':'';
+  savol();
  });
 }
 function savol(){
  var q=T.savollar[IDX];
- var h='<div class="qn">'+esc(T.oquvchi)+' \u00b7 '+esc(T.fan)+' \u00b7 savol '+(IDX+1)+'/'+T.savollar.length+'</div>'+
-   '<div class="q"><div class="qt">'+esc(q.savol)+'</div>';
+ var h='';
+ if(KID){
+  h+='<div class="yurak">'+('\u2764\uFE0F'.repeat(Math.max(0,3-XATO)))+('\u{1F5A4}'.repeat(Math.min(3,XATO)))+'</div>';
+  h+='<div class="dots">';
+  for(var i=0;i<T.savollar.length;i++){
+   var cl=i<IDX?(JAV['ok'+i]?'ok':'no'):(i===IDX?'now':'');
+   h+='<i class="'+cl+'"></i>';
+  }
+  h+='</div>';
+  h+='<div class="qn" style="text-align:center">'+esc(T.oquvchi)+' \u00b7 '+esc(T.fan)+'</div>';
+ } else {
+  h+='<div class="qn">'+esc(T.oquvchi)+' \u00b7 '+esc(T.fan)+' \u00b7 savol '+(IDX+1)+'/'+T.savollar.length+'</div>';
+ }
+ h+='<div class="q"><div class="qt">'+esc(q.savol)+'</div>';
  ['a','b','c','d'].forEach(function(k){
-  h+='<button class="v'+(JAV[q.id]===k?' on':'')+'" onclick="tanla(\''+k+'\')">'+k.toUpperCase()+') '+esc(q[k])+'</button>';
+  h+='<button class="v'+(JAV[q.id]===k?' on':'')+'" id="v_'+k+'" onclick="tanla(\''+k+'\')">'+(KID?'':k.toUpperCase()+') ')+esc(q[k])+'</button>';
  });
- $('app').innerHTML=h+'</div>';
- $('bar').innerHTML='<div class="bar">'+
-  (IDX>0?'<button class="back" onclick="IDX--;savol()">\u2039 Oldingi</button>':'')+
-  (IDX<T.savollar.length-1?'<button class="go" onclick="keyingi()">Keyingi \u203a</button>'
-    :'<button class="go" onclick="tugat()">\u2713 Testni yakunlash</button>')+'</div>';
+ h+='</div><div class="kidmsg" id="kmsg"></div>';
+ $('app').innerHTML=h;
+ if(KID){ $('bar').innerHTML=''; }
+ else {
+  $('bar').innerHTML='<div class="bar">'+
+   (IDX>0?'<button class="back" onclick="IDX--;savol()">\u2039 Oldingi</button>':'')+
+   (IDX<T.savollar.length-1?'<button class="go" onclick="keyingi()">Keyingi \u203a</button>'
+     :'<button class="go" onclick="tugat()">\u2713 Testni yakunlash</button>')+'</div>';
+ }
  window.scrollTo(0,0);
 }
-function tanla(k){ JAV[T.savollar[IDX].id]=k; savol(); }
+var OLQISH=['Barakalla! \u{1F31F}','Zo\u2018r! \u{1F44F}','Juda yaxshi! \u{1F389}','Aqlli bola! \u{1F9E0}','To\u2018g\u2018ri! \u2705'];
+var TASALLI=['Hechqisi yo\u2018q, davom etamiz \u{1F4AA}','Keyingisida albatta! \u{1F31F}','Yaxshi urinish! \u{1F642}'];
+function tanla(k){
+ var q=T.savollar[IDX];
+ if(!KID){ JAV[q.id]=k; savol(); return; }
+ if(TEKSH) return;
+ TEKSH=true; JAV[q.id]=k;
+ rpc('ep_savol_togri',{p_token:TOK,p_id:q.id}).then(function(d){
+  var tg=(d&&d.togri)||null;
+  var el=$('v_'+k), msg=$('kmsg');
+  if(tg===k){ el.className='v togri'; JAV['ok'+IDX]=true; msg.className='kidmsg ok'; msg.textContent=OLQISH[IDX%OLQISH.length]; }
+  else { el.className='v xato'; JAV['ok'+IDX]=false; XATO++; msg.className='kidmsg no';
+    msg.textContent=TASALLI[IDX%TASALLI.length]; if(tg&&$('v_'+tg)) $('v_'+tg).className='v togri'; }
+  setTimeout(function(){
+   TEKSH=false;
+   if(IDX<T.savollar.length-1){ IDX++; savol(); } else { tugat(); }
+  }, tg===k?900:1600);
+ })["catch"](function(){ TEKSH=false; });
+}
 function keyingi(){ if(!JAV[T.savollar[IDX].id]){alert('Javobni tanlang');return;} IDX++; savol(); }
 function tugat(){
  if(Object.keys(JAV).length<T.savollar.length){alert('Barcha savollarga javob bering');return;}
  rpc('ep_test_tugat',{p_token:TOK,p_id:T.id,p_javoblar:JAV}).then(function(d){
   if(!d||!d.ok){alert('Xatolik');return;}
-  var h='<h1>Natija</h1><div class="card"><div class="ball '+(d.ball>=4?'ok':(d.ball>=3?'':'bad'))+'">'+d.ball+' / 5</div>'+
+  var h='';
+  if(KID){
+   var em=d.ball>=5?'\u{1F3C6}':(d.ball>=4?'\u{1F31F}':(d.ball>=3?'\u{1F44D}':'\u{1F4AA}'));
+   var sz=d.ball>=5?'Ajoyib! Hammasi to\u2018g\u2018ri!':(d.ball>=4?'Juda zo\u2018r!':(d.ball>=3?'Yaxshi!':'Keyingi safar yaxshiroq!'));
+   h+='<div class="card"><div class="emoji">'+em+'</div>'+
+      (d.ball>=4?'<div class="conf">\u{1F389} \u2728 \u{1F38A}</div>':'')+
+      '<div class="ball '+(d.ball>=4?'ok':(d.ball>=3?'':'bad'))+'">'+d.ball+' / 5</div>'+
+      '<p class="center" style="font-size:20px;font-weight:800">'+sz+'</p>'+
+      '<p class="center"><b>'+esc(d.oquvchi)+'</b><br><span class="mu">'+esc(d.fan)+' \u00b7 '+esc(T.sinf)+'</span></p></div>';
+  } else {
+   h+='<h1>Natija</h1><div class="card"><div class="ball '+(d.ball>=4?'ok':(d.ball>=3?'':'bad'))+'">'+d.ball+' / 5</div>'+
     '<p class="center"><b>'+esc(d.oquvchi)+'</b><br><span class="mu">'+esc(d.fan)+' \u00b7 '+esc(T.sinf)+'</span></p></div>';
+  }
   T.savollar.forEach(function(q,i){
    var tanl=JAV[q.id];
    h+='<div class="res"><div class="t">'+(i+1)+'. '+esc(q.savol)+'</div><div class="g">Javob: <b>'+esc(q[tanl])+'</b></div></div>';
   });
   h+='<p class="sm mu center">Natija ota-onaga va rahbariyatga yuborildi.</p>';
   $('app').innerHTML=h;
+  document.body.className='';
   $('bar').innerHTML='<div class="bar"><button class="back" onclick="sinflar()">Sinflar</button>'+
-    '<button class="go" onclick="fanlar('+BOLA.id+',\''+esc(BOLA.ism).replace(/'/g,"\\'")+'\')">Yana test</button></div>';
+    '<button class="go" onclick="oquvchilar('+SINF.id+',\''+esc(SINF.nom)+'\')">Keyingi o\u2018quvchi</button></div>';
   window.scrollTo(0,0);
  })["catch"](function(){alert('Xatolik');});
 }
