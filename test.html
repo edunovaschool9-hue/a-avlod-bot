@@ -92,8 +92,8 @@ function sinflar(){
   $('app').innerHTML=h+'</div>';
  })["catch"](function(){$('app').innerHTML='<p class="mu">Xatolik</p>';});
 }
-function oquvchilar(id,nom){
- SINF={id:id,nom:nom};
+function oquvchilar(id,nom,til){
+ SINF={id:id,nom:nom,til:til||(/-B$/.test(nom)?'ru':'uz')};
  $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
  rpc('ep_dav_royxat',{p_token:TOK,p_sinf_id:id,p_kun:null}).then(function(d){
   if(!d||!d.ok){alert('Xatolik');sinflar();return;}
@@ -117,7 +117,7 @@ function fanlar(oid,ism){
  BOLA={id:oid,ism:ism};
  $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
  var daraja=parseInt(SINF.nom,10);
- rpc('ep_test_fanlar',{p_token:TOK,p_daraja:daraja}).then(function(d){
+ rpc('ep_test_fanlar',{p_token:TOK,p_daraja:daraja,p_til:SINF.til||'uz'}).then(function(d){
   if(!d||!d.ok){alert('Xatolik');return;}
   var h='<h1>'+esc(ism)+'</h1><p class="sm mu">'+esc(SINF.nom)+' \u00b7 fanni tanlang. Har kuni savollar yangilanadi.</p>';
   (d.royxat||[]).forEach(function(f){
@@ -178,8 +178,12 @@ function savol(){
  }
  window.scrollTo(0,0);
 }
-var OLQISH=['Barakalla! \u{1F31F}','Zo\u2018r! \u{1F44F}','Juda yaxshi! \u{1F389}','Aqlli bola! \u{1F9E0}','To\u2018g\u2018ri! \u2705'];
-var TASALLI=['Hechqisi yo\u2018q, davom etamiz \u{1F4AA}','Keyingisida albatta! \u{1F31F}','Yaxshi urinish! \u{1F642}'];
+var OLQISH_UZ=['Barakalla! \u{1F31F}','Zo\u2018r! \u{1F44F}','Juda yaxshi! \u{1F389}','Aqlli bola! \u{1F9E0}','To\u2018g\u2018ri! \u2705'];
+var OLQISH_RU=['\u041c\u043e\u043b\u043e\u0434\u0435\u0446! \u{1F31F}','\u0417\u0434\u043e\u0440\u043e\u0432\u043e! \u{1F44F}','\u041e\u0442\u043b\u0438\u0447\u043d\u043e! \u{1F389}','\u0423\u043c\u043d\u0438\u0446\u0430! \u{1F9E0}','\u0412\u0435\u0440\u043d\u043e! \u2705'];
+function OLQISH_(){return (SINF&&SINF.til==='ru')?OLQISH_RU:OLQISH_UZ;}
+var TASALLI_UZ=['Hechqisi yo\u2018q, davom etamiz \u{1F4AA}','Keyingisida albatta! \u{1F31F}','Yaxshi urinish! \u{1F642}'];
+var TASALLI_RU=['\u041d\u0438\u0447\u0435\u0433\u043e, \u0438\u0434\u0451\u043c \u0434\u0430\u043b\u044c\u0448\u0435 \u{1F4AA}','\u0412 \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0438\u0439 \u0440\u0430\u0437 \u043f\u043e\u043b\u0443\u0447\u0438\u0442\u0441\u044f! \u{1F31F}','\u0425\u043e\u0440\u043e\u0448\u0430\u044f \u043f\u043e\u043f\u044b\u0442\u043a\u0430! \u{1F642}'];
+function TASALLI_(){return (SINF&&SINF.til==='ru')?TASALLI_RU:TASALLI_UZ;}
 function tanla(k){
  var q=T.savollar[IDX];
  if(!KID){ JAV[q.id]=k; savol(); return; }
@@ -188,9 +192,9 @@ function tanla(k){
  rpc('ep_savol_togri',{p_token:TOK,p_id:q.id}).then(function(d){
   var tg=(d&&d.togri)||null;
   var el=$('v_'+k), msg=$('kmsg');
-  if(tg===k){ el.className='v togri'; JAV['ok'+IDX]=true; msg.className='kidmsg ok'; msg.textContent=OLQISH[IDX%OLQISH.length]; }
+  if(tg===k){ el.className='v togri'; JAV['ok'+IDX]=true; msg.className='kidmsg ok'; msg.textContent=OLQISH_()[IDX%OLQISH_().length]; }
   else { el.className='v xato'; JAV['ok'+IDX]=false; XATO++; msg.className='kidmsg no';
-    msg.textContent=TASALLI[IDX%TASALLI.length]; if(tg&&$('v_'+tg)) $('v_'+tg).className='v togri'; }
+    msg.textContent=TASALLI_()[IDX%TASALLI_().length]; if(tg&&$('v_'+tg)) $('v_'+tg).className='v togri'; }
   setTimeout(function(){
    TEKSH=false;
    if(IDX<T.savollar.length-1){ IDX++; savol(); } else { tugat(); }
@@ -205,7 +209,8 @@ function tugat(){
   var h='';
   if(KID){
    var em=d.ball>=5?'\u{1F3C6}':(d.ball>=4?'\u{1F31F}':(d.ball>=3?'\u{1F44D}':'\u{1F4AA}'));
-   var sz=d.ball>=5?'Ajoyib! Hammasi to\u2018g\u2018ri!':(d.ball>=4?'Juda zo\u2018r!':(d.ball>=3?'Yaxshi!':'Keyingi safar yaxshiroq!'));
+   var RU=(SINF&&SINF.til==='ru');
+   var sz=RU?(d.ball>=5?'\u041e\u0442\u043b\u0438\u0447\u043d\u043e! \u0412\u0441\u0451 \u0432\u0435\u0440\u043d\u043e!':(d.ball>=4?'\u041e\u0447\u0435\u043d\u044c \u0445\u043e\u0440\u043e\u0448\u043e!':(d.ball>=3?'\u0425\u043e\u0440\u043e\u0448\u043e!':'\u0412 \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0438\u0439 \u0440\u0430\u0437 \u043b\u0443\u0447\u0448\u0435!'))):(d.ball>=5?'Ajoyib! Hammasi to\u2018g\u2018ri!':(d.ball>=4?'Juda zo\u2018r!':(d.ball>=3?'Yaxshi!':'Keyingi safar yaxshiroq!')));
    h+='<div class="card"><div class="emoji">'+em+'</div>'+
       (d.ball>=4?'<div class="conf">\u{1F389} \u2728 \u{1F38A}</div>':'')+
       '<div class="ball '+(d.ball>=4?'ok':(d.ball>=3?'':'bad'))+'">'+d.ball+' / 5</div>'+
