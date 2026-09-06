@@ -848,6 +848,38 @@ Deno.serve(async (req) => {
     }
     return jsonc({ ok: true, tekshirildi: list.length, yangilandi: n });
   }
+  if (q("savol_yarat") !== null) {
+    const b = await req.json().catch(() => ({})) as any;
+    const a = await rpc("ep_admin_tekshir", { p_token: b.token ?? "" });
+    if (!a?.ok) return no();
+    const KEY = Deno.env.get("DEEPSEEK_API_KEY") ?? "";
+    if (!KEY) return jsonc({ ok: false, xato: "kalit yo‘q" });
+    const fan = String(b.fan ?? ""), daraja = Number(b.daraja ?? 1), soni = Math.min(Number(b.soni ?? 10), 20);
+    const fanId = Number(b.fan_id ?? 0);
+    if (!fanId || !fan) return jsonc({ ok: false, xato: "fan" });
+    const prompt = `Sen O‘zbekiston maktabi uchun test tuzuvchi metodistsan.\n` +
+      `Fan: ${fan}. Sinf: ${daraja}-sinf. ${soni} ta test savoli tuz.\n` +
+      `Talablar:\n- Savol va javoblar o‘zbek tilida (lotin), ${daraja}-sinf o‘quvchisi tushunadigan darajada\n` +
+      `- Har savolda 4 ta variant, faqat bittasi to‘g‘ri\n- Noto‘g‘ri variantlar ishonarli bo‘lsin\n` +
+      `- To‘g‘ri javob a,b,c,d orasida teng taqsimlansin\n- Savollar bir-birini takrorlamasin\n` +
+      `Faqat JSON massiv qaytar, boshqa matnsiz:\n` +
+      `[{"savol":"...","a":"...","b":"...","c":"...","d":"...","togri":"a","izoh":"qisqa tushuntirish"}]`;
+    let js: any[] = [];
+    try {
+      const rr = await fetch("https://api.deepseek.com/chat/completions", { method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${KEY}` },
+        body: JSON.stringify({ model: "deepseek-chat", temperature: 0.8, messages: [{ role: "user", content: prompt }] }) });
+      const j = await rr.json();
+      let txt = String(j?.choices?.[0]?.message?.content ?? "").trim();
+      txt = txt.replace(/^```(json)?/i, "").replace(/```$/, "").trim();
+      const i1 = txt.indexOf("["), i2 = txt.lastIndexOf("]");
+      if (i1 >= 0 && i2 > i1) txt = txt.slice(i1, i2 + 1);
+      js = JSON.parse(txt);
+    } catch (e) { return jsonc({ ok: false, xato: "ai", detal: String(e).slice(0, 120) }); }
+    if (!Array.isArray(js) || !js.length) return jsonc({ ok: false, xato: "bo‘sh" });
+    const r = await rpc("ep_savol_qosh_tok", { p_token: b.token, p_fan_id: fanId, p_daraja: daraja, p_savollar: js });
+    return jsonc({ ok: true, ai: js.length, qoshildi: r?.qoshildi ?? 0 });
+  }
   if (q("hujjat") !== null) {
     const b = await req.json().catch(() => ({})) as any;
     const uid = await initDataTekshir(String(b.initData ?? ""), TEACH);
@@ -993,7 +1025,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v4.1 test ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v4.3 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
