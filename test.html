@@ -1,428 +1,159 @@
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduNova — Test Kabineti</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@500;600;700&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!doctype html><html lang="uz"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>EduNova — Test</title><meta name="theme-color" content="#F6F1E6">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{
-  --orange:#FF6B1A; --orange-d:#E85400;
-  --steel:#1C1C1C; --navy:#1A2238;
-  --concrete:#E7E1D3; --cream:#FAF6EC; --card:#FFFFFF;
-  --line:#CFC7B6; --mut:#6B6558; --ok:#1E8E4E; --bad:#C0392B;
-  --fm:'Oswald',sans-serif;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Rubik',sans-serif;background:var(--concrete);color:var(--steel);min-height:100vh;
-  background-image:radial-gradient(circle at 20% 10%,rgba(255,107,26,.06),transparent 40%),radial-gradient(circle at 90% 90%,rgba(26,34,56,.06),transparent 40%);}
-.hazard{height:7px;background:repeating-linear-gradient(-45deg,var(--orange) 0 14px,var(--steel) 14px 28px)}
-.wrap{max-width:760px;margin:0 auto;padding:20px 16px 60px;min-height:100vh;display:flex;flex-direction:column}
-.topbar{display:flex;justify-content:space-between;align-items:center;padding:6px 2px 20px}
-.logo{font-family:'Archivo Black',sans-serif;font-size:20px;letter-spacing:.5px}
-.logo span{color:var(--orange)}
-.logo small{display:block;font-family:var(--fm);font-weight:500;font-size:9px;letter-spacing:3px;color:var(--mut)}
-.lang-sw{display:flex;gap:6px}
-.lang-sw button{font-family:var(--fm);font-weight:600;font-size:12px;letter-spacing:1px;padding:7px 12px;border:2px solid var(--steel);background:transparent;color:var(--steel);cursor:pointer;border-radius:8px}
-.lang-sw button.on{background:var(--steel);color:#fff}
-
-.screen{display:none;flex:1;flex-direction:column;justify-content:center;animation:fade .3s}
-.screen.on{display:flex}
-@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-
-/* CODE ENTRY */
-.card{background:var(--card);border-radius:22px;padding:36px 28px;box-shadow:0 10px 40px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.04)}
-.big-title{font-family:'Archivo Black',sans-serif;font-size:clamp(26px,6vw,36px);text-transform:uppercase;text-align:center;line-height:1.1;margin-bottom:10px}
-.subtitle{text-align:center;color:var(--mut);font-size:15px;margin-bottom:28px}
-.code-in{width:100%;font-family:var(--fm);font-weight:700;font-size:38px;letter-spacing:14px;text-align:center;padding:20px;border:3px solid var(--line);border-radius:16px;color:var(--steel);background:var(--cream);outline:none;transition:.2s}
-.code-in:focus{border-color:var(--orange)}
-.code-in::placeholder{letter-spacing:8px;color:#bbb;font-size:24px}
-.btn{width:100%;font-family:var(--fm);font-weight:700;font-size:18px;letter-spacing:1px;text-transform:uppercase;padding:18px;border:none;border-radius:16px;background:var(--orange);color:#fff;cursor:pointer;margin-top:18px;transition:.2s;box-shadow:0 6px 18px rgba(255,107,26,.3)}
-.btn:hover{background:var(--orange-d)}
-.btn:disabled{opacity:.5;cursor:default}
-.btn-sec{background:var(--navy);box-shadow:0 6px 18px rgba(26,34,56,.25)}
-.err{color:var(--bad);text-align:center;font-size:14px;margin-top:14px;font-weight:600;display:none}
-
-/* SUBJECT PICK */
-.hello{text-align:center;margin-bottom:8px}
-.hello .nm{font-family:'Archivo Black',sans-serif;font-size:28px;color:var(--steel)}
-.hello .gr{color:var(--mut);font-size:14px;font-family:var(--fm);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
-.subj-grid{display:grid;gap:14px;margin-top:24px}
-.subj{display:flex;align-items:center;gap:16px;background:var(--card);border:2px solid transparent;border-radius:18px;padding:20px 22px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.06);transition:.2s}
-.subj:hover{border-color:var(--orange);transform:translateX(4px)}
-.subj .ic{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
-.subj .tx b{font-size:19px;display:block}
-.subj .tx span{font-size:13px;color:var(--mut)}
-.subj .arrow{margin-left:auto;color:var(--orange);font-size:22px;font-weight:700}
-
-/* TEST */
-.prog-bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:20px}
-.prog-fill{height:100%;background:var(--orange);border-radius:99px;transition:width .3s;width:0}
-.q-count{font-family:var(--fm);font-weight:600;font-size:13px;letter-spacing:1px;color:var(--mut);text-transform:uppercase;margin-bottom:10px;text-align:center}
-.q-text{font-size:22px;font-weight:600;text-align:center;margin-bottom:26px;line-height:1.35;min-height:60px}
-.opts{display:grid;gap:12px}
-.opt{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:16px 20px;font-size:16px;cursor:pointer;transition:.15s;text-align:left}
-.opt:hover{border-color:var(--orange);background:var(--cream)}
-.opt.correct{border-color:var(--ok);background:#e8f6ee}
-.opt.wrong{border-color:var(--bad);background:#fbeceb}
-.opt.disabled{pointer-events:none;opacity:.85}
-
-/* RESULT */
-.res-circle{width:150px;height:150px;border-radius:50%;margin:0 auto 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}
-.res-circle .pc{font-family:'Archivo Black',sans-serif;font-size:44px;line-height:1}
-.res-circle .lbl{font-family:var(--fm);font-size:12px;letter-spacing:1px;margin-top:2px}
-.res-msg{text-align:center;font-size:20px;font-weight:600;margin-bottom:8px}
-.res-sub{text-align:center;color:var(--mut);font-size:15px;margin-bottom:26px}
-.spinner{width:40px;height:40px;border:4px solid var(--line);border-top-color:var(--orange);border-radius:50%;animation:spin 1s linear infinite;margin:20px auto}
-@keyframes spin{to{transform:rotate(360deg)}}
-</style>
-</head>
-<body>
-<div class="hazard"></div>
-<div class="wrap">
-  <div class="topbar">
-    <div class="logo">EDU<span>NOVA</span><small>TEST KABINETI</small></div>
-    <div class="lang-sw">
-      <button id="lng-uz" class="on" onclick="setLang('uz')">O'ZB</button>
-      <button id="lng-ru" onclick="setLang('ru')">РУС</button>
-    </div>
-  </div>
-
-  <!-- SCREEN 1: CODE -->
-  <div class="screen on" id="sc-code">
-    <div class="card">
-      <div class="big-title" data-uz="Test kabineti" data-ru="Тест-кабинет">Test kabineti</div>
-      <div class="subtitle" data-uz="Kodingizni kiriting" data-ru="Введите свой код">Kodingizni kiriting</div>
-      <input class="code-in" id="code-input" type="tel" maxlength="6" placeholder="0000" autocomplete="off" inputmode="numeric">
-      <button class="btn" id="code-btn" onclick="checkCode()" data-uz="Kirish" data-ru="Войти">Kirish</button>
-      <div class="err" id="code-err"></div>
-    </div>
-  </div>
-
-  <!-- SCREEN 2: SUBJECT -->
-  <div class="screen" id="sc-subj">
-    <div class="hello">
-      <div class="nm" id="stu-nm">—</div>
-      <div class="gr" id="stu-gr">—</div>
-    </div>
-    <div class="subtitle" data-uz="Fanni tanlang" data-ru="Выберите предмет">Fanni tanlang</div>
-    <div class="subj-grid" id="subj-grid"></div>
-    <button class="btn btn-sec" onclick="logout()" style="margin-top:22px" data-uz="Chiqish" data-ru="Выход">Chiqish</button>
-  </div>
-
-  <!-- SCREEN 3: TEST -->
-  <div class="screen" id="sc-test">
-    <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
-    <div class="q-count" id="q-count">1 / 5</div>
-    <div class="q-text" id="q-text">—</div>
-    <div class="opts" id="opts"></div>
-  </div>
-
-  <!-- SCREEN 4: RESULT -->
-  <div class="screen" id="sc-result">
-    <div class="card">
-      <div class="res-circle" id="res-circle"><div class="pc" id="res-pc">0%</div><div class="lbl" data-uz="natija" data-ru="результат">natija</div></div>
-      <div class="res-msg" id="res-msg">—</div>
-      <div class="res-sub" id="res-sub">—</div>
-      <div id="save-state"></div>
-      <button class="btn" onclick="logout()" data-uz="Tayyor — Chiqish" data-ru="Готово — Выход">Tayyor — Chiqish</button>
-    </div>
-  </div>
-</div>
-<div class="hazard"></div>
-
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#F6F1E6;color:#1A2238;font-size:16px}
+.wrap{max-width:620px;margin:0 auto;padding:14px 12px 90px}
+.top{display:flex;align-items:center;gap:10px;padding:2px 0 12px}
+.logo{font-weight:800;font-size:17px}.out{margin-left:auto;font-size:13px;color:#8b8271;text-decoration:underline}
+h1{font-size:19px;margin:0 0 10px}
+.card{background:#fff;border:1px solid #e6dcc8;border-radius:14px;padding:14px;margin-bottom:12px}
+input{width:100%;padding:12px;border:1px solid #d9cfba;border-radius:10px;font-size:17px;background:#fff;color:#1A2238}
+.btn{display:block;width:100%;padding:14px;border:0;border-radius:12px;background:#FF7A00;color:#fff;font-size:16px;font-weight:700;margin-top:10px}
+.btn.sec{background:#fff;color:#1A2238;border:1px solid #d9cfba}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cls{background:#fff;border:1px solid #e0d5bf;border-radius:12px;padding:14px 6px;text-align:center;font-weight:800;font-size:17px}
+.cls small{display:block;font-weight:600;color:#8b8271;font-size:11px;margin-top:3px}
+.row{background:#fff;border:1px solid #e6dcc8;border-radius:12px;padding:14px 12px;margin-bottom:8px;font-size:17px;font-weight:600}
+.fan{display:flex;justify-content:space-between;align-items:center}
+.fan .n{font-size:12px;color:#8b8271;font-weight:600}
+.fan.yoq{opacity:.45}
+.q{background:#fff;border:1px solid #e6dcc8;border-radius:14px;padding:16px;margin-bottom:12px}
+.qn{font-size:12px;color:#8b8271;font-weight:700;margin-bottom:6px}
+.qt{font-size:20px;font-weight:700;margin-bottom:12px;line-height:1.35}
+.v{display:block;width:100%;text-align:left;padding:14px;border:2px solid #e6dcc8;border-radius:11px;background:#fff;font-size:17px;margin-bottom:8px;font-weight:600}
+.v.on{border-color:#FF7A00;background:#fff7ed}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#F6F1E6;border-top:1px solid #e0d5bf;padding:10px 12px;display:flex;gap:8px;max-width:620px;margin:0 auto}
+.bar button{flex:1;padding:14px;border:0;border-radius:11px;font-weight:700;font-size:15px}
+.bar .go{background:#FF7A00;color:#fff}.bar .back{background:#fff;border:1px solid #d9cfba;color:#1A2238}
+.mu{color:#8b8271}.sm{font-size:13px}.center{text-align:center}.err{color:#b91c1c;font-size:14px;min-height:18px}
+.ball{font-size:56px;font-weight:800;text-align:center;margin:10px 0}
+.ok{color:#15803d}.bad{color:#b91c1c}
+.res{background:#fff;border:1px solid #e6dcc8;border-radius:12px;padding:12px;margin-bottom:8px}
+.res .t{font-weight:700;margin-bottom:4px}
+.res .g{font-size:14px}
+</style></head><body><div class="wrap">
+<div class="top"><span class="logo">EduNova · Test</span><a class="out" href="#" onclick="chiq();return false;">Chiqish</a></div>
+<div id="app"></div></div><div id="bar"></div>
 <script>
-const sb = supabase.createClient('https://unaodltahuevrfnarfha.supabase.co','sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP');
-
-// AI test generatsiya (Edge Function ai-test)
-const AI_TEST_CFG={
-  url:'https://unaodltahuevrfnarfha.supabase.co/functions/v1/ai-test',
-  anonKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVuYW9kbHRhaHVldnJmbmFyZmhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNDE0NDEsImV4cCI6MjA5NDkxNzQ0MX0.e6vf7eMkihzmGlBidSb5WtKtDu9FYn-C1C_EOLhByeQ'
-};
-
-let LANG='uz';
-let student=null;      // {id, full_name, grade, access_code}
-let curSubject=null;
-let curQuestions=[];
-let qIdx=0, correct=0;
-
-// ============ TEST BANK ============
-// Struktura: TESTS[subject][grade] = [{q_uz,q_ru,opts_uz,opts_ru,correct}]
-// Namuna: 1, 5, 9-sinf. Qolganlarini keyin qo'shamiz.
-const TESTS = {
-  math: {
-    1: [
-      {q_uz:"2 + 3 = ?",q_ru:"2 + 3 = ?",opts_uz:["4","5","6","3"],opts_ru:["4","5","6","3"],c:1},
-      {q_uz:"5 dan katta son qaysi?",q_ru:"Какое число больше 5?",opts_uz:["3","4","7","2"],opts_ru:["3","4","7","2"],c:2},
-      {q_uz:"10 - 4 = ?",q_ru:"10 - 4 = ?",opts_uz:["6","5","7","8"],opts_ru:["6","5","7","8"],c:0},
-      {q_uz:"Qaysi shakl uchburchak?",q_ru:"Какая фигура треугольник?",opts_uz:["▲","●","■","★"],opts_ru:["▲","●","■","★"],c:0},
-      {q_uz:"1, 2, 3, ... keyingi son?",q_ru:"1, 2, 3, ... следующее число?",opts_uz:["5","4","6","2"],opts_ru:["5","4","6","2"],c:1},
-    ],
-    5: [
-      {q_uz:"12 × 8 = ?",q_ru:"12 × 8 = ?",opts_uz:["96","86","108","92"],opts_ru:["96","86","108","92"],c:0},
-      {q_uz:"144 ÷ 12 = ?",q_ru:"144 ÷ 12 = ?",opts_uz:["12","11","14","10"],opts_ru:["12","11","14","10"],c:0},
-      {q_uz:"1/2 + 1/4 = ?",q_ru:"1/2 + 1/4 = ?",opts_uz:["3/4","2/6","1/6","2/4"],opts_ru:["3/4","2/6","1/6","2/4"],c:0},
-      {q_uz:"Kvadratning 4 tomoni 6 sm. Perimetri?",q_ru:"Сторона квадрата 6 см. Периметр?",opts_uz:["24 sm","36 sm","12 sm","18 sm"],opts_ru:["24 см","36 см","12 см","18 см"],c:0},
-      {q_uz:"25% ni kasr ko'rinishi?",q_ru:"25% в виде дроби?",opts_uz:["1/4","1/2","1/5","2/5"],opts_ru:["1/4","1/2","1/5","2/5"],c:0},
-    ],
-    9: [
-      {q_uz:"x² = 49, x = ?",q_ru:"x² = 49, x = ?",opts_uz:["±7","7","±49","14"],opts_ru:["±7","7","±49","14"],c:0},
-      {q_uz:"2x + 6 = 14, x = ?",q_ru:"2x + 6 = 14, x = ?",opts_uz:["4","5","3","6"],opts_ru:["4","5","3","6"],c:0},
-      {q_uz:"√144 = ?",q_ru:"√144 = ?",opts_uz:["12","14","11","13"],opts_ru:["12","14","11","13"],c:0},
-      {q_uz:"To'g'ri burchak necha gradus?",q_ru:"Сколько градусов в прямом угле?",opts_uz:["90°","180°","45°","60°"],opts_ru:["90°","180°","45°","60°"],c:0},
-      {q_uz:"a=3, b=4 bo'lsa, gipotenuza (c)?",q_ru:"Если a=3, b=4, гипотенуза (c)?",opts_uz:["5","6","7","4"],opts_ru:["5","6","7","4"],c:0},
-    ],
-  },
-  english: {
-    1: [
-      {q_uz:"'Cat' — bu nima?",q_ru:"'Cat' — это что?",opts_uz:["Mushuk","It","Sigir","Ot"],opts_ru:["Кошка","Собака","Корова","Лошадь"],c:0},
-      {q_uz:"'One, two, ...' keyingisi?",q_ru:"'One, two, ...' следующее?",opts_uz:["three","four","five","ten"],opts_ru:["three","four","five","ten"],c:0},
-      {q_uz:"'Red' rangi qaysi?",q_ru:"'Red' — какой цвет?",opts_uz:["Qizil","Ko'k","Yashil","Sariq"],opts_ru:["Красный","Синий","Зелёный","Жёлтый"],c:0},
-      {q_uz:"'Dog' — bu?",q_ru:"'Dog' — это?",opts_uz:["It","Mushuk","Baliq","Qush"],opts_ru:["Собака","Кошка","Рыба","Птица"],c:0},
-      {q_uz:"'Hello' nima ma'noda?",q_ru:"Что значит 'Hello'?",opts_uz:["Salom","Xayr","Rahmat","Ha"],opts_ru:["Привет","Пока","Спасибо","Да"],c:0},
-    ],
-    5: [
-      {q_uz:"'I ___ a student' — to'g'ri so'z?",q_ru:"'I ___ a student' — правильное слово?",opts_uz:["am","is","are","be"],opts_ru:["am","is","are","be"],c:0},
-      {q_uz:"'Book' ko'plik shakli?",q_ru:"Множественное число 'book'?",opts_uz:["books","bookes","booken","book"],opts_ru:["books","bookes","booken","book"],c:0},
-      {q_uz:"'Yesterday' nima?",q_ru:"Что значит 'Yesterday'?",opts_uz:["Kecha","Bugun","Ertaga","Hozir"],opts_ru:["Вчера","Сегодня","Завтра","Сейчас"],c:0},
-      {q_uz:"'She ___ to school' (every day)",q_ru:"'She ___ to school' (каждый день)",opts_uz:["goes","go","going","gone"],opts_ru:["goes","go","going","gone"],c:0},
-      {q_uz:"'Big' ning teskarisi?",q_ru:"Противоположность 'Big'?",opts_uz:["Small","Tall","Long","Fast"],opts_ru:["Small","Tall","Long","Fast"],c:0},
-    ],
-    9: [
-      {q_uz:"'I have ___ finished' — to'g'ri?",q_ru:"'I have ___ finished' — правильно?",opts_uz:["already","yet","ago","since"],opts_ru:["already","yet","ago","since"],c:0},
-      {q_uz:"Past tense of 'go'?",q_ru:"Прошедшее время 'go'?",opts_uz:["went","goed","gone","going"],opts_ru:["went","goed","gone","going"],c:0},
-      {q_uz:"'If it rains, I ___ stay home'",q_ru:"'If it rains, I ___ stay home'",opts_uz:["will","would","did","am"],opts_ru:["will","would","did","am"],c:0},
-      {q_uz:"'Beautiful' — so'z turkumi?",q_ru:"'Beautiful' — часть речи?",opts_uz:["Adjective","Noun","Verb","Adverb"],opts_ru:["Прилагательное","Существ.","Глагол","Наречие"],c:0},
-      {q_uz:"Choose passive: 'The book ___ written'",q_ru:"Пассив: 'The book ___ written'",opts_uz:["was","did","has","is being done"],opts_ru:["was","did","has","is being done"],c:0},
-    ],
-  },
-  ai: {
-    1: [
-      {q_uz:"AI nima?",q_ru:"Что такое ИИ?",opts_uz:["Aqlli mashina","O'yinchoq","Kitob","Rasm"],opts_ru:["Умная машина","Игрушка","Книга","Картинка"],c:0},
-      {q_uz:"ChatGPT nima qila oladi?",q_ru:"Что умеет ChatGPT?",opts_uz:["Savolga javob beradi","Ovqat pishiradi","Yuguradi","Uxlaydi"],opts_ru:["Отвечает на вопросы","Готовит еду","Бегает","Спит"],c:0},
-      {q_uz:"Robot — bu?",q_ru:"Робот — это?",opts_uz:["Mashina yordamchi","Hayvon","Meva","O'simlik"],opts_ru:["Машина-помощник","Животное","Фрукт","Растение"],c:0},
-      {q_uz:"AI rasm chiza oladimi?",q_ru:"Может ли ИИ рисовать?",opts_uz:["Ha","Yo'q","Bilmayman","Ba'zan"],opts_ru:["Да","Нет","Не знаю","Иногда"],c:0},
-      {q_uz:"AI bilan qanday gaplashamiz?",q_ru:"Как общаемся с ИИ?",opts_uz:["Yozib","Qichqirib","Sakrab","Yugurib"],opts_ru:["Печатая","Крича","Прыгая","Бегая"],c:0},
-    ],
-    5: [
-      {q_uz:"'Prompt' nima?",q_ru:"Что такое 'Prompt'?",opts_uz:["AI'ga buyruq/savol","O'yin","Rang","Raqam"],opts_ru:["Команда/вопрос ИИ","Игра","Цвет","Число"],c:0},
-      {q_uz:"ChatGPT ni kim yaratgan?",q_ru:"Кто создал ChatGPT?",opts_uz:["OpenAI","Google","Apple","Meta"],opts_ru:["OpenAI","Google","Apple","Meta"],c:0},
-      {q_uz:"Yaxshi prompt qanday bo'ladi?",q_ru:"Какой хороший промпт?",opts_uz:["Aniq va batafsil","Qisqa va noaniq","Bo'sh","Faqat bitta harf"],opts_ru:["Точный и подробный","Короткий и неясный","Пустой","Одна буква"],c:0},
-      {q_uz:"AI qanday o'rganadi?",q_ru:"Как ИИ учится?",opts_uz:["Ko'p ma'lumotdan","Uxlab","Yugurib","O'ynab"],opts_ru:["Из данных","Во сне","Бегая","Играя"],c:0},
-      {q_uz:"Gemini ni kim yaratgan?",q_ru:"Кто создал Gemini?",opts_uz:["Google","Apple","OpenAI","Amazon"],opts_ru:["Google","Apple","OpenAI","Amazon"],c:0},
-    ],
-    9: [
-      {q_uz:"'Machine Learning' nima?",q_ru:"Что такое 'Machine Learning'?",opts_uz:["Ma'lumotdan o'rganish","O'yin turi","Dastur tili","Kompyuter qismi"],opts_ru:["Обучение на данных","Вид игры","Язык программ.","Часть ПК"],c:0},
-      {q_uz:"Prompt engineering nima?",q_ru:"Что такое prompt engineering?",opts_uz:["AI'ga to'g'ri buyruq berish san'ati","Robot yasash","O'yin qilish","Rasm chizish"],opts_ru:["Искусство команд ИИ","Сборка робота","Создание игр","Рисование"],c:0},
-      {q_uz:"'Neural network' nimaga o'xshaydi?",q_ru:"На что похожа 'нейросеть'?",opts_uz:["Inson miyasiga","Toshga","Suvga","Daraxtga"],opts_ru:["Мозг человека","Камень","Вода","Дерево"],c:0},
-      {q_uz:"AI qaysi sohada ishlatiladi?",q_ru:"Где применяется ИИ?",opts_uz:["Deyarli hamma joyda","Faqat o'yinda","Hech qayerda","Faqat maktabda"],opts_ru:["Почти везде","Только в играх","Нигде","Только в школе"],c:0},
-      {q_uz:"Yaxshi natija uchun promptda nima muhim?",q_ru:"Что важно в промпте для результата?",opts_uz:["Kontekst va aniqlik","Uzunlik","Qichqiriq","Rang"],opts_ru:["Контекст и точность","Длина","Крик","Цвет"],c:0},
-    ],
-  },
-};
-
-const SUBJECTS = [
-  {key:'math',    ic:'📐', bg:'#FF6B1A', uz:'Matematika',  ru:'Математика',        d_uz:"Hisob va mantiq",       d_ru:"Счёт и логика"},
-  {key:'english', ic:'🇬🇧', bg:'#1A2238', uz:'Ingliz tili', ru:'Английский язык',   d_uz:"So'z va grammatika",    d_ru:"Слова и грамматика"},
-  {key:'ai',      ic:'🤖', bg:'#1E8E4E', uz:'AI va Prompt', ru:'ИИ и Промпт',       d_uz:"Sun'iy intellekt",      d_ru:"Искусственный интеллект"},
-];
-
-const T = {
-  wrongCode:{uz:"Kod noto'g'ri. Qaytadan urinib ko'ring.",ru:"Неверный код. Попробуйте снова."},
-  emptyCode:{uz:"Kodni kiriting",ru:"Введите код"},
-  noTest:{uz:"Bu sinf uchun test hali tayyor emas.",ru:"Тест для этого класса ещё не готов."},
-  noGrade:{uz:"Sizning sinfingiz belgilanmagan. Administratorga murojaat qiling.",ru:"Ваш класс не указан. Обратитесь к администратору."},
-  aiThinking:{uz:"AI savollar tayyorlamoqda… 🤖",ru:"ИИ готовит вопросы… 🤖"},
-  grade:{uz:"-sinf",ru:" класс"},
-  correctW:{uz:"to'g'ri",ru:"правильно"},
-  saving:{uz:"Natija saqlanmoqda…",ru:"Результат сохраняется…"},
-  saved:{uz:"✓ Natija saqlandi",ru:"✓ Результат сохранён"},
-  saveErr:{uz:"⚠ Saqlashda xatolik (natija ko'rsatilgan)",ru:"⚠ Ошибка сохранения (результат показан)"},
-  resGood:{uz:"Ajoyib! 🎉",ru:"Отлично! 🎉"},
-  resOk:{uz:"Yaxshi! 👍",ru:"Хорошо! 👍"},
-  resLow:{uz:"Harakat qil! 💪",ru:"Старайся! 💪"},
-};
-
-function tr(o){return o[LANG];}
-
-function setLang(l){
-  LANG=l;
-  document.getElementById('lng-uz').classList.toggle('on',l==='uz');
-  document.getElementById('lng-ru').classList.toggle('on',l==='ru');
-  document.querySelectorAll('[data-uz]').forEach(el=>{el.textContent=el.getAttribute('data-'+l);});
-  // qayta render kerak bo'lsa
-  if(document.getElementById('sc-subj').classList.contains('on')) renderSubjects();
-  if(document.getElementById('sc-test').classList.contains('on')) renderQuestion();
+var SB='https://unaodltahuevrfnarfha.supabase.co', KEY='sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP';
+var TOK=sessionStorage.getItem('test_tok')||localStorage.getItem('ep_token_oqituvchi')||'';
+var SINF=null, BOLA=null, T=null, JAV={}, IDX=0;
+function $(i){return document.getElementById(i);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function rpc(fn,a){return fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY,Authorization:'Bearer '+KEY},body:JSON.stringify(a||{})}).then(function(r){return r.json();});}
+function chiq(){sessionStorage.removeItem('test_tok');TOK='';$('bar').innerHTML='';kirish();}
+function kirish(){
+ $('bar').innerHTML='';
+ $('app').innerHTML='<h1>Kirish</h1><div class="card"><label class="sm mu">PIN kod</label>'+
+  '<input id="pin" type="password" inputmode="numeric"><div class="err" id="e"></div>'+
+  '<button class="btn" onclick="kir()">Kirish</button></div>';
+ var p=$('pin'); if(p){p.focus();p.addEventListener('keydown',function(ev){if(ev.key==='Enter')kir();});}
 }
-
-function show(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-  document.getElementById(id).classList.add('on');
+function kir(){
+ var v=($('pin').value||'').trim(); if(!v)return; $('e').textContent='';
+ rpc('ep_kirish',{p_pin:v}).then(function(d){
+  if(!d||!d.token){$('e').textContent='PIN noto\u2018g\u2018ri';return;}
+  if(d.rol!=='oqituvchi'&&d.rol!=='admin'){$('e').textContent='Ruxsat yo\u2018q';return;}
+  TOK=d.token; sessionStorage.setItem('test_tok',TOK); sinflar();
+ })["catch"](function(){$('e').textContent='Xatolik';});
 }
-
-// ======= CODE CHECK =======
-async function checkCode(){
-  const code=document.getElementById('code-input').value.trim();
-  const err=document.getElementById('code-err');
-  const btn=document.getElementById('code-btn');
-  err.style.display='none';
-  if(!code){err.textContent=tr(T.emptyCode);err.style.display='block';return;}
-  btn.disabled=true;btn.textContent='...';
-  try{
-    const{data,error}=await sb.from('students').select('id,full_name,grade,access_code').eq('access_code',code).maybeSingle();
-    if(error||!data){err.textContent=tr(T.wrongCode);err.style.display='block';btn.disabled=false;setBtnLabel();return;}
-    student=data;
-    document.getElementById('stu-nm').textContent=data.full_name||'—';
-    document.getElementById('stu-gr').textContent=(data.grade!=null?data.grade:'?')+tr(T.grade);
-    renderSubjects();
-    show('sc-subj');
-  }catch(e){
-    err.textContent=tr(T.wrongCode);err.style.display='block';
-  }
-  btn.disabled=false;setBtnLabel();
+function sinflar(){
+ SINF=null;BOLA=null;T=null;$('bar').innerHTML='';
+ $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
+ rpc('ep_dav_sinflar',{p_token:TOK,p_kun:null}).then(function(d){
+  if(!d||!d.ok){chiq();return;}
+  var h='<h1>Sinfni tanlang</h1><div class="grid">';
+  d.sinflar.forEach(function(s){ h+='<button class="cls" onclick="oquvchilar('+s.id+',\''+esc(s.nom)+'\')">'+esc(s.nom)+'<small>'+s.jami+' o\u2018quvchi</small></button>'; });
+  $('app').innerHTML=h+'</div>';
+ })["catch"](function(){$('app').innerHTML='<p class="mu">Xatolik</p>';});
 }
-function setBtnLabel(){document.getElementById('code-btn').textContent=document.getElementById('code-btn').getAttribute('data-'+LANG);}
-
-// ======= SUBJECTS =======
-function renderSubjects(){
-  const grid=document.getElementById('subj-grid');
-  grid.innerHTML=SUBJECTS.map(s=>
-    '<div class="subj" onclick="startTest(\''+s.key+'\')">'
-    +'<div class="ic" style="background:'+s.bg+'22">'+s.ic+'</div>'
-    +'<div class="tx"><b>'+(LANG==='uz'?s.uz:s.ru)+'</b><span>'+(LANG==='uz'?s.d_uz:s.d_ru)+'</span></div>'
-    +'<div class="arrow">→</div>'
-    +'</div>'
-  ).join('');
+function oquvchilar(id,nom){
+ SINF={id:id,nom:nom};
+ $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
+ rpc('ep_dav_royxat',{p_token:TOK,p_sinf_id:id,p_kun:null}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik');sinflar();return;}
+  var h='<h1>'+esc(nom)+' \u2014 o\u2018quvchi</h1>';
+  (d.royxat||[]).forEach(function(o){ h+='<div class="row" onclick="fanlar('+o.id+',\''+esc(o.ism).replace(/'/g,"\\'")+'\')">'+esc(o.ism)+'</div>'; });
+  if(!(d.royxat||[]).length)h+='<p class="mu center">Bu sinfda o\u2018quvchi yo\u2018q</p>';
+  $('app').innerHTML=h;
+  $('bar').innerHTML='<div class="bar"><button class="back" onclick="sinflar()">\u2039 Sinflar</button>'+
+    '<button class="go" onclick="qosh()">+ O\u2018quvchi qo\u2018shish</button></div>';
+ });
 }
-
-// ======= TEST =======
-async function startTest(subjKey){
-  curSubject=subjKey;
-  const grade=student.grade;
-  if(grade==null){ alert(tr(T.noGrade)); return; }
-
-  // Loading ekrani
-  show('sc-test');
-  document.getElementById('q-count').textContent='';
-  document.getElementById('prog-fill').style.width='0%';
-  document.getElementById('q-text').textContent = tr(T.aiThinking);
-  document.getElementById('opts').innerHTML='<div class="spinner"></div>';
-
-  let qs=null;
-
-  // 1) AI orqali generatsiya
-  try{
-    const ctl=new AbortController();
-    const tm=setTimeout(()=>ctl.abort(),20000);
-    const r=await fetch(AI_TEST_CFG.url,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+AI_TEST_CFG.anonKey},
-      body:JSON.stringify({subject:subjKey,grade:grade,lang:LANG}),
-      signal:ctl.signal
-    });
-    clearTimeout(tm);
-    if(r.ok){
-      const j=await r.json();
-      if(j.questions && Array.isArray(j.questions) && j.questions.length){
-        // AI format: {q, opts, c} — bitta tilda
-        qs=j.questions.map(x=>({q:x.q, opts:x.opts, c:x.c}));
-      }
-    }
-  }catch(e){ console.warn('AI test error, fallback ishlatiladi', e); }
-
-  // 2) Fallback — tayyor namunalar (AI ishlamasa)
-  if(!qs || !qs.length){
-    const bank=(TESTS[subjKey]||{})[grade];
-    if(bank && bank.length){
-      qs=bank.map(x=>({
-        q: LANG==='uz'?x.q_uz:x.q_ru,
-        opts: LANG==='uz'?x.opts_uz:x.opts_ru,
-        c: x.c
-      }));
-    }
-  }
-
-  if(!qs || !qs.length){
-    alert(tr(T.noTest));
-    show('sc-subj');
-    return;
-  }
-
-  curQuestions=qs;
-  qIdx=0;correct=0;
-  renderQuestion();
+function qosh(){
+ var ism=prompt(SINF.nom+' \u2014 yangi o\u2018quvchining ism va familiyasi:');
+ if(!ism||ism.trim().length<4)return;
+ rpc('ep_dav_qol',{p_token:TOK,p_sinf_id:SINF.id,p_ism:ism.trim()}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik');return;}
+  oquvchilar(SINF.id,SINF.nom);
+ })["catch"](function(){alert('Xatolik');});
 }
-
-function renderQuestion(){
-  const q=curQuestions[qIdx];
-  document.getElementById('q-count').textContent=(qIdx+1)+' / '+curQuestions.length;
-  document.getElementById('prog-fill').style.width=((qIdx)/curQuestions.length*100)+'%';
-  document.getElementById('q-text').textContent=q.q;
-  const box=document.getElementById('opts');
-  box.innerHTML=q.opts.map((o,i)=>'<button class="opt" onclick="answer('+i+')">'+o+'</button>').join('');
+function fanlar(oid,ism){
+ BOLA={id:oid,ism:ism};
+ $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
+ var daraja=parseInt(SINF.nom,10);
+ rpc('ep_test_fanlar',{p_token:TOK,p_daraja:daraja}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik');return;}
+  var h='<h1>'+esc(ism)+'</h1><p class="sm mu">'+esc(SINF.nom)+' \u00b7 fanni tanlang. Har kuni savollar yangilanadi.</p>';
+  (d.royxat||[]).forEach(function(f){
+   var bor=f.savol>=5;
+   h+='<div class="row fan'+(bor?'':' yoq')+'"'+(bor?' onclick="boshla('+f.id+')"':'')+'>'+
+      '<span>'+esc(f.nom)+'</span><span class="n">'+(bor?(f.savol+' savol'):'savol yo\u2018q')+'</span></div>';
+  });
+  $('app').innerHTML=h;
+  $('bar').innerHTML='<div class="bar"><button class="back" onclick="oquvchilar('+SINF.id+',\''+esc(SINF.nom)+'\')">\u2039 Orqaga</button></div>';
+ });
 }
-
-function answer(i){
-  const q=curQuestions[qIdx];
-  const btns=document.querySelectorAll('#opts .opt');
-  btns.forEach(b=>b.classList.add('disabled'));
-  if(i===q.c){correct++;btns[i].classList.add('correct');}
-  else{btns[i].classList.add('wrong');btns[q.c].classList.add('correct');}
-  document.getElementById('prog-fill').style.width=((qIdx+1)/curQuestions.length*100)+'%';
-  setTimeout(()=>{
-    qIdx++;
-    if(qIdx<curQuestions.length) renderQuestion();
-    else finishTest();
-  },900);
+function boshla(fid){
+ $('app').innerHTML='<p class="mu">Test tayyorlanmoqda\u2026</p>';
+ rpc('ep_test_boshla',{p_token:TOK,p_oquvchi_id:BOLA.id,p_fan_id:fid}).then(function(d){
+  if(!d||!d.ok){alert(d&&d.xato==='savol_kam'?'Bu fan uchun savollar yetarli emas':'Xatolik');fanlar(BOLA.id,BOLA.ism);return;}
+  T=d; JAV={}; IDX=0; savol();
+ });
 }
-
-async function finishTest(){
-  const total=curQuestions.length;
-  const pc=Math.round(correct/total*100);
-  // result screen
-  const circle=document.getElementById('res-circle');
-  const col= pc>=70?'#1E8E4E' : pc>=40?'#C98A1B' : '#C0392B';
-  circle.style.background=col;
-  document.getElementById('res-pc').textContent=pc+'%';
-  document.getElementById('res-msg').textContent= pc>=70?tr(T.resGood):pc>=40?tr(T.resOk):tr(T.resLow);
-  document.getElementById('res-sub').textContent=correct+' / '+total+' '+tr(T.correctW);
-  const ss=document.getElementById('save-state');
-  ss.innerHTML='<div class="q-count" style="margin:10px 0">'+tr(T.saving)+'</div>';
-  show('sc-result');
-
-  // SAVE to DB
-  try{
-    const{error}=await sb.from('test_results').insert({
-      student_id:student.id,
-      student_name:student.full_name,
-      subject:curSubject,
-      grade:student.grade,
-      score:correct,
-      total:total,
-      percent:pc,
-      created_at:new Date().toISOString()
-    });
-    if(error) throw error;
-    ss.innerHTML='<div class="q-count" style="margin:10px 0;color:#1E8E4E">'+tr(T.saved)+'</div>';
-  }catch(e){
-    ss.innerHTML='<div class="q-count" style="margin:10px 0;color:#C0392B">'+tr(T.saveErr)+'</div>';
-    console.error('save error',e);
-  }
+function savol(){
+ var q=T.savollar[IDX];
+ var h='<div class="qn">'+esc(T.oquvchi)+' \u00b7 '+esc(T.fan)+' \u00b7 savol '+(IDX+1)+'/'+T.savollar.length+'</div>'+
+   '<div class="q"><div class="qt">'+esc(q.savol)+'</div>';
+ ['a','b','c','d'].forEach(function(k){
+  h+='<button class="v'+(JAV[q.id]===k?' on':'')+'" onclick="tanla(\''+k+'\')">'+k.toUpperCase()+') '+esc(q[k])+'</button>';
+ });
+ $('app').innerHTML=h+'</div>';
+ $('bar').innerHTML='<div class="bar">'+
+  (IDX>0?'<button class="back" onclick="IDX--;savol()">\u2039 Oldingi</button>':'')+
+  (IDX<T.savollar.length-1?'<button class="go" onclick="keyingi()">Keyingi \u203a</button>'
+    :'<button class="go" onclick="tugat()">\u2713 Testni yakunlash</button>')+'</div>';
+ window.scrollTo(0,0);
 }
-
-function logout(){
-  student=null;curSubject=null;curQuestions=[];qIdx=0;correct=0;
-  document.getElementById('code-input').value='';
-  document.getElementById('code-err').style.display='none';
-  show('sc-code');
-  setTimeout(()=>document.getElementById('code-input').focus(),100);
+function tanla(k){ JAV[T.savollar[IDX].id]=k; savol(); }
+function keyingi(){ if(!JAV[T.savollar[IDX].id]){alert('Javobni tanlang');return;} IDX++; savol(); }
+function tugat(){
+ if(Object.keys(JAV).length<T.savollar.length){alert('Barcha savollarga javob bering');return;}
+ rpc('ep_test_tugat',{p_token:TOK,p_id:T.id,p_javoblar:JAV}).then(function(d){
+  if(!d||!d.ok){alert('Xatolik');return;}
+  var h='<h1>Natija</h1><div class="card"><div class="ball '+(d.ball>=4?'ok':(d.ball>=3?'':'bad'))+'">'+d.ball+' / 5</div>'+
+    '<p class="center"><b>'+esc(d.oquvchi)+'</b><br><span class="mu">'+esc(d.fan)+' \u00b7 '+esc(T.sinf)+'</span></p></div>';
+  T.savollar.forEach(function(q,i){
+   var tanl=JAV[q.id];
+   h+='<div class="res"><div class="t">'+(i+1)+'. '+esc(q.savol)+'</div><div class="g">Javob: <b>'+esc(q[tanl])+'</b></div></div>';
+  });
+  h+='<p class="sm mu center">Natija ota-onaga va rahbariyatga yuborildi.</p>';
+  $('app').innerHTML=h;
+  $('bar').innerHTML='<div class="bar"><button class="back" onclick="sinflar()">Sinflar</button>'+
+    '<button class="go" onclick="fanlar('+BOLA.id+',\''+esc(BOLA.ism).replace(/'/g,"\\'")+'\')">Yana test</button></div>';
+  window.scrollTo(0,0);
+ })["catch"](function(){alert('Xatolik');});
 }
-
-// Enter tugmasi
-document.getElementById('code-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkCode();});
-document.getElementById('code-input').focus();
-</script>
-</body>
-</html>
+(function(){
+ try{
+  var m=(location.hash||'').match(/[#&]t=([A-Za-z0-9]+)/);
+  if(m&&m[1]){ TOK=m[1]; sessionStorage.setItem('test_tok',TOK); history.replaceState(null,'',location.pathname); }
+ }catch(e){}
+ var tg=window.Telegram&&window.Telegram.WebApp;
+ if(tg&&tg.initData){ try{tg.expand();tg.ready();}catch(e){} }
+ if(TOK) sinflar(); else kirish();
+})();
+</script></body></html>
