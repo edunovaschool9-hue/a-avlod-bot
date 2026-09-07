@@ -29,7 +29,7 @@ const cronOk = async (k: string | null) => !!k && ((CRON && k === CRON) || (awai
 
 // ---------- klaviaturalar ----------
 const KB_LOK = { keyboard: [[{ text: "📍 Joylashuvni yuborish", request_location: true }]], resize_keyboard: true, one_time_keyboard: true };
-const KB_ADMIN = { keyboard: [[{ text: "🏫 Kim maktabda" }, { text: "📋 Davomat hisoboti" }], [{ text: "📣 Chaqirish" }, { text: "📝 Arizalar" }], [{ text: "👨‍👩‍👧 Ota-onalar" }, { text: "📢 Xabar" }], [{ text: "🎒 O‘quvchilar" }, { text: "🎫 Talonlar" }], [{ text: "🧪 Test" }, { text: "📚 Fanlarim" }], [{ text: "📝 Xulosalar" }, { text: "🧪 Natijalar" }], [{ text: "👩‍🏫 O‘qituvchilar" }], [{ text: "📤 Davomat so‘rash" }], [{ text: "📱 Kabinet" }]], resize_keyboard: true };
+const KB_ADMIN = { keyboard: [[{ text: "🏫 Kim maktabda" }, { text: "📋 Davomat hisoboti" }], [{ text: "📣 Chaqirish" }, { text: "📝 Arizalar" }], [{ text: "👨‍👩‍👧 Ota-onalar" }, { text: "📢 Xabar" }], [{ text: "🎒 O‘quvchilar" }, { text: "🎫 Talonlar" }], [{ text: "🧪 Test" }, { text: "📚 Fanlarim" }], [{ text: "📝 Xulosalar" }, { text: "🧪 Natijalar" }], [{ text: "📊 Kunlik hisobot" }], [{ text: "👩‍🏫 O‘qituvchilar" }], [{ text: "📤 Davomat so‘rash" }], [{ text: "📱 Kabinet" }]], resize_keyboard: true };
 const KB_TEACH = { keyboard: [[{ text: "✅ Davomat belgilash" }, { text: "📝 Xulosa yozish" }], [{ text: "🧪 Test" }, { text: "📚 Fanlarim" }], [{ text: "📊 Holatim" }], [{ text: "🔑 PIN" }, { text: "📱 Kabinet" }]], resize_keyboard: true };
 const KB_APP = (t = "📱 Kabinetni ochish") => ({ inline_keyboard: [[{ text: t, web_app: { url: APP } }]] });
 
@@ -543,6 +543,42 @@ async function tanlovCallback(cq: any, k: string, a: string, b: string) {
   await ok();
 }
 
+
+// ---------- AI kunlik hisobot ----------
+async function kunHisobot(chat: number, kun: string | null) {
+  const ses: any = await rpc("ep_tg_sessiya", { p_chat_id: chat });
+  if (!ses?.token) { await send(chat, "Ruxsat yo‘q"); return; }
+  const xom = await rpc("ep_kun_xom_tok", { p_token: ses.token, p_kun: kun });
+  if (!xom?.ok) { await send(chat, "Xatolik"); return; }
+  const KEY = Deno.env.get("DEEPSEEK_API_KEY") ?? "";
+  if (!KEY) { await send(chat, "AI kaliti sozlanmagan"); return; }
+  await send(chat, "📊 Hisobot tayyorlanmoqda…");
+  const prompt = `Sen EduNova School (Farg‘ona, xususiy maktab) rahbariyati uchun kunlik hisobot yozadigan yordamchisan.\n` +
+    `Quyidagi JSON — bugungi haqiqiy raqamlar. Faqat shu raqamlarga tayan, hech narsa o‘ylab topma.\n\n` +
+    JSON.stringify(xom) + `\n\n` +
+    `Hisobotni o‘zbek tilida (lotin) yoz. Tuzilishi:\n` +
+    `1) Sarlavha va sana\n2) Umumiy raqamlar (davomat, xulosa, test va o‘rtacha ball)\n` +
+    `3) Testda eng faol o‘qituvchilar — ro‘yxat, test soni va o‘rtacha ball bilan\n` +
+    `4) Dars xulosasi bo‘yicha eng faol o‘qituvchilar\n5) Kun qahramoni (eng faol 1-2 kishi)\n` +
+    `6) Bugun umuman faoliyat ko‘rsatmaganlar bo‘lsa — muloyim eslatma\n` +
+    `Uslub: rasmiy, lekin iliq. Emoji o‘rtacha. Telegram HTML: faqat <b> va <i> teglari. Maksimum 2500 belgi.`;
+  try {
+    const rr = await fetch("https://api.deepseek.com/chat/completions", { method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${KEY}` },
+      body: JSON.stringify({ model: "deepseek-chat", temperature: 0.5, messages: [{ role: "user", content: prompt }] }) });
+    const j = await rr.json();
+    let txt = String(j?.choices?.[0]?.message?.content ?? "").trim();
+    txt = txt.replace(/```/g, "").replace(/<(?!\/?(b|i)>)[^>]*>/g, "");
+    if (!txt) { await send(chat, "AI javob bermadi"); return; }
+    const qatorlar = txt.split("\n"); let buf = "";
+    for (const q of qatorlar) {
+      if ((buf + "\n" + q).length > 3500) { await send(chat, buf); buf = ""; }
+      buf += (buf ? "\n" : "") + q;
+    }
+    if (buf.trim()) await send(chat, buf, { reply_markup: { inline_keyboard: [[{ text: "📤 Kecha uchun", callback_data: "kh:kecha" }]] } });
+  } catch (e) { await send(chat, "AI xatosi: " + esc(String(e).slice(0, 80))); }
+}
+
 // ---------- xabarlar ----------
 async function xabar(msg: any) {
   const chat = msg.chat?.id as number; if (!chat) return;
@@ -670,6 +706,7 @@ async function xabar(msg: any) {
     if (/arizalar/i.test(matn)) { await arizalar(chat); return; }
     if (/o‘qituvchilar|o'qituvchilar|oqituvchilar/i.test(matn)) { await oqitRoyxat(chat); return; }
     if (/xulosalar/i.test(matn)) { await xulosaHisobot(chat); return; }
+    if (/kunlik hisobot/i.test(matn)) { await kunHisobot(chat, null); return; }
     if (/natija/i.test(matn)) {
       let ses: any = await rpc("ep_tg_sessiya", { p_chat_id: chat });
       const d = ses?.token ? await rpc("ep_test_royxat", { p_token: ses.token, p_kun: null }) : null;
@@ -722,6 +759,7 @@ async function callback(cq: any) {
   if (k.startsWith("dv_")) { await davCallback(cq, k, a, b); return; }
   if (k.startsWith("oqt_")) { await oqitCallback(cq, k, a); return; }
   if (k.startsWith("tn")) { await tanlovCallback(cq, k, a, b); return; }
+  if (k === "kh") { await ok(); const kecha=new Date(Date.now()+5*3600*1000-86400000).toISOString().slice(0,10); await kunHisobot(chat, kecha); return; }
   if (k.startsWith("oq_")) { await oqCallback(cq, k, a, b); return; }
   if (k.startsWith("hj_")) { await talonCallback(cq, k, a, b); return; }
   if (k === "xr") { await ok(); await xulosaOqi(chat, Number(a), b === "k"); return; }
@@ -1136,7 +1174,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v4.8 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v4.9 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
