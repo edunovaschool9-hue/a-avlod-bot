@@ -677,7 +677,14 @@ async function xabar(msg: any) {
       const r: any[] = d.royxat ?? [];
       if (!r.length) { await send(chat, `🧪 <b>Test natijalari</b> · ${d.kun}\n\nBugun test o‘tkazilmagan.`); return; }
       const t = r.map((x: any) => `${Number(x.ball) >= 4 ? "🟢" : Number(x.ball) >= 3 ? "🟡" : "🔴"} <b>${esc(x.oquvchi)}</b> (${esc(x.sinf)}) · ${esc(x.fan)} · <b>${x.ball}/5</b>` + (x.vaqt ? ` · ${x.vaqt}` : "") + (x.oqituvchi ? `\n   <i>${esc(x.oqituvchi)}</i>` : "")).join("\n");
-      await send(chat, `🧪 <b>Test natijalari</b> · ${d.kun}\nJami: <b>${d.jami}</b> ta · o‘rtacha: <b>${d.ortacha ?? "-"}</b>/5\n\n${t}`.slice(0, 3900));
+      const bosh = `🧪 <b>Test natijalari</b> · ${d.kun}\nJami: <b>${d.jami}</b> ta · o‘rtacha: <b>${d.ortacha ?? "-"}</b>/5\n`;
+      const qatorlar = t.split("\n");
+      let buf = bosh;
+      for (const q of qatorlar) {
+        if ((buf + "\n" + q).length > 3500) { await send(chat, buf); buf = ""; }
+        buf += (buf ? "\n" : "") + q;
+      }
+      if (buf.trim()) await send(chat, buf);
       return;
     }
     if (/talon/i.test(matn)) { await talonMenyu(chat); return; }
@@ -1129,7 +1136,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v4.7 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v4.8 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
