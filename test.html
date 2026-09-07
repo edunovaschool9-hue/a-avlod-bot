@@ -62,7 +62,7 @@ body.kid{background:linear-gradient(160deg,#EEF6FF 0%,#F7F0FF 100%)}
 <script>
 var SB='https://unaodltahuevrfnarfha.supabase.co', KEY='sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP';
 var TOK=sessionStorage.getItem('test_tok')||localStorage.getItem('ep_token_oqituvchi')||'';
-var SINF=null, BOLA=null, T=null, JAV={}, IDX=0, KID=false, XATO=0, TEKSH=false;
+var SINF=null, BOLA=null, T=null, JAV={}, IDX=0, KID=false, XATO=0, TEKSH=false, MENI=null;
 function $(i){return document.getElementById(i);}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function rpc(fn,a){return fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY,Authorization:'Bearer '+KEY},body:JSON.stringify(a||{})}).then(function(r){return r.json();});}
@@ -83,12 +83,21 @@ function kir(){
  })["catch"](function(){$('e').textContent='Xatolik';});
 }
 function sinflar(){
- SINF=null;BOLA=null;T=null;$('bar').innerHTML='';
+ SINF=null;BOLA=null;T=null;$('bar').innerHTML='';document.body.className='';
  $('app').innerHTML='<p class="mu">Yuklanmoqda\u2026</p>';
- rpc('ep_dav_sinflar',{p_token:TOK,p_kun:null}).then(function(d){
+ rpc('ep_test_mening',{p_token:TOK}).then(function(d){
   if(!d||!d.ok){chiq();return;}
-  var h='<h1>Sinfni tanlang</h1><div class="grid">';
-  d.sinflar.forEach(function(s){ h+='<button class="cls" onclick="oquvchilar('+s.id+',\''+esc(s.nom)+'\')">'+esc(s.nom)+'<small>'+s.jami+' o\u2018quvchi</small></button>'; });
+  MENI=d;
+  var h='';
+  if(!d.tanlangan && d.rol!=='admin'){
+   h+='<div class="card" style="border-color:#fed7aa;background:#fff7ed"><b>\u{1F4DA} Fan va sinflaringiz belgilanmagan</b>'+
+      '<div class="sm mu" style="margin-top:4px">Botda <b>\u{1F4DA} Fanlarim</b> tugmasini bosib belgilang \u2014 shunda faqat sizning sinf va fanlaringiz chiqadi.</div></div>';
+  }
+  h+='<h1>Sinfni tanlang</h1><div class="grid">';
+  (d.sinflar||[]).forEach(function(s){
+   h+='<button class="cls" onclick="oquvchilar('+s.id+',\''+esc(s.nom)+'\',\''+esc(s.til)+'\')">'+esc(s.nom)+'<small>'+s.jami+' o\u2018quvchi</small></button>';
+  });
+  if(!(d.sinflar||[]).length)h+='<p class="mu center">Sinf tanlanmagan</p>';
   $('app').innerHTML=h+'</div>';
  })["catch"](function(){$('app').innerHTML='<p class="mu">Xatolik</p>';});
 }
@@ -119,14 +128,17 @@ function fanlar(oid,ism){
  var daraja=parseInt(SINF.nom,10);
  rpc('ep_test_fanlar',{p_token:TOK,p_daraja:daraja,p_til:SINF.til||'uz'}).then(function(d){
   if(!d||!d.ok){alert('Xatolik');return;}
-  var h='<h1>'+esc(ism)+'</h1><p class="sm mu">'+esc(SINF.nom)+' \u00b7 fanni tanlang. Har kuni savollar yangilanadi.</p>';
-  (d.royxat||[]).forEach(function(f){
+  var meniki=(MENI&&MENI.fanlar||[]).map(function(f){return f.id;});
+  var royxat=(d.royxat||[]).filter(function(f){ return !meniki.length || meniki.indexOf(f.id)>=0; });
+  var h='<h1>'+esc(ism)+'</h1><p class="sm mu">'+esc(SINF.nom)+' \u00b7 '+((SINF.til==='ru')?'\u0440\u0443\u0441\u0441\u043a\u0438\u0439':'o\u2018zbek')+' \u00b7 fanni tanlang</p>';
+  royxat.forEach(function(f){
    var bor=f.savol>=5;
    h+='<div class="row fan'+(bor?'':' yoq')+'"'+(bor?' onclick="boshla('+f.id+')"':'')+'>'+
       '<span>'+esc(f.nom)+'</span><span class="n">'+(bor?(f.savol+' savol'):'savol yo\u2018q')+'</span></div>';
   });
+  if(!royxat.length)h+='<p class="mu center">Fan tanlanmagan \u2014 botda \u{1F4DA} Fanlarim</p>';
   $('app').innerHTML=h;
-  $('bar').innerHTML='<div class="bar"><button class="back" onclick="oquvchilar('+SINF.id+',\''+esc(SINF.nom)+'\')">\u2039 Orqaga</button></div>';
+  $('bar').innerHTML='<div class="bar"><button class="back" onclick="oquvchilar('+SINF.id+',\''+esc(SINF.nom)+'\',\''+esc(SINF.til||'uz')+'\')">\u2039 Orqaga</button></div>';
  });
 }
 function boshla(fid){
@@ -138,7 +150,7 @@ function boshla(fid){
        '<h1 style="text-align:center">Bugun test topshirilgan</h1>'+
        '<p class="center"><b>'+esc(d.oquvchi)+'</b><br><span class="mu">'+esc(d.fan)+' \u00b7 '+d.ball+'/5 \u00b7 '+esc(d.vaqt||'')+'</span></p>'+
        '<p class="sm mu center">Har bir o\u2018quvchi kuniga bitta test topshiradi. Ertaga yangi test bo\u2018ladi.</p></div>';
-      $('bar').innerHTML='<div class="bar"><button class="back" onclick="oquvchilar('+SINF.id+',\''+esc(SINF.nom)+'\')">\u2039 Boshqa o\u2018quvchi</button></div>';
+      $('bar').innerHTML='<div class="bar"><button class="back" onclick="oquvchilar('+SINF.id+',\''+esc(SINF.nom)+'\',\''+esc(SINF.til||'uz')+'\')">\u2039 Boshqa o\u2018quvchi</button></div>';
       return;
     }
     alert(d&&d.xato==='savol_kam'?'Bu fan uchun savollar yetarli emas':'Xatolik');fanlar(BOLA.id,BOLA.ism);return;}
@@ -228,7 +240,7 @@ function tugat(){
   $('app').innerHTML=h;
   document.body.className='';
   $('bar').innerHTML='<div class="bar"><button class="back" onclick="sinflar()">Sinflar</button>'+
-    '<button class="go" onclick="oquvchilar('+SINF.id+',\''+esc(SINF.nom)+'\')">Keyingi o\u2018quvchi</button></div>';
+    '<button class="go" onclick="oquvchilar('+SINF.id+',\''+esc(SINF.nom)+'\',\''+esc(SINF.til||'uz')+'\')">Keyingi o\u2018quvchi</button></div>';
   window.scrollTo(0,0);
  })["catch"](function(){alert('Xatolik');});
 }
