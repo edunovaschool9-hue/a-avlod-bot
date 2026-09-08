@@ -523,9 +523,9 @@ async function otaXabar(msg: any) {
   const ulangan = rol?.ok && rol.rol === "ota";
 
   if (matn.startsWith("/start") && /\blst_(\d+)/.test(matn)) {
-    const m = matn.match(/\blst_(\d+)(?:_(\d+))?/) ?? [];
-    const fid = Number(m[1] ?? 0), dar = m[2] ? Number(m[2]) : null;
-    const r = await rpc("ep_listovka_ol", { p_chat_id: chat, p_fan_id: fid, p_daraja: dar });
+    const m = matn.match(/\blst_(\d+)(?:_(\d+))?(?:_(uz|ru))?/) ?? [];
+    const fid = Number(m[1] ?? 0), dar = m[2] ? Number(m[2]) : null, tl = m[3] ?? null;
+    const r = await rpc("ep_listovka_ol", { p_chat_id: chat, p_fan_id: fid, p_daraja: dar, p_til: tl });
     if (!r?.ok) { await send(chat, r?.xato === "royxatda_yoq" ? T.royxatda_yoq : "Fan topilmadi."); return; }
     const qayer = r.sinf ? `${esc(r.sinf)} · ` : "";
     await send(chat, `📄 <b>${qayer}${esc(r.fan)}</b> — listovka olindi.\n${esc(r.ism)} · bugun ${r.bugun}-marta.\n\n<i>Rahbariyatga xabar berildi.</i>`);
@@ -1270,7 +1270,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v5.7 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v5.8 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
