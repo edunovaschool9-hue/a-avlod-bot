@@ -139,9 +139,7 @@ async function davomatSoraYubor(quruq: boolean): Promise<{ yuborildi: number; ja
 const DB_ICON: Record<string, string> = { keldi: "🟢", kelmadi: "🔴" };
 function davKb(sinf: number, royxat: any[], belgi: Record<string, string>) {
   const rows = royxat.map((o: any) => [
-    { text: `${DB_ICON[belgi[o.id]] ?? "⚪"} ${o.ism}`, callback_data: `dv_n:${sinf}:${o.id}` },
-    { text: "✓", callback_data: `dv_k:${sinf}:${o.id}` },
-    { text: "✗", callback_data: `dv_y:${sinf}:${o.id}` }]);
+    { text: `${DB_ICON[belgi[o.id]] ?? "⚪"} ${o.ism}`, callback_data: `dv_n:${sinf}:${o.id}` }]);
   rows.push([{ text: "✅ Hammasi keldi", callback_data: `dv_all:${sinf}` }]);
   rows.push([{ text: "📤 Davomatni yuborish", callback_data: `dv_send:${sinf}` }, { text: "✖ Bekor", callback_data: "dv_cancel" }]);
   return { inline_keyboard: rows };
@@ -152,7 +150,7 @@ async function davBoshla(chat: number, sinf: number, message_id?: number) {
   const belgi: Record<string, string> = {};
   (d.royxat ?? []).forEach((o: any) => { if (o.holat) belgi[o.id] = o.holat === "kech" ? "keldi" : o.holat; });
   await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: "davomat", p_malumot: { sinf, belgi, royxat: d.royxat } });
-  const t = `📋 <b>${esc(d.sinf)} davomati</b> · ${d.kun}\nHar bir o‘quvchi uchun ✓ (keldi) yoki ✗ (kelmadi) bosing.`;
+  const t = `📋 <b>${esc(d.sinf)} davomati</b> · ${d.kun}\nIsm ustiga bosing: 🟢 keldi ⇄ 🔴 kelmadi.\nTezroq: «Hammasi keldi» → keyin kelmaganlarni bosing.`;
   if (message_id) await tg("editMessageText", { chat_id: chat, message_id, text: t, parse_mode: "HTML", reply_markup: davKb(sinf, d.royxat, belgi) });
   else await send(chat, t, { reply_markup: davKb(sinf, d.royxat, belgi) });
 }
@@ -1174,7 +1172,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v4.9 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v5.0 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
