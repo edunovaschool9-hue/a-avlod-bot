@@ -94,6 +94,12 @@ label{display:block;font-size:12px;color:var(--mu);margin:0 0 4px}
 .chk b.on.r{background:#FDF2DC;border-color:#E7C588;color:#8A5A00}
 .chk b.on.k{background:#FCE9E9;border-color:#EFB4B4;color:#991B1B}
 .kod{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;letter-spacing:.12em}
+.print-folder{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.print-folder .pf-icon{font-size:34px;line-height:1}
+.print-folder .pf-main{flex:1;min-width:170px}
+.print-folder .pf-title{font-size:18px;font-weight:700}
+.print-classes{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.print-total{font-size:12px;color:var(--mu);margin-top:3px}
 
 .pill.sari{background:#FFF3D6;color:#8a5b00;border:1px solid #f0d9a0}
 </style>
@@ -123,7 +129,7 @@ label{display:block;font-size:12px;color:var(--mu);margin:0 0 4px}
     <div class="til"><button class="til-btn" data-lang="uz">UZ</button><button class="til-btn" data-lang="ru">RU</button></div>
   </div></div>
   <div class="wrap"><div id="cont"></div></div>
-  <div class="nav"><b data-tab="kun" onclick="ochTab('kun')"><i>📅</i><span data-tl="n_kun">n_kun</span></b><b data-tab="davomat" onclick="ochTab('davomat')"><i>🕗</i><span data-tl="n_davomat">n_davomat</span></b><b data-tab="oqituvchilar" onclick="ochTab('oqituvchilar')"><i>🧑‍🏫</i><span data-tl="n_oqituvchilar">n_oqituvchilar</span></b><b data-tab="oquvchilar" onclick="ochTab('oquvchilar')"><i>👥</i><span data-tl="n_oquvchilar">n_oquvchilar</span></b><b data-tab="reyting" onclick="ochTab('reyting')"><i>🏆</i><span data-tl="n_reyting">n_reyting</span></b><b data-tab="sozlama" onclick="ochTab('sozlama')"><i>⚙️</i><span data-tl="n_sozlama">n_sozlama</span></b></div>
+  <div class="nav"><b data-tab="kun" onclick="ochTab('kun')"><i>📅</i><span data-tl="n_kun">n_kun</span></b><b data-tab="davomat" onclick="ochTab('davomat')"><i>🕗</i><span data-tl="n_davomat">n_davomat</span></b><b data-tab="oqituvchilar" onclick="ochTab('oqituvchilar')"><i>🧑‍🏫</i><span data-tl="n_oqituvchilar">n_oqituvchilar</span></b><b data-tab="oquvchilar" onclick="ochTab('oquvchilar')"><i>👥</i><span data-tl="n_oquvchilar">n_oquvchilar</span></b><b data-tab="pechat" onclick="ochTab('pechat')"><i>🖨️</i><span data-tl="n_pechat">n_pechat</span></b><b data-tab="reyting" onclick="ochTab('reyting')"><i>🏆</i><span data-tl="n_reyting">n_reyting</span></b><b data-tab="sozlama" onclick="ochTab('sozlama')"><i>⚙️</i><span data-tl="n_sozlama">n_sozlama</span></b></div>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -149,7 +155,8 @@ bola_yoq:'Sizga bola biriktirilmagan. Maktabga murojaat qiling.',dars_kunlik:'Ku
 tolov:'To\'lov',tolov_holat:'To\'lov holati',tolangan:'To\'langan',qarz:'Qarz',yaqin:'Muddat yaqin',kelajak:'Keyingi',muddat:'Muddat',qoldiq:'Qoldiq',narx:'Oylik to\'lov',tolov_tarix:'To\'lovlar tarixi',tolov_yoq:'Hali to\'lov kiritilmagan',kun_qoldi:'kun qoldi',kun_otdi:'kun o\'tdi',bugun_muddat:'Bugun to\'lov kuni',
 tg_ulash:'Telegram orqali eslatma',tg_izoh:'Botga shu kodni yuboring — to\'lov muddati yaqinlashganda eslatma keladi',tg_ulangan:'Telegram ulangan',kod_nusxa:'Kodni nusxalash',nusxalandi:'Nusxalandi',
 ad_sarlavha:'Boshqaruv paneli',ad_kirish_izoh:'Administrator PIN kodini kiriting',
-n_kun:'Kun',n_oqituvchilar:'O\'qituvchilar',n_reyting:'Reyting',n_sozlama:'Sozlama',
+n_kun:'Kun',n_oqituvchilar:'O\'qituvchilar',n_reyting:'Reyting',n_sozlama:'Sozlama',n_pechat:'Chop',
+pechat_sarlavha:'Kunlik to\'plamlar',pechat_izoh:'Sinf papkasini oching va barcha fanlarni o\'quvchilar soniga qarab chop eting.',pechat_sana:'Topshiriqlar sanasi',pechat_sinf:'sinf',pechat_komplekt:'to\'plam',pechat_varaq:'varaq',pechat_btn:'Hammasini chop etish',pechat_fanlar:'5 fan: Matematika, Tarix, Tabiiy fan, Rus tili, Ona tili va adabiyoti',pechat_yoq:'Bu sinfda faol o\'quvchi yo\'q',pechat_savol_yoq:'Topshiriqlar yetarli emas',pechat_ism:'O\'quvchi',pechat_nusxa:'Nusxa',
 kun_manzara:'Kun manzarasi',kim_yozdi:'Kim xulosa yozdi',hammasi_yozildi:'Hamma darslar yozilgan',qongiroq:'To\'lov uchun qo\'ng\'iroq',qongiroq_yoq:'Bugun qo\'ng\'iroq qilish shart emas',bugungi_xulosalar:'Bugungi xulosalar',
 oqituvchi_qosh:'O\'qituvchi qo\'shish',pin_yangi:'Yangi PIN',pin_yangila:'PIN ni yangilash',pin_yangila_izoh:'Eski PIN ishlamay qoladi',faol:'Faol',nofaol:'Faol emas',oxirgi_kirish:'Oxirgi kirish',hech_qachon:'Hech qachon',
 oquvchilar_royxati:'O\'quvchilar',import:'Import',import_izoh:'Har bir qatorda: Ism; Sinf; Ota-ona; Telefon. Excel dan nusxalab qo\'ying.',import_bajar:'Import qilish',manba:'Eski bazadan',manba_izoh:'qab_oquvchi va students jadvallaridagi hali qo\'shilmagan o\'quvchilar',manba_yoq:'Yangi yozuv yo\'q',tanlangan:'tanlandi',ota_ism:'Ota-ona ismi',ota_pin:'Ota-ona PIN',oq_yozdi:'O\'qituvchi yozib qo\'ygan',qr_keldi:'Kelish belgilandi',qr_ketdi:'Ketish belgilandi',qr_vaqt:'Hozir belgilash vaqti emas.',qr_kalit_xato:'QR kod eskirgan — maktabdagi varaqani skanerlang',qulf_sarlavha:'Avval QR kodni skanerlang',qulf_izoh:'Maktab kirishidagi varaqadagi QR kodni telefon kamerasi bilan skanerlang — shundan keyin panel ochiladi.',qr_kelish_v:'Kelish',qr_ketish_v:'Ketish',n_davomat:'Davomat',qr_varaqa:'QR varaqa',qr_varaqa_izoh:'Varaqani chop eting va maktab kirishiga, kamera yoniga osing.',qr_yangila:'Yangi kod',qr_rasm_yoq:'QR rasmi yuklanmadi — internetni tekshiring',joy_kutilmoqda:'Joylashuv aniqlanmoqda…',joy_ruxsat:'Joylashuvga ruxsat bering — usiz belgilanmaydi',joy_topilmadi:'Joylashuv aniqlanmadi — ochiq joyga chiqib qayta urinib ko\'ring',joy_uzoq:'Siz maktabda emassiz. Masofa:',joy_sarlavha:'Maktab joylashuvi',joy_olish:'Hozirgi joylashuvni olish',joy_radius:'Radius (metr)',joy_talab:'Faqat maktabda skanerlansin',joy_yoq:'Koordinata hali yozilmagan',joy_bor:'Koordinata yozilgan',joy_ogoh:'Maktab hovlisida turib bosing — hozirgi nuqta maktab markazi bo\'lib yoziladi.',joy_ogoh_yoq:'Yoqilsa, maktabdan tashqarida skanerlagan o\'qituvchi belgilanmaydi. Koordinata to\'g\'ri yozilganini tekshirdingizmi?',x_radius:'Radius 30 dan 5000 metrgacha bo\'lsin',chop:'Chop etish',qulf:'Qulf',yoqilgan:'yoqilgan',ochirilgan:'o\'chirilgan',belgilamagan:'Belgilamagan',jami:'Jami',qolda:'Qo\'lda',x_vaqt:'Vaqt 08:05 ko\'rinishida bo\'lsin',x_oyna:'Brauzer yangi oynani bloklab qo\'ydi',x_oyna_format:'Vaqt 07:00-09:00 ko\'rinishida bo\'lsin',qulf_izoh_ad:'Skanerlamagan o\'qituvchida panel yopiq bo\'lsinmi?',qulf_ogoh:'Yoqilsa, QR skanerlamagan o\'qituvchi kabinetga kira olmaydi. Varaqa osilganini tekshirdingizmi?',pin_kutmoqda:'PIN kutmoqda',ixtiyoriy:'ixtiyoriy',ota_tel:'Ota-ona telefoni',shaxsiy_narx:'Shaxsiy narx (bo\'sh — umumiy narx)',
@@ -176,7 +183,8 @@ bola_yoq:'К вам не привязан ребёнок. Обратитесь �
 tolov:'Оплата',tolov_holat:'Состояние оплаты',tolangan:'Оплачено',qarz:'Долг',yaqin:'Срок близко',kelajak:'Следующий',muddat:'Срок',qoldiq:'Остаток',narx:'Оплата в месяц',tolov_tarix:'История оплат',tolov_yoq:'Оплаты ещё не внесены',kun_qoldi:'дн. осталось',kun_otdi:'дн. просрочки',bugun_muddat:'Сегодня день оплаты',
 tg_ulash:'Напоминание в Telegram',tg_izoh:'Отправьте боту этот код — напоминание придёт перед сроком оплаты',tg_ulangan:'Telegram подключён',kod_nusxa:'Скопировать код',nusxalandi:'Скопировано',
 ad_sarlavha:'Панель управления',ad_kirish_izoh:'Введите PIN администратора',
-n_kun:'День',n_oqituvchilar:'Учителя',n_reyting:'Рейтинг',n_sozlama:'Настройки',
+n_kun:'День',n_oqituvchilar:'Учителя',n_reyting:'Рейтинг',n_sozlama:'Настройки',n_pechat:'Печать',
+pechat_sarlavha:'Ежедневные комплекты',pechat_izoh:'Откройте папку класса и распечатайте все предметы по количеству учеников.',pechat_sana:'Дата заданий',pechat_sinf:'класс',pechat_komplekt:'комплектов',pechat_varaq:'листов',pechat_btn:'Печатать весь комплект',pechat_fanlar:'5 предметов: Математика, История, Естественные науки, Русский язык, Родной язык и литература',pechat_yoq:'В этом классе нет активных учеников',pechat_savol_yoq:'Недостаточно заданий',pechat_ism:'Ученик',pechat_nusxa:'Копия',
 kun_manzara:'Картина дня',kim_yozdi:'Кто написал итоги',hammasi_yozildi:'Все уроки записаны',qongiroq:'Обзвон по оплате',qongiroq_yoq:'Сегодня звонить не нужно',bugungi_xulosalar:'Итоги за день',
 oqituvchi_qosh:'Добавить учителя',pin_yangi:'Новый PIN',pin_yangila:'Обновить PIN',pin_yangila_izoh:'Старый PIN перестанет работать',faol:'Активен',nofaol:'Не активен',oxirgi_kirish:'Последний вход',hech_qachon:'Никогда',
 oquvchilar_royxati:'Ученики',import:'Импорт',import_izoh:'В каждой строке: Имя; Класс; Родитель; Телефон. Можно вставить из Excel.',import_bajar:'Импортировать',manba:'Из старой базы',manba_izoh:'Ученики из qab_oquvchi и students, которых ещё нет здесь',manba_yoq:'Новых записей нет',tanlangan:'выбрано',ota_ism:'Имя родителя',ota_pin:'PIN родителя',oq_yozdi:'Внёс учитель',qr_keldi:'Приход отмечен',qr_ketdi:'Уход отмечен',qr_vaqt:'Сейчас не время отметки.',qr_kalit_xato:'QR-код устарел — отсканируйте листовку в школе',qulf_sarlavha:'Сначала отсканируйте QR',qulf_izoh:'Отсканируйте камерой телефона QR-код на листовке у входа — после этого панель откроется.',qr_kelish_v:'Приход',qr_ketish_v:'Уход',n_davomat:'Давомат',qr_varaqa:'QR-листовка',qr_varaqa_izoh:'Распечатайте листовку и повесьте у входа, рядом с камерой.',qr_yangila:'Новый код',qr_rasm_yoq:'Картинка QR не загрузилась — проверьте интернет',joy_kutilmoqda:'Определяем местоположение…',joy_ruxsat:'Разрешите доступ к геолокации — без неё отметка не пройдёт',joy_topilmadi:'Местоположение не определилось — выйдите на открытое место и повторите',joy_uzoq:'Вы не в школе. Расстояние:',joy_sarlavha:'Координаты школы',joy_olish:'Взять текущие координаты',joy_radius:'Радиус (метров)',joy_talab:'Отмечать только на территории школы',joy_yoq:'Координаты ещё не заданы',joy_bor:'Координаты заданы',joy_ogoh:'Нажимайте, стоя во дворе школы — текущая точка станет центром.',joy_ogoh_yoq:'После включения отметка вне школы не пройдёт. Координаты точно верные?',x_radius:'Радиус от 30 до 5000 метров',chop:'Печать',qulf:'Блокировка',yoqilgan:'включена',ochirilgan:'выключена',belgilamagan:'Не отметились',jami:'Всего',qolda:'Вручную',x_vaqt:'Время в формате 08:05',x_oyna:'Браузер заблокировал новое окно',x_oyna_format:'Время в формате 07:00-09:00',qulf_izoh_ad:'Закрывать панель тем, кто не отсканировал?',qulf_ogoh:'После включения учитель без скана не войдёт в кабинет. Листовка уже висит?',pin_kutmoqda:'Ждут PIN',ixtiyoriy:'необязательно',ota_tel:'Телефон родителя',shaxsiy_narx:'Своя цена (пусто — общая)',
@@ -295,7 +303,7 @@ async function ishga(){
   if(!T){ $('kirish').style.display='flex'; $('ilova').style.display='none'; }
 }
 
-let DVM=null, DSANA=null, SOZ={}, SINFLAR=[], TAB='kun', KM=null, OQS=[], OQV=[], FILTR={sinf:null,q:'',pinsiz:false}, HAFTA=null, KARTA=null;
+let DVM=null, DSANA=null, SOZ={}, SINFLAR=[], TAB='kun', KM=null, OQS=[], OQV=[], FILTR={sinf:null,q:'',pinsiz:false}, HAFTA=null, KARTA=null, PSANA=null, PKOM=null;
 
 async function boshla(){
   $('kirish').style.display='none';
@@ -322,11 +330,63 @@ async function ochTab(x){
     else if(x==='davomat') await chizDavomat();
     else if(x==='oqituvchilar') await chizOqituvchilar();
     else if(x==='oquvchilar') await chizOquvchilar();
+    else if(x==='pechat') await chizPechat();
     else if(x==='reyting') await chizReyting();
     else await chizSozlama();
   }catch(e){ $('cont').innerHTML='<div class="empty">'+esc(xatoMatn(e))+'</div>'; }
 }
 function sinfNom(id){ const s=SINFLAR.find(x=>x.id===id); return s?s.nom:''; }
+
+/* ---------------- KUNLIK PECHAT ---------------- */
+async function chizPechat(){
+  if(!PSANA) PSANA=ymd(new Date());
+  PKOM=await rpc('ep_print_komplekt',{p_token:T,p_daraja:null,p_sana:PSANA});
+  const sinflar=PKOM.sinflar||[];
+  let h='<div class="card"><h2>'+t('pechat_sarlavha')+'</h2><div class="sm mu">'+t('pechat_izoh')+'</div>'+
+    '<div class="fld mt"><label>'+t('pechat_sana')+'</label><input type="date" value="'+esc(PSANA)+'" onchange="pechatSana(this.value)"></div>'+
+    '<div class="xs mu">'+t('pechat_fanlar')+'</div></div>';
+  [5,6,7].forEach(d=>{
+    const ss=sinflar.filter(x=>+x.daraja===d);
+    const jami=ss.reduce((n,x)=>n+(+x.oquvchilar||0),0);
+    const varaqlar=jami*5;
+    h+='<div class="card"><div class="print-folder"><div class="pf-icon">📁</div><div class="pf-main">'+
+      '<div class="pf-title">'+d+'-'+t('pechat_sinf')+'</div><div class="print-classes">'+
+      ss.map(x=>'<span class="pill '+(x.til==='ru'?'bl':'gn')+'">'+esc(x.nom)+' · '+x.oquvchilar+' '+x.til.toUpperCase()+'</span>').join('')+
+      '</div><div class="print-total">'+jami+' '+t('pechat_komplekt')+' · '+varaqlar+' '+t('pechat_varaq')+'</div></div>'+
+      '<button class="btn" '+(jami?'onclick="chopDaraja('+d+')"':'disabled')+'>🖨️ '+t('pechat_btn')+'</button></div>'+
+      (!jami?'<div class="empty">'+t('pechat_yoq')+'</div>':'')+'</div>';
+  });
+  $('cont').innerHTML=h;
+}
+function pechatSana(v){ PSANA=v||ymd(new Date()); chizPechat(); }
+function chopDaraja(daraja){
+  const oyn=window.open('','_blank');
+  if(!oyn){ xabar(t('x_oyna'),'xato'); return; }
+  const sinflar=((PKOM&&PKOM.sinflar)||[]).filter(x=>+x.daraja===+daraja && +x.oquvchilar>0);
+  if(!sinflar.length){ oyn.close(); xabar(t('pechat_yoq'),'xato'); return; }
+  let pages='';
+  let kam=false;
+  sinflar.forEach(sinf=>{
+    const fanlar=sinf.fanlar||[];
+    const pl=sinf.til==='ru'?{student:'Ученик',copy:'Копия'}:{student:"O'quvchi",copy:'Nusxa'};
+    for(let nusxa=1;nusxa<=+sinf.oquvchilar;nusxa++){
+      fanlar.forEach(fan=>{
+        const savollar=fan.savollar||[];
+        if(savollar.length<5) kam=true;
+        pages+='<section class="sheet"><header><div><b>EDUNOVA SCHOOL</b><small>'+esc(PSANA)+'</small></div><div class="meta">'+esc(sinf.nom)+' · '+sinf.til.toUpperCase()+'<br>'+pl.copy+' '+nusxa+'/'+sinf.oquvchilar+'</div></header>'+
+          '<h1>'+esc(fan.nom)+'</h1><div class="student">'+pl.student+': <span></span></div><ol>'+
+          savollar.map(q=>'<li><div class="question">'+esc(q.savol)+'</div><div class="answers">'+
+            ['a','b','c','d'].filter(k=>q[k]!=null&&q[k]!=='').map(k=>'<div><b>'+k.toUpperCase()+')</b> '+esc(q[k])+'</div>').join('')+'</div></li>').join('')+
+          '</ol><footer>'+esc(sinf.nom)+' · '+esc(fan.nom)+' · '+esc(PSANA)+'</footer></section>';
+      });
+    }
+  });
+  oyn.document.open();
+  oyn.document.write('<!doctype html><html lang="'+(LANG==='ru'?'ru':'uz')+'"><head><meta charset="utf-8"><title>'+daraja+'-'+t('pechat_sinf')+' · '+esc(PSANA)+'</title><style>'+pechatUslub()+'</style></head><body>'+pages+'<script>window.onload=function(){setTimeout(function(){window.print()},250)}<\/script></body></html>');
+  oyn.document.close();
+  if(kam) xabar(t('pechat_savol_yoq'),'xato');
+}
+function pechatUslub(){ return '@page{size:A4;margin:12mm}*{box-sizing:border-box}body{margin:0;color:#111;font-family:Arial,sans-serif}.sheet{position:relative;min-height:270mm;page-break-after:always;padding:2mm}.sheet:last-child{page-break-after:auto}header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #111;padding-bottom:8px}header b{font-size:16px;letter-spacing:.08em}header small{display:block;margin-top:4px;color:#555}.meta{text-align:right;font-size:12px;line-height:1.5}.sheet h1{text-align:center;font-size:24px;margin:18px 0 12px}.student{font-size:14px;margin:0 0 16px}.student span{display:inline-block;width:65%;border-bottom:1px solid #111}ol{margin:0;padding-left:26px}li{margin:0 0 17px;padding-left:5px;break-inside:avoid}.question{font-size:16px;font-weight:600;margin-bottom:8px}.answers{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;font-size:14px}.answers div{border:1px solid #ccc;border-radius:5px;padding:6px 8px}footer{position:absolute;left:2mm;right:2mm;bottom:0;border-top:1px solid #bbb;padding-top:5px;text-align:center;font-size:10px;color:#666}'; }
 
 /* ---------------- KUN ---------------- */
 let KSANA=null;
