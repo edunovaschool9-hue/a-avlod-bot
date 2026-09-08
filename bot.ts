@@ -522,19 +522,6 @@ async function otaXabar(msg: any) {
   const rol = await rpc("ep_tg_rol", { p_chat_id: chat });
   const ulangan = rol?.ok && rol.rol === "ota";
 
-  if (matn.startsWith("/start") && /\blst_(\d+)/.test(matn)) {
-    const m = matn.match(/\blst_(\d+)(?:_(\d+))?(?:_(uz|ru))?/) ?? [];
-    const fid = Number(m[1] ?? 0), dar = m[2] ? Number(m[2]) : null, tl = m[3] ?? null;
-    const r = await rpc("ep_listovka_ol", { p_chat_id: chat, p_fan_id: fid, p_daraja: dar, p_til: tl });
-    if (!r?.ok) { await send(chat, r?.xato === "royxatda_yoq" ? T.royxatda_yoq : "Fan topilmadi."); return; }
-    const qayer = r.sinf ? `${esc(r.sinf)} · ` : "";
-    await send(chat, `📄 <b>${qayer}${esc(r.fan)}</b> — listovka olindi.\n${esc(r.ism)} · bugun ${r.bugun}-marta.\n\n<i>Rahbariyatga xabar berildi.</i>`);
-    const adm = await rpc("ep_adminlar_chat", {});
-    for (const c of (Array.isArray(adm) ? adm : [])) {
-      await send(Number(c), `📄 <b>Listovka olindi</b>\n<b>${esc(r.ism)}</b> — ${qayer}${esc(r.fan)}\nBugun jami: ${r.bugun} ta`);
-    }
-    return;
-  }
   if (matn.startsWith("/start")) {
     const kod = matn.split(" ")[1];
     if (kod) {
@@ -707,6 +694,19 @@ async function xabar(msg: any) {
 
   // --- buyruqlar ---
   if (matn === "/admin") { await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: "admin_pin", p_malumot: null }); await send(chat, T.admin_pin); return; }
+  if (matn.startsWith("/start") && /\blst_(\d+)/.test(matn)) {
+    const m = matn.match(/\blst_(\d+)(?:_(\d+))?(?:_(uz|ru))?/) ?? [];
+    const fid = Number(m[1] ?? 0), dar = m[2] ? Number(m[2]) : null, tl = m[3] ?? null;
+    const r = await rpc("ep_listovka_ol", { p_chat_id: chat, p_fan_id: fid, p_daraja: dar, p_til: tl });
+    if (!r?.ok) { await send(chat, r?.xato === "royxatda_yoq" ? T.royxatda_yoq : "Fan topilmadi."); return; }
+    const qayer = r.sinf ? `${esc(r.sinf)} · ` : "";
+    await send(chat, `📄 <b>${qayer}${esc(r.fan)}</b> — listovka olindi.\n${esc(r.ism)} · bugun ${r.bugun}-marta.\n\n<i>Rahbariyatga xabar berildi.</i>`);
+    const adm = await rpc("ep_adminlar_chat", {});
+    for (const c of (Array.isArray(adm) ? adm : [])) {
+      await send(Number(c), `📄 <b>Listovka olindi</b>\n<b>${esc(r.ism)}</b> — ${qayer}${esc(r.fan)}\nBugun jami: ${r.bugun} ta`);
+    }
+    return;
+  }
   if (matn === "/start" || matn === "/boshla") {
     if (isAdmin) { await adminMenyu(chat, rol.ism); return; }
     if (isTeach) { await send(chat, `Salom, <b>${esc(rol.ism)}</b>!`, { reply_markup: KB_TEACH }); return; }
@@ -1270,7 +1270,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v5.8 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v5.9 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
