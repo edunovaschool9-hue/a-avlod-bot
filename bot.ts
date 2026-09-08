@@ -239,12 +239,9 @@ async function oqRoyxat(chat: number, sinf: number, message_id?: number) {
   const d = await rpc("ep_oq_tg_royxat", { p_chat_id: chat, p_sinf_id: sinf });
   if (!d?.ok) { await send(chat, "Ruxsat yo‘q"); return; }
   const rows: any[] = (d.royxat ?? []).map((o: any) => [
-    { text: o.ism, callback_data: `oq_i:${sinf}:${o.id}` },
-    { text: "✏️", callback_data: `oq_ed:${sinf}:${o.id}` },
-    { text: "🗑", callback_data: `oq_del:${sinf}:${o.id}` },
-    { text: "🔁", callback_data: `oq_mv:${sinf}:${o.id}` }]);
+    { text: o.ism, callback_data: `oq_i:${sinf}:${o.id}` }]);
   rows.push([{ text: "➕ O‘quvchi qo‘shish", callback_data: `oq_add:${sinf}` }, { text: "◀️ Sinflar", callback_data: "oq_sinflar" }]);
-  const t = `🎒 <b>${esc(d.sinf)}</b> · ${(d.royxat ?? []).length} ta o‘quvchi\n✏️ ism · 🗑 chiqarish · 🔁 boshqa sinfga ko‘chirish`;
+  const t = `🎒 <b>${esc(d.sinf)}</b> · ${(d.royxat ?? []).length} ta o‘quvchi\n\nO‘quvchi ustiga bosing — ism, chiqarish yoki boshqa sinfga ko‘chirish.`;
   if (message_id) await tg("editMessageText", { chat_id: chat, message_id, text: t, parse_mode: "HTML", reply_markup: { inline_keyboard: rows } });
   else await send(chat, t, { reply_markup: { inline_keyboard: rows } });
 }
@@ -253,16 +250,29 @@ async function oqCallback(cq: any, k: string, a: string, b: string) {
   const ok = (text = "") => tg("answerCallbackQuery", { callback_query_id: cq.id, text });
   if (k === "oq_sinflar") { await ok(); await tg("editMessageReplyMarkup", { chat_id: chat, message_id: mid, reply_markup: { inline_keyboard: [] } }); await sinfSora(chat, "🎒 Qaysi sinf?", "oq_sinf"); return; }
   if (k === "oq_sinf") { await ok(); await tg("editMessageReplyMarkup", { chat_id: chat, message_id: mid, reply_markup: { inline_keyboard: [] } }); await oqRoyxat(chat, Number(a)); return; }
-  if (k === "oq_i") { await ok("✏️ — ism, 🗑 — chiqarish"); return; }
+  if (k === "oq_i") {
+    await ok();
+    const d = await rpc("ep_oq_tg_royxat", { p_chat_id: chat, p_sinf_id: Number(a) });
+    const o = ((d?.royxat ?? []) as any[]).find((x: any) => Number(x.id) === Number(b));
+    if (!o) { await send(chat, "Topilmadi"); return; }
+    await send(chat, `🎒 <b>${esc(o.ism)}</b>\n${esc(d.sinf ?? "")}`, { reply_markup: { inline_keyboard: [
+      [{ text: "✏️ Ismni to‘g‘rilash", callback_data: `oq_ed:${a}:${b}` }],
+      [{ text: "🔁 Boshqa sinfga ko‘chirish", callback_data: `oq_mv:${a}:${b}` }],
+      [{ text: "🗑 Ro‘yxatdan chiqarish", callback_data: `oq_del:${a}:${b}` }],
+      [{ text: "◀️ Ro‘yxat", callback_data: `oq_sinf:${a}` }]] } });
+    return;
+  }
   if (k === "oq_ed") {
     await ok();
-    const nom = (cq.message.reply_markup?.inline_keyboard ?? []).flat().find((x: any) => x.callback_data === `oq_i:${a}:${b}`)?.text ?? "";
+    const dd = await rpc("ep_oq_tg_royxat", { p_chat_id: chat, p_sinf_id: Number(a) });
+    const nom = ((dd?.royxat ?? []) as any[]).find((x: any) => Number(x.id) === Number(b))?.ism ?? "";
     await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: "oq_ism", p_malumot: { sinf: Number(a), id: Number(b), eski: nom } });
     await send(chat, `✏️ <b>${esc(nom)}</b> uchun yangi ism va familiyani yozing:`); return;
   }
   if (k === "oq_del") {
     await ok();
-    const nom = (cq.message.reply_markup?.inline_keyboard ?? []).flat().find((x: any) => x.callback_data === `oq_i:${a}:${b}`)?.text ?? "";
+    const dd2 = await rpc("ep_oq_tg_royxat", { p_chat_id: chat, p_sinf_id: Number(a) });
+    const nom = ((dd2?.royxat ?? []) as any[]).find((x: any) => Number(x.id) === Number(b))?.ism ?? "";
     await send(chat, `🗑 <b>${esc(nom)}</b> ro‘yxatdan chiqarilsinmi?\nU davomat, obzvon va ota-ona xabarlaridan yo‘qoladi.` + JAVOB_MATN,
       { reply_markup: { inline_keyboard: [[{ text: "✅ Tasdiqlayman, javobgarman", callback_data: `oq_del_ok:${a}:${b}` }], [{ text: "✖ Bekor", callback_data: "oq_bekor" }]] } });
     return;
@@ -276,7 +286,8 @@ async function oqCallback(cq: any, k: string, a: string, b: string) {
   }
   if (k === "oq_mv") {
     await ok();
-    const nom = (cq.message.reply_markup?.inline_keyboard ?? []).flat().find((x: any) => x.callback_data === `oq_i:${a}:${b}`)?.text ?? "";
+    const dd3 = await rpc("ep_oq_tg_royxat", { p_chat_id: chat, p_sinf_id: Number(a) });
+    const nom = ((dd3?.royxat ?? []) as any[]).find((x: any) => Number(x.id) === Number(b))?.ism ?? "";
     const sinflar: any[] = (await rpc("ep_sinflar_qisqa", {})) ?? [];
     const rows: any[] = []; for (let i = 0; i < sinflar.length; i += 4) rows.push(sinflar.slice(i, i + 4).map((x: any) => ({ text: x.nom, callback_data: `oq_mv2:${b}:${x.id}` })));
     rows.push([{ text: "✖ Bekor", callback_data: "oq_bekor" }]);
@@ -1192,7 +1203,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v5.1 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v5.2 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
