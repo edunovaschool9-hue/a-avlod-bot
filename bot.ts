@@ -762,7 +762,7 @@ async function xabar(msg: any) {
         { reply_markup: { inline_keyboard: [[{ text: "✅ Ha, yuborilsin", callback_data: "dsora_ok" }], [{ text: "✖ Bekor", callback_data: "dsora_no" }]] } });
       return;
     }
-    if (/ota-onalar/i.test(matn)) { await send(chat, "Qaysi ro‘yxat?", { reply_markup: { inline_keyboard: [[{ text: "✅ Botda", callback_data: "ota_bor" }, { text: "❌ Botda emas", callback_data: "ota_yoq" }], [{ text: "🆕 Shartnomasiz murojaatlar", callback_data: "ota_sorov" }]] } }); return; }
+    if (/ota-onalar/i.test(matn)) { await send(chat, "Qaysi ro‘yxat?", { reply_markup: { inline_keyboard: [[{ text: "✅ Botda", callback_data: "ota_bor" }, { text: "❌ Botda emas", callback_data: "ota_yoq" }], [{ text: "🆕 Shartnomasiz murojaatlar", callback_data: "ota_sorov" }], [{ text: "👀 Kim xabarni o‘qidi", callback_data: "ota_oqish" }]] } }); return; }
     if (/^\S*\s*xabar$/i.test(matn)) { await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: "ommaviy", p_malumot: null }); await send(chat, "Barcha ota-onalarga yuboriladigan xabar matnini yozing:"); return; }
     await send(chat, "Menyudan tanlang 👇", { reply_markup: KB_ADMIN }); return;
   }
@@ -821,6 +821,24 @@ async function callback(cq: any) {
   }
   if (k === "xl_menu") { await ok(); await sinfSora(chat, "Qaysi sinf uchun xulosa yozasiz?", "xl_sinf"); return; }
   if (k === "ota_bor" || k === "ota_yoq") { await ok(); await otaRoyxat(chat, k === "ota_bor" ? "bor" : "yoq"); return; }
+  if (k === "ota_oqish") {
+    await ok();
+    const d = await rpc("ep_ota_oqish_tg", { p_chat_id: chat, p_kun: null });
+    if (!d?.ok) { await send(chat, "Ruxsat yo‘q"); return; }
+    const r: any[] = (d.royxat ?? []).filter((x: any) => Number(x.yuborildi) > 0);
+    let t = `👀 <b>Ota-onalar xabarni o‘qidimi</b> · ${d.kun}\nYuborildi: <b>${d.yuborildi}</b> · tasdiqlandi: <b>${d.oqildi}</b>\n`;
+    if (!r.length) t += "\nBugun xabar yuborilmagan.";
+    else {
+      const oq = r.filter((x: any) => Number(x.oqildi) > 0), yoq = r.filter((x: any) => !Number(x.oqildi));
+      if (oq.length) t += `\n<b>✅ O‘qigan (${oq.length})</b>\n` + oq.map((x: any) => `• ${esc(x.ism)} — ${x.oqildi}/${x.yuborildi}` + (x.bolalar ? ` <i>${esc(x.bolalar)}</i>` : "")).join("\n") + "\n";
+      if (yoq.length) t += `\n<b>⚪ Tasdiqlamagan (${yoq.length})</b>\n` + yoq.map((x: any) => `• ${esc(x.ism)}` + (x.tel ? ` · ${esc(x.tel)}` : "")).join("\n");
+    }
+    t += `\n\n<i>Telegram o‘qilganini bildirmaydi — bu ota-ona «✅ O‘qidim» tugmasini bosgani.</i>`;
+    const qatorlar = t.split("\n"); let buf = "";
+    for (const q of qatorlar) { if ((buf + "\n" + q).length > 3500) { await send(chat, buf); buf = ""; } buf += (buf ? "\n" : "") + q; }
+    if (buf.trim()) await send(chat, buf);
+    return;
+  }
   if (k === "ota_sorov") {
     await ok();
     const d = await rpc("ep_sorov_royxat_tg", { p_chat_id: chat });
@@ -886,7 +904,11 @@ async function navbatYubor(): Promise<{ teach: number; ota: number; xato: number
     const token = bot === "teach" ? TEACH : OTA; if (!token) continue;
     const list: any[] = (await rpc("ep_xabar_ol", { p_bot: bot, p_limit: 40 })) ?? [];
     for (const m of list) {
-      const r = await send(Number(m.chat_id), m.matn, m.tugmalar ? { reply_markup: m.tugmalar } : {}, token);
+      let kb: any = m.tugmalar ? { reply_markup: m.tugmalar } : {};
+      if (bot === "ota" && !m.tugmalar && /^(dav|xul|test):/.test(String(m.kalit ?? ""))) {
+        kb = { reply_markup: { inline_keyboard: [[{ text: "✅ O‘qidim", callback_data: `rd:${m.kalit}` }]] } };
+      }
+      const r = await send(Number(m.chat_id), m.matn, kb, token);
       await rpc("ep_xabar_natija", { p_id: m.id, p_ok: !!r?.ok, p_xato: r?.ok ? null : JSON.stringify(r).slice(0, 200) });
       if (r?.ok) n[bot]++; else n.xato++;
     }
@@ -1203,7 +1225,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v5.2 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v5.3 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
@@ -1212,6 +1234,12 @@ Deno.serve(async (req) => {
         const cq = upd.callback_query, chat = cq.message?.chat?.id as number;
         const [kk, aa] = String(cq.data ?? "").split(":");
         await tg("answerCallbackQuery", { callback_query_id: cq.id }, OTA);
+        if (kk === "rd" && chat) {
+          const kalit = String(cq.data ?? "").slice(3);
+          await rpc("ep_xabar_oqildi", { p_chat_id: chat, p_kalit: kalit });
+          await tg("editMessageReplyMarkup", { chat_id: chat, message_id: cq.message.message_id, reply_markup: { inline_keyboard: [[{ text: "✅ O‘qildi", callback_data: "rd_ok" }]] } }, OTA);
+          return new Response("ok");
+        }
         if (kk === "sv" && chat) {
           const st = await rpc("ep_tg_holat_ol", { p_chat_id: chat });
           const r = await rpc("ep_sorov_bola", { p_chat_id: chat, p_bola: st?.malumot?.bola ?? "", p_sinf_id: Number(aa) });
