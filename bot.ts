@@ -586,9 +586,22 @@ async function kunHisobot(chat: number, kun: string | null) {
   const KEY = Deno.env.get("DEEPSEEK_API_KEY") ?? "";
   if (!KEY) { await send(chat, "AI kaliti sozlanmagan"); return; }
   await send(chat, "📊 Hisobot tayyorlanmoqda…");
+  const faol = ((xom.oqituvchilar ?? []) as any[]);
+  const passivRoyxat = ((xom.passiv ?? []) as any[]).join(", ") || "yo‘q";
+  const topTest = faol.filter((x: any) => Number(x.test) > 0).sort((a: any, b: any) => Number(b.test) - Number(a.test))
+    .map((x: any) => `${x.ism} — ${x.test} ta test, o‘rtacha ${x.ball ?? "-"}`).join("\n") || "yo‘q";
+  const topXul = faol.filter((x: any) => Number(x.xulosa) > 0).sort((a: any, b: any) => Number(b.xulosa) - Number(a.xulosa))
+    .map((x: any) => `${x.ism} — ${x.xulosa} ta xulosa`).join("\n") || "yo‘q";
   const prompt = `Sen EduNova School (Farg‘ona, xususiy maktab) rahbariyati uchun kunlik hisobot yozadigan yordamchisan.\n` +
+    `MUHIM QOIDALAR:\n` +
+    `- Ismlarni faqat quyidagi tayyor ro‘yxatlardan ko‘chir. Hech kimni o‘zing qo‘shma yoki olib tashlama.\n` +
+    `- Testda faol o‘qituvchilar (aynan shu ro‘yxat, shu tartibda):\n${topTest}\n` +
+    `- Xulosa yozganlar (aynan shu ro‘yxat):\n${topXul}\n` +
+    `- Bugun umuman faoliyat ko‘rsatmaganlar (FAQAT shu ismlar, boshqa hech kim emas): ${passivRoyxat}\n` +
+    `- Agar biror o‘qituvchi yuqoridagi faol ro‘yxatlarda bo‘lsa, uni hech qachon "faoliyat ko‘rsatmagan" deb yozma.\n\n`;
+  const prompt2 = `` +
     `Quyidagi JSON — bugungi haqiqiy raqamlar. Faqat shu raqamlarga tayan, hech narsa o‘ylab topma.\n\n` +
-    JSON.stringify(xom) + `\n\n` +
+    JSON.stringify(xom) + `\n\n` + `` +
     `Hisobotni o‘zbek tilida (lotin) yoz. Tuzilishi:\n` +
     `1) Sarlavha va sana\n2) Umumiy raqamlar (davomat, xulosa, test va o‘rtacha ball)\n` +
     `3) Testda eng faol o‘qituvchilar — ro‘yxat, test soni va o‘rtacha ball bilan\n` +
@@ -598,7 +611,7 @@ async function kunHisobot(chat: number, kun: string | null) {
   try {
     const rr = await fetch("https://api.deepseek.com/chat/completions", { method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${KEY}` },
-      body: JSON.stringify({ model: "deepseek-chat", temperature: 0.5, messages: [{ role: "user", content: prompt }] }) });
+      body: JSON.stringify({ model: "deepseek-chat", temperature: 0.3, messages: [{ role: "user", content: prompt + prompt2 }] }) });
     const j = await rr.json();
     let txt = String(j?.choices?.[0]?.message?.content ?? "").trim();
     txt = txt.replace(/```/g, "").replace(/<(?!\/?(b|i)>)[^>]*>/g, "");
@@ -1232,7 +1245,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v5.4 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v5.5 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
