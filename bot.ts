@@ -399,9 +399,14 @@ async function xulosaHisobot(chat: number, kun: string | null = null) {
   const rows: any[] = [];
   for (let k = 0; k < yozgan.length; k += 2) rows.push(yozgan.slice(k, k + 2).map((x: any) => ({ text: `📖 ${String(x.ism).split(" ")[0]} (${x.soni})`, callback_data: `xr:${x.id}:${kun ? "k" : "b"}` })));
   rows.push([{ text: "🔄 Yangilash", callback_data: "xh:bugun" }, { text: "◀️ Kecha", callback_data: "xh:kecha" }]);
-  for (let i = 0; i < t.length; i += 3800) {
-    const oxirgi = i + 3800 >= t.length;
-    await send(chat, t.slice(i, i + 3800), oxirgi ? { reply_markup: { inline_keyboard: rows } } : {});
+  const qatorlar = t.split("\n"); const bloklar: string[] = []; let buf = "";
+  for (const q of qatorlar) {
+    if ((buf + "\n" + q).length > 3500) { bloklar.push(buf); buf = ""; }
+    buf += (buf ? "\n" : "") + q;
+  }
+  if (buf.trim()) bloklar.push(buf);
+  for (let i = 0; i < bloklar.length; i++) {
+    await send(chat, bloklar[i], i === bloklar.length - 1 ? { reply_markup: { inline_keyboard: rows } } : {});
   }
 }
 
@@ -418,7 +423,9 @@ async function xulosaOqi(chat: number, oqit: number, kecha: boolean) {
     t += `\n━━━━━━━━━━\n<b>${esc(x.sinf)} · ${esc(x.fan)}</b>` + (x.raqam ? ` · ${x.raqam}-dars` : "") + (x.vaqt ? ` · ${x.vaqt}` : "") + "\n" +
       (x.mavzu ? `<b>${esc(x.mavzu)}</b>\n` : "") + esc(x.matn) + "\n";
   });
-  for (let i = 0; i < t.length; i += 3800) await send(chat, t.slice(i, i + 3800));
+  const qq = t.split("\n"); let bb = "";
+  for (const q of qq) { if ((bb + "\n" + q).length > 3500) { await send(chat, bb); bb = ""; } bb += (bb ? "\n" : "") + q; }
+  if (bb.trim()) await send(chat, bb);
 }
 
 // ---------- o'qituvchilar ro'yxati ----------
@@ -1225,7 +1232,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v5.3 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v5.4 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
