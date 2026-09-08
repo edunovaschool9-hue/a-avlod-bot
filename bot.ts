@@ -522,6 +522,17 @@ async function otaXabar(msg: any) {
   const rol = await rpc("ep_tg_rol", { p_chat_id: chat });
   const ulangan = rol?.ok && rol.rol === "ota";
 
+  if (matn.startsWith("/start") && /\blst_(\d+)/.test(matn)) {
+    const fid = Number((matn.match(/\blst_(\d+)/) ?? [])[1] ?? 0);
+    const r = await rpc("ep_listovka_ol", { p_chat_id: chat, p_fan_id: fid });
+    if (!r?.ok) { await send(chat, r?.xato === "royxatda_yoq" ? T.royxatda_yoq : "Fan topilmadi."); return; }
+    await send(chat, `📄 <b>${esc(r.fan)}</b> — listovka olindi.\n${esc(r.ism)} · bugun ${r.bugun}-marta.\n\n<i>Rahbariyatga xabar berildi.</i>`);
+    const adm = await rpc("ep_adminlar_chat", {});
+    for (const c of (Array.isArray(adm) ? adm : [])) {
+      await send(Number(c), `📄 <b>Listovka olindi</b>\n<b>${esc(r.ism)}</b> — ${esc(r.fan)}\nBugun jami: ${r.bugun} ta`);
+    }
+    return;
+  }
   if (matn.startsWith("/start")) {
     const kod = matn.split(" ")[1];
     if (kod) {
@@ -756,6 +767,18 @@ async function xabar(msg: any) {
     if (/arizalar/i.test(matn)) { await arizalar(chat); return; }
     if (/o‘qituvchilar|o'qituvchilar|oqituvchilar/i.test(matn)) { await oqitRoyxat(chat); return; }
     if (/xulosalar/i.test(matn)) { await xulosaHisobot(chat); return; }
+    if (/listovka/i.test(matn)) {
+      const d = await rpc("ep_listovka_royxat_tg", { p_chat_id: chat, p_kun: null });
+      if (!d?.ok) { await send(chat, "Ruxsat yo‘q"); return; }
+      const r: any[] = d.royxat ?? [];
+      if (!r.length) { await send(chat, `📄 <b>Listovkalar</b> · ${d.kun}\n\nBugun hech kim olmagan.`); return; }
+      const t = `📄 <b>Listovkalar</b> · ${d.kun}\nJami: <b>${d.jami}</b> ta\n\n` +
+        r.map((x: any) => `• <b>${esc(x.ism)}</b> — ${esc(x.fan)} · ${esc(x.vaqt)}`).join("\n");
+      const qq = t.split("\n"); let bb = "";
+      for (const q of qq) { if ((bb + "\n" + q).length > 3500) { await send(chat, bb); bb = ""; } bb += (bb ? "\n" : "") + q; }
+      if (bb.trim()) await send(chat, bb);
+      return;
+    }
     if (/kunlik hisobot/i.test(matn)) { await kunHisobot(chat, null); return; }
     if (/natija/i.test(matn)) {
       let ses: any = await rpc("ep_tg_sessiya", { p_chat_id: chat });
@@ -1245,7 +1268,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v5.5 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v5.6 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
