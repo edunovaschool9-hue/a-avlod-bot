@@ -1,0 +1,101 @@
+<!doctype html><html lang="uz"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>EduNova — Tizimni baholang</title><meta name="theme-color" content="#F6F1E6">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#F6F1E6;color:#1A2238;font-size:16px}
+.wrap{max-width:620px;margin:0 auto;padding:16px 14px 40px}
+.hd{background:#1A2238;color:#fff;border-radius:16px;padding:18px;margin-bottom:14px}
+.hd b{font-size:20px}.hd p{margin:6px 0 0;font-size:14px;color:#c9c9d1}
+h2{font-size:17px;margin:18px 0 10px}
+.card{background:#fff;border:1px solid #e6dcc8;border-radius:14px;padding:14px;margin-bottom:12px}
+.it{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.it i{flex:0 0 6px;height:38px;background:#FF7A00;border-radius:3px;display:block}
+.it b{display:block;font-size:15px}.it span{font-size:13px;color:#7d7469}
+select,input,textarea{width:100%;padding:12px;border:1px solid #d9cfba;border-radius:10px;font-size:16px;background:#fff;color:#1A2238;margin-top:6px}
+label{font-size:13px;font-weight:700;color:#4a4436}
+.q{margin:14px 0}.q p{margin:0 0 8px;font-weight:600;font-size:15px}
+.st{display:flex;gap:8px}
+.st button{flex:1;padding:14px 0;border:2px solid #e0d5bf;border-radius:12px;background:#fff;font-size:18px;font-weight:800;color:#8b8271}
+.st button.on{border-color:#FF7A00;background:#fff7ed;color:#FF7A00}
+.btn{display:block;width:100%;padding:16px;border:0;border-radius:12px;background:#FF7A00;color:#fff;font-size:17px;font-weight:700;margin-top:14px}
+.btn[disabled]{opacity:.5}
+.mu{color:#8b8271;font-size:13px}.err{color:#b91c1c;font-size:14px;min-height:18px}
+.ok{text-align:center;padding:30px 10px}.ok .em{font-size:64px}
+</style></head><body><div class="wrap">
+<div class="hd"><b>EduNova School</b><p>Raqamli tizim — ota-onalar uchun so‘rovnoma</p></div>
+<div id="app"></div></div>
+<script>
+var SB='https://unaodltahuevrfnarfha.supabase.co', KEY='sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP';
+var B={b1:0,b2:0,b3:0}, SINF=null, BOLA=null;
+function $(i){return document.getElementById(i);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function rpc(fn,a){return fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY,Authorization:'Bearer '+KEY},body:JSON.stringify(a||{})}).then(function(r){return r.json();});}
+function boshla(){
+ var h='<div class="card"><h2 style="margin-top:0">Tizim nima beradi?</h2>'+
+  '<div class="it"><i></i><div><b>Davomat</b><span>Farzandingiz maktabga kelgani — darhol xabar</span></div></div>'+
+  '<div class="it"><i></i><div><b>Dars xulosasi</b><span>Mavzu va uy vazifasi — har dars uchun</span></div></div>'+
+  '<div class="it"><i></i><div><b>Kunlik test</b><span>5 ta savol, natija sizga darhol keladi</span></div></div>'+
+  '<div class="it"><i></i><div><b>Shaxsiy kabinet</b><span>PIN kerak emas — bir tugma bilan</span></div></div>'+
+  '<p class="mu" style="margin:10px 0 0">Tizim sinov rejimida — fikringiz uni yaxshilashga yordam beradi.</p></div>';
+ h+='<div class="card"><h2 style="margin-top:0">Farzandingizni tanlang</h2>'+
+  '<label>Sinf</label><select id="sinf" onchange="oquvchi()"><option value="">— tanlang —</option></select>'+
+  '<div id="oq_box"></div></div>';
+ h+='<div class="card"><h2 style="margin-top:0">Bahoyingiz</h2>'+
+  q(1,'Xabarlar tushunarli va o\u2018z vaqtida keladimi?')+
+  q(2,'Farzandingiz haqida ma\u2019lumot yetarlimi?')+
+  q(3,'Botdan foydalanish osonmi?')+
+  '<div class="q"><p>Taklif yoki e\u2019tirozingiz (ixtiyoriy)</p><textarea id="izoh" rows="3" placeholder="Yozib qoldiring..."></textarea></div>'+
+  '<label>Ismingiz (ixtiyoriy)</label><input id="ota" placeholder="F.I.Sh.">'+
+  '<div class="err" id="e"></div>'+
+  '<button class="btn" onclick="yubor(this)">Bahoni yuborish</button></div>';
+ $('app').innerHTML=h;
+ rpc('ep_sinflar_qisqa',{}).then(function(d){
+  var s=$('sinf'); (d||[]).forEach(function(x){ var o=document.createElement('option'); o.value=x.id; o.textContent=x.nom; s.appendChild(o); });
+ });
+}
+function q(n,t){
+ var h='<div class="q"><p>'+n+'. '+t+'</p><div class="st">';
+ for(var i=1;i<=5;i++) h+='<button id="b'+n+'_'+i+'" onclick="bal('+n+','+i+')">'+i+'</button>';
+ return h+'</div></div>';
+}
+function bal(n,v){
+ B['b'+n]=v;
+ for(var i=1;i<=5;i++){ var el=$('b'+n+'_'+i); if(el) el.className=(i===v?'on':''); }
+}
+function oquvchi(){
+ var sid=$('sinf').value; BOLA=null; SINF=sid?parseInt(sid,10):null;
+ if(!sid){$('oq_box').innerHTML='';return;}
+ $('oq_box').innerHTML='<p class="mu">Yuklanmoqda…</p>';
+ rpc('ep_sinf_oquvchilari',{p_sinf_id:SINF}).then(function(list){
+  var h='<label style="display:block;margin-top:10px">Farzandingiz</label><select id="oq" onchange="BOLA=$(\'oq\').value"><option value="">— tanlang —</option>';
+  (list||[]).forEach(function(o){ h+='<option value="'+o.id+'">'+esc(o.ism)+'</option>'; });
+  h+='<option value="yoq">— ro\u2018yxatda yo\u2018q —</option></select>'+
+     '<div id="qol"></div>';
+  $('oq_box').innerHTML=h;
+  $('oq').addEventListener('change',function(){
+   BOLA=$('oq').value;
+   $('qol').innerHTML=(BOLA==='yoq')?'<label style="display:block;margin-top:10px">Farzandingiz ism-familiyasi</label><input id="bola_ism" placeholder="Ism Familiya">':'';
+  });
+ });
+}
+function yubor(btn){
+ var e=$('e'); e.textContent='';
+ if(!B.b1||!B.b2||!B.b3){ e.textContent='Iltimos, 3 ta savolga ham baho bering'; return; }
+ if(!SINF){ e.textContent='Sinfni tanlang'; return; }
+ var oid=(BOLA&&BOLA!=='yoq')?parseInt(BOLA,10):null;
+ var ism=(BOLA==='yoq'&&$('bola_ism'))?$('bola_ism').value:'';
+ if(!oid && !ism.trim()){ e.textContent='Farzandingizni tanlang yoki ismini yozing'; return; }
+ btn.disabled=true; btn.textContent='Yuborilmoqda…';
+ rpc('ep_baho_saqla',{p_oquvchi_id:oid,p_sinf_id:SINF,p_bola:ism,p_ota:($('ota').value||''),p_tel:null,
+   p_b1:B.b1,p_b2:B.b2,p_b3:B.b3,p_izoh:($('izoh').value||'')}).then(function(d){
+  if(!d||!d.ok){ btn.disabled=false; btn.textContent='Bahoni yuborish'; e.textContent='Xatolik, qaytadan urining'; return; }
+  $('app').innerHTML='<div class="card ok"><div class="em">\u2705</div>'+
+    '<h2>Rahmat!</h2><p>Bahoyingiz qabul qilindi.</p>'+
+    '<p class="mu">'+esc(d.bola||'')+(d.sinf?' \u00b7 '+esc(d.sinf):'')+' \u00b7 o\u2018rtacha '+d.ortacha+'/5</p>'+
+    '<p class="mu">Fikringiz tizimni yaxshilashga yordam beradi.</p></div>';
+  window.scrollTo(0,0);
+ })["catch"](function(){ btn.disabled=false; btn.textContent='Bahoni yuborish'; e.textContent='Aloqa xatosi'; });
+}
+boshla();
+</script></body></html>
