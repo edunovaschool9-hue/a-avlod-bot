@@ -1034,6 +1034,39 @@ Deno.serve(async (req) => {
     }
     return jsonc({ ok: true, tekshirildi: list.length, yangilandi: n });
   }
+  if (q("baho_tahlil") !== null) {
+    const b = await req.json().catch(() => ({})) as any;
+    const a = await rpc("ep_admin_tekshir", { p_token: b.token ?? "" });
+    if (!a?.ok) return no();
+    const KEY = Deno.env.get("DEEPSEEK_API_KEY") ?? "";
+    if (!KEY) return jsonc({ ok: false, xato: "kalit yo‘q" });
+    const st = await rpc("ep_baho_hisobot", { p_token: b.token });
+    if (!st?.ok) return jsonc({ ok: false, xato: "ruxsat" });
+    const izohlar = ((st.royxat ?? []) as any[]).filter((x: any) => x.izoh)
+      .map((x: any) => `${x.sinf ?? ""}: ${x.izoh}`).slice(0, 40).join("\n") || "izoh yo‘q";
+    const sinflar = ((st.sinflar ?? []) as any[]).map((x: any) => `${x.sinf}: ${x.soni} ta javob, o‘rtacha ${x.ort}`).join("\n") || "-";
+    const prompt = `Sen EduNova School (Farg‘ona, xususiy maktab) rahbariyatining tahlilchisisan.\n` +
+      `Ota-onalar raqamli tizimni baholadi. Quyidagi RAQAMLARDAN boshqa hech narsa o‘ylab topma.\n\n` +
+      `Jami javob: ${st.jami}\nUmumiy o‘rtacha: ${st.ortacha} / 5\n` +
+      `1-savol (xabarlar tushunarli va o‘z vaqtida): ${st.b1}\n` +
+      `2-savol (farzand haqida ma’lumot yetarli): ${st.b2}\n` +
+      `3-savol (botdan foydalanish oson): ${st.b3}\n\n` +
+      `Sinflar kesimida:\n${sinflar}\n\nOta-onalarning izohlari:\n${izohlar}\n\n` +
+      `Vazifa: o‘zbek tilida (lotin) O‘QITUVCHILARGA yuboriladigan qisqa tahlil yoz.\n` +
+      `Tuzilishi:\n1) Umumiy natija (1-2 gap)\n2) Nima yaxshi ishlayapti\n3) Nimani yaxshilash kerak\n` +
+      `4) O‘qituvchilarga 3 ta aniq tavsiya\n` +
+      `Uslub: hurmatli, ayblovsiz, aniq. Telegram HTML: faqat <b> va <i>. Maksimum 2000 belgi.`;
+    try {
+      const rr = await fetch("https://api.deepseek.com/chat/completions", { method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${KEY}` },
+        body: JSON.stringify({ model: "deepseek-chat", temperature: 0.4, messages: [{ role: "user", content: prompt }] }) });
+      const j = await rr.json();
+      let txt = String(j?.choices?.[0]?.message?.content ?? "").trim();
+      txt = txt.replace(/```/g, "").replace(/<(?!\/?(b|i)>)[^>]*>/g, "");
+      if (!txt) return jsonc({ ok: false, xato: "bo‘sh" });
+      return jsonc({ ok: true, matn: txt, jami: st.jami, ortacha: st.ortacha });
+    } catch (e) { return jsonc({ ok: false, xato: String(e).slice(0, 100) }); }
+  }
   if (q("savol_toldir") !== null) {
     const b = await req.json().catch(() => ({})) as any;
     const a = await rpc("ep_admin_tekshir", { p_token: b.token ?? "" });
@@ -1272,7 +1305,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v6.0 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v6.1 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
