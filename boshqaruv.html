@@ -333,7 +333,9 @@ async function chizBaho(){
     '<canvas id="gz" width="620" height="380" style="width:100%;height:auto;background:#fff;border-radius:12px"></canvas>'+
     '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">'+
     '<button class="btn" onclick="gzYukla()">\u2b07 PNG</button>'+
-    '<button class="btn sec" onclick="gzHavola()">\u{1F517} So\u2018rovnoma havolasi</button></div></div>';
+    '<button class="btn sec" onclick="gzHavola()">\u{1F517} So\u2018rovnoma havolasi</button>'+
+    '<button class="btn sec" onclick="gzTahlil(this)">\u{1F916} AI tahlil</button></div>'+
+    '<div id="tahlil_box"></div></div>';
   h+='<div class="card"><div class="row"><b>'+d.jami+'</b> javob \u00b7 o\u2018rtacha <b>'+d.ortacha+'</b>/5</div>'+
      gzBar('Xabarlar tushunarli va o\u2018z vaqtida',d.b1)+
      gzBar('Ma\u2019lumot yetarli',d.b2)+
@@ -391,6 +393,27 @@ function gzHavola(){
   var u='https://edunovaschool9-hue.github.io/a-avlod-bot/baho.html';
   if(navigator.clipboard) navigator.clipboard.writeText(u).then(function(){ alert('Havola nusxalandi:\n'+u); });
   else prompt('Havola:',u);
+}
+
+
+function gzTahlil(btn){
+  var t=btn.textContent; btn.disabled=true; btn.textContent='AI ishlayapti\u2026';
+  fetch('https://unaodltahuevrfnarfha.supabase.co/functions/v1/teach-bot?baho_tahlil=1',
+    {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:T})})
+   .then(function(r){return r.json();}).then(function(d){
+     btn.disabled=false; btn.textContent=t;
+     var box=document.getElementById('tahlil_box');
+     if(!d||!d.ok){ box.innerHTML='<div class="sub" style="color:#b91c1c;margin-top:8px">Xatolik: '+esc((d&&d.xato)||'server')+'</div>'; return; }
+     window.__TAHLIL=d.matn.replace(/<[^>]*>/g,'');
+     box.innerHTML='<div style="margin-top:12px;background:#fff;border:1px solid #e6dcc8;border-radius:12px;padding:14px;white-space:pre-wrap;line-height:1.5">'+d.matn+'</div>'+
+       '<button class="btn" style="margin-top:8px" onclick="tahlilNusxa()">\u{1F4CB} Nusxalash</button>';
+   })["catch"](function(){ btn.disabled=false; btn.textContent=t;
+     document.getElementById('tahlil_box').innerHTML='<div class="sub" style="color:#b91c1c">Aloqa xatosi</div>'; });
+}
+function tahlilNusxa(){
+  var x=window.__TAHLIL||'';
+  if(navigator.clipboard) navigator.clipboard.writeText(x).then(function(){ alert('Nusxalandi \u2014 o\u2018qituvchilar guruhiga tashlang'); });
+  else prompt('Nusxalang:',x);
 }
 
 async function ochTab(x){
