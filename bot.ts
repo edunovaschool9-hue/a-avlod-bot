@@ -652,6 +652,69 @@ async function belgisizYubor(quruq: boolean): Promise<{ yuborildi: number; jami:
   return { yuborildi: n, jami: Number(d.jami ?? 0), oqit: oqit.length };
 }
 
+
+// ---------- o'qituvchilar reytingi ----------
+function davr(k: string): { dan: string | null; nom: string } {
+  const T = new Date(Date.now() + 5 * 3600 * 1000);
+  const bugun = T.toISOString().slice(0, 10);
+  if (k === "kun") return { dan: bugun, nom: "Bugun" };
+  if (k === "hafta") { const d = new Date(T.getTime() - 6 * 86400000); return { dan: d.toISOString().slice(0, 10), nom: "Oxirgi 7 kun" }; }
+  return { dan: null, nom: "Boshidan beri" };
+}
+async function reytingKor(chat: number, k: string) {
+  const p = davr(k);
+  const d = await rpc("ep_reyting_tg", { p_chat_id: chat, p_dan: p.dan, p_gacha: null });
+  if (!d?.ok) { await send(chat, "Ruxsat yo‘q"); return; }
+  const r: any[] = ((d.royxat ?? []) as any[]).filter((x: any) => Number(x.ball) > 0);
+  const nol: any[] = ((d.royxat ?? []) as any[]).filter((x: any) => !Number(x.ball));
+  const med = ["🥇", "🥈", "🥉"];
+  let t = `🏆 <b>O‘qituvchilar reytingi</b> · ${p.nom}\n<i>${d.dan} — ${d.gacha} · ${d.kunlar} kun</i>\n\n`;
+  if (!r.length) t += "Bu davrda faoliyat yo‘q.";
+  else r.forEach((x: any, i: number) => {
+    t += `${i < 3 ? med[i] : (i + 1) + "."} <b>${esc(x.ism)}</b> — <b>${x.ball}</b> ball\n` +
+      `   📝 ${x.xulosa} xulosa · ✅ ${x.davomat} davomat · 🧪 ${x.test} test` +
+      (Number(x.test) ? ` (o‘rt. ${x.test_ball})` : "") + `\n   <i>${x.faol_kun} kun faol · kuniga ${x.kunlik}</i>\n`;
+  });
+  if (nol.length) t += `\n<b>⚪ Faoliyat yo‘q (${nol.length})</b>\n` + nol.map((x: any) => `• ${esc(x.ism)}`).join("\n");
+  t += `\n\n<i>Ball: xulosa ×3 · davomat (sinf/kun) ×2 · test ×1</i>`;
+  const qq = t.split("\n"); let bb = ""; const bloklar: string[] = [];
+  for (const q2 of qq) { if ((bb + "\n" + q2).length > 3500) { bloklar.push(bb); bb = ""; } bb += (bb ? "\n" : "") + q2; }
+  if (bb.trim()) bloklar.push(bb);
+  for (let i = 0; i < bloklar.length; i++) {
+    await send(chat, bloklar[i], i === bloklar.length - 1 ? { reply_markup: { inline_keyboard: [
+      [{ text: "📅 Bugun", callback_data: "rt:kun" }, { text: "📆 7 kun", callback_data: "rt:hafta" }, { text: "🗓 Boshidan", callback_data: "rt:hammasi" }],
+      [{ text: "🤖 AI tahlil", callback_data: `rta:${k}` }]] } } : {});
+  }
+}
+async function reytingTahlil(chat: number, k: string) {
+  const KEY = Deno.env.get("DEEPSEEK_API_KEY") ?? "";
+  if (!KEY) { await send(chat, "AI kaliti yo‘q"); return; }
+  const p = davr(k);
+  const d = await rpc("ep_reyting_tg", { p_chat_id: chat, p_dan: p.dan, p_gacha: null });
+  if (!d?.ok) { await send(chat, "Ruxsat yo‘q"); return; }
+  await send(chat, "🤖 Tahlil tayyorlanmoqda…");
+  const jadval = ((d.royxat ?? []) as any[]).map((x: any) =>
+    `${x.ism}: ${x.ball} ball (xulosa ${x.xulosa}, davomat ${x.davomat}, test ${x.test}, faol kun ${x.faol_kun})`).join("\n");
+  const prompt = `Sen EduNova School rahbariyati uchun tahlilchisan. Quyida o‘qituvchilar faolligi (${p.nom}, ${d.kunlar} kun).\n` +
+    `Ball: dars xulosasi ×3, davomat (sinf/kun) ×2, test ×1.\n\n${jadval}\n\n` +
+    `Faqat shu raqamlarga tayan, hech narsa o‘ylab topma. O‘zbek tilida qisqa tahlil yoz:\n` +
+    `1) Umumiy holat\n2) Eng faol 2-3 kishi va nimasi bilan\n3) Qaysi yo‘nalish bo‘sh qolyapti (xulosa/davomat/test)\n` +
+    `4) Rahbariyatga 3 ta aniq tavsiya\n` +
+    `Uslub: hurmatli, ayblovsiz. Faoliyat ko‘rsatmaganlarni ayblama — sababini so‘rashni tavsiya qil.\n` +
+    `Telegram HTML: faqat <b> va <i>. Maksimum 2000 belgi.`;
+  try {
+    const rr = await fetch("https://api.deepseek.com/chat/completions", { method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${KEY}` },
+      body: JSON.stringify({ model: "deepseek-chat", temperature: 0.4, messages: [{ role: "user", content: prompt }] }) });
+    const j = await rr.json();
+    let txt = String(j?.choices?.[0]?.message?.content ?? "").trim().replace(/```/g, "").replace(/<(?!\/?(b|i)>)[^>]*>/g, "");
+    if (!txt) { await send(chat, "AI javob bermadi"); return; }
+    const qq = txt.split("\n"); let bb = "";
+    for (const q2 of qq) { if ((bb + "\n" + q2).length > 3500) { await send(chat, bb); bb = ""; } bb += (bb ? "\n" : "") + q2; }
+    if (bb.trim()) await send(chat, bb);
+  } catch (e) { await send(chat, "AI xatosi: " + esc(String(e).slice(0, 80))); }
+}
+
 // ---------- xabarlar ----------
 async function xabar(msg: any) {
   const chat = msg.chat?.id as number; if (!chat) return;
@@ -832,6 +895,7 @@ async function xabar(msg: any) {
       if (bb.trim()) await send(chat, bb);
       return;
     }
+    if (/reyting/i.test(matn)) { await reytingKor(chat, "hafta"); return; }
     if (/belgilanmagan/i.test(matn)) {
       const d = await rpc("ep_belgisiz_tg", { p_chat_id: chat, p_kun: null });
       if (!d?.ok) { await send(chat, "Ruxsat yo‘q"); return; }
@@ -901,6 +965,8 @@ async function callback(cq: any) {
   if (k.startsWith("hj_")) { await talonCallback(cq, k, a, b); return; }
   if (k === "xr") { await ok(); await xulosaOqi(chat, Number(a), b === "k"); return; }
   if (k === "xh") { await ok(); const kecha=new Date(Date.now()+5*3600*1000-(a==="kecha"?86400000:0)).toISOString().slice(0,10); await xulosaHisobot(chat, kecha); return; }
+  if (k === "rt") { await ok(); await reytingKor(chat, a); return; }
+  if (k === "rta") { await ok(); await reytingTahlil(chat, a); return; }
   if (k === "bz_yubor") {
     if (!(await rpc("ep_tg_rol", { p_chat_id: chat }))?.ok) { await ok("Ruxsat yo‘q"); return; }
     await ok("Yuborilmoqda…");
