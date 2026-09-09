@@ -500,8 +500,10 @@ async function otaXabar(msg: any) {
       await S(`✅ <b>${esc(r.ism)}</b>, xush kelibsiz!\n\nFarzandingiz: <b>${esc(r.bolalar)}</b>\n\nEndi farzandingiz maktabga kelgani, dars xulosalari va to‘lov haqidagi xabarlar shu yerga keladi.\n\nKabinet PIN kodingiz: <code>${esc(r.pin)}</code>`, { reply_markup: KB_OTA });
       await S("Kabinetni ochish — pastdagi tugma. PIN kerak emas.", { reply_markup: KB_OTA_APP });
     } else if (r?.xato === "topilmadi") {
-      await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: "sorov_bola", p_malumot: null });
-      await S("Raqamingiz bazada topilmadi — shartnoma hali rasmiylashtirilmagan bo‘lishi mumkin.\n\nIltimos, <b>farzandingizning ism va familiyasini</b> yozing — ma’muriyat siz bilan bog‘lanadi.", { reply_markup: { remove_keyboard: true } });
+      const sinflar: any[] = (await rpc("ep_sinflar_qisqa", {})) ?? [];
+      const rows: any[] = []; for (let i = 0; i < sinflar.length; i += 4) rows.push(sinflar.slice(i, i + 4).map((x: any) => ({ text: x.nom, callback_data: `sv_c:${x.id}` })));
+      await S("Raqamingiz bazada topilmadi — shartnoma hali rasmiylashtirilmagan bo‘lishi mumkin.\n\n<b>Farzandingiz qaysi sinfda?</b>\n<i>Agar bir nechta farzandingiz bo‘lsa — birinchisini tanlang, keyin qolganini qo‘shamiz.</i>", { reply_markup: { remove_keyboard: true } });
+      await S("Sinfni tanlang:", { reply_markup: { inline_keyboard: rows } });
     } else {
       await S("Raqamni o‘qib bo‘lmadi. Qaytadan urinib ko‘ring.", { reply_markup: KB_OTA_TEL });
     }
@@ -512,11 +514,11 @@ async function otaXabar(msg: any) {
   if (stO?.holat === "sorov_bola" && matn && !matn.startsWith("/")) {
     const bola = matn.replace(/\s+/g, " ").trim();
     if (bola.length < 4) { await S("Ism va familiyani to‘liq yozing:"); return; }
-    await rpc("ep_sorov_bola", { p_chat_id: chat, p_bola: bola, p_sinf_id: null });
-    await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: "sorov_sinf", p_malumot: { bola } });
-    const sinflar: any[] = (await rpc("ep_sinflar_qisqa", {})) ?? [];
-    const rows: any[] = []; for (let i = 0; i < sinflar.length; i += 4) rows.push(sinflar.slice(i, i + 4).map((x: any) => ({ text: x.nom, callback_data: `sv:${x.id}` })));
-    await S(`<b>${esc(bola)}</b> — qaysi sinfga bormoqchi (yoki bormoqda)?`, { reply_markup: { inline_keyboard: rows } });
+    const sid = Number(stO?.malumot?.sinf ?? 0) || null;
+    const r = await rpc("ep_sorov_bola", { p_chat_id: chat, p_bola: bola, p_sinf_id: sid, p_oquvchi_id: null });
+    await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: null, p_malumot: null });
+    await S(`✅ <b>${esc(r?.bola ?? bola)}</b>` + (r?.sinf ? ` · ${esc(r.sinf)}` : "") + ` qabul qilindi.`,
+      { reply_markup: { inline_keyboard: [[{ text: "➕ Yana farzandim bor", callback_data: "sv_yana" }], [{ text: "✅ Hammasi shu", callback_data: "sv_tamom" }]] } });
     return;
   }
   const rol = await rpc("ep_tg_rol", { p_chat_id: chat });
@@ -1270,7 +1272,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v5.9 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v6.0 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
@@ -1284,6 +1286,44 @@ Deno.serve(async (req) => {
           await rpc("ep_xabar_oqildi", { p_chat_id: chat, p_kalit: kalit });
           await tg("editMessageReplyMarkup", { chat_id: chat, message_id: cq.message.message_id, reply_markup: { inline_keyboard: [[{ text: "✅ O‘qildi", callback_data: "rd_ok" }]] } }, OTA);
           return new Response("ok");
+        }
+        if ((kk === "sv_c" || kk === "sv_o" || kk === "sv_m" || kk === "sv_yana" || kk === "sv_tamom") && chat) {
+          const SS = (t: string, extra: Record<string, unknown> = {}) => send(chat, t, extra, OTA);
+          if (kk === "sv_yana") {
+            const sinflar: any[] = (await rpc("ep_sinflar_qisqa", {})) ?? [];
+            const rows: any[] = []; for (let i = 0; i < sinflar.length; i += 4) rows.push(sinflar.slice(i, i + 4).map((x: any) => ({ text: x.nom, callback_data: `sv_c:${x.id}` })));
+            await SS("Keyingi farzandingiz qaysi sinfda?", { reply_markup: { inline_keyboard: rows } });
+            return new Response("ok");
+          }
+          if (kk === "sv_tamom") {
+            const d = await rpc("ep_sorov_royxat_tg", { p_chat_id: chat }).catch(() => null); void d;
+            await tg("editMessageReplyMarkup", { chat_id: chat, message_id: cq.message.message_id, reply_markup: { inline_keyboard: [] } }, OTA);
+            await SS("✅ Rahmat! Ma’lumotlaringiz qabul qilindi.\n\nMa’muriyat tez orada siz bilan bog‘lanadi va shartnomani rasmiylashtiramiz.");
+            const adm = await rpc("ep_adminlar_chat", {});
+            for (const c of (Array.isArray(adm) ? adm : [])) await send(Number(c), `🆕 <b>Shartnomasiz murojaat</b> — ota-ona farzand(lar)ini kiritdi.\n«Ota-onalar» bo‘limida ko‘ring.`);
+            return new Response("ok");
+          }
+          if (kk === "sv_c") {
+            const sid = Number(aa);
+            const lst: any[] = (await rpc("ep_sinf_oquvchilari", { p_sinf_id: sid })) ?? [];
+            const rows: any[] = lst.slice(0, 40).map((o: any) => [{ text: o.ism, callback_data: `sv_o:${o.id}` }]);
+            rows.push([{ text: "➕ Ro‘yxatda yo‘q — ismini yozaman", callback_data: `sv_m:${sid}` }]);
+            await tg("editMessageText", { chat_id: chat, message_id: cq.message.message_id, parse_mode: "HTML",
+              text: `Farzandingizni ro‘yxatdan tanlang:` , reply_markup: { inline_keyboard: rows } }, OTA);
+            return new Response("ok");
+          }
+          if (kk === "sv_m") {
+            await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: "sorov_bola", p_malumot: { sinf: Number(aa) } });
+            await SS("Farzandingizning <b>ism va familiyasini</b> yozing:");
+            return new Response("ok");
+          }
+          if (kk === "sv_o") {
+            const r = await rpc("ep_sorov_bola", { p_chat_id: chat, p_bola: null, p_sinf_id: null, p_oquvchi_id: Number(aa) });
+            await tg("editMessageText", { chat_id: chat, message_id: cq.message.message_id, parse_mode: "HTML",
+              text: `✅ <b>${esc(r?.bola ?? "")}</b> · ${esc(r?.sinf ?? "")} qabul qilindi.`,
+              reply_markup: { inline_keyboard: [[{ text: "➕ Yana farzandim bor", callback_data: "sv_yana" }], [{ text: "✅ Hammasi shu", callback_data: "sv_tamom" }]] } }, OTA);
+            return new Response("ok");
+          }
         }
         if (kk === "sv" && chat) {
           const st = await rpc("ep_tg_holat_ol", { p_chat_id: chat });
