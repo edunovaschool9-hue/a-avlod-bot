@@ -137,6 +137,15 @@ label{display:block;font-size:12px;color:var(--mu);margin:0 0 4px}
 .msh-act .b-ok{background:#1F7A45;border-color:#1F7A45;color:#fff}
 .msh-act .b-bad{color:#be123c;border-color:#f0c4ce}
 @media(max-width:640px){.msh-stats{grid-template-columns:repeat(2,1fr)}.msh-stats b{font-size:20px}}
+.mt-h{margin:0 0 14px;font-size:17px}
+.mt-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.mt-f{display:block;margin-bottom:10px}
+.mt-f span{font-size:12px;color:var(--mu,#64748b)}
+.mt-f input{width:100%;font:inherit;font-size:15px;padding:9px 11px;border:1px solid var(--bd,#dfe4ec);border-radius:8px;margin-top:3px;background:var(--cd,#fff);color:inherit}
+.mt-act{display:flex;gap:8px;margin-top:16px}
+.mt-act button{flex:1;padding:11px;border-radius:8px;border:1px solid var(--bd,#dfe4ec);background:var(--cd,#fff);color:inherit;font:inherit;cursor:pointer}
+.mt-act .b-ok{background:#1F7A45;border-color:#1F7A45;color:#fff}
+@media(max-width:560px){.mt-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -1334,9 +1343,12 @@ function mshChiz(){
         kv('Bir soatlik to\'lov',r.soatlik?pul(r.soatlik):'')+kv('Oylik maosh',r.oylik?pul(r.oylik):'')+
         kv('Imzo',r.imzo?'qo\'yilgan':'')+'</dl>';
       if(r.izoh) h+='<div class="msh-izoh">'+esc(r.izoh)+'</div>';
-      if(st==='wait') h+='<div class="msh-act">'+
+      h+='<div class="msh-act">';
+      if(st==='wait') h+=
         '<button class="b-ok" onclick="mshTasdiq('+(r.sh_id??r.id)+','+r.id+',true)">Tasdiqlash</button>'+
-        '<button class="b-bad" onclick="mshTasdiq('+(r.sh_id??r.id)+','+r.id+',false)">Rad etish</button></div>';
+        '<button class="b-bad" onclick="mshTasdiq('+(r.sh_id??r.id)+','+r.id+',false)">Rad etish</button>';
+      h+='<button onclick="mshTahrir('+(r.sh_id??r.id)+')">Tahrirlash</button>'+
+         '<button class="b-bad" onclick="mshOchir('+(r.sh_id??r.id)+','+r.id+')">O\'chirish</button></div>';
     }
     h+='</div></div>';
   });
@@ -1346,6 +1358,51 @@ function mshChiz(){
   if(q){ q.oninput=e=>{ clearTimeout(window._mshT);
     window._mshT=setTimeout(()=>{ MSH_Q=e.target.value.trim().toLowerCase(); mshChiz();
       const n=$('mshQ'); if(n){n.focus(); n.setSelectionRange(n.value.length,n.value.length);} },200); }; }
+}
+
+function mshTahrir(shId){
+  const r=(MSH_D.royxat||[]).find(x=>(x.sh_id??x.id)===shId)||{};
+  const f=(id,lbl,val,tur)=>'<label class="mt-f"><span>'+lbl+'</span>'+
+    '<input id="mt_'+id+'" type="'+(tur||'text')+'" value="'+esc(val==null?'':val)+'"></label>';
+  modalOch('<h3 class="mt-h">Shartnomani tahrirlash</h3><div class="mt-grid">'+
+    f('fio','F.I.Sh.',r.ism)+f('pasport','Pasport',r.pasport)+f('pinfl','JSHSHIR',r.pinfl)+
+    f('tugilgan','Tug\'ilgan sana',String(r.tugilgan||'').slice(0,10),'date')+
+    f('telefon','Telefon',r.tel)+f('lavozim','Lavozim',r.lavozim)+
+    f('hafta_kun','Haftadagi ish kuni',r.kun)+f('hafta_soat','Haftalik soat',r.soat)+
+    f('soatlik','Bir soatlik to\'lov',r.soatlik)+f('oylik','Oylik maosh',r.oylik)+
+    f('boshlanish','Boshlanish sanasi',String(r.boshlanish||'').slice(0,10),'date')+
+    '</div>'+f('manzil','Manzil',r.manzil)+f('izoh','Izoh',r.izoh)+
+    '<div class="mt-act"><button class="b-ok" onclick="mshSaqla('+shId+')">Saqlash</button>'+
+    '<button onclick="modalYop()">Bekor qilish</button></div>');
+}
+
+async function mshSaqla(shId){
+  const v=id=>{const e=$('mt_'+id); return e?e.value.trim():'';};
+  const son=id=>v(id).replace(/[^0-9.]/g,'');
+  try{
+    const d=await rpc('ep_msh_tahrir',{p_token:T,p_id:shId,
+      p_fio:v('fio'),p_pasport:v('pasport'),p_pinfl:v('pinfl'),p_tugilgan:v('tugilgan'),
+      p_manzil:v('manzil'),p_telefon:v('telefon'),p_lavozim:v('lavozim'),
+      p_hafta_kun:v('hafta_kun'),p_hafta_soat:v('hafta_soat'),
+      p_soatlik:son('soatlik'),p_oylik:son('oylik'),
+      p_ish_boshlanish:v('boshlanish'),p_izoh:v('izoh')});
+    if(!d||!d.ok) throw new Error((d&&d.xato)||'Saqlanmadi');
+    modalYop();
+    MSH_D=await rpc('ep_msh_royxat',{p_token:T}); mshChiz();
+    xabar('Saqlandi','ok');
+  }catch(e){ xabar(xatoMatn(e),'xato'); }
+}
+
+async function mshOchir(shId,odamId){
+  const r=(MSH_D.royxat||[]).find(x=>x.id===odamId)||{};
+  if(!confirm('Shartnoma o\'chirilsinmi?\n\n'+(r.ism||'')+'\n\nBu amalni bekor qilib bo\'lmaydi.')) return;
+  try{
+    const d=await rpc('ep_msh_ochir',{p_token:T,p_id:shId});
+    if(!d||!d.ok) throw new Error((d&&d.xato)||'O\'chirilmadi');
+    console.log('EduNova: o\'chirilgan yozuv (zaxira nusxa):', JSON.stringify(d.ochirildi));
+    MSH_D=await rpc('ep_msh_royxat',{p_token:T}); mshChiz();
+    xabar('O\'chirildi','ok');
+  }catch(e){ xabar(xatoMatn(e),'xato'); }
 }
 
 function mshOch(el,val){ el.textContent = el.textContent.indexOf('\u2022')>=0 ? val : mshMask(val); }

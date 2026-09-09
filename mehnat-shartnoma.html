@@ -30,10 +30,10 @@ h1{font-size:21px;font-weight:650;letter-spacing:-.01em;margin:0 0 6px}
 
 /* ── PIN ── */
 #pinPane .card{text-align:center;padding:32px 20px}
-#pinPane input{width:100%;max-width:240px;text-align:center;font-size:26px;letter-spacing:.32em;
-  padding:14px 12px;border:1px solid var(--line);border-radius:10px;font-family:inherit;
-  background:var(--soft);color:var(--ink);margin:6px 0 16px}
-#pinPane input:focus{outline:2px solid var(--acc);outline-offset:-1px;background:var(--paper)}
+#pinPane select{width:100%;font-size:16px;padding:13px 12px;border:1px solid var(--line);
+  border-radius:10px;font-family:inherit;background:var(--soft);color:var(--ink);margin:6px 0 16px}
+#pinPane select:focus{outline:2px solid var(--acc);outline-offset:-1px;background:var(--paper)}
+#pinPane .qol{font-size:13px;color:var(--dim);margin-top:-8px;margin-bottom:14px}
 
 /* ── Forma ── */
 fieldset{border:0;padding:0;margin:0 0 26px}
@@ -95,10 +95,11 @@ button.ghost{background:transparent;color:var(--dim);border-color:var(--line);fo
   <section id="pinPane">
     <div class="card">
       <h1>Mehnat shartnomasi</h1>
-      <p class="lead">Davom etish uchun shaxsiy PIN kodingizni kiriting</p>
+      <p class="lead">Roʻyxatdan oʻzingizni tanlang</p>
       <div id="pinXato"></div>
-      <input id="pin" type="password" inputmode="numeric" autocomplete="off"
-             maxlength="8" placeholder="••••••" aria-label="PIN kod">
+      <select id="kim" aria-label="Ismingiz">
+        <option value="">Yuklanmoqda…</option>
+      </select>
       <button id="pinBtn">Davom etish</button>
     </div>
   </section>
@@ -223,7 +224,7 @@ button.ghost{background:transparent;color:var(--dim);border-color:var(--line);fo
 
 /* ══════════════ SOZLAMA ══════════════════════════════════════════
    SB_KEY  — anon key, boshqa sahifadan koʻchiring.
-   PIN_FN  — PIN ni oldindan tekshiradigan mavjud RPC nomi.
+   (PIN kerak emas — o'qituvchi ro'yxatdan tanlanadi.)
              Bilmasangiz boʻsh qoldiring — PIN yuborishda tekshiriladi.
    DRAFT_MAXFIY — true boʻlsa qoralamaga pasport/JSHSHIR yozilmaydi.
    ═════════════════════════════════════════════════════════════════ */
@@ -327,42 +328,60 @@ function hisobla(){
 }
 
 /* ── PIN ekrani ───────────────────────────────────────────────────── */
-$('#pinBtn').onclick = async () => {
-  const v = onlyDigits($('#pin').value);
-  alertBox('#pinXato','');
-  if(v.length < 4){ alertBox('#pinXato','PIN kamida 4 raqamdan iborat'); return; }
+let ODAM_ID = null;   // null = ro'yxatda yo'q, qo'lda kiritilgan
 
-  const b = $('#pinBtn'); b.disabled = true; b.textContent = 'Tekshirilmoqda…';
+/* ── Ro'yxatni yuklash ─────────────────────────────────────────────── */
+(async function royxatYukla(){
+  const sel = $('#kim');
   try{
-    const d = await rpc('ep_kirish', {pin:v});
-    if(!d || !d.ok) throw new Error(d && d.xato ? d.xato : 'PIN xato');
-    if(d.rol !== 'oqituvchi') throw new Error('Bu PIN o\u2018qituvchiga tegishli emas');
-
-    // ismni oldindan qo'yamiz, agar server bersa
-    try{
-      const m = await rpc('ep_men', {token:d.token});
-      const ism = m && (m.ism || m.fio || (m.profil && (m.profil.ism || m.profil.fio)));
-      const lav = m && (m.lavozim || (m.profil && m.profil.lavozim));
-      if(ism && !$('#fio').value) $('#fio').value = ism;
-      if(lav && !$('#lavozim').value) $('#lavozim').value = lav;
-    }catch(e){ if(DEBUG) console.warn('ep_men:', e.message); }
-
-    PIN = v;
-    $('#pinPane').classList.add('hidden');
-    $('#formPane').classList.remove('hidden');
-    $('#bar').classList.remove('hidden');
-    tikla(); hisobla();
-    ($('#fio').value ? $('#pasport') : $('#fio')).focus();
-    window.scrollTo(0,0);
+    const d = await rpc('ep_msh_ochiq_royxat', {});
+    const r = (d && d.royxat) || [];
+    if(!r.length) throw new Error('Ro\u2018yxat bo\u2018sh');
+    sel.innerHTML = '<option value="">\u2014 tanlang \u2014</option>' +
+      r.map(x => '<option value="'+x.id+'" data-holat="'+x.holat+'">' +
+                 x.ism.replace(/[<>&]/g,'') +
+                 (x.holat === 'tasdiqlangan' ? ' \u2713' :
+                  x.holat === 'kutmoqda'     ? ' (ko\u2018rib chiqilmoqda)' : '') +
+                 '</option>').join('') +
+      '<option value="yoq">Men ro\u2018yxatda yo\u2018qman</option>';
   }catch(e){
-    alertBox('#pinXato', /PIN|xato|topilmadi/i.test(e.message)
-      ? 'PIN qabul qilinmadi. Direksiyadan tekshirib oling.'
-      : 'Tekshirib bo\u2018lmadi.\n' + e.message);
-  }finally{
-    b.disabled = false; b.textContent = 'Davom etish';
+    sel.innerHTML = '<option value="yoq">Men ro\u2018yxatda yo\u2018qman</option>';
+    alertBox('#pinXato','Ro\u2018yxatni yuklab bo\u2018lmadi, ma\u2019lumotlarni qo\u2018lda kiriting.','info');
   }
+})();
+
+$('#kim').onchange = () => {
+  const o = $('#kim').selectedOptions[0];
+  alertBox('#pinXato','');
+  if(o && o.dataset.holat === 'tasdiqlangan')
+    alertBox('#pinXato','Shartnomangiz allaqachon tasdiqlangan. O\u2018zgartirish uchun direksiyaga murojaat qiling.','info');
 };
-$('#pin').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#pinBtn').click(); });
+
+$('#pinBtn').onclick = () => {
+  const sel = $('#kim'), v = sel.value;
+  alertBox('#pinXato','');
+  if(!v){ alertBox('#pinXato','Iltimos, ro\u2018yxatdan o\u2018zingizni tanlang'); return; }
+
+  const o = sel.selectedOptions[0];
+  if(o && o.dataset.holat === 'tasdiqlangan'){
+    alertBox('#pinXato','Shartnomangiz allaqachon tasdiqlangan. O\u2018zgartirish uchun direksiyaga murojaat qiling.');
+    return;
+  }
+
+  if(v === 'yoq'){
+    ODAM_ID = null;
+  }else{
+    ODAM_ID = Number(v);
+    if(!$('#fio').value) $('#fio').value = o.textContent.replace(/\s*(\u2713|\(.*\))\s*$/,'').trim();
+  }
+
+  $('#pinPane').classList.add('hidden');
+  $('#formPane').classList.remove('hidden');
+  $('#bar').classList.remove('hidden');
+  tikla(); hisobla();
+  ($('#fio').value ? $('#pasport') : $('#fio')).focus();
+  window.scrollTo(0,0);
+};
 
 /* ── Forma xatti-harakati ─────────────────────────────────────────── */
 Object.keys(RULES).forEach(k=>{
@@ -404,8 +423,8 @@ $('#yubor').onclick = async () => {
   }
   const b = $('#yubor'); b.disabled = true; b.textContent = 'Yuborilmoqda…';
   try{
-    const javob = await rpc('ep_msh_yubor', {
-      pin:      PIN,
+    const javob = await rpc('ep_msh_ochiq_yubor', {
+      oqituvchi_id: ODAM_ID,
       fio:      $('#fio').value.trim().replace(/\s+/g,' '),
       pasport:  $('#pasport').value.trim().toUpperCase(),
       pinfl:    onlyDigits($('#pinfl').value),
@@ -429,7 +448,7 @@ $('#yubor').onclick = async () => {
   }catch(e){
     const m = e.message||'';
     alertBox('#formXato',
-      /pin/i.test(m)                    ? 'PIN qabul qilinmadi. Direksiyadan tekshirib oling.' :
+      /tasdiqlangan/i.test(m)           ? 'Shartnomangiz allaqachon tasdiqlangan. Direksiyaga murojaat qiling.' :
       /duplicate|unique|already/i.test(m)? 'Sizning arizangiz allaqachon yuborilgan. Direksiya koʻrib chiqmoqda.' :
       'Yuborilmadi.\n' + m);
     b.disabled = false; b.textContent = 'Tasdiqlashga yuborish';
