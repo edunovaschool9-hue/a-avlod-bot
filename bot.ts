@@ -29,7 +29,20 @@ const cronOk = async (k: string | null) => !!k && ((CRON && k === CRON) || (awai
 
 // ---------- klaviaturalar ----------
 const KB_LOK = { keyboard: [[{ text: "📍 Joylashuvni yuborish", request_location: true }]], resize_keyboard: true, one_time_keyboard: true };
-const KB_ADMIN = { keyboard: [[{ text: "🏫 Kim maktabda" }, { text: "📋 Davomat hisoboti" }], [{ text: "📣 Chaqirish" }, { text: "📝 Arizalar" }], [{ text: "👨‍👩‍👧 Ota-onalar" }, { text: "📢 Xabar" }], [{ text: "🎒 O‘quvchilar" }, { text: "🎫 Talonlar" }], [{ text: "🧪 Test" }, { text: "📚 Fanlarim" }], [{ text: "🎒 Maktab o‘quvchilari" }], [{ text: "📝 Xulosalar" }, { text: "🧪 Natijalar" }], [{ text: "⚠️ Belgilanmaganlar" }, { text: "🏆 Reyting" }], [{ text: "📊 Kunlik hisobot" }], [{ text: "👩‍🏫 O‘qituvchilar" }], [{ text: "📤 Davomat so‘rash" }], [{ text: "📱 Kabinet" }]], resize_keyboard: true };
+const KB_ADMIN = { keyboard: [
+  [{ text: "📋 Davomat hisoboti" }, { text: "⚠️ Belgilanmaganlar" }],
+  [{ text: "📝 Xulosalar" }, { text: "🏆 Reyting" }],
+  [{ text: "👨‍👩‍👧 Ota-onalar" }, { text: "👩‍🏫 O‘qituvchilar" }],
+  [{ text: "📊 Kunlik hisobot" }, { text: "📱 Kabinet" }],
+  [{ text: "➕ Boshqa bo‘limlar" }]], resize_keyboard: true };
+const KB_ADMIN2 = { keyboard: [
+  [{ text: "🏫 Kim maktabda" }, { text: "📤 Davomat so‘rash" }],
+  [{ text: "🧪 Test" }, { text: "🧪 Natijalar" }],
+  [{ text: "🎒 O‘quvchilar" }, { text: "🎫 Talonlar" }],
+  [{ text: "📣 Chaqirish" }, { text: "📝 Arizalar" }],
+  [{ text: "📢 Xabar" }, { text: "📄 Listovkalar" }],
+  [{ text: "📚 Fanlarim" }],
+  [{ text: "◀️ Asosiy menyu" }]], resize_keyboard: true };
 const KB_TEACH = { keyboard: [[{ text: "✅ Davomat belgilash" }, { text: "📝 Xulosa yozish" }], [{ text: "🧪 Test" }, { text: "📚 Fanlarim" }], [{ text: "🎒 Maktab o‘quvchilari" }], [{ text: "📊 Holatim" }], [{ text: "🔑 PIN" }, { text: "📱 Kabinet" }]], resize_keyboard: true };
 const KB_APP = (t = "📱 Kabinetni ochish") => ({ inline_keyboard: [[{ text: t, web_app: { url: APP } }]] });
 
@@ -895,6 +908,8 @@ async function xabar(msg: any) {
       if (bb.trim()) await send(chat, bb);
       return;
     }
+    if (/boshqa bo‘limlar|boshqa bolimlar/i.test(matn)) { await send(chat, "Qo‘shimcha bo‘limlar 👇", { reply_markup: KB_ADMIN2 }); return; }
+    if (/asosiy menyu/i.test(matn)) { await send(chat, "Asosiy menyu 👇", { reply_markup: KB_ADMIN }); return; }
     if (/reyting/i.test(matn)) { await reytingKor(chat, "hafta"); return; }
     if (/belgilanmagan/i.test(matn)) {
       const d = await rpc("ep_belgisiz_tg", { p_chat_id: chat, p_kun: null });
@@ -1473,7 +1488,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v6.4 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v6.5 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
