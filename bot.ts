@@ -29,7 +29,7 @@ const cronOk = async (k: string | null) => !!k && ((CRON && k === CRON) || (awai
 
 // ---------- klaviaturalar ----------
 const KB_LOK = { keyboard: [[{ text: "📍 Joylashuvni yuborish", request_location: true }]], resize_keyboard: true, one_time_keyboard: true };
-const KB_ADMIN = { keyboard: [[{ text: "🏫 Kim maktabda" }, { text: "📋 Davomat hisoboti" }], [{ text: "📣 Chaqirish" }, { text: "📝 Arizalar" }], [{ text: "👨‍👩‍👧 Ota-onalar" }, { text: "📢 Xabar" }], [{ text: "🎒 O‘quvchilar" }, { text: "🎫 Talonlar" }], [{ text: "🧪 Test" }, { text: "📚 Fanlarim" }], [{ text: "🎒 Maktab o‘quvchilari" }], [{ text: "📝 Xulosalar" }, { text: "🧪 Natijalar" }], [{ text: "⚠️ Belgilanmaganlar" }, { text: "📊 Kunlik hisobot" }], [{ text: "👩‍🏫 O‘qituvchilar" }], [{ text: "📤 Davomat so‘rash" }], [{ text: "📱 Kabinet" }]], resize_keyboard: true };
+const KB_ADMIN = { keyboard: [[{ text: "🏫 Kim maktabda" }, { text: "📋 Davomat hisoboti" }], [{ text: "📣 Chaqirish" }, { text: "📝 Arizalar" }], [{ text: "👨‍👩‍👧 Ota-onalar" }, { text: "📢 Xabar" }], [{ text: "🎒 O‘quvchilar" }, { text: "🎫 Talonlar" }], [{ text: "🧪 Test" }, { text: "📚 Fanlarim" }], [{ text: "🎒 Maktab o‘quvchilari" }], [{ text: "📝 Xulosalar" }, { text: "🧪 Natijalar" }], [{ text: "⚠️ Belgilanmaganlar" }, { text: "🏆 Reyting" }], [{ text: "📊 Kunlik hisobot" }], [{ text: "👩‍🏫 O‘qituvchilar" }], [{ text: "📤 Davomat so‘rash" }], [{ text: "📱 Kabinet" }]], resize_keyboard: true };
 const KB_TEACH = { keyboard: [[{ text: "✅ Davomat belgilash" }, { text: "📝 Xulosa yozish" }], [{ text: "🧪 Test" }, { text: "📚 Fanlarim" }], [{ text: "🎒 Maktab o‘quvchilari" }], [{ text: "📊 Holatim" }], [{ text: "🔑 PIN" }, { text: "📱 Kabinet" }]], resize_keyboard: true };
 const KB_APP = (t = "📱 Kabinetni ochish") => ({ inline_keyboard: [[{ text: t, web_app: { url: APP } }]] });
 
@@ -808,6 +808,30 @@ async function xabar(msg: any) {
       if (bb.trim()) await send(chat, bb);
       return;
     }
+    if (/reyting/i.test(matn)) {
+      const d = await rpc("ep_reyting_tg", { p_chat_id: chat, p_kun: null });
+      if (!d?.ok) { await send(chat, "Ruxsat yo‘q"); return; }
+      const Q = d.qoida ?? { xulosa: 5, davomat: 5, test: 2 };
+      const ball = (x: any, p: string) => Number(x[p + "xul"]) * Q.xulosa + Number(x[p + "dav"]) * Q.davomat + Number(x[p + "test"]) * Q.test;
+      const r: any[] = ((d.royxat ?? []) as any[]).map((x: any) => ({ ...x, bk: ball(x, "k_"), bh: ball(x, "h_"), bj: ball(x, "j_") }));
+      const kun = [...r].sort((a2: any, b2: any) => b2.bk - a2.bk).filter((x: any) => x.bk > 0);
+      const haf = [...r].sort((a2: any, b2: any) => b2.bh - a2.bh).filter((x: any) => x.bh > 0);
+      const jam = [...r].sort((a2: any, b2: any) => b2.bj - a2.bj).filter((x: any) => x.bj > 0);
+      const med = ["🥇", "🥈", "🥉"];
+      const qat = (list: any[], p: string, b: string) => list.map((x: any, i: number) =>
+        `${med[i] ?? (i + 1) + "."} <b>${esc(x.ism)}</b> — <b>${x[b]}</b> ball  <i>(${x[p + "xul"]} xulosa · ${x[p + "dav"]} davomat · ${x[p + "test"]} test)</i>`).join("\n") || "—";
+      let t = `🏆 <b>O‘qituvchilar reytingi</b> · ${d.kun}\n` +
+        `<i>Ball: xulosa ${Q.xulosa} · davomat ${Q.davomat} · test ${Q.test}</i>\n\n` +
+        `<b>📅 BUGUN</b>\n${qat(kun, "k_", "bk")}\n\n` +
+        `<b>📆 SHU HAFTA</b> (${d.hafta_boshi} dan)\n${qat(haf, "h_", "bh")}\n\n` +
+        `<b>🗓 UMUMIY</b> (${d.boshlangan} dan)\n${qat(jam, "j_", "bj")}`;
+      const nol = r.filter((x: any) => x.bj === 0);
+      if (nol.length) t += `\n\n<b>⚪ Hali faoliyat yo‘q</b>\n` + nol.map((x: any) => `• ${esc(x.ism)}`).join("\n");
+      const qq = t.split("\n"); let bb = "";
+      for (const q2 of qq) { if ((bb + "\n" + q2).length > 3500) { await send(chat, bb); bb = ""; } bb += (bb ? "\n" : "") + q2; }
+      if (bb.trim()) await send(chat, bb);
+      return;
+    }
     if (/belgilanmagan/i.test(matn)) {
       const d = await rpc("ep_belgisiz_tg", { p_chat_id: chat, p_kun: null });
       if (!d?.ok) { await send(chat, "Ruxsat yo‘q"); return; }
@@ -1354,7 +1378,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v6.2 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v6.3 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
