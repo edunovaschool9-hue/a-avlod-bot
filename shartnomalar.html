@@ -78,13 +78,7 @@ function chiz(){
  var h=nav()+'<div class="stat"><div><b>'+D.jami+'</b><small>SHARTNOMA</small></div>'+
    '<div><b>'+D.imzosiz.length+'</b><small>QOLDI</small></div>'+
    '<div><b>'+D.oquvchi+'</b><small>O\u2018QUVCHI</small></div></div>';
- h+='<div class="tabs"><button class="'+(TAB==='imzo'?'on':'')+'" onclick="setTab(\'imzo\')">Shartnoma</button>'+
-    '<button class="'+(TAB==='yoq'?'on':'')+'" onclick="setTab(\'yoq\')">Qolganlar</button>'+
-    '<button class="'+(TAB==='teach'?'on':'')+'" onclick="teachEkran()">O\u2018qituvchi</button>'+
-    '<button class="'+(TAB==='rahbar'?'on':'')+'" onclick="rahbarEkran()">Rahbariyat</button>'+
-    '<button class="'+(TAB==='ota'?'on':'')+'" onclick="otaEkran()">Ota-ona</button>'+
-    '<button class="'+(TAB==='talon'?'on':'')+'" onclick="talonEkran()">Talon</button>'+
-    '<button class="'+(TAB==='baho'?'on':'')+'" onclick="bahoEkran()">Baho</button></div>';
+ h+=tabRow('imzo');
  h+='<div class="chips" id="chips"></div>';
  h+='<input id="q" placeholder="Ism yoki telefon bo\u2018yicha qidirish\u2026" value="'+esc(Q)+'" oninput="Q=this.value;lst()">';
  h+='<div id="lst" style="margin-top:10px"></div>';
@@ -171,9 +165,7 @@ function teachEkran(){
 function teachChiz(){
  var d=TD, ich=0, jam=0;
  d.oqituvchilar.forEach(function(o){ich+=o.ichkarida;jam+=o.slotlar;});
- var h=nav()+'<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
-   '<button class="on">O\u2018qituvchi</button>'+
-   '<button onclick="rahbarEkran()">Rahbariyat</button></div>';
+ var h=nav()+tabRow('teach');
  h+='<div class="stat"><div><b>'+d.arizalar.length+'</b><small>ARIZA</small></div>'+
    '<div><b>'+d.oqituvchilar.length+'</b><small>O\u2018QITUVCHI</small></div>'+
    '<div><b>'+ich+'/'+jam+'</b><small>BUGUN ICHKARIDA</small></div></div>';
@@ -242,9 +234,7 @@ function rahbarEkran(){
 function rahbarChiz(){
  var d=RH, faol=d.royxat.filter(function(x){return x.faol;});
  var ulangan=faol.filter(function(x){return x.tg;}).length;
- var h=nav()+'<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
-   '<button onclick="teachEkran()">O\u2018qituvchi</button>'+
-   '<button class="on">Rahbariyat</button></div>';
+ var h=nav()+tabRow('rahbar');
  h+='<div class="stat"><div><b>'+faol.length+'</b><small>RAHBAR</small></div>'+
    '<div><b>'+ulangan+'</b><small>TELEGRAMDA</small></div></div>';
  if(ulangan<faol.length){
@@ -311,10 +301,7 @@ function otaEkran(){
 }
 function otaChiz(){
  var d=OT;
- var h=nav()+'<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
-   '<button onclick="teachEkran()">O\u2018qituvchi</button>'+
-   '<button onclick="rahbarEkran()">Rahbariyat</button>'+
-   '<button class="on">Ota-ona</button></div>';
+ var h=nav()+tabRow('ota');
  h+='<div class="stat"><div><b>'+d.jami+'</b><small>OTA-ONA</small></div>'+
    '<div><b>'+d.tg+'</b><small>BOTGA ULANGAN</small></div>'+
    '<div><b>'+(d.jami-d.tg)+'</b><small>ULANMAGAN</small></div></div>';
@@ -357,11 +344,7 @@ function nusxa(t){
 
 function talonEkran(){
  TAB='talon';
- var h=nav()+'<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
-   '<button onclick="teachEkran()">O\u2018qituvchi</button>'+
-   '<button onclick="otaEkran()">Ota-ona</button>'+
-   '<button class="on">Talon</button>'+
-    '<button onclick="bahoEkran()">Baho</button></div>';
+ var h=nav()+tabRow('talon');
  h+='<div class="card"><b>\u{1F5C2} Xujjat ishlar</b><div class="sm mu" style="margin:6px 0 10px">Kelish/ketish talonlari va buyruqlar \u2014 akademiyadagi reyestr, bir xil blank, bir xil raqamlash (T / KT / OQ).</div>'+
    '<a class="btn" style="text-decoration:none;text-align:center" href="hujjat.html?tur=kelish">\u{1F4E5} Kelish taloni</a>'+
    '<a class="btn" style="text-decoration:none;text-align:center" href="hujjat.html?tur=ketish">\u{1F4E4} Ketish taloni</a>'+
@@ -617,11 +600,7 @@ function bahoEkran(){
 }
 function bahoChiz(){
  var d=BH;
- var h=nav()+'<div class="tabs"><button onclick="chiz()">Shartnoma</button>'+
-   '<button onclick="teachEkran()">O\u2018qituvchi</button>'+
-   '<button onclick="otaEkran()">Ota-ona</button>'+
-   '<button onclick="talonEkran()">Talon</button>'+
-   '<button class="on">Baho</button></div>';
+ var h=nav()+tabRow('baho');
  h+='<div class="card"><b>\u2B50 Tizim bahosi</b>'+
     '<div class="sm mu" style="margin:4px 0 8px">Ota-onalar so\u2018rovnomasi natijasi</div>'+
     '<canvas id="gauge" width="620" height="380" style="width:100%;height:auto"></canvas>'+
@@ -690,6 +669,16 @@ function bahoHavola(){
  var u='https://edunovaschool9-hue.github.io/a-avlod-bot/baho.html';
  if(navigator.clipboard){navigator.clipboard.writeText(u).then(function(){alert('Havola nusxalandi:\n'+u);});}
  else prompt('Havola:',u);
+}
+
+
+function tabRow(act){
+ var t=[['imzo','Shartnoma','chiz()'],['teach','O\u2018qituvchi','teachEkran()'],
+        ['rahbar','Rahbariyat','rahbarEkran()'],['ota','Ota-ona','otaEkran()'],
+        ['talon','Talon','talonEkran()'],['baho','Baho','bahoEkran()']];
+ return '<div class="tabs">'+t.map(function(x){
+   return '<button class="'+(act===x[0]?'on':'')+'" onclick="'+x[2]+'">'+x[1]+'</button>';
+ }).join('')+'</div>';
 }
 
 if(TOK) yukla(); else kirishEkran();
