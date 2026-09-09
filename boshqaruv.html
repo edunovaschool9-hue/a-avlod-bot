@@ -129,7 +129,7 @@ label{display:block;font-size:12px;color:var(--mu);margin:0 0 4px}
     <div class="til"><button class="til-btn" data-lang="uz">UZ</button><button class="til-btn" data-lang="ru">RU</button></div>
   </div></div>
   <div class="wrap"><div id="cont"></div></div>
-  <div class="nav"><b data-tab="kun" onclick="ochTab('kun')"><i>📅</i><span data-tl="n_kun">n_kun</span></b><b data-tab="davomat" onclick="ochTab('davomat')"><i>🕗</i><span data-tl="n_davomat">n_davomat</span></b><b data-tab="oqituvchilar" onclick="ochTab('oqituvchilar')"><i>🧑‍🏫</i><span data-tl="n_oqituvchilar">n_oqituvchilar</span></b><b data-tab="oquvchilar" onclick="ochTab('oquvchilar')"><i>👥</i><span data-tl="n_oquvchilar">n_oquvchilar</span></b><b data-tab="pechat" onclick="ochTab('pechat')"><i>🖨️</i><span data-tl="n_pechat">n_pechat</span></b><b data-tab="reyting" onclick="ochTab('reyting')"><i>🏆</i><span data-tl="n_reyting">n_reyting</span></b><b data-tab="sozlama" onclick="ochTab('sozlama')"><i>⚙️</i><span data-tl="n_sozlama">n_sozlama</span></b></div>
+  <div class="nav"><b data-tab="kun" onclick="ochTab('kun')"><i>📅</i><span data-tl="n_kun">n_kun</span></b><b data-tab="davomat" onclick="ochTab('davomat')"><i>🕗</i><span data-tl="n_davomat">n_davomat</span></b><b data-tab="oqituvchilar" onclick="ochTab('oqituvchilar')"><i>🧑‍🏫</i><span data-tl="n_oqituvchilar">n_oqituvchilar</span></b><b data-tab="oquvchilar" onclick="ochTab('oquvchilar')"><i>👥</i><span data-tl="n_oquvchilar">n_oquvchilar</span></b><b data-tab="pechat" onclick="ochTab('pechat')"><i>🖨️</i><span data-tl="n_pechat">n_pechat</span></b><b data-tab="baho" onclick="ochTab('baho')"><i>⭐</i><span>Baho</span></b><b data-tab="reyting" onclick="ochTab('reyting')"><i>🏆</i><span data-tl="n_reyting">n_reyting</span></b><b data-tab="sozlama" onclick="ochTab('sozlama')"><i>⚙️</i><span data-tl="n_sozlama">n_sozlama</span></b></div>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -322,6 +322,77 @@ async function boshla(){
 }
 function qaytaChiz(){ if(SINFLAR.length||SOZ) ochTab(TAB); }
 function navChiz(){ document.querySelectorAll('.nav b').forEach(b=>b.classList.toggle('on',b.dataset.tab===TAB)); }
+
+var BHD=null;
+async function chizBaho(){
+  const d=await rpc('ep_baho_hisobot',{p_token:T});
+  if(!d||!d.ok){ $('cont').innerHTML='<div class="empty">Ruxsat yo\u2018q</div>'; return; }
+  BHD=d;
+  var h='<div class="card"><div class="ttl">\u2b50 Tizim bahosi</div>'+
+    '<div class="sub">Ota-onalar so\u2018rovnomasi</div>'+
+    '<canvas id="gz" width="620" height="380" style="width:100%;height:auto;background:#fff;border-radius:12px"></canvas>'+
+    '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">'+
+    '<button class="btn" onclick="gzYukla()">\u2b07 PNG</button>'+
+    '<button class="btn sec" onclick="gzHavola()">\u{1F517} So\u2018rovnoma havolasi</button></div></div>';
+  h+='<div class="card"><div class="row"><b>'+d.jami+'</b> javob \u00b7 o\u2018rtacha <b>'+d.ortacha+'</b>/5</div>'+
+     gzBar('Xabarlar tushunarli va o\u2018z vaqtida',d.b1)+
+     gzBar('Ma\u2019lumot yetarli',d.b2)+
+     gzBar('Botdan foydalanish oson',d.b3)+'</div>';
+  if((d.royxat||[]).length){
+    h+='<div class="card"><div class="ttl">Javoblar</div>';
+    d.royxat.forEach(function(x){
+      h+='<div class="row" style="display:block"><b>'+esc(x.bola||'\u2014')+'</b> '+
+         '<span class="pill">'+esc(x.sinf||'')+'</span> <span class="pill">'+x.ort+'/5</span>'+
+         '<div class="sub">'+x.b1+' \u00b7 '+x.b2+' \u00b7 '+x.b3+(x.ota?' \u00b7 '+esc(x.ota):'')+' \u00b7 '+esc(x.vaqt||'')+'</div>'+
+         (x.izoh?'<div class="sub"><i>'+esc(x.izoh)+'</i></div>':'')+'</div>';
+    });
+    h+='</div>';
+  } else h+='<div class="empty">Hali javob yo\u2018q</div>';
+  $('cont').innerHTML=h;
+  setTimeout(gzChiz,50);
+}
+function gzBar(nom,v){
+  var p=Math.round((v/5)*100);
+  return '<div style="margin-top:10px"><div class="sub">'+nom+' \u2014 <b>'+v+'</b>/5</div>'+
+    '<div style="height:12px;background:#eee;border-radius:6px;margin-top:4px;overflow:hidden">'+
+    '<div style="height:12px;width:'+p+'%;background:'+(v>=4?'#16a34a':(v>=3?'#f59e0b':'#dc2626'))+'"></div></div></div>';
+}
+function gzChiz(){
+  var c=document.getElementById('gz'); if(!c||!BHD)return;
+  var x=c.getContext('2d'), W=620,H=380, cx=W/2, cy=300, R=230;
+  x.fillStyle='#fff'; x.fillRect(0,0,W,H);
+  [['#dc2626',0,.2],['#f59e0b',.2,.4],['#eab308',.4,.6],['#84cc16',.6,.8],['#16a34a',.8,1]].forEach(function(s){
+    x.beginPath(); x.lineWidth=52; x.strokeStyle=s[0];
+    x.arc(cx,cy,R,Math.PI+Math.PI*s[1],Math.PI+Math.PI*s[2]); x.stroke();
+  });
+  for(var i=1;i<=5;i++){ var an=Math.PI+Math.PI*((i-.5)/5);
+    x.fillStyle='#fff'; x.font='bold 20px sans-serif'; x.textAlign='center';
+    x.fillText(String(i), cx+Math.cos(an)*R, cy+Math.sin(an)*R+7); }
+  var v=Math.max(1,Math.min(5,parseFloat(BHD.ortacha)||1));
+  var ang=Math.PI+Math.PI*((v-1)/4*.96+.02);
+  x.save(); x.translate(cx,cy); x.rotate(ang);
+  x.beginPath(); x.moveTo(0,-9); x.lineTo(R-30,0); x.lineTo(0,9); x.closePath();
+  x.fillStyle='#1A2238'; x.fill(); x.restore();
+  x.beginPath(); x.arc(cx,cy,18,0,7); x.fillStyle='#1A2238'; x.fill();
+  x.fillStyle='#1A2238'; x.font='bold 64px sans-serif'; x.textAlign='center';
+  x.fillText(String(BHD.ortacha), cx, cy-60);
+  x.font='16px sans-serif'; x.fillStyle='#8b8271';
+  x.fillText('5 balldan \u00b7 '+BHD.jami+' ta javob', cx, cy-25);
+  x.font='bold 18px sans-serif'; x.fillStyle='#1A2238';
+  x.fillText('EduNova School \u2014 tizim bahosi', cx, 40);
+}
+function gzYukla(){
+  var c=document.getElementById('gz'); if(!c)return;
+  var a=document.createElement('a');
+  a.download='EduNova_baho_'+(new Date().toISOString().slice(0,10))+'.png';
+  a.href=c.toDataURL('image/png'); a.click();
+}
+function gzHavola(){
+  var u='https://edunovaschool9-hue.github.io/a-avlod-bot/baho.html';
+  if(navigator.clipboard) navigator.clipboard.writeText(u).then(function(){ alert('Havola nusxalandi:\n'+u); });
+  else prompt('Havola:',u);
+}
+
 async function ochTab(x){
   TAB=x; navChiz();
   $('cont').innerHTML='<div class="empty">'+t('yuklanmoqda')+'</div>';
@@ -331,6 +402,7 @@ async function ochTab(x){
     else if(x==='oqituvchilar') await chizOqituvchilar();
     else if(x==='oquvchilar') await chizOquvchilar();
     else if(x==='pechat') await chizPechat();
+    else if(x==='baho') await chizBaho();
     else if(x==='reyting') await chizReyting();
     else await chizSozlama();
   }catch(e){ $('cont').innerHTML='<div class="empty">'+esc(xatoMatn(e))+'</div>'; }
