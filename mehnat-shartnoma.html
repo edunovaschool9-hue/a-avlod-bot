@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#16202e">
+<title>Mehnat shartnomasi — EduNova School</title>
+<style>
+:root{
+  --paper:#fff; --soft:#f4f6f9; --line:#dfe4ec; --ink:#16202e; --dim:#64748b;
+  --acc:#1d4ed8; --ok:#12805c; --ok-bg:#e6f4ee; --bad:#be123c; --bad-bg:#fdeaef;
+  --wait:#b45309; --wait-bg:#fdf3e3;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--soft);color:var(--ink);line-height:1.5;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:16px}
+
+.wrap{max-width:560px;margin:0 auto;padding:20px 16px 120px}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 0 18px}
+.brand .mark{width:30px;height:30px;border-radius:8px;background:var(--ink);color:#fff;
+  display:grid;place-items:center;font-weight:700;font-size:14px;letter-spacing:-.02em}
+.brand span{font-weight:600;font-size:15px}
+.brand em{font-style:normal;color:var(--dim);font-weight:400}
+
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px 18px}
+h1{font-size:21px;font-weight:650;letter-spacing:-.01em;margin:0 0 6px}
+.lead{color:var(--dim);font-size:14px;margin:0 0 20px}
+
+/* ── PIN ── */
+#pinPane .card{text-align:center;padding:32px 20px}
+#pinPane input{width:100%;max-width:240px;text-align:center;font-size:26px;letter-spacing:.32em;
+  padding:14px 12px;border:1px solid var(--line);border-radius:10px;font-family:inherit;
+  background:var(--soft);color:var(--ink);margin:6px 0 16px}
+#pinPane input:focus{outline:2px solid var(--acc);outline-offset:-1px;background:var(--paper)}
+
+/* ── Forma ── */
+fieldset{border:0;padding:0;margin:0 0 26px}
+legend{font-size:13px;font-weight:650;color:var(--dim);padding:0 0 10px}
+.f{margin-bottom:15px}
+.f label{display:block;font-size:13.5px;font-weight:550;margin-bottom:5px}
+.f label i{font-style:normal;color:var(--bad)}
+.f .hint{font-size:12.5px;color:var(--dim);margin-top:4px}
+input,select,textarea{width:100%;font:inherit;font-size:16px;padding:11px 13px;
+  border:1px solid var(--line);border-radius:9px;background:var(--paper);color:var(--ink)}
+input:focus,select,textarea:focus{outline:2px solid var(--acc);outline-offset:-1px;border-color:var(--acc)}
+select:focus{outline:2px solid var(--acc)}
+textarea{min-height:82px;resize:vertical}
+.f.err input,.f.err select,.f.err textarea{border-color:var(--bad);background:var(--bad-bg)}
+.f .msg{display:none;font-size:12.5px;color:var(--bad);margin-top:4px}
+.f.err .msg{display:block}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:420px){.two{grid-template-columns:1fr}}
+
+button{font:inherit;font-size:16px;font-weight:600;cursor:pointer;border-radius:10px;
+  border:1px solid var(--ink);background:var(--ink);color:#fff;padding:13px 20px;width:100%;
+  transition:opacity .12s}
+button:hover{opacity:.88}
+button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+button[disabled]{opacity:.5;cursor:default}
+button.ghost{background:transparent;color:var(--dim);border-color:var(--line);font-weight:500;font-size:14px;padding:10px}
+
+.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.94);
+  backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+.bar .in{max-width:560px;margin:0 auto}
+
+.alert{padding:12px 14px;border-radius:10px;font-size:14px;margin-bottom:16px;white-space:pre-wrap;word-break:break-word}
+.alert.bad{background:var(--bad-bg);color:var(--bad);border:1px solid #f0c4ce}
+.alert.info{background:var(--wait-bg);color:var(--wait);border:1px solid #f0d9b0}
+
+.hisob{background:var(--soft);border-radius:9px;padding:11px 13px;font-size:13.5px;color:var(--dim);
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:-6px;margin-bottom:15px}
+.hisob b{color:var(--ink);font-variant-numeric:tabular-nums}
+.hisob button{width:auto;padding:5px 11px;font-size:13px;background:var(--paper);color:var(--acc);
+  border-color:var(--line);font-weight:550}
+
+/* ── Natija ── */
+#okPane .card{text-align:center;padding:40px 22px}
+.tick{width:56px;height:56px;border-radius:50%;background:var(--ok-bg);color:var(--ok);
+  display:grid;place-items:center;font-size:28px;margin:0 auto 16px}
+.hidden{display:none!important}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="brand">
+    <div class="mark">EN</div>
+    <span>EduNova School <em>· Fargʻona</em></span>
+  </div>
+
+  <!-- ═══ 1. PIN ═══ -->
+  <section id="pinPane">
+    <div class="card">
+      <h1>Mehnat shartnomasi</h1>
+      <p class="lead">Davom etish uchun shaxsiy PIN kodingizni kiriting</p>
+      <div id="pinXato"></div>
+      <input id="pin" type="password" inputmode="numeric" autocomplete="off"
+             maxlength="8" placeholder="••••••" aria-label="PIN kod">
+      <button id="pinBtn">Davom etish</button>
+    </div>
+  </section>
+
+  <!-- ═══ 2. Forma ═══ -->
+  <section id="formPane" class="hidden">
+    <div class="card">
+      <h1>Shartnoma maʼlumotlari</h1>
+      <p class="lead">Maydonlarni toʻldiring va tasdiqlashga yuboring. Direksiya koʻrib chiqadi.</p>
+      <div id="formXato"></div>
+
+      <fieldset>
+        <legend>Shaxsiy maʼlumotlar</legend>
+
+        <div class="f" data-k="fio">
+          <label for="fio">Familiya, ism, sharif <i>*</i></label>
+          <input id="fio" autocomplete="name" placeholder="Aliyev Vali Aliyevich">
+          <div class="msg">Toʻliq F.I.Sh. ni kiriting</div>
+        </div>
+
+        <div class="two">
+          <div class="f" data-k="pasport">
+            <label for="pasport">Pasport <i>*</i></label>
+            <input id="pasport" maxlength="9" autocapitalize="characters" placeholder="AB1234567">
+            <div class="msg">2 harf + 7 raqam</div>
+          </div>
+          <div class="f" data-k="tugilgan">
+            <label for="tugilgan">Tugʻilgan sana <i>*</i></label>
+            <input id="tugilgan" type="date">
+            <div class="msg">Sanani tekshiring</div>
+          </div>
+        </div>
+
+        <div class="f" data-k="pinfl">
+          <label for="pinfl">JSHSHIR (PINFL) <i>*</i></label>
+          <input id="pinfl" inputmode="numeric" maxlength="14" placeholder="14 ta raqam">
+          <div class="msg">14 ta raqam boʻlishi kerak</div>
+        </div>
+
+        <div class="f" data-k="tel">
+          <label for="tel">Telefon raqami <i>*</i></label>
+          <input id="tel" type="tel" inputmode="tel" placeholder="+998 90 123 45 67">
+          <div class="msg">+998 va 9 ta raqam</div>
+        </div>
+
+        <div class="f" data-k="manzil">
+          <label for="manzil">Yashash manzili <i>*</i></label>
+          <input id="manzil" autocomplete="street-address" placeholder="Fargʻona sh., Mustaqillik koʻch., 12">
+          <div class="msg">Manzilni kiriting</div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Ish sharoiti</legend>
+
+        <div class="f" data-k="lavozim">
+          <label for="lavozim">Lavozim <i>*</i></label>
+          <input id="lavozim" placeholder="Matematika oʻqituvchisi">
+          <div class="msg">Lavozimni kiriting</div>
+        </div>
+
+        <div class="two">
+          <div class="f" data-k="kun">
+            <label for="kun">Haftadagi ish kuni <i>*</i></label>
+            <input id="kun" inputmode="numeric" maxlength="1" placeholder="5">
+            <div class="msg">1 dan 7 gacha</div>
+          </div>
+          <div class="f" data-k="soat">
+            <label for="soat">Haftalik soat <i>*</i></label>
+            <input id="soat" inputmode="numeric" maxlength="2" placeholder="24">
+            <div class="msg">1 dan 60 gacha</div>
+          </div>
+        </div>
+
+        <div class="two">
+          <div class="f" data-k="soatlik">
+            <label for="soatlik">Bir soatlik toʻlov <i>*</i></label>
+            <input id="soatlik" inputmode="numeric" placeholder="soʻm">
+            <div class="msg">Summani kiriting</div>
+          </div>
+          <div class="f" data-k="oylik">
+            <label for="oylik">Oylik maosh <i>*</i></label>
+            <input id="oylik" inputmode="numeric" placeholder="soʻm">
+            <div class="msg">Summani kiriting</div>
+          </div>
+        </div>
+
+        <div class="hisob hidden" id="hisob">
+          <span>Soatlar boʻyicha taxminan <b id="hisobSon">—</b> soʻm</span>
+          <button type="button" id="hisobBtn">Qoʻyish</button>
+        </div>
+
+        <div class="f" data-k="izoh">
+          <label for="izoh">Izoh</label>
+          <textarea id="izoh" placeholder="Qoʻshimcha shartlar, tanaffuslar, boshqa fanlar…"></textarea>
+        </div>
+      </fieldset>
+
+      <button class="ghost" id="tozala" type="button">Formani tozalash</button>
+    </div>
+  </section>
+
+  <!-- ═══ 3. Natija ═══ -->
+  <section id="okPane" class="hidden">
+    <div class="card">
+      <div class="tick">✓</div>
+      <h1>Ariza yuborildi</h1>
+      <p class="lead" style="margin-bottom:0">
+        Maʼlumotlaringiz direksiyaga yuborildi. Tasdiqlangandan soʻng shartnoma
+        <b>Oʻqituvchi kabineti</b> boʻlimida koʻrinadi.
+      </p>
+    </div>
+  </section>
+</div>
+
+<div class="bar hidden" id="bar">
+  <div class="in"><button id="yubor">Tasdiqlashga yuborish</button></div>
+</div>
+
+<script>
+'use strict';
+
+/* ══════════════ SOZLAMA ══════════════════════════════════════════
+   SB_KEY  — anon key, boshqa sahifadan koʻchiring.
+   PIN_FN  — PIN ni oldindan tekshiradigan mavjud RPC nomi.
+             Bilmasangiz boʻsh qoldiring — PIN yuborishda tekshiriladi.
+   DRAFT_MAXFIY — true boʻlsa qoralamaga pasport/JSHSHIR yozilmaydi.
+   ═════════════════════════════════════════════════════════════════ */
+const SB_URL = 'https://unaodltahuevrfnarfha.supabase.co';
+const SB_KEY = 'sb_publishable_i705NKn0jH1yGmIZJGAdgQ_wyzlcrZP';
+
+const DRAFT_MAXFIY = true;
+const DEBUG = new URLSearchParams(location.search).has('debug');
+/* ═════════════════════════════════════════════════════════════════ */
+
+const $ = s => document.querySelector(s);
+let PIN = '';
+
+/* ── RPC ─── ep_msh_* funksiyalari p_ prefiksli parametrlarni kutadi
+      (jonli tekshirilgan: ep_msh_royxat(p_token), ep_msh_tasdiq(p_token,p_id,p_ok)) ── */
+async function rpc(fn,args){
+  const body={}; for(const k in args) body['p_'+k]=args[k];
+  const r = await fetch(SB_URL+'/rest/v1/rpc/'+fn,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},
+    body:JSON.stringify(body)});
+  const t = await r.text();
+  if(DEBUG) console.log('[rpc]',fn,body,'→',r.status,t);
+  if(!r.ok){ const e=new Error(t||('HTTP '+r.status)); e.status=r.status; throw e; }
+  return t ? JSON.parse(t) : null;
+}
+
+/* ── Yordamchilar ─────────────────────────────────────────────────── */
+const alertBox = (sel,msg,tur)=>{
+  $(sel).innerHTML = msg ? '<div class="alert '+(tur||'bad')+'"></div>' : '';
+  if(msg) $(sel).firstChild.textContent = msg;
+};
+const onlyDigits = s => String(s||'').replace(/\D/g,'');
+const num = n => String(Math.round(+n||0)).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+
+function telNorm(v){
+  let d = onlyDigits(v);
+  if(d.startsWith('998')) d = d.slice(3);
+  if(d.length===9) return '+998'+d;
+  return v.trim().startsWith('+') ? '+'+onlyDigits(v) : d;
+}
+
+/* ── Validatsiya ──────────────────────────────────────────────────── */
+const RULES = {
+  fio:      v => v.trim().split(/\s+/).filter(x=>x.length>1).length >= 2,
+  pasport:  v => /^[A-Z]{2}\d{7}$/.test(v.trim().toUpperCase()),
+  pinfl:    v => /^\d{14}$/.test(onlyDigits(v)),
+  tugilgan: v => { if(!v) return false; const d=new Date(v); if(isNaN(d)) return false;
+                   const y=(Date.now()-d)/31557600000; return y>=18 && y<=75; },
+  tel:      v => /^\+998\d{9}$/.test(telNorm(v)),
+  manzil:   v => v.trim().length >= 6,
+  lavozim:  v => v.trim().length >= 3,
+  kun:      v => { const n=+onlyDigits(v); return n>=1 && n<=7; },
+  soat:     v => { const n=+onlyDigits(v); return n>=1 && n<=60; },
+  soatlik:  v => +onlyDigits(v) > 0,
+  oylik:    v => +onlyDigits(v) > 0,
+  izoh:     () => true
+};
+
+function tekshir(k, koʻrsat){
+  const f = document.querySelector('.f[data-k="'+k+'"]');
+  if(!f) return true;
+  const ok = RULES[k]($('#'+k).value);
+  if(koʻrsat) f.classList.toggle('err', !ok);
+  return ok;
+}
+function hammasi(koʻrsat){
+  return Object.keys(RULES).every(k => tekshir(k, koʻrsat));
+}
+
+/* ── Qoralama ─────────────────────────────────────────────────────── */
+const DK = 'ep_msh_qoralama';
+const MAXFIY = ['pasport','pinfl'];
+function saqla(){
+  const d = {};
+  Object.keys(RULES).forEach(k=>{
+    if(DRAFT_MAXFIY && MAXFIY.includes(k)) return;
+    d[k] = $('#'+k).value;
+  });
+  try{ localStorage.setItem(DK, JSON.stringify(d)); }catch(e){}
+}
+function tikla(){
+  try{
+    const d = JSON.parse(localStorage.getItem(DK)||'{}');
+    Object.keys(d).forEach(k=>{ if($('#'+k) && d[k]) $('#'+k).value = d[k]; });
+  }catch(e){}
+}
+const qoralamaOchir = () => { try{ localStorage.removeItem(DK); }catch(e){} };
+
+/* ── Oylikni soatlardan hisoblash (taklif) ────────────────────────── */
+function hisobla(){
+  const s = +onlyDigits($('#soatlik').value);
+  const h = +onlyDigits($('#soat').value);
+  const box = $('#hisob');
+  if(s>0 && h>0){
+    const taxmin = Math.round(s*h*4.33/1000)*1000;
+    box.classList.remove('hidden');
+    $('#hisobSon').textContent = num(taxmin);
+    $('#hisobBtn').dataset.v = taxmin;
+  }else box.classList.add('hidden');
+}
+
+/* ── PIN ekrani ───────────────────────────────────────────────────── */
+$('#pinBtn').onclick = async () => {
+  const v = onlyDigits($('#pin').value);
+  alertBox('#pinXato','');
+  if(v.length < 4){ alertBox('#pinXato','PIN kamida 4 raqamdan iborat'); return; }
+
+  const b = $('#pinBtn'); b.disabled = true; b.textContent = 'Tekshirilmoqda…';
+  try{
+    const d = await rpc('ep_kirish', {pin:v});
+    if(!d || !d.ok) throw new Error(d && d.xato ? d.xato : 'PIN xato');
+    if(d.rol !== 'oqituvchi') throw new Error('Bu PIN o\u2018qituvchiga tegishli emas');
+
+    // ismni oldindan qo'yamiz, agar server bersa
+    try{
+      const m = await rpc('ep_men', {token:d.token});
+      const ism = m && (m.ism || m.fio || (m.profil && (m.profil.ism || m.profil.fio)));
+      const lav = m && (m.lavozim || (m.profil && m.profil.lavozim));
+      if(ism && !$('#fio').value) $('#fio').value = ism;
+      if(lav && !$('#lavozim').value) $('#lavozim').value = lav;
+    }catch(e){ if(DEBUG) console.warn('ep_men:', e.message); }
+
+    PIN = v;
+    $('#pinPane').classList.add('hidden');
+    $('#formPane').classList.remove('hidden');
+    $('#bar').classList.remove('hidden');
+    tikla(); hisobla();
+    ($('#fio').value ? $('#pasport') : $('#fio')).focus();
+    window.scrollTo(0,0);
+  }catch(e){
+    alertBox('#pinXato', /PIN|xato|topilmadi/i.test(e.message)
+      ? 'PIN qabul qilinmadi. Direksiyadan tekshirib oling.'
+      : 'Tekshirib bo\u2018lmadi.\n' + e.message);
+  }finally{
+    b.disabled = false; b.textContent = 'Davom etish';
+  }
+};
+$('#pin').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#pinBtn').click(); });
+
+/* ── Forma xatti-harakati ─────────────────────────────────────────── */
+Object.keys(RULES).forEach(k=>{
+  const inp = $('#'+k);
+  inp.addEventListener('input', ()=>{
+    const f = inp.closest('.f');
+    if(f.classList.contains('err')) tekshir(k, true);
+    saqla();
+  });
+  inp.addEventListener('blur', ()=>{ if(inp.value.trim()) tekshir(k, true); });
+});
+$('#pasport').addEventListener('input', e=>{
+  e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,9);
+});
+$('#pinfl').addEventListener('input', e=>{ e.target.value = onlyDigits(e.target.value).slice(0,14); });
+$('#tel').addEventListener('blur',  e=>{ const t=telNorm(e.target.value); if(/^\+998\d{9}$/.test(t)) e.target.value=t; });
+['kun','soat'].forEach(k=>$('#'+k).addEventListener('input', e=>{ e.target.value = onlyDigits(e.target.value); }));
+['soatlik','oylik'].forEach(k=>$('#'+k).addEventListener('input', e=>{
+  const d = onlyDigits(e.target.value);
+  e.target.value = d ? num(d) : '';
+  hisobla();
+}));
+$('#soat').addEventListener('input', hisobla);
+$('#hisobBtn').onclick = e=>{ $('#oylik').value = num(e.target.dataset.v); tekshir('oylik',true); saqla(); };
+$('#tozala').onclick = ()=>{
+  if(!confirm('Barcha maydonlar tozalansinmi?')) return;
+  Object.keys(RULES).forEach(k=>{ $('#'+k).value=''; $('#'+k).closest('.f').classList.remove('err'); });
+  qoralamaOchir(); hisobla();
+};
+
+/* ── Yuborish ─────────────────────────────────────────────────────── */
+$('#yubor').onclick = async () => {
+  alertBox('#formXato','');
+  if(!hammasi(true)){
+    const bad = document.querySelector('.f.err');
+    if(bad){ bad.scrollIntoView({block:'center',behavior:'smooth'}); bad.querySelector('input,textarea')?.focus({preventScroll:true}); }
+    alertBox('#formXato','Belgilangan maydonlarni toʻgʻrilang');
+    return;
+  }
+  const b = $('#yubor'); b.disabled = true; b.textContent = 'Yuborilmoqda…';
+  try{
+    const javob = await rpc('ep_msh_yubor', {
+      pin:      PIN,
+      fio:      $('#fio').value.trim().replace(/\s+/g,' '),
+      pasport:  $('#pasport').value.trim().toUpperCase(),
+      pinfl:    onlyDigits($('#pinfl').value),
+      tugilgan: $('#tugilgan').value,
+      manzil:   $('#manzil').value.trim(),
+      tel:      telNorm($('#tel').value),
+      lavozim:  $('#lavozim').value.trim(),
+      kun:      onlyDigits($('#kun').value),
+      soat:     onlyDigits($('#soat').value),
+      soatlik:  +onlyDigits($('#soatlik').value),
+      oylik:    +onlyDigits($('#oylik').value),
+      izoh:     $('#izoh').value.trim()
+    });
+    if(javob && javob.ok === false)
+      throw new Error(javob.xato || javob.error || 'Server arizani qabul qilmadi');
+    qoralamaOchir();
+    $('#formPane').classList.add('hidden');
+    $('#bar').classList.add('hidden');
+    $('#okPane').classList.remove('hidden');
+    window.scrollTo(0,0);
+  }catch(e){
+    const m = e.message||'';
+    alertBox('#formXato',
+      /pin/i.test(m)                    ? 'PIN qabul qilinmadi. Direksiyadan tekshirib oling.' :
+      /duplicate|unique|already/i.test(m)? 'Sizning arizangiz allaqachon yuborilgan. Direksiya koʻrib chiqmoqda.' :
+      'Yuborilmadi.\n' + m);
+    b.disabled = false; b.textContent = 'Tasdiqlashga yuborish';
+  }
+};
+
+
+</script>
+</body>
+</html>
