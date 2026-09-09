@@ -129,7 +129,7 @@ label{display:block;font-size:12px;color:var(--mu);margin:0 0 4px}
     <div class="til"><button class="til-btn" data-lang="uz">UZ</button><button class="til-btn" data-lang="ru">RU</button></div>
   </div></div>
   <div class="wrap"><div id="cont"></div></div>
-  <div class="nav"><b data-tab="kun" onclick="ochTab('kun')"><i>📅</i><span data-tl="n_kun">n_kun</span></b><b data-tab="davomat" onclick="ochTab('davomat')"><i>🕗</i><span data-tl="n_davomat">n_davomat</span></b><b data-tab="oqituvchilar" onclick="ochTab('oqituvchilar')"><i>🧑‍🏫</i><span data-tl="n_oqituvchilar">n_oqituvchilar</span></b><b data-tab="oquvchilar" onclick="ochTab('oquvchilar')"><i>👥</i><span data-tl="n_oquvchilar">n_oquvchilar</span></b><b data-tab="pechat" onclick="ochTab('pechat')"><i>🖨️</i><span data-tl="n_pechat">n_pechat</span></b><b data-tab="baho" onclick="ochTab('baho')"><i>⭐</i><span>Baho</span></b><b data-tab="reyting" onclick="ochTab('reyting')"><i>🏆</i><span data-tl="n_reyting">n_reyting</span></b><b data-tab="sozlama" onclick="ochTab('sozlama')"><i>⚙️</i><span data-tl="n_sozlama">n_sozlama</span></b></div>
+  <div class="nav"><b data-tab="kun" onclick="ochTab('kun')"><i>📅</i><span data-tl="n_kun">n_kun</span></b><b data-tab="davomat" onclick="ochTab('davomat')"><i>🕗</i><span data-tl="n_davomat">n_davomat</span></b><b data-tab="oqituvchilar" onclick="ochTab('oqituvchilar')"><i>🧑‍🏫</i><span data-tl="n_oqituvchilar">n_oqituvchilar</span></b><b data-tab="oquvchilar" onclick="ochTab('oquvchilar')"><i>👥</i><span data-tl="n_oquvchilar">n_oquvchilar</span></b><b data-tab="pechat" onclick="ochTab('pechat')"><i>🖨️</i><span data-tl="n_pechat">n_pechat</span></b><b data-tab="baho" onclick="ochTab('baho')"><i>⭐</i><span>Baho</span></b><b data-tab="oreyting" onclick="ochTab('oreyting')"><i>🏆</i><span>Faollik</span></b><b data-tab="reyting" onclick="ochTab('reyting')"><i>🏆</i><span data-tl="n_reyting">n_reyting</span></b><b data-tab="sozlama" onclick="ochTab('sozlama')"><i>⚙️</i><span data-tl="n_sozlama">n_sozlama</span></b></div>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -416,6 +416,67 @@ function tahlilNusxa(){
   else prompt('Nusxalang:',x);
 }
 
+
+var RDAVR='hafta';
+function rDan(k){
+  var T=new Date(Date.now()+5*3600*1000);
+  if(k==='kun') return T.toISOString().slice(0,10);
+  if(k==='hafta') return new Date(T.getTime()-6*86400000).toISOString().slice(0,10);
+  return null;
+}
+async function chizOreyting(){
+  const d=await rpc('ep_reyting_web',{p_token:T,p_dan:rDan(RDAVR),p_gacha:null});
+  if(!d||!d.ok){ $('cont').innerHTML='<div class="empty">Ruxsat yo\u2018q</div>'; return; }
+  var r=(d.royxat||[]).filter(function(x){return +x.ball>0;});
+  var nol=(d.royxat||[]).filter(function(x){return !+x.ball;});
+  var med=['\u{1F947}','\u{1F948}','\u{1F949}'];
+  var h='<div class="card"><div class="ttl">\u{1F3C6} O\u2018qituvchilar faolligi</div>'+
+    '<div class="sub">'+d.dan+' \u2014 '+d.gacha+' \u00b7 '+d.kunlar+' kun</div>'+
+    '<div style="display:flex;gap:6px;margin:10px 0;flex-wrap:wrap">'+
+    ['kun','hafta','hammasi'].map(function(k){
+      var nm=(k==='kun'?'Bugun':(k==='hafta'?'7 kun':'Boshidan'));
+      return '<button class="btn '+(RDAVR===k?'':'sec')+'" onclick="RDAVR=\''+k+'\';ochTab(\'oreyting\')">'+nm+'</button>';
+    }).join('')+'</div>'+
+    '<button class="btn" onclick="rTahlil(this)">\u{1F916} AI tahlil (guruhga yuborish uchun)</button>'+
+    '<div id="rt_box"></div></div>';
+  h+='<div class="card"><div class="ttl">Reyting</div>';
+  if(!r.length) h+='<div class="empty">Bu davrda faoliyat yo\u2018q</div>';
+  r.forEach(function(x,i){
+    h+='<div class="row" style="display:block"><b>'+(i<3?med[i]:(i+1)+'.')+' '+esc(x.ism)+'</b> '+
+       '<span class="pill">'+x.ball+' ball</span>'+
+       '<div class="sub">\u{1F4DD} '+x.xulosa+' xulosa \u00b7 \u2705 '+x.davomat+' davomat \u00b7 \u{1F9EA} '+x.test+' test'+
+       (+x.test?' (o\u2018rt. '+x.test_ball+')':'')+'</div>'+
+       '<div class="sub">'+x.faol_kun+' kun faol \u00b7 kuniga '+x.kunlik+'</div></div>';
+  });
+  h+='</div>';
+  if(nol.length){
+    h+='<div class="card"><div class="ttl">\u26AA Faoliyat yo\u2018q ('+nol.length+')</div>';
+    nol.forEach(function(x){ h+='<div class="row">'+esc(x.ism)+'</div>'; });
+    h+='</div>';
+  }
+  h+='<div class="card"><div class="sub">Ball: dars xulosasi \u00d73 \u00b7 davomat (sinf/kun) \u00d72 \u00b7 test \u00d71</div></div>';
+  $('cont').innerHTML=h;
+}
+function rTahlil(btn){
+  var t=btn.textContent; btn.disabled=true; btn.textContent='AI ishlayapti\u2026';
+  fetch('https://unaodltahuevrfnarfha.supabase.co/functions/v1/teach-bot?reyting_tahlil=1',
+    {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:T,davr:RDAVR})})
+   .then(function(r){return r.json();}).then(function(d){
+     btn.disabled=false; btn.textContent=t;
+     var box=document.getElementById('rt_box');
+     if(!d||!d.ok){ box.innerHTML='<div class="sub" style="color:#b91c1c;margin-top:8px">Xatolik: '+esc((d&&d.xato)||'server')+'</div>'; return; }
+     window.__RT=d.matn;
+     box.innerHTML='<div style="margin-top:12px;background:#fff;border:1px solid #e6dcc8;border-radius:12px;padding:14px;white-space:pre-wrap;line-height:1.5">'+esc(d.matn)+'</div>'+
+       '<button class="btn" style="margin-top:8px" onclick="rNusxa()">\u{1F4CB} Nusxalash \u2014 guruhga tashlang</button>';
+   })["catch"](function(){ btn.disabled=false; btn.textContent=t;
+     document.getElementById('rt_box').innerHTML='<div class="sub" style="color:#b91c1c">Aloqa xatosi</div>'; });
+}
+function rNusxa(){
+  var x=window.__RT||'';
+  if(navigator.clipboard) navigator.clipboard.writeText(x).then(function(){ alert('Nusxalandi \u2014 o\u2018qituvchilar guruhiga tashlang'); });
+  else prompt('Nusxalang:',x);
+}
+
 async function ochTab(x){
   TAB=x; navChiz();
   $('cont').innerHTML='<div class="empty">'+t('yuklanmoqda')+'</div>';
@@ -426,6 +487,7 @@ async function ochTab(x){
     else if(x==='oquvchilar') await chizOquvchilar();
     else if(x==='pechat') await chizPechat();
     else if(x==='baho') await chizBaho();
+    else if(x==='oreyting') await chizOreyting();
     else if(x==='reyting') await chizReyting();
     else await chizSozlama();
   }catch(e){ $('cont').innerHTML='<div class="empty">'+esc(xatoMatn(e))+'</div>'; }
