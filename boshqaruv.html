@@ -1362,10 +1362,14 @@ function mshChiz(){
       const n=$('mshQ'); if(n){n.focus(); n.setSelectionRange(n.value.length,n.value.length);} },200); }; }
 }
 
-function mshNusxa(shId,odamId){
+async function mshNusxa(shId,odamId){
   const r=(MSH_D.royxat||[]).find(x=>x.id===odamId)||{};
   const w=window.open('','_blank');
   if(!w){ xabar('Oynani ochib bo\'lmadi. Brauzerda pop-up ruxsatini yoqing.','xato'); return; }
+  w.document.write('<p style="font-family:Arial;padding:24px;color:#555">Tayyorlanmoqda\u2026</p>');
+  let imzoRasm=null;
+  try{ const dd=await rpc('ep_msh_imzo',{p_token:T,p_id:shId});
+       if(dd&&dd.ok&&dd.imzo) imzoRasm=dd.imzo; }catch(e){}
   const L='<span class="ln"></span>';
   const v=x=>(x==null||x==='')?L:esc(String(x));
   const p=x=>(x==null||x==='')?L:esc(Number(x).toLocaleString('ru-RU').replace(/\u00a0/g,' '))+' so\'m';
@@ -1427,10 +1431,11 @@ function mshNusxa(shId,odamId){
   '<div class="imzo">'+
   '<div><b>Ish beruvchi</b><br>\u201cEduNova School\u201d xususiy maktabi<br>Farg\'ona shahri'+
   '<div class="sig">Direktor \u2014 imzo, F.I.Sh.</div></div>'+
-  '<div><b>Xodim</b><br>'+v(r.ism)+'<br>&nbsp;'+
+  '<div><b>Xodim</b><br>'+v(r.ism)+'<br>'+
+  (imzoRasm?'<img src="'+imzoRasm+'" alt="imzo" style="height:17mm;max-width:100%;margin-top:1mm">':'&nbsp;')+
   '<div class="sig">Imzo, sana</div></div>'+
   '</div>';
-  w.document.write(h); w.document.close();
+  w.document.open(); w.document.write(h); w.document.close();
   setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} }, 500);
 }
 

@@ -81,6 +81,10 @@ button.ghost{background:transparent;color:var(--dim);border-color:var(--line);fo
   display:grid;place-items:center;font-size:28px;margin:0 auto 16px}
 .hidden{display:none!important}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.pad{border:1px solid var(--line);border-radius:10px;background:var(--paper);overflow:hidden;touch-action:none}
+.pad canvas{display:block;width:100%;height:160px;cursor:crosshair}
+.f.err .pad{border-color:var(--bad);background:var(--bad-bg)}
+#imzoTozala{margin-top:8px}
 </style>
 </head>
 <body>
@@ -182,6 +186,18 @@ button.ghost{background:transparent;color:var(--dim);border-color:var(--line);fo
         </div>
       </fieldset>
 
+      <fieldset>
+        <legend>Imzo</legend>
+        <div class="f" data-k="imzo">
+          <label>Barmogʻingiz bilan imzo qoʻying <i>*</i></label>
+          <div class="pad"><canvas id="imzoCanvas"></canvas></div>
+          <input type="hidden" id="imzo">
+          <div class="hint">Ramka ichiga imzoingizni chizing</div>
+          <button class="ghost" id="imzoTozala" type="button">Imzoni tozalash</button>
+          <div class="msg">Imzo qoʻyilmagan</div>
+        </div>
+      </fieldset>
+
       <button class="ghost" id="tozala" type="button">Formani tozalash</button>
     </div>
   </section>
@@ -263,7 +279,8 @@ const RULES = {
   lavozim:  v => v.trim().length >= 3,
   kun:      v => { const n=+onlyDigits(v); return n>=1 && n<=7; },
   soat:     v => { const n=+onlyDigits(v); return n>=1 && n<=60; },
-  izoh:     () => true
+  izoh:     () => true,
+  imzo:     v => /^data:image\//.test(v)
 };
 
 function tekshir(k, koʻrsat){
@@ -279,7 +296,7 @@ function hammasi(koʻrsat){
 
 /* ── Qoralama ─────────────────────────────────────────────────────── */
 const DK = 'ep_msh_qoralama';
-const MAXFIY = ['pasport','pinfl'];
+const MAXFIY = ['pasport','pinfl','imzo'];
 function saqla(){
   const d = {};
   Object.keys(RULES).forEach(k=>{
@@ -348,6 +365,7 @@ $('#pinBtn').onclick = () => {
   $('#pinPane').classList.add('hidden');
   $('#formPane').classList.remove('hidden');
   $('#bar').classList.remove('hidden');
+  imzoOlcham();
   tikla();
   ($('#fio').value ? $('#pasport') : $('#fio')).focus();
   window.scrollTo(0,0);
@@ -375,6 +393,35 @@ $('#tozala').onclick = ()=>{
   qoralamaOchir();
 };
 
+/* ── Imzo maydoni (barmoq bilan chiziladi) ───────────────────────── */
+let imzoOlcham = ()=>{};
+(function(){
+  const c=$('#imzoCanvas'), hid=$('#imzo'), ctx=c.getContext('2d');
+  let chizmoqda=false, bor=false;
+  imzoOlcham=function(){
+    const kw=c.parentNode.clientWidth; if(!kw) return;
+    const dpr=window.devicePixelRatio||1;
+    const eski=bor?c.toDataURL():null;
+    c.width=Math.round(kw*dpr); c.height=Math.round(160*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#16202e';
+    if(eski){ const im=new Image(); im.onload=()=>ctx.drawImage(im,0,0,kw,160); im.src=eski; }
+  };
+  const poz=e=>{ const r=c.getBoundingClientRect(); const p=e.touches?e.touches[0]:e;
+                 return [p.clientX-r.left, p.clientY-r.top]; };
+  const bosh=e=>{ e.preventDefault(); chizmoqda=true; const [x,y]=poz(e); ctx.beginPath(); ctx.moveTo(x,y); };
+  const chiz=e=>{ if(!chizmoqda) return; e.preventDefault(); const [x,y]=poz(e);
+                  ctx.lineTo(x,y); ctx.stroke(); bor=true; };
+  const tugat=()=>{ if(!chizmoqda) return; chizmoqda=false;
+                    hid.value = bor ? c.toDataURL('image/png') : ''; tekshir('imzo',true); };
+  ['mousedown','touchstart'].forEach(k=>c.addEventListener(k,bosh,{passive:false}));
+  ['mousemove','touchmove'].forEach(k=>c.addEventListener(k,chiz,{passive:false}));
+  ['mouseup','mouseleave','touchend','touchcancel'].forEach(k=>c.addEventListener(k,tugat));
+  $('#imzoTozala').onclick=()=>{ ctx.clearRect(0,0,c.width,c.height); bor=false; hid.value='';
+                                 $('#imzoCanvas').closest('.f').classList.remove('err'); };
+  window.addEventListener('resize', ()=>imzoOlcham());
+})();
+
 /* ── Yuborish ─────────────────────────────────────────────────────── */
 $('#yubor').onclick = async () => {
   alertBox('#formXato','');
@@ -399,7 +446,8 @@ $('#yubor').onclick = async () => {
       hafta_soat: onlyDigits($('#soat').value),
       soatlik:  '',
       oylik:    '',
-      izoh:     $('#izoh').value.trim()
+      izoh:     $('#izoh').value.trim(),
+      imzo:     $('#imzo').value
     });
     if(javob && javob.ok === false)
       throw new Error(javob.xato || javob.error || 'Server arizani qabul qilmadi');
