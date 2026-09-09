@@ -1168,6 +1168,35 @@ Deno.serve(async (req) => {
     }
     return jsonc({ ok: true, tekshirildi: list.length, yangilandi: n });
   }
+  if (q("reyting_tahlil") !== null) {
+    const b = await req.json().catch(() => ({})) as any;
+    const a = await rpc("ep_admin_tekshir", { p_token: b.token ?? "" });
+    if (!a?.ok) return no();
+    const KEY = Deno.env.get("DEEPSEEK_API_KEY") ?? "";
+    if (!KEY) return jsonc({ ok: false, xato: "kalit yo‘q" });
+    const p = davr(String(b.davr ?? "hafta"));
+    const d = await rpc("ep_reyting_web", { p_token: b.token, p_dan: p.dan, p_gacha: null });
+    if (!d?.ok) return jsonc({ ok: false, xato: "ruxsat" });
+    const jadval = ((d.royxat ?? []) as any[]).map((x: any) =>
+      `${x.ism}: ${x.ball} ball (xulosa ${x.xulosa}, davomat ${x.davomat}, test ${x.test}, faol kun ${x.faol_kun})`).join("\n");
+    const prompt = `Sen EduNova School rahbariyati tahlilchisisan. O‘qituvchilar faolligi (${p.nom}, ${d.kunlar} kun).\n` +
+      `Ball: dars xulosasi ×3, davomat (sinf/kun) ×2, test ×1.\n\n${jadval}\n\n` +
+      `Faqat shu raqamlarga tayan, hech narsa o‘ylab topma.\n` +
+      `Bu matn O‘QITUVCHILAR GURUHIGA yuboriladi. O‘zbek tilida yoz:\n` +
+      `1) Umumiy holat va davr\n2) Eng faol o‘qituvchilarni nomma-nom tabriklash\n` +
+      `3) Qaysi yo‘nalish bo‘sh qolyapti (xulosa/davomat/test)\n4) Hammaga 3 ta aniq tavsiya\n` +
+      `Uslub: hurmatli, ruhlantiruvchi, ayblovsiz. Faol bo‘lmaganlarni ism bilan tanqid qilma.\n` +
+      `Oddiy matn, HTML teg ishlatma. Maksimum 2000 belgi.`;
+    try {
+      const rr = await fetch("https://api.deepseek.com/chat/completions", { method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${KEY}` },
+        body: JSON.stringify({ model: "deepseek-chat", temperature: 0.4, messages: [{ role: "user", content: prompt }] }) });
+      const j = await rr.json();
+      const txt = String(j?.choices?.[0]?.message?.content ?? "").trim().replace(/```/g, "").replace(/<[^>]*>/g, "");
+      if (!txt) return jsonc({ ok: false, xato: "bo‘sh" });
+      return jsonc({ ok: true, matn: txt, davr: p.nom, kunlar: d.kunlar });
+    } catch (e) { return jsonc({ ok: false, xato: String(e).slice(0, 100) }); }
+  }
   if (q("baho_tahlil") !== null) {
     const b = await req.json().catch(() => ({})) as any;
     const a = await rpc("ep_admin_tekshir", { p_token: b.token ?? "" });
@@ -1444,7 +1473,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v6.3 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v6.4 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
