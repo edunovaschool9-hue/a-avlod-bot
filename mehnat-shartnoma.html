@@ -108,7 +108,7 @@ button.ghost{background:transparent;color:var(--dim);border-color:var(--line);fo
   <section id="formPane" class="hidden">
     <div class="card">
       <h1>Shartnoma maʼlumotlari</h1>
-      <p class="lead">Maydonlarni toʻldiring va tasdiqlashga yuboring. Direksiya koʻrib chiqadi.</p>
+      <p class="lead">Maydonlarni toʻldiring va tasdiqlashga yuboring. Toʻlov miqdorini direksiya tasdiqlash vaqtida belgilaydi.</p>
       <div id="formXato"></div>
 
       <fieldset>
@@ -174,23 +174,7 @@ button.ghost{background:transparent;color:var(--dim);border-color:var(--line);fo
           </div>
         </div>
 
-        <div class="two">
-          <div class="f" data-k="soatlik">
-            <label for="soatlik">Bir soatlik toʻlov <i>*</i></label>
-            <input id="soatlik" inputmode="numeric" placeholder="soʻm">
-            <div class="msg">Summani kiriting</div>
-          </div>
-          <div class="f" data-k="oylik">
-            <label for="oylik">Oylik maosh <i>*</i></label>
-            <input id="oylik" inputmode="numeric" placeholder="soʻm">
-            <div class="msg">Summani kiriting</div>
-          </div>
-        </div>
 
-        <div class="hisob hidden" id="hisob">
-          <span>Soatlar boʻyicha taxminan <b id="hisobSon">—</b> soʻm</span>
-          <button type="button" id="hisobBtn">Qoʻyish</button>
-        </div>
 
         <div class="f" data-k="izoh">
           <label for="izoh">Izoh</label>
@@ -279,8 +263,6 @@ const RULES = {
   lavozim:  v => v.trim().length >= 3,
   kun:      v => { const n=+onlyDigits(v); return n>=1 && n<=7; },
   soat:     v => { const n=+onlyDigits(v); return n>=1 && n<=60; },
-  soatlik:  v => +onlyDigits(v) > 0,
-  oylik:    v => +onlyDigits(v) > 0,
   izoh:     () => true
 };
 
@@ -314,18 +296,6 @@ function tikla(){
 }
 const qoralamaOchir = () => { try{ localStorage.removeItem(DK); }catch(e){} };
 
-/* ── Oylikni soatlardan hisoblash (taklif) ────────────────────────── */
-function hisobla(){
-  const s = +onlyDigits($('#soatlik').value);
-  const h = +onlyDigits($('#soat').value);
-  const box = $('#hisob');
-  if(s>0 && h>0){
-    const taxmin = Math.round(s*h*4.33/1000)*1000;
-    box.classList.remove('hidden');
-    $('#hisobSon').textContent = num(taxmin);
-    $('#hisobBtn').dataset.v = taxmin;
-  }else box.classList.add('hidden');
-}
 
 /* ── PIN ekrani ───────────────────────────────────────────────────── */
 let ODAM_ID = null;   // null = ro'yxatda yo'q, qo'lda kiritilgan
@@ -378,7 +348,7 @@ $('#pinBtn').onclick = () => {
   $('#pinPane').classList.add('hidden');
   $('#formPane').classList.remove('hidden');
   $('#bar').classList.remove('hidden');
-  tikla(); hisobla();
+  tikla();
   ($('#fio').value ? $('#pasport') : $('#fio')).focus();
   window.scrollTo(0,0);
 };
@@ -399,17 +369,10 @@ $('#pasport').addEventListener('input', e=>{
 $('#pinfl').addEventListener('input', e=>{ e.target.value = onlyDigits(e.target.value).slice(0,14); });
 $('#tel').addEventListener('blur',  e=>{ const t=telNorm(e.target.value); if(/^\+998\d{9}$/.test(t)) e.target.value=t; });
 ['kun','soat'].forEach(k=>$('#'+k).addEventListener('input', e=>{ e.target.value = onlyDigits(e.target.value); }));
-['soatlik','oylik'].forEach(k=>$('#'+k).addEventListener('input', e=>{
-  const d = onlyDigits(e.target.value);
-  e.target.value = d ? num(d) : '';
-  hisobla();
-}));
-$('#soat').addEventListener('input', hisobla);
-$('#hisobBtn').onclick = e=>{ $('#oylik').value = num(e.target.dataset.v); tekshir('oylik',true); saqla(); };
 $('#tozala').onclick = ()=>{
   if(!confirm('Barcha maydonlar tozalansinmi?')) return;
   Object.keys(RULES).forEach(k=>{ $('#'+k).value=''; $('#'+k).closest('.f').classList.remove('err'); });
-  qoralamaOchir(); hisobla();
+  qoralamaOchir();
 };
 
 /* ── Yuborish ─────────────────────────────────────────────────────── */
@@ -434,8 +397,8 @@ $('#yubor').onclick = async () => {
       lavozim:  $('#lavozim').value.trim(),
       kun:      onlyDigits($('#kun').value),
       soat:     onlyDigits($('#soat').value),
-      soatlik:  +onlyDigits($('#soatlik').value),
-      oylik:    +onlyDigits($('#oylik').value),
+      soatlik:  '',
+      oylik:    '',
       izoh:     $('#izoh').value.trim()
     });
     if(javob && javob.ok === false)

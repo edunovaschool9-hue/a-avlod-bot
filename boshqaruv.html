@@ -138,6 +138,7 @@ label{display:block;font-size:12px;color:var(--mu);margin:0 0 4px}
 .msh-act .b-bad{color:#be123c;border-color:#f0c4ce}
 @media(max-width:640px){.msh-stats{grid-template-columns:repeat(2,1fr)}.msh-stats b{font-size:20px}}
 .mt-h{margin:0 0 14px;font-size:17px}
+.mt-info{background:var(--bg,#f4f6f9);border-radius:8px;padding:9px 12px;font-size:13.5px;margin-bottom:14px}
 .mt-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
 .mt-f{display:block;margin-bottom:10px}
 .mt-f span{font-size:12px;color:var(--mu,#64748b)}
@@ -1345,7 +1346,7 @@ function mshChiz(){
       if(r.izoh) h+='<div class="msh-izoh">'+esc(r.izoh)+'</div>';
       h+='<div class="msh-act">';
       if(st==='wait') h+=
-        '<button class="b-ok" onclick="mshTasdiq('+(r.sh_id??r.id)+','+r.id+',true)">Tasdiqlash</button>'+
+        '<button class="b-ok" onclick="mshTasdiqOyna('+(r.sh_id??r.id)+','+r.id+')">Tasdiqlash</button>'+
         '<button class="b-bad" onclick="mshTasdiq('+(r.sh_id??r.id)+','+r.id+',false)">Rad etish</button>';
       h+='<button onclick="mshTahrir('+(r.sh_id??r.id)+')">Tahrirlash</button>'+
          '<button class="b-bad" onclick="mshOchir('+(r.sh_id??r.id)+','+r.id+')">O\'chirish</button></div>';
@@ -1358,6 +1359,49 @@ function mshChiz(){
   if(q){ q.oninput=e=>{ clearTimeout(window._mshT);
     window._mshT=setTimeout(()=>{ MSH_Q=e.target.value.trim().toLowerCase(); mshChiz();
       const n=$('mshQ'); if(n){n.focus(); n.setSelectionRange(n.value.length,n.value.length);} },200); }; }
+}
+
+function mshTasdiqOyna(shId,odamId){
+  const r=(MSH_D.royxat||[]).find(x=>x.id===odamId)||{};
+  const f=(id,lbl,val,tur)=>'<label class="mt-f"><span>'+lbl+'</span>'+
+    '<input id="mt_'+id+'" type="'+(tur||'text')+'" value="'+esc(val==null?'':val)+'"></label>';
+  modalOch('<h3 class="mt-h">Shartnomani tasdiqlash</h3>'+
+    '<div class="mt-info">'+esc(r.ism||'')+(r.lavozim?' \u00b7 '+esc(r.lavozim):'')+
+      ' \u00b7 haftasiga '+esc(r.soat==null?'?':r.soat)+' soat</div>'+
+    '<div class="mt-grid">'+
+      f('tsoatlik','Bir soatlik to\'lov (so\'m)',r.soatlik)+
+      f('toylik','Oylik maosh (so\'m)',r.oylik)+
+    '</div>'+
+    f('tboshlanish','Ish boshlanish sanasi',String(r.boshlanish||'').slice(0,10)||new Date().toISOString().slice(0,10),'date')+
+    '<div class="mt-act"><button class="b-ok" onclick="mshTasdiqla('+shId+','+odamId+')">Tasdiqlash</button>'+
+    '<button onclick="modalYop()">Bekor qilish</button></div>');
+}
+
+async function mshTasdiqla(shId,odamId){
+  const r=(MSH_D.royxat||[]).find(x=>x.id===odamId)||{};
+  const g=id=>{const e=$('mt_'+id); return e?e.value.trim():'';};
+  const son=id=>g(id).replace(/[^0-9.]/g,'');
+  if(!son('tsoatlik') && !son('toylik') &&
+     !confirm('To\'lov miqdori kiritilmadi. Baribir tasdiqlansinmi?')) return;
+  const oldi=mshHolat(r.holat);
+  try{
+    let d=await rpc('ep_msh_tahrir',{p_token:T,p_id:shId,
+      p_fio:r.ism||'',p_pasport:r.pasport||'',p_pinfl:r.pinfl||'',
+      p_tugilgan:String(r.tugilgan||'').slice(0,10),p_manzil:r.manzil||'',
+      p_telefon:r.tel||'',p_lavozim:r.lavozim||'',
+      p_hafta_kun:r.kun==null?'':String(r.kun),p_hafta_soat:r.soat==null?'':String(r.soat),
+      p_soatlik:son('tsoatlik'),p_oylik:son('toylik'),
+      p_ish_boshlanish:g('tboshlanish'),p_izoh:r.izoh||''});
+    if(!d||!d.ok) throw new Error((d&&d.xato)||'To\'lov saqlanmadi');
+    d=await rpc('ep_msh_tasdiq',{p_token:T,p_id:shId,p_ok:true});
+    if(!d||!d.ok) throw new Error((d&&d.xato)||'Tasdiqlanmadi');
+    modalYop();
+    MSH_D=await rpc('ep_msh_royxat',{p_token:T}); mshChiz();
+    const y=(MSH_D.royxat||[]).find(x=>x.id===odamId);
+    if(y && mshHolat(y.holat)===oldi)
+      xabar('To\'lov saqlandi, lekin holat o\'zgarmadi (p_id='+shId+')','xato');
+    else xabar('Tasdiqlandi','ok');
+  }catch(e){ xabar(xatoMatn(e),'xato'); }
 }
 
 function mshTahrir(shId){
