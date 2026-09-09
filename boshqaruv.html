@@ -1348,7 +1348,8 @@ function mshChiz(){
       if(st==='wait') h+=
         '<button class="b-ok" onclick="mshTasdiqOyna('+(r.sh_id??r.id)+','+r.id+')">Tasdiqlash</button>'+
         '<button class="b-bad" onclick="mshTasdiq('+(r.sh_id??r.id)+','+r.id+',false)">Rad etish</button>';
-      h+='<button onclick="mshTahrir('+(r.sh_id??r.id)+')">Tahrirlash</button>'+
+      h+='<button onclick="mshNusxa('+(r.sh_id??r.id)+','+r.id+')">Nusxa olish</button>'+
+         '<button onclick="mshTahrir('+(r.sh_id??r.id)+')">Tahrirlash</button>'+
          '<button class="b-bad" onclick="mshOchir('+(r.sh_id??r.id)+','+r.id+')">O\'chirish</button></div>';
     }
     h+='</div></div>';
@@ -1359,6 +1360,78 @@ function mshChiz(){
   if(q){ q.oninput=e=>{ clearTimeout(window._mshT);
     window._mshT=setTimeout(()=>{ MSH_Q=e.target.value.trim().toLowerCase(); mshChiz();
       const n=$('mshQ'); if(n){n.focus(); n.setSelectionRange(n.value.length,n.value.length);} },200); }; }
+}
+
+function mshNusxa(shId,odamId){
+  const r=(MSH_D.royxat||[]).find(x=>x.id===odamId)||{};
+  const w=window.open('','_blank');
+  if(!w){ xabar('Oynani ochib bo\'lmadi. Brauzerda pop-up ruxsatini yoqing.','xato'); return; }
+  const L='<span class="ln"></span>';
+  const v=x=>(x==null||x==='')?L:esc(String(x));
+  const p=x=>(x==null||x==='')?L:esc(Number(x).toLocaleString('ru-RU').replace(/\u00a0/g,' '))+' so\'m';
+  const s=x=>x?esc(sanaMatn(x)):L;
+  const bugun=sanaMatn(ymd(new Date()));
+  const css='@page{size:A4;margin:16mm}*{box-sizing:border-box}'+
+    'body{margin:0;color:#111;font-family:"Times New Roman",Georgia,serif;font-size:12.5pt;line-height:1.5}'+
+    'h1{text-align:center;font-size:15pt;margin:0 0 2mm;letter-spacing:.04em}'+
+    '.no{text-align:center;font-size:11pt;color:#333;margin:0 0 8mm}'+
+    '.top{display:flex;justify-content:space-between;font-size:11pt;margin-bottom:7mm}'+
+    'h2{font-size:12.5pt;margin:6mm 0 2mm}'+
+    'p{margin:0 0 1.6mm;text-align:justify}'+
+    '.ln{display:inline-block;min-width:52mm;border-bottom:1px solid #111;vertical-align:baseline}'+
+    'table{width:100%;border-collapse:collapse;margin:2mm 0 0}'+
+    'td{padding:1.6mm 2mm;border:1px solid #999;vertical-align:top}'+
+    'td.k{width:42%;color:#333}'+
+    '.imzo{display:flex;justify-content:space-between;gap:14mm;margin-top:12mm}'+
+    '.imzo div{width:50%;font-size:11pt}'+
+    '.imzo .sig{margin-top:12mm;border-top:1px solid #111;padding-top:1.5mm;color:#555;font-size:10pt}'+
+    '.izoh{margin-top:4mm;font-size:11pt}'+
+    '@media print{.hint{display:none}}'+
+    '.hint{background:#FFF3D6;border:1px solid #f0d9a0;padding:3mm;font-size:10pt;margin-bottom:6mm;font-family:Arial,sans-serif}';
+  const h=
+  '<!doctype html><meta charset="utf-8"><title>Mehnat shartnomasi \u2014 '+esc(r.ism||'')+'</title><style>'+css+'</style>'+
+  '<div class="hint">Chop etish oynasida <b>\u201cSaqlash \u2192 PDF\u201d</b> ni tanlasangiz, nusxa faylga yuklanadi.</div>'+
+  '<h1>MEHNAT SHARTNOMASI</h1>'+
+  '<p class="no">\u2116 '+(r.raqam!=null?esc(r.raqam):'____')+'</p>'+
+  '<div class="top"><span>Farg\'ona shahri</span><span>'+esc(bugun)+'</span></div>'+
+  '<p>\u201cEduNova School\u201d xususiy maktabi nomidan maktab direktori, keyingi o\'rinlarda <b>Ish beruvchi</b>, '+
+  'bir tomondan, va fuqaro '+v(r.ism)+', keyingi o\'rinlarda <b>Xodim</b>, ikkinchi tomondan, '+
+  'quyidagilar to\'g\'risida ushbu shartnomani tuzdilar.</p>'+
+  '<h2>1. Shartnoma predmeti</h2>'+
+  '<p>1.1. Xodim '+v(r.lavozim)+' lavozimiga qabul qilinadi.</p>'+
+  '<p>1.2. Ish joyi: \u201cEduNova School\u201d xususiy maktabi, Farg\'ona shahri.</p>'+
+  '<p>1.3. Ishga kirish sanasi: '+s(r.boshlanish)+'.</p>'+
+  '<h2>2. Ish vaqti</h2>'+
+  '<p>2.1. Haftadagi ish kunlari soni: '+v(r.kun)+'.</p>'+
+  '<p>2.2. Haftalik dars yuklamasi: '+v(r.soat)+' soat.</p>'+
+  '<p>2.3. Dam olish kunlari va mehnat ta\'tili maktabning ichki mehnat tartibi qoidalariga muvofiq belgilanadi.</p>'+
+  '<h2>3. Mehnatga haq to\'lash</h2>'+
+  '<p>3.1. Bir soatlik to\'lov: '+p(r.soatlik)+'.</p>'+
+  '<p>3.2. Oylik maosh: '+p(r.oylik)+'.</p>'+
+  '<p>3.3. Ish haqi oyiga kamida ikki marta to\'lanadi.</p>'+
+  '<h2>4. Tomonlarning huquq va majburiyatlari</h2>'+
+  '<p>4.1. Xodim lavozim majburiyatlarini vijdonan bajaradi va ichki mehnat tartibi qoidalariga rioya qiladi.</p>'+
+  '<p>4.2. Ish beruvchi zarur mehnat sharoitlarini ta\'minlaydi va ish haqini o\'z vaqtida to\'laydi.</p>'+
+  '<p>4.3. Ushbu shartnomada nazarda tutilmagan masalalar O\'zbekiston Respublikasi Mehnat kodeksi asosida hal etiladi.</p>'+
+  '<h2>5. Xodim ma\'lumotlari</h2>'+
+  '<table>'+
+  '<tr><td class="k">F.I.Sh.</td><td>'+v(r.ism)+'</td></tr>'+
+  '<tr><td class="k">Tug\'ilgan sana</td><td>'+s(r.tugilgan)+'</td></tr>'+
+  '<tr><td class="k">Pasport seriya va raqami</td><td>'+v(r.pasport)+'</td></tr>'+
+  '<tr><td class="k">JSHSHIR</td><td>'+v(r.pinfl)+'</td></tr>'+
+  '<tr><td class="k">Yashash manzili</td><td>'+v(r.manzil)+'</td></tr>'+
+  '<tr><td class="k">Telefon raqami</td><td>'+v(r.tel)+'</td></tr>'+
+  '</table>'+
+  (r.izoh?'<p class="izoh"><b>Izoh:</b> '+esc(r.izoh)+'</p>':'')+
+  '<h2>6. Tomonlarning imzolari</h2>'+
+  '<div class="imzo">'+
+  '<div><b>Ish beruvchi</b><br>\u201cEduNova School\u201d xususiy maktabi<br>Farg\'ona shahri'+
+  '<div class="sig">Direktor \u2014 imzo, F.I.Sh.</div></div>'+
+  '<div><b>Xodim</b><br>'+v(r.ism)+'<br>&nbsp;'+
+  '<div class="sig">Imzo, sana</div></div>'+
+  '</div>';
+  w.document.write(h); w.document.close();
+  setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} }, 500);
 }
 
 function mshTasdiqOyna(shId,odamId){
