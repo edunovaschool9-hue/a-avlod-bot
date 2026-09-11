@@ -49,6 +49,7 @@ canvas{width:100%;height:190px;background:#fff;border:1px dashed #c9bfa8;border-
 a.tg{display:block;text-align:center;background:#229ED9;color:#fff;text-decoration:none;padding:14px;
  border-radius:12px;font-weight:700;margin-top:10px}
 .srch{margin-bottom:8px}
+.kutish{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:12px;font-size:14px;color:#9a3412;line-height:1.45;margin:6px 0 4px}
 </style></head><body><div class="wrap">
 <div class="top"><span class="logo">EduNova School</span>
 <span class="lang"><button id="lu" class="on" onclick="setTil('uz')">UZ</button><button id="lr" onclick="setTil('ru')">RU</button></span></div>
@@ -121,7 +122,7 @@ function msBlocks(d,raqam){
   P('4.3. O\u2018qituvchilar, xodimlar va boshqa o\u2018quvchilarga nisbatan hurmat bilan munosabatda bo\u2018lish.');
   P('4.4. Maktab mulkiga ehtiyotkorona munosabatda bo\u2018lish, dars jarayoniga xalaqit bermaslik.');
   H('5. To\u2018lov tartibi, chegirma va grantlar');
-  P('5.1. Bir oylik o\u2018qish to\u2018lovi: '+msNarxFmt(d['ms-narx'])+' so\u2018m. To\u2018lov o\u2018quv yili davomida 10 (o\u2018n) oy uchun amalga oshiriladi.');
+  P('5.1. Bir oylik o\u2018qish to\u2018lovi: to\u2018lov summasi ma\u2019muriyat tomonidan tasdiqlangandan so\u2018ng belgilanadi. To\u2018lov o\u2018quv yili davomida 10 (o\u2018n) oy uchun amalga oshiriladi.');
   P('5.2. To\u2018lov har oyning '+(d['ms-tkun']||'______')+' sanasigacha amalga oshiriladi.');
   P('5.3. To\u2018lov naqd yoki bank o\u2018tkazmasi orqali qabul qilinadi, har bir to\u2018lov platformada qayd etiladi.');
   P('5.4. Ta\u2019lim nazorati bo\u2018limi operatorlari to\u2018lov muddati yaqinlashganda Buyurtmachiga oldindan eslatib boradi.');
@@ -188,7 +189,7 @@ var TX={
   saqla:'Davom etish',orqa:'Orqaga',
   q3:'Ota-ona ma\u2019lumotlari',q3s:'Shartnoma shu ma\u2019lumotlar asosida tuziladi',
   fio:'F.I.Sh. (to\u2018liq)',pas:'Pasport / ID raqami',man:'Yashash manzili',tel:'Telefon raqamingiz',
-  tugyil:'Farzand tug\u2018ilgan yili',til:'Ta\u2019lim tili',narx:'Bir oylik to\u2018lov (so\u2018m)',
+  tugyil:'Farzand tug\u2018ilgan yili',til:'Ta\u2019lim tili',narx:'Bir oylik to\u2018lov (so\u2018m)',narx_yoq:'\u{1F4B3} To\u2018lov summasi ma\u2019muriyat tomonidan tasdiqlangandan so\u2018ng belgilanadi va shaxsiy kabinetingizda ko\u2018rinadi.',
   tkun:'To\u2018lov sanasi (har oyning)',yil:'O\u2018quv yili boshi',
   q4:'Shartnomani o\u2018qing va imzolang',q4s:'Imzoni barmoq bilan chizing',
   oqidim:'Shartnoma matnini o\u2018qib chiqdim va shartlariga roziman',
@@ -208,7 +209,7 @@ var TX={
   saqla:'Продолжить',orqa:'Назад',
   q3:'Данные родителя',q3s:'Договор составляется по этим данным',
   fio:'Ф.И.О. полностью',pas:'Паспорт / ID номер',man:'Адрес проживания',tel:'Ваш телефон',
-  tugyil:'Год рождения ребёнка',til:'Язык обучения',narx:'Оплата за месяц (сум)',
+  tugyil:'Год рождения ребёнка',til:'Язык обучения',narx:'Оплата за месяц (сум)',narx_yoq:'\u{1F4B3} Сумма оплаты назначается администрацией после подтверждения договора и будет видна в личном кабинете.',
   tkun:'День оплаты (каждого месяца)',yil:'Начало учебного года',
   q4:'Прочитайте и подпишите договор',q4s:'Подпись рисуется пальцем',
   oqidim:'Я прочитал(а) текст договора и согласен(на) с условиями',
@@ -306,7 +307,7 @@ function ekran3(){
  h+='<label>'+t('man')+'</label><input id="f_man" value="'+esc(q.m||'')+'">';
  h+='<label>'+t('tugyil')+'</label><input id="f_tugyil" inputmode="numeric" value="'+esc(q.ty||'')+'" placeholder="2015">';
  h+='<label>'+t('til')+'</label><select id="f_til"><option value="o\u2018zbek">O\u2018zbek</option><option value="rus">Rus / Русский</option></select>';
- h+='<label>'+t('narx')+' *</label><input id="f_narx" inputmode="numeric" value="'+(ST.narx||'')+'">';
+ h+='<div class="kutish">'+t('narx_yoq')+'</div>';
  h+='<label>'+t('tkun')+'</label><input id="f_tkun" inputmode="numeric" value="'+(ST.tkun||5)+'">';
  h+='<label>'+t('yil')+'</label><input id="f_yil" inputmode="numeric" value="'+yil+'">';
  h+='</div><div class="err" id="e"></div>';
@@ -331,7 +332,7 @@ function shData(){
  d['ms-tel']=val('f_tel')||ST.f_tel;    d['ms-oquvchi']=ST.oquvchiIsm;
  d['ms-sinf']=(ST.sinfNom||'').split('-')[0]; d['ms-tugyil']=val('f_tugyil')||ST.f_tugyil;
  d['ms-oyil']=val('f_yil')||ST.f_yil;   d['ms-til']=val('f_til')||ST.f_til;
- d['ms-narx']=val('f_narx')||ST.f_narx; d['ms-tkun']=val('f_tkun')||ST.f_tkun;
+ d['ms-narx']=''; d['ms-tkun']=val('f_tkun')||ST.f_tkun;
  d['ms-kkun']='15'; d['ms-sana']=new Date().toISOString().slice(0,10);
  return d;
 }
@@ -350,7 +351,7 @@ function shMatn(){
 function ekran4(){
  bosqich(4);
  ST.f_fio=val('f_fio');ST.f_pas=val('f_pas');ST.f_tel=val('f_tel');ST.f_man=val('f_man');
- ST.f_tugyil=val('f_tugyil');ST.f_til=val('f_til');ST.f_narx=val('f_narx');
+ ST.f_tugyil=val('f_tugyil');ST.f_til=val('f_til');ST.f_narx=null;
  ST.f_tkun=val('f_tkun');ST.f_yil=val('f_yil');
  var h='<h1>'+t('q4')+'</h1><p class="sub">'+t('q4s')+'</p>';
  h+='<div class="doc" id="doc">'+esc(shMatn())+'</div>';
@@ -389,7 +390,7 @@ function yakunla(){
  IMZO=PAD.toDataURL('image/png');
  rpc('ep_sh_saqla',{p_kalit:KALIT,p_oquvchi_id:ST.oquvchi,p_ota_ism:ST.f_fio,p_pasport:ST.f_pas,
    p_manzil:ST.f_man,p_telefon:ST.f_tel,p_tugyil:ST.f_tugyil,
-   p_narx:parseInt(String(ST.f_narx).replace(/[^0-9]/g,''),10)||null,
+   p_narx:null,
    p_tolov_kuni:parseInt(ST.f_tkun,10)||5,p_oquv_yili:parseInt(ST.f_yil,10)||null,
    p_til:(ST.f_til==='rus'?'ru':'uz'),p_imzo:IMZO,p_matn:shMatn(),
    p_qurilma:navigator.userAgent}).then(function(d){
