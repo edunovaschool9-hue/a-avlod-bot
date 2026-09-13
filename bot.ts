@@ -33,7 +33,7 @@ const KB_ADMIN = { keyboard: [
   [{ text: "✅ Davomat" }, { text: "📝 O‘quv jarayoni" }],
   [{ text: "👥 Odamlar" }, { text: "📊 Hisobotlar" }],
   [{ text: "📱 Kabinet" }]], resize_keyboard: true };
-const KB_TEACH = { keyboard: [[{ text: "✅ Davomat belgilash" }, { text: "📝 Xulosa yozish" }], [{ text: "🧪 Test" }, { text: "➕ Savol qo‘shish" }], [{ text: "📚 Fanlarim" }, { text: "🎒 Maktab o‘quvchilari" }], [{ text: "📊 Holatim" }], [{ text: "🔑 PIN" }, { text: "📱 Kabinet" }]], resize_keyboard: true };
+const KB_TEACH = { keyboard: [[{ text: "✅ Davomat belgilash" }, { text: "📝 Xulosa yozish" }], [{ text: "🧪 Test" }, { text: "➕ Savol qo‘shish" }], [{ text: "🎯 Yo‘nalishlar" }], [{ text: "📚 Fanlarim" }, { text: "🎒 Maktab o‘quvchilari" }], [{ text: "📊 Holatim" }], [{ text: "🔑 PIN" }, { text: "📱 Kabinet" }]], resize_keyboard: true };
 const KB_APP = (t = "📱 Kabinetni ochish") => ({ inline_keyboard: [[{ text: t, web_app: { url: APP } }]] });
 
 const T = {
@@ -763,6 +763,27 @@ async function savolFan(chat: number) {
     { reply_markup: { inline_keyboard: rows.slice(0, 12) } });
 }
 
+
+// ---------- yo'nalishlar ----------
+async function yonMenyu(chat: number, tur: string) {
+  const d = await rpc("ep_yon_tg", { p_chat_id: chat });
+  if (!d?.ok) { await send(chat, T.royxatda_yoq); return; }
+  const y: any[] = (d.royxat ?? []) as any[];
+  if (!y.length) { await send(chat, "Yo‘nalish yo‘q."); return; }
+  const rows = y.map((x: any) => [{ text: `${x.nom} (${x.jami})`, callback_data: `yo_${tur}:${x.id}` }]);
+  await send(chat, tur === "dav" ? "🎯 <b>Yo‘nalish bo‘yicha davomat</b>\nQaysi yo‘nalish?" : "🎯 <b>Yo‘nalish o‘quvchilari</b>",
+    { reply_markup: { inline_keyboard: rows } });
+}
+async function yonOquvchi(chat: number, yid: number) {
+  const d = await rpc("ep_yon_oq_tg", { p_chat_id: chat, p_yon_id: yid });
+  if (!d?.ok) { await send(chat, "Ruxsat yo‘q"); return; }
+  const r: any[] = (d.royxat ?? []) as any[];
+  if (!r.length) { await send(chat, `${esc(d.nom ?? "")} — o‘quvchi biriktirilmagan.`); return; }
+  const t = `🎯 <b>${esc(d.nom ?? "")}</b> · ${r.length} ta o‘quvchi\n\n` +
+    r.map((x: any, i: number) => `${i + 1}. <b>${esc(x.ism)}</b> · ${esc(x.sinf)}`).join("\n");
+  await send(chat, t);
+}
+
 // ---------- xabarlar ----------
 async function xabar(msg: any) {
   const chat = msg.chat?.id as number; if (!chat) return;
@@ -879,6 +900,10 @@ async function xabar(msg: any) {
   if (/o‘quvchilar|o'quvchilar|oquvchilar/i.test(matn)) {
     if (!isTeach && !isAdmin) { await send(chat, T.royxatda_yoq); return; }
     await sinfSora(chat, "🎒 Qaysi sinf?", "oq_sinf"); return;
+  }
+  if (/yo‘nalish|yonalish/i.test(matn)) {
+    if (!isTeach && !isAdmin) { await send(chat, T.royxatda_yoq); return; }
+    await yonMenyu(chat, "koz"); return;
   }
   if (/savol qo‘shish|savol qoshish/i.test(matn)) {
     if (!isTeach && !isAdmin) { await send(chat, T.royxatda_yoq); return; }
@@ -1029,6 +1054,7 @@ async function callback(cq: any) {
   const [k, a, b] = data.split(":");
   if (k.startsWith("dv_")) { await davCallback(cq, k, a, b); return; }
   if (k.startsWith("oqt_")) { await oqitCallback(cq, k, a); return; }
+  if (k === "yo_koz") { await ok(); await yonOquvchi(chat, Number(a)); return; }
   if (k === "sq_f") {
     await ok();
     const rows: any[] = [];
@@ -1569,7 +1595,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v6.7 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v6.8 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
