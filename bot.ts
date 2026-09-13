@@ -33,7 +33,7 @@ const KB_ADMIN = { keyboard: [
   [{ text: "✅ Davomat" }, { text: "📝 O‘quv jarayoni" }],
   [{ text: "👥 Odamlar" }, { text: "📊 Hisobotlar" }],
   [{ text: "📱 Kabinet" }]], resize_keyboard: true };
-const KB_TEACH = { keyboard: [[{ text: "✅ Davomat belgilash" }, { text: "📝 Xulosa yozish" }], [{ text: "🧪 Test" }, { text: "📚 Fanlarim" }], [{ text: "🎒 Maktab o‘quvchilari" }], [{ text: "📊 Holatim" }], [{ text: "🔑 PIN" }, { text: "📱 Kabinet" }]], resize_keyboard: true };
+const KB_TEACH = { keyboard: [[{ text: "✅ Davomat belgilash" }, { text: "📝 Xulosa yozish" }], [{ text: "🧪 Test" }, { text: "➕ Savol qo‘shish" }], [{ text: "📚 Fanlarim" }, { text: "🎒 Maktab o‘quvchilari" }], [{ text: "📊 Holatim" }], [{ text: "🔑 PIN" }, { text: "📱 Kabinet" }]], resize_keyboard: true };
 const KB_APP = (t = "📱 Kabinetni ochish") => ({ inline_keyboard: [[{ text: t, web_app: { url: APP } }]] });
 
 const T = {
@@ -735,6 +735,34 @@ async function menyuKor(chat: number, k: string) {
   await send(chat, m.sarl, { reply_markup: { inline_keyboard: rows } });
 }
 
+
+// ---------- o'qituvchi o'z savolini qo'shadi ----------
+const SAV_NAMUNA = `➕ <b>O‘z savolingizni qo‘shish</b>\n\n` +
+  `Savolni bitta xabar qilib yuboring — shu ko‘rinishda:\n\n` +
+  `<code>Kasrlarni qo‘shishda nima o‘zgarmaydi?\nA) Surat\nB) Maxraj\nC) Butun qism\nD) Hech nima\n* B</code>\n\n` +
+  `<i>Oxirgi qatorda * belgisi bilan to‘g‘ri javob harfini yozing.</i>\n` +
+  `Savolingiz testda AI savollaridan oldin chiqadi.`;
+function savolParse(t: string) {
+  const q = t.split("\n").map((x) => x.trim()).filter(Boolean);
+  if (q.length < 4) return null;
+  const togri = (q.find((x) => /^[*✅]/.test(x)) ?? "").replace(/^[*✅]\s*/, "").trim().toLowerCase().slice(0, 1);
+  if (!["a", "b", "c", "d"].includes(togri)) return null;
+  const v: Record<string, string> = {};
+  for (const x of q) { const m = x.match(/^([A-Da-d])\s*[).:-]\s*(.+)$/); if (m) v[m[1].toLowerCase()] = m[2].trim(); }
+  const savol = q.find((x) => !/^[A-Da-d]\s*[).:-]/.test(x) && !/^[*✅]/.test(x));
+  if (!savol || !v.a || !v.b) return null;
+  return { savol, a: v.a, b: v.b, c: v.c ?? null, d: v.d ?? null, togri };
+}
+async function savolFan(chat: number) {
+  const d = await rpc("ep_mening_tanlovim", { p_chat_id: chat });
+  if (!d?.ok) { await send(chat, T.royxatda_yoq); return; }
+  const fan: any[] = ((d.fanlar ?? []) as any[]).filter((x: any) => x.bor);
+  const list = fan.length ? fan : ((d.fanlar ?? []) as any[]);
+  const rows: any[] = []; for (let i = 0; i < list.length; i += 2) rows.push(list.slice(i, i + 2).map((x: any) => ({ text: x.nom, callback_data: `sq_f:${x.id}` })));
+  await send(chat, SAV_NAMUNA + (fan.length ? "" : "\n\n<i>Avval 📚 Fanlarim dan o‘z fanlaringizni belgilang.</i>"),
+    { reply_markup: { inline_keyboard: rows.slice(0, 12) } });
+}
+
 // ---------- xabarlar ----------
 async function xabar(msg: any) {
   const chat = msg.chat?.id as number; if (!chat) return;
@@ -764,6 +792,20 @@ async function xabar(msg: any) {
     await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: null, p_malumot: null });
     const a = await rpc("ep_tg_admin_ulash", { p_chat_id: chat, p_pin: matn });
     if (a?.ok) await adminMenyu(chat, a.ism); else await send(chat, T.admin_xato);
+    return;
+  }
+  if (st?.holat === "sq_matn" && matn && !matn.startsWith("/")) {
+    const m = st.malumot ?? {};
+    const p = savolParse(matn);
+    if (!p) { await send(chat, "❌ Format noto‘g‘ri.\n\n" + SAV_NAMUNA); return; }
+    const r = await rpc("ep_savol_oqit", { p_chat_id: chat, p_fan_id: Number(m.fan), p_daraja: Number(m.daraja),
+      p_til: m.til ?? "uz", p_savol: p.savol, p_a: p.a, p_b: p.b, p_c: p.c, p_d: p.d, p_togri: p.togri });
+    await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: null, p_malumot: null });
+    if (!r?.ok) { await send(chat, "Xatolik: " + esc(String(r?.xato ?? "")), { reply_markup: KB_TEACH }); return; }
+    const vv = [["a", p.a], ["b", p.b], ["c", p.c], ["d", p.d]].filter((x) => x[1])
+      .map((x) => (x[0] === p.togri ? "✅ " : "   ") + String(x[0]).toUpperCase() + ") " + esc(String(x[1]))).join("\n");
+    await send(chat, `✅ <b>Savol qo‘shildi</b>\n${esc(r.fan)} · ${m.daraja}-sinf · ${String(m.til).toUpperCase()}\n\n<b>${esc(p.savol)}</b>\n${vv}\n\n<i>Siz jami ${r.jami} ta savol qo‘shdingiz. Testda sizniki birinchi chiqadi.</i>`,
+      { reply_markup: { inline_keyboard: [[{ text: "➕ Yana savol", callback_data: `sq_d:${m.fan}:${m.daraja}:${m.til}` }]] } });
     return;
   }
   if (st?.holat === "oqit_ism" && !matn.startsWith("/")) {
@@ -837,6 +879,10 @@ async function xabar(msg: any) {
   if (/o‘quvchilar|o'quvchilar|oquvchilar/i.test(matn)) {
     if (!isTeach && !isAdmin) { await send(chat, T.royxatda_yoq); return; }
     await sinfSora(chat, "🎒 Qaysi sinf?", "oq_sinf"); return;
+  }
+  if (/savol qo‘shish|savol qoshish/i.test(matn)) {
+    if (!isTeach && !isAdmin) { await send(chat, T.royxatda_yoq); return; }
+    await savolFan(chat); return;
   }
   if (/fanlarim/i.test(matn)) {
     if (!isTeach && !isAdmin) { await send(chat, T.royxatda_yoq); return; }
@@ -983,6 +1029,26 @@ async function callback(cq: any) {
   const [k, a, b] = data.split(":");
   if (k.startsWith("dv_")) { await davCallback(cq, k, a, b); return; }
   if (k.startsWith("oqt_")) { await oqitCallback(cq, k, a); return; }
+  if (k === "sq_f") {
+    await ok();
+    const rows: any[] = [];
+    for (let d1 = 1; d1 <= 11; d1 += 4) rows.push([1, 2, 3, 4].map((i) => d1 + i - 1).filter((x) => x <= 11).map((x) => ({ text: `${x}-sinf`, callback_data: `sq_s:${a}:${x}` })));
+    await send(chat, "Qaysi sinf uchun?", { reply_markup: { inline_keyboard: rows } });
+    return;
+  }
+  if (k === "sq_s") {
+    await ok();
+    await send(chat, "Qaysi tilda?", { reply_markup: { inline_keyboard: [[
+      { text: "🇺🇿 O‘zbek", callback_data: `sq_d:${a}:${b}:uz` }, { text: "🇷🇺 Rus", callback_data: `sq_d:${a}:${b}:ru` }]] } });
+    return;
+  }
+  if (k === "sq_d") {
+    await ok();
+    const [, fan, dar, til] = String(cq.data ?? "").split(":");
+    await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: "sq_matn", p_malumot: { fan: Number(fan), daraja: Number(dar), til } });
+    await send(chat, `${dar}-sinf · ${String(til).toUpperCase()}\n\nEndi savolni yuboring:\n\n` + SAV_NAMUNA);
+    return;
+  }
   if (k.startsWith("tn")) { await tanlovCallback(cq, k, a, b); return; }
   if (k === "kh") { await ok(); const kecha=new Date(Date.now()+5*3600*1000-86400000).toISOString().slice(0,10); await kunHisobot(chat, kecha); return; }
   if (k.startsWith("oq_")) { await oqCallback(cq, k, a, b); return; }
@@ -1503,7 +1569,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v6.6 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v6.7 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
