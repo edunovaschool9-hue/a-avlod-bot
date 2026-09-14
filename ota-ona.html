@@ -123,7 +123,7 @@ label{display:block;font-size:12px;color:var(--mu);margin:0 0 4px}
     <div class="til"><button class="til-btn" data-lang="uz">UZ</button><button class="til-btn" data-lang="ru">RU</button></div>
   </div></div>
   <div class="wrap"><div id="cont"></div></div>
-  <div class="nav"><b data-tab="darslar" onclick="ochTab('darslar')"><i>📖</i><span data-tl="n_darslar">n_darslar</span></b><b data-tab="natija" onclick="ochTab('natija')"><i>🏅</i><span data-tl="n_natija">n_natija</span></b><b data-tab="tolov" onclick="ochTab('tolov')"><i>💳</i><span data-tl="n_tolov">n_tolov</span></b></div>
+  <div class="nav"><b data-tab="darslar" onclick="ochTab('darslar')"><i>📖</i><span data-tl="n_darslar">n_darslar</span></b><b data-tab="natija" onclick="ochTab('natija')"><i>🏅</i><span data-tl="n_natija">n_natija</span></b></div>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -339,17 +339,11 @@ function chiz(){
     h+='</div>';
   }
   const o=D.oquvchi, tl=D.tolov||{}, m=tl.muhim;
-  h+='<div class="card"><div class="row"><div style="flex:1"><h2>'+esc(o.ism)+'</h2><div class="sm mu">'+esc(o.sinf||'')+'</div></div>'+tolovPill(m)+'</div>';
-  if(m&&m.holat!=='tolangan'&&m.holat!=='kelajak'){
-    const kun=+m.kun;
-    h+='<div class="it mt" style="border-color:'+(m.holat==='qarz'?'#EFB4B4':'#E7C588')+';background:'+(m.holat==='qarz'?'#FCE9E9':'#FDF2DC')+'">'+
-      '<div class="b">'+oyMatn(m.oy)+' · '+pul(m.qoldiq)+'</div>'+
-      '<div class="sm">'+t('muddat')+': '+sanaMatn(m.muddat)+' · '+(kun>0?kun+' '+t('kun_qoldi'):(kun===0?t('bugun_muddat'):(-kun)+' '+t('kun_otdi')))+'</div></div>';
-  }
+  h+='<div class="card"><div class="row"><div style="flex:1"><h2>'+esc(o.ism)+'</h2><div class="sm mu">'+esc(o.sinf||'')+'</div></div>'+'</div>';
   h+='</div>';
-  if(TAB==='darslar') h+=tabDarslar();
-  else if(TAB==='natija') h+=tabNatija();
-  else h+=tabTolov();
+  if(TAB==='natija') h+=tabNatija();
+  else h+=tabDarslar();
+  h+=pastBlok();
   $('cont').innerHTML=h;
 }
 
@@ -435,6 +429,13 @@ function tabNatija(){
   return h+'</div>';
 }
 
+function pastBlok(){
+  let h='<div class="card"><h3>'+t('tg_ulash')+'</h3>'+
+    (B.tg_ulangan?'<div class="row"><span class="pill gn">'+t('tg_ulangan')+'</span></div>':
+    '<div class="sm mu">'+t('tg_izoh')+'</div><div id="tg_box" class="mt"><button class="btn sec sm" onclick="tgKod()">'+t('tg_ulash')+'</button></div>')+'</div>';
+  h+='<div class="center mt"><button class="btn sec" onclick="chiqish()">'+t('chiqish')+'</button></div>';
+  return h;
+}
 function tabTolov(){
   const tl=D.tolov||{}, oy=tl.oylar||[];
   let h='<div class="card"><h3>'+t('tolov_holat')+'</h3>'+
