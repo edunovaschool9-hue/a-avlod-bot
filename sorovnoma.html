@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metodik so‘rovnoma | EduNova</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #26313a;
+  --ink-2: #5e6b73;
+  --paper: #fbfcfa;
+  --grid: rgba(38, 49, 58, 0.055);
+  --line: #d9e0e3;
+  --field-line: #c4ced3;
+  --teal: #0b7f7b;
+  --teal-tint: #e0f2f0;
+  --yellow: #ffd23f;
+  --error: #b42318;
+  --font-body: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-head: "Unbounded", "Onest", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font: 16px/1.5 var(--font-body);
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.demo {
+  background: var(--yellow);
+  color: var(--ink);
+  font-size: 13.5px;
+  line-height: 1.35;
+  padding: 8px 20px;
+  text-align: center;
+}
+
+/* header */
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(251, 252, 250, 0.95);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--line);
+}
+.top-in { max-width: 680px; margin: 0 auto; padding: 12px 20px 8px; }
+.brand-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+.brand b { font-family: var(--font-head); font-weight: 600; font-size: 17px; letter-spacing: -0.01em; }
+.brand span { font-size: 12.5px; color: var(--ink-2); }
+
+.lang { display: inline-flex; flex: none; border: 1.5px solid var(--field-line); border-radius: 999px; padding: 2px; background: #fff; }
+.lang button {
+  border: 0; background: transparent; color: var(--ink-2); cursor: pointer;
+  font: 500 13px/1 var(--font-body); padding: 8px 11px; border-radius: 999px;
+}
+.lang button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+
+.progress { position: relative; height: 14px; margin-top: 12px; }
+.progress .track { position: absolute; left: 0; right: 0; top: 6px; border-top: 2px dotted #b5c0c6; }
+.progress .fill {
+  position: absolute; left: 0; top: 5px; height: 3px; width: 0;
+  background: var(--ink); border-radius: 2px;
+  transition: width 0.7s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+.progress .tip {
+  position: absolute; top: 0; left: 0; width: 28px; height: 14px;
+  transition: left 0.7s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+.progress .tip svg { display: block; }
+.meta-row { display: flex; justify-content: flex-end; min-height: 18px; margin-top: 2px; font-size: 12.5px; color: var(--ink-2); }
+.saved { opacity: 0; transition: opacity 0.3s; }
+.saved.show { opacity: 1; }
+
+.reduce-motion .progress .fill,
+.reduce-motion .progress .tip,
+.reduce-motion .saved { transition: none; }
+
+/* content */
+main { max-width: 680px; margin: 0 auto; padding: 30px 20px 150px; }
+
+h1, h2 { font-family: var(--font-head); font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+h1 { font-size: clamp(32px, 9vw, 46px); line-height: 1.06; }
+h2 { font-size: clamp(24px, 6.4vw, 31px); line-height: 1.15; }
+
+.step-no {
+  display: inline-block;
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 1px 9px;
+  margin-bottom: 12px;
+  background: linear-gradient(100deg, transparent 2%, var(--yellow) 5%, var(--yellow) 95%, transparent 98%);
+}
+.hint { color: var(--ink-2); margin: 10px 0 6px; max-width: 60ch; }
+
+.lead { font-size: 18px; line-height: 1.5; max-width: 56ch; margin: 18px 0 0; }
+.intro-sub { margin: 28px 0 4px; font-weight: 600; }
+.intro-list { list-style: none; counter-reset: s; padding: 0; margin: 6px 0 22px; }
+.intro-list li {
+  counter-increment: s;
+  display: flex; align-items: baseline; gap: 14px;
+  padding: 10px 0; border-bottom: 1px solid var(--line);
+  font-size: 16.5px;
+}
+.intro-list li::before {
+  content: counter(s);
+  flex: none; min-width: 26px; text-align: center;
+  font-family: var(--font-head); font-weight: 600; font-size: 14px;
+  background: linear-gradient(100deg, transparent 4%, var(--yellow) 9%, var(--yellow) 91%, transparent 96%);
+}
+.facts p { margin: 7px 0; color: var(--ink-2); max-width: 60ch; }
+.restored { margin: 18px 0 0; padding: 10px 14px; border-left: 3px solid var(--teal); background: var(--teal-tint); max-width: 60ch; }
+.intro-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+.intro-actions .btn { min-width: 180px; }
+
+.done { padding-top: 12vh; }
+.facts-note { color: var(--ink-2); margin-top: 14px; }
+
+/* questions */
+.qs { margin-top: 6px; }
+.q { padding: 22px 0; border-bottom: 1px solid var(--line); }
+.qs > .q:last-child { border-bottom: 0; }
+.q-label { font-weight: 600; font-size: 17px; line-height: 1.38; margin-bottom: 8px; max-width: 62ch; }
+.req { color: var(--teal); font-weight: 700; }
+.q-help { font-size: 14px; color: var(--ink-2); margin: -3px 0 10px; max-width: 62ch; }
+.q-err { display: none; margin-top: 8px; color: var(--error); font-size: 14px; font-weight: 500; }
+.q.invalid > .q-err { display: block; }
+.q.invalid > .q-label { color: var(--error); }
+.q.invalid .inp,
+.q.invalid .pill,
+.q.invalid .sc { border-color: var(--error); }
+
+.inp {
+  width: 100%;
+  background: #fff;
+  border: 1.5px solid var(--field-line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: var(--ink);
+  font: 16px/1.45 var(--font-body);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.inp::placeholder { color: #8e9aa1; }
+.inp:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(11, 127, 123, 0.18); }
+.ta { min-height: 88px; resize: vertical; }
+.other { margin-top: 10px; }
+
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill {
+  display: inline-flex; align-items: center; gap: 9px;
+  min-height: 42px; padding: 9px 14px;
+  border: 1.5px solid var(--field-line); border-radius: 999px;
+  background: #fff; color: var(--ink);
+  font: 500 15px/1.25 var(--font-body);
+  text-align: left; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.pill .mark {
+  flex: none; width: 16px; height: 16px;
+  border: 1.5px solid #9aa7ae; border-radius: 5px;
+  display: grid; place-items: center;
+}
+.pills[role="radiogroup"] .pill .mark { border-radius: 50%; }
+.pill.on { background: var(--teal-tint); border-color: var(--teal); }
+.pill.on .mark { background: var(--teal); border-color: var(--teal); }
+.pill.on .mark::after {
+  content: ""; width: 8px; height: 4.5px;
+  border: 2px solid #fff; border-top: 0; border-right: 0;
+  transform: translateY(-1px) rotate(-45deg);
+}
+.pills[role="radiogroup"] .pill.on .mark::after {
+  width: 6px; height: 6px; border: 0; border-radius: 50%; background: #fff; transform: none;
+}
+
+.scale-row { display: flex; gap: 8px; }
+.sc {
+  width: 52px; height: 48px;
+  border: 1.5px solid var(--field-line); border-radius: 10px;
+  background: #fff; color: var(--ink); cursor: pointer;
+  font: 600 17px var(--font-head);
+}
+.sc.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+.scale-ends { display: flex; justify-content: space-between; max-width: 292px; margin-top: 6px; font-size: 13px; color: var(--ink-2); }
+
+.case { display: grid; gap: 6px; padding-left: 14px; border-left: 2px solid var(--teal); }
+.case-lbl { margin-top: 6px; font-size: 14px; font-weight: 500; color: var(--ink-2); }
+.case-lbl:first-child { margin-top: 0; }
+.case-note { margin: 4px 0 0; }
+
+.books { display: grid; gap: 14px; }
+.book { background: #fff; border: 1.5px solid var(--line); border-radius: 14px; padding: 4px 16px; }
+.book-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 0; }
+.book-n { font-family: var(--font-head); font-weight: 600; font-size: 15px; }
+.book .q { padding: 14px 0; }
+.book .q:last-child { border-bottom: 0; }
+.book .q-label { font-size: 15.5px; }
+.link-btn { border: 0; background: none; padding: 6px 0; color: var(--error); cursor: pointer; font: 500 14px var(--font-body); }
+.add { justify-self: start; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 50px; padding: 0 20px;
+  border: 1.5px solid transparent; border-radius: 12px;
+  font: 600 16px var(--font-body); cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn.primary { background: var(--teal); color: #fff; }
+.btn.primary:disabled { opacity: 0.6; cursor: default; }
+.btn.ghost { background: #fff; border-color: var(--field-line); color: var(--ink); }
+
+button:focus-visible { outline: 3px solid rgba(11, 127, 123, 0.5); outline-offset: 2px; }
+
+/* bottom navigation */
+.nav {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  background: rgba(251, 252, 250, 0.97);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid var(--line);
+  padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+}
+.nav-in { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+.nav-msg { margin-bottom: 8px; color: var(--error); font-size: 14px; font-weight: 500; }
+.nav-msg:empty { display: none; }
+.nav-btns { display: flex; gap: 10px; }
+.nav-btns .primary { flex: 1; }
+
+@media (min-width: 720px) {
+  main { padding-top: 44px; }
+  .q-label { font-size: 17.5px; }
+}
+
+</style>
+</head>
+<body>
+<div id="demo" class="demo" hidden></div>
+<header class="top">
+  <div class="top-in">
+    <div class="brand-row">
+      <div class="brand"><b>EduNova</b><span id="brandSub"></span></div>
+      <div class="lang" role="group" aria-label="Til / Язык">
+        <button type="button" data-lang="uz" aria-pressed="true">O‘zbekcha</button>
+        <button type="button" data-lang="ru" aria-pressed="false">Русский</button>
+      </div>
+    </div>
+    <div class="progress" aria-hidden="true">
+      <div class="track"></div>
+      <div class="fill" id="pFill"></div>
+      <div class="tip" id="pTip">
+        <svg viewBox="0 0 28 14" width="28" height="14">
+          <rect x="0" y="3" width="4" height="8" rx="1" fill="#0b7f7b"/>
+          <rect x="4" y="3" width="15" height="8" fill="#ffd23f"/>
+          <rect x="4" y="6.2" width="15" height="1.6" fill="#f0bd1d"/>
+          <path d="M19 3 L27 7 L19 11 Z" fill="#f1d9ad"/>
+          <path d="M23.8 5.4 L27 7 L23.8 8.6 Z" fill="#26313a"/>
+        </svg>
+      </div>
+    </div>
+    <div class="meta-row"><span id="saved" class="saved" aria-live="polite"></span></div>
+  </div>
+</header>
+<main id="app"></main>
+<div class="nav" id="nav" hidden>
+  <div class="nav-in">
+    <div class="nav-msg" id="navMsg" role="alert"></div>
+    <div class="nav-btns" id="navBtns"></div>
+  </div>
+</div>
+<script>
+"use strict";
+
+const I18N = {
+  uz: {
+    brandSub: "Metodik so‘rovnoma",
+    introTitle: "Ustozlar tajribasi",
+    introLead: "EduNova yagona metodik bazani yig‘moqda: qaysi kitoblar, usullar va yondashuvlar sinfda haqiqatan ishlaydi. Bu bazaning asosi sizning tajribangiz bo‘ladi.",
+    introSections: "So‘rovnoma 5 bo‘limdan iborat:",
+    factTime: "Taxminan 20 daqiqa oladi, savollarning ko‘pi tugmali.",
+    factSave: "Javoblar shu qurilmada saqlanib boradi: to‘xtab, keyin davom ettirishingiz mumkin.",
+    factSaveNo: "So‘rovnomani bir o‘tirishda to‘ldirishni tavsiya qilamiz.",
+    factPrivacy: "Javoblar metodik tahlil uchun ishlatiladi va boshqa ustozlarga ko‘rsatilmaydi.",
+    factReq: "* belgisi majburiy savollarni bildiradi.",
+    restored: "Oldingi javoblaringiz saqlangan, davom ettirishingiz mumkin.",
+    start: "Boshlash",
+    resume: "Davom ettirish",
+    restart: "Boshidan boshlash",
+    restartConfirm: "Barcha javoblar o‘chiriladi. Davom etasizmi?",
+    back: "Orqaga",
+    next: "Keyingi bo‘lim",
+    submit: "Javoblarni yuborish",
+    sending: "Yuborilmoqda…",
+    required: "Bu savolga javob bering",
+    fillRequired: "Qizil bilan belgilangan savollarga javob bering",
+    otherPh: "O‘zingiz yozing",
+    addBook: "+ Yana kitob qo‘shish",
+    removeBook: "O‘chirish",
+    bookN: (n) => n + "-kitob",
+    booksMax: "Ko‘pi bilan 5 ta kitob qo‘shish mumkin",
+    saved: "Saqlandi",
+    doneTitle: "Rahmat!",
+    doneText: "Javoblaringiz yuborildi. Tajribangiz EduNova metodik bazasiga qo‘shiladi.",
+    errorSend: "Javoblar yuborilmadi. Internetni tekshirib, qayta bosing. Javoblaringiz saqlanib qoldi.",
+    demo: "Ko‘rish rejimi: javoblar faqat asosiy havola orqali ochilganda yuboriladi.",
+    demoDone: "Bu ko‘rish rejimi edi, javoblar hech qayerga yuborilmadi.",
+    caseSituation: "Vaziyat qanday edi?",
+    caseAction: "Nima qildingiz?",
+    caseResult: "Natija qanday bo‘ldi?",
+    initialsNote: "O‘quvchilarni ismi bilan emas, bosh harflari bilan yozing, masalan A.K.",
+    scaleMin: "Juda yomon",
+    scaleMax: "A’lo",
+    stepMeta: (a, b) => a + " / " + b,
+  },
+  ru: {
+    brandSub: "Методический опрос",
+    introTitle: "Опыт учителей",
+    introLead: "EduNova собирает единую методическую базу: какие книги, приёмы и подходы действительно работают в классе. Основой этой базы станет ваш опыт.",
+    introSections: "Опрос состоит из 5 разделов:",
+    factTime: "Займёт около 20 минут, на большинство вопросов отвечать кнопками.",
+    factSave: "Ответы сохраняются на этом устройстве: можно прерваться и продолжить позже.",
+    factSaveNo: "Рекомендуем заполнить опрос за один раз.",
+    factPrivacy: "Ответы используются для методического анализа и не показываются другим учителям.",
+    factReq: "Звёздочкой * отмечены обязательные вопросы.",
+    restored: "Ваши прошлые ответы сохранены, можно продолжить.",
+    start: "Начать",
+    resume: "Продолжить",
+    restart: "Начать заново",
+    restartConfirm: "Все ответы будут удалены. Продолжить?",
+    back: "Назад",
+    next: "Следующий раздел",
+    submit: "Отправить ответы",
+    sending: "Отправляем…",
+    required: "Ответьте на этот вопрос",
+    fillRequired: "Ответьте на вопросы, отмеченные красным",
+    otherPh: "Напишите свой вариант",
+    addBook: "+ Добавить ещё книгу",
+    removeBook: "Удалить",
+    bookN: (n) => "Книга " + n,
+    booksMax: "Можно добавить не больше 5 книг",
+    saved: "Сохранено",
+    doneTitle: "Спасибо!",
+    doneText: "Ответы отправлены. Ваш опыт войдёт в методическую базу EduNova.",
+    errorSend: "Ответы не отправились. Проверьте интернет и нажмите ещё раз. Ваши ответы сохранены.",
+    demo: "Режим просмотра: ответы отправляются, только когда страница открыта по основной ссылке.",
+    demoDone: "Это был режим просмотра, ответы никуда не отправлены.",
+    caseSituation: "Какая была ситуация?",
+    caseAction: "Что вы сделали?",
+    caseResult: "Какой получился результат?",
+    initialsNote: "Учеников указывайте не по имени, а инициалами, например А.К.",
+    scaleMin: "Очень плохо",
+    scaleMax: "Отлично",
+    stepMeta: (a, b) => a + " / " + b,
+  },
+};
+
+const O = (v, uz, ru) => ({ v, uz, ru });
+const T = (uz, ru) => ({ uz, ru });
+
+const SUBJECTS = [
+  O("matematika", "Matematika", "Математика"),
+  O("ona_tili", "Ona tili va adabiyot", "Родной язык и литература"),
+  O("ingliz", "Ingliz tili", "Английский язык"),
+  O("rus", "Rus tili", "Русский язык"),
+  O("koreys", "Koreys tili", "Корейский язык"),
+  O("nemis", "Nemis tili", "Немецкий язык"),
+  O("tarix", "Tarix", "История"),
+  O("huquq", "Huquq", "Право"),
+  O("biologiya", "Biologiya", "Биология"),
+  O("kimyo", "Kimyo", "Химия"),
+  O("fizika", "Fizika", "Физика"),
+  O("geografiya", "Geografiya", "География"),
+  O("tabiiy", "Tabiiy fanlar", "Естествознание"),
+  O("it", "IT va sun’iy intellekt", "IT и искусственный интеллект"),
+  O("robot", "Robototexnika", "Робототехника"),
+  O("boshlangich", "Boshlang‘ich sinf", "Начальные классы"),
+  O("sport", "Sport", "Спорт"),
+  O("shaxmat", "Shaxmat", "Шахматы"),
+  O("psixologiya", "Psixologiya", "Психология"),
+  O("boshqa", "Boshqa", "Другое"),
+];
+
+const GRADES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"].map((g) => O(g, g, g));
+const YES_NO = [O("ha", "Ha", "Да"), O("yoq", "Yo‘q", "Нет")];
+
+const BOOK_FIELDS = [
+  { id: "nomi", type: "text", req: true, col: "Kitob nomi", label: T("Kitob nomi", "Название книги") },
+  { id: "muallif", type: "text", col: "Muallif/nashriyot", label: T("Muallif yoki nashriyot", "Автор или издательство") },
+  { id: "sinf", type: "text", col: "Qaysi sinflar uchun", label: T("Qaysi sinflar uchun", "Для каких классов") },
+  { id: "narx", type: "number", col: "Narx (so‘m)", label: T("Narxi, so‘m", "Цена, сум"), ph: T("Masalan, 35000", "Например, 35000") },
+  {
+    id: "qamrov", type: "radio", col: "Kimda bor",
+    label: T("Kitob o‘quvchilarning qanchasida bor?", "У скольких учеников есть эта книга?"),
+    options: [
+      O("hammasi", "Hammasida", "У всех"),
+      O("kopchilik", "Ko‘pchiligida", "У большинства"),
+      O("bazilar", "Ba’zilarida", "У некоторых"),
+      O("faqat_men", "Faqat menda, darsda ishlataman", "Только у меня, использую на уроке"),
+    ],
+  },
+  {
+    id: "olish", type: "chips", col: "Qanday olinadi",
+    label: T("Ota-onalar kitobni qanday oladi?", "Как родители приобретают книгу?"),
+    options: [
+      O("dokon", "O‘zlari do‘kondan", "Сами в магазине"),
+      O("onlayn", "Onlayn: Uzum, Asaxiy", "Онлайн: Uzum, Asaxiy"),
+      O("oqituvchi", "O‘qituvchi olib kelib beradi", "Приносит учитель"),
+      O("maktab", "Maktab orqali", "Через школу"),
+      O("nusxa", "Nusxa ko‘chiriladi", "Делают копии"),
+    ],
+  },
+  { id: "nega", type: "textarea", req: true, col: "Nega shu kitob", label: T("Nega aynan shu kitob?", "Почему именно эта книга?") },
+  { id: "kuchli", type: "textarea", col: "Kuchli tomonlari", label: T("Kuchli tomonlari", "Сильные стороны") },
+  { id: "kamchilik", type: "textarea", col: "Kamchiliklari", label: T("Kamchiliklari", "Слабые стороны") },
+  { id: "natija", type: "textarea", col: "Natija", label: T("O‘quvchilarda qanday natija ko‘rdingiz?", "Какой результат вы увидели у учеников?") },
+];
+
+const STEPS = [
+  {
+    id: "profil",
+    title: T("Siz haqingizda", "О вас"),
+    hint: T("Kim qaysi fan va sinflarda ishlashini bilish uchun.", "Чтобы понимать, кто в каких предметах и классах работает."),
+    fields: [
+      { id: "fio", type: "text", req: true, col: "F.I.Sh.", label: T("Familiya, ism, sharifingiz", "Фамилия, имя, отчество") },
+      { id: "aloqa", type: "text", col: "Telefon/Telegram", label: T("Telefon yoki Telegram", "Телефон или Telegram"), help: T("Javobni aniqlashtirish kerak bo‘lsa, bog‘lanish uchun.", "Чтобы связаться, если понадобится уточнить ответ.") },
+      { id: "fanlar", type: "chips", req: true, other: true, col: "Fanlar", label: T("Qaysi fanlardan dars berasiz?", "Какие предметы вы ведёте?"), options: SUBJECTS },
+      { id: "sinflar", type: "chips", req: true, col: "Sinflar", label: T("Qaysi sinflarda ishlaysiz?", "В каких классах работаете?"), options: GRADES },
+      {
+        id: "oqim", type: "radio", req: true, col: "Oqim",
+        label: T("Qaysi guruhda dars berasiz?", "В каком потоке преподаёте?"),
+        options: [
+          O("a", "A (o‘zbek guruhi)", "A (узбекский поток)"),
+          O("b", "B (rus guruhi)", "B (русский поток)"),
+          O("ikkalasi", "Ikkalasida", "В обоих"),
+        ],
+      },
+      {
+        id: "staj", type: "radio", req: true, col: "Pedagogik staj",
+        label: T("Pedagogik stajingiz", "Ваш педагогический стаж"),
+        options: [
+          O("0_1", "1 yilgacha", "До 1 года"),
+          O("1_3", "1–3 yil", "1–3 года"),
+          O("3_5", "3–5 yil", "3–5 лет"),
+          O("5_10", "5–10 yil", "5–10 лет"),
+          O("10p", "10 yildan ortiq", "Больше 10 лет"),
+        ],
+      },
+      {
+        id: "edunova", type: "radio", col: "EduNova’da",
+        label: T("EduNova’da qancha vaqtdan beri ishlaysiz?", "Сколько вы работаете в EduNova?"),
+        options: [
+          O("yangi", "Shu o‘quv yilidan", "С этого учебного года"),
+          O("1yil", "1 yil atrofida", "Около года"),
+          O("2p", "2 yil va undan ko‘p", "2 года и больше"),
+        ],
+      },
+      { id: "sertifikat", type: "text", col: "Sertifikat/yutuqlar", label: T("Sertifikat, malaka yoki yutuqlaringiz", "Сертификаты, квалификация, достижения"), help: T("Masalan: IELTS, CEFR, malaka toifasi, olimpiada g‘oliblari.", "Например: IELTS, CEFR, категория, победители олимпиад.") },
+    ],
+  },
+  {
+    id: "materiallar",
+    title: T("Kitoblar va materiallar", "Книги и материалы"),
+    hint: T("Qaysi darslik va qo‘llanmalar ishlaydi, qaysilari yo‘q.", "Какие учебники и пособия работают, а какие нет."),
+    fields: [
+      {
+        id: "asosiy_darslik", type: "radio", req: true, col: "Asosiy darslik",
+        label: T("Asosan qaysi darslik bilan ishlaysiz?", "По какому учебнику в основном работаете?"),
+        options: [
+          O("davlat", "Davlat darsligi", "Государственный учебник"),
+          O("boshqa_darslik", "Boshqa darslik yoki qo‘llanma", "Другой учебник или пособие"),
+          O("oz", "O‘zim tayyorlagan materiallar", "Собственные материалы"),
+        ],
+      },
+      { id: "darslik_nomi", type: "text", col: "Darslik nomi", label: T("Darslik nomi, muallifi va nashr yili", "Название, автор и год издания учебника") },
+      { id: "darslik_baho", type: "scale", req: true, col: "Darslik bahosi (1–5)", label: T("Bu darslikni qanday baholaysiz?", "Как вы оцениваете этот учебник?") },
+      { id: "darslik_kamchilik", type: "textarea", col: "Darslikda yetishmaydi", label: T("Darslikda nima yetishmaydi yoki nima ortiqcha?", "Чего не хватает в учебнике или что в нём лишнее?") },
+      { id: "qoshimcha", type: "radio", req: true, col: "Qo‘shimcha kitob", label: T("Qo‘shimcha kitob yoki qo‘llanmadan foydalanasizmi yoki ularni tavsiya qilasizmi?", "Используете или рекомендуете дополнительные книги и пособия?"), options: YES_NO },
+      { id: "kitoblar", type: "books", col: "Kitoblar ro‘yxati", showIf: { field: "qoshimcha", eq: "ha" }, label: T("Har bir kitob haqida yozing", "Расскажите о каждой книге") },
+      {
+        id: "tanlash", type: "chips", other: true, col: "Material tanlash",
+        label: T("Kitob va materiallarni qanday tanlaysiz?", "Как вы выбираете книги и материалы?"),
+        options: [
+          O("tajriba", "O‘z tajribam", "Личный опыт"),
+          O("hamkasb", "Hamkasblar tavsiyasi", "Советы коллег"),
+          O("markaz", "O‘quv markazlari tajribasi", "Опыт учебных центров"),
+          O("telegram", "Telegram kanallar va bloglar", "Telegram-каналы и блоги"),
+          O("imtihon", "Olimpiada va imtihon talablari", "Требования олимпиад и экзаменов"),
+          O("ota_ona", "Ota-onalar iltimosi", "Просьбы родителей"),
+          O("boshqa", "Boshqa", "Другое"),
+        ],
+      },
+      { id: "onlayn", type: "textarea", col: "Onlayn manbalar", label: T("Qaysi sayt, ilova, YouTube yoki Telegram manbalardan foydalanasiz va qanday?", "Какими сайтами, приложениями, YouTube или Telegram-каналами пользуетесь и как?") },
+      { id: "voz_kechdi", type: "textarea", col: "Voz kechilgan material", label: T("Qaysi kitob yoki materialdan voz kechdingiz va nega?", "От какой книги или материала вы отказались и почему?") },
+      { id: "ideal", type: "textarea", col: "Ideal qo‘llanma", label: T("Sizningcha, ideal qo‘llanma qanday bo‘lishi kerak?", "Каким, по-вашему, должно быть идеальное пособие?") },
+    ],
+  },
+  {
+    id: "metodika",
+    title: T("Darslar va metodika", "Уроки и методика"),
+    hint: T("Sinfda o‘zingiz sinab ko‘rgan usullar va real keyslar.", "Приёмы, проверенные в классе, и реальные кейсы."),
+    fields: [
+      {
+        id: "dars_qismlari", type: "chips", col: "Dars qismlari",
+        label: T("Odatiy darsingizda nimalar bo‘ladi?", "Что обычно бывает на вашем уроке?"),
+        options: [
+          O("takror", "Takrorlash", "Повторение"),
+          O("yangi", "Yangi mavzuni tushuntirish", "Объяснение новой темы"),
+          O("guruh", "Juftlik yoki guruh ishi", "Работа в парах или группах"),
+          O("mustaqil", "Mustaqil ish", "Самостоятельная работа"),
+          O("ogzaki", "Og‘zaki savol-javob", "Устный опрос"),
+          O("test", "Test yoki nazorat", "Тест или контроль"),
+          O("oyin", "O‘yin elementlari", "Игровые элементы"),
+          O("video", "Video yoki taqdimot", "Видео или презентация"),
+          O("loyiha", "Loyiha ishi", "Проектная работа"),
+          O("amaliy", "Amaliy mashg‘ulot", "Практическое занятие"),
+        ],
+      },
+      { id: "samarali_usul", type: "textarea", req: true, col: "Eng samarali usul", label: T("Eng samarali usulingiz qaysi? Nima qilasiz, qaysi sinfda va qanday natija beradi?", "Какой ваш самый эффективный приём? Что делаете, в каком классе и какой результат он даёт?") },
+      { id: "keys_yutuq", type: "case", req: true, col: "Keys: yutuq", label: T("Muvaffaqiyatli keys: o‘quvchi yoki sinf qanday o‘zgardi?", "Успешный кейс: как изменился ученик или класс?") },
+      { id: "keys_qiyin", type: "case", col: "Keys: qiyin vaziyat", label: T("Qiyin keys: nima ishlamadi va undan nima o‘rgandingiz?", "Трудный кейс: что не сработало и чему вы научились?") },
+      { id: "sust", type: "textarea", col: "Sust o‘quvchilar bilan ish", label: T("Sust yoki darsga qiziqmaydigan o‘quvchilar bilan qanday ishlaysiz?", "Как вы работаете со слабыми или незаинтересованными учениками?") },
+      { id: "kuchli_oquvchi", type: "textarea", col: "Kuchli o‘quvchilar bilan ish", label: T("Kuchli o‘quvchilarga qanday qo‘shimcha topshiriq berasiz?", "Какие дополнительные задания даёте сильным ученикам?") },
+      {
+        id: "tekshirish", type: "chips", col: "Bilimni tekshirish",
+        label: T("Bilimni qanday tekshirasiz?", "Как вы проверяете знания?"),
+        options: [
+          O("ogzaki", "Og‘zaki", "Устно"),
+          O("yozma", "Yozma ish", "Письменная работа"),
+          O("test", "Test", "Тест"),
+          O("uy", "Uy vazifasi", "Домашнее задание"),
+          O("loyiha", "Loyiha yoki taqdimot", "Проект или презентация"),
+          O("diktant", "Diktant yoki insho", "Диктант или сочинение"),
+        ],
+      },
+      {
+        id: "nazorat", type: "radio", col: "Nazorat chastotasi",
+        label: T("Qanchalik tez-tez nazorat o‘tkazasiz?", "Как часто проводите контроль?"),
+        options: [
+          O("har_dars", "Har darsda", "Каждый урок"),
+          O("haftada", "Haftada 1–2 marta", "1–2 раза в неделю"),
+          O("mavzu", "Mavzu oxirida", "В конце темы"),
+          O("chorak", "Chorakda bir marta", "Раз в четверть"),
+        ],
+      },
+      {
+        id: "uy_vazifa", type: "radio", col: "Uy vazifasi vaqti",
+        label: T("Uy vazifasi odatda qancha vaqt oladi?", "Сколько времени обычно занимает домашнее задание?"),
+        options: [
+          O("yoq", "Uy vazifasi bermayman", "Не задаю домашнее задание"),
+          O("15", "15 daqiqagacha", "До 15 минут"),
+          O("30", "15–30 daqiqa", "15–30 минут"),
+          O("30p", "30 daqiqadan ko‘p", "Больше 30 минут"),
+        ],
+      },
+      { id: "faollik", type: "textarea", col: "Faollikni oshirish", label: T("Darsda o‘quvchilar faolligini qanday oshirasiz?", "Как вы повышаете активность учеников на уроке?") },
+      {
+        id: "tayyorgarlik", type: "radio", col: "Darsga tayyorgarlik vaqti",
+        label: T("Bitta darsga tayyorlanish qancha vaqt oladi?", "Сколько времени уходит на подготовку к одному уроку?"),
+        options: [
+          O("15", "15 daqiqagacha", "До 15 минут"),
+          O("30", "15–30 daqiqa", "15–30 минут"),
+          O("60", "30–60 daqiqa", "30–60 минут"),
+          O("60p", "1 soatdan ko‘p", "Больше часа"),
+        ],
+      },
+    ],
+  },
+  {
+    id: "ota_onalar",
+    title: T("Ota-onalar bilan ishlash", "Работа с родителями"),
+    hint: T("Aloqa, ishonch va ota-onalarning kutishlari.", "Общение, доверие и ожидания родителей."),
+    fields: [
+      {
+        id: "aloqa_kanal", type: "chips", col: "Aloqa usuli",
+        label: T("Ota-onalar bilan qanday aloqa qilasiz?", "Как вы общаетесь с родителями?"),
+        options: [
+          O("guruh", "Sinf Telegram guruhi", "Telegram-группа класса"),
+          O("shaxsiy", "Shaxsiy yozishma", "Личные сообщения"),
+          O("qongiroq", "Qo‘ng‘iroq", "Звонки"),
+          O("uchrashuv", "Yuzma-yuz uchrashuv", "Личные встречи"),
+          O("majlis", "Ota-onalar majlisi", "Родительские собрания"),
+          O("platforma", "Maktab platformasi", "Платформа школы"),
+        ],
+      },
+      {
+        id: "natija_chastota", type: "radio", req: true, col: "Natija haqida xabar",
+        label: T("Ota-onaga farzandining natijalari haqida qanchalik tez-tez xabar berasiz?", "Как часто сообщаете родителям о результатах ребёнка?"),
+        options: [
+          O("kunlik", "Har kuni", "Каждый день"),
+          O("haftalik", "Haftada bir marta", "Раз в неделю"),
+          O("oylik", "Oyda bir marta", "Раз в месяц"),
+          O("chorak", "Chorakda bir marta", "Раз в четверть"),
+          O("muammo", "Faqat muammo bo‘lganda", "Только когда есть проблема"),
+        ],
+      },
+      {
+        id: "natija_qanday", type: "chips", col: "Natijani ulashish",
+        label: T("Natijalarni qanday ulashasiz?", "Как вы делитесь результатами?"),
+        options: [
+          O("umumiy", "Umumiy guruhda", "В общей группе"),
+          O("alohida", "Har bir ota-onaga alohida", "Каждому родителю лично"),
+          O("majlis", "Majlisda", "На собрании"),
+          O("platforma", "Platformada", "На платформе"),
+          O("yoq", "Ulashmayman", "Не делюсь"),
+        ],
+      },
+      { id: "ishonch", type: "textarea", req: true, col: "Ishonch qozonish usuli", label: T("Ota-onalar ishonchini qanday qozongansiz? Eng yaxshi ishlagan usulni yozing.", "Как вы завоевали доверие родителей? Опишите приём, который сработал лучше всего.") },
+      { id: "sorovlar", type: "textarea", col: "Ota-ona savollari", label: T("Ota-onalar ko‘pincha nimani so‘raydi yoki nimadan xavotirlanadi?", "О чём родители чаще всего спрашивают и что их тревожит?") },
+      {
+        id: "xarajat", type: "chips", other: true, col: "Tayyor xarajatlar",
+        label: T("Ota-onalar qo‘shimcha nimalarga pul sarflashga tayyor?", "На что родители готовы тратить деньги дополнительно?"),
+        options: [
+          O("kitob", "Qo‘shimcha kitoblar", "Дополнительные книги"),
+          O("darslar", "Qo‘shimcha darslar yoki repetitor", "Дополнительные занятия или репетитор"),
+          O("olimpiada", "Olimpiada va Prezident maktabiga tayyorgarlik", "Подготовка к олимпиадам и Президентской школе"),
+          O("ingliz", "Ingliz tili kurslari", "Курсы английского"),
+          O("it", "IT va robototexnika to‘garaklari", "Кружки IT и робототехники"),
+          O("onlayn", "Onlayn ilova va testlar", "Онлайн-приложения и тесты"),
+          O("sertifikat", "Sertifikat imtihonlari", "Сертификационные экзамены"),
+          O("boshqa", "Boshqa", "Другое"),
+        ],
+      },
+      { id: "etiroz", type: "textarea", col: "E’tirozlar", label: T("Qanday xarajat yoki talabga e’tiroz bildirishadi?", "Какие расходы или требования вызывают у родителей возражения?") },
+      { id: "ota_keys", type: "case", col: "Keys: ota-ona", label: T("Ota-ona bilan qiyin vaziyat: nima bo‘ldi va qanday hal qildingiz?", "Трудная ситуация с родителем: что произошло и как вы её решили?") },
+      { id: "kutish", type: "textarea", col: "Ota-ona kutishlari", label: T("Ota-onalar maktabdan yana nimani kutadi?", "Чего ещё родители ждут от школы?") },
+    ],
+  },
+  {
+    id: "takliflar",
+    title: T("Muammolar va takliflar", "Проблемы и предложения"),
+    hint: T("Nima xalaqit beradi va maktabda nimani o‘zgartirish kerak.", "Что мешает и что стоит изменить в школе."),
+    fields: [
+      {
+        id: "xalaqit", type: "chips", other: true, col: "Xalaqit beradi",
+        label: T("Ishingizga eng ko‘p nima xalaqit beradi?", "Что больше всего мешает вашей работе?"),
+        options: [
+          O("vaqt", "Vaqt yetishmasligi", "Нехватка времени"),
+          O("material", "Darslik va materiallar", "Учебники и материалы"),
+          O("texnika", "Texnika: proyektor, printer", "Техника: проектор, принтер"),
+          O("intizom", "Sinfdagi intizom", "Дисциплина в классе"),
+          O("daraja", "O‘quvchilar darajasi har xil", "Разный уровень учеников"),
+          O("hisobot", "Hujjat va hisobotlar ko‘pligi", "Много отчётов и документов"),
+          O("ota_ona", "Ota-onalar bilan muloqot", "Общение с родителями"),
+          O("jadval", "Dars jadvali", "Расписание"),
+          O("motivatsiya", "Motivatsiya va rag‘bat", "Мотивация и поощрение"),
+          O("boshqa", "Boshqa", "Другое"),
+        ],
+      },
+      { id: "xalaqit_izoh", type: "textarea", col: "Xalaqit izohi", label: T("Batafsilroq yozing", "Опишите подробнее") },
+      { id: "ozgartirish", type: "textarea", req: true, col: "Takliflar", label: T("Maktabda nimani o‘zgartirgan bo‘lardingiz? Uchta taklif yozing.", "Что бы вы изменили в школе? Напишите три предложения.") },
+      {
+        id: "yordam", type: "chips", col: "Kerakli yordam",
+        label: T("Sizga qanday yordam kerak?", "Какая помощь вам нужна?"),
+        options: [
+          O("seminar", "Metodik seminar", "Методический семинар"),
+          O("material", "Tayyor materiallar", "Готовые материалы"),
+          O("texnika", "Texnika", "Техника"),
+          O("tajriba", "Hamkasblar bilan tajriba almashish", "Обмен опытом с коллегами"),
+          O("mentor", "Mentor", "Наставник"),
+          O("psixolog", "Psixolog maslahati", "Консультация психолога"),
+        ],
+      },
+      { id: "orgata", type: "radio", col: "Hamkasblarga o‘rgata oladi", label: T("Hamkasblarga o‘rgata oladigan tajribangiz bormi?", "Есть ли опыт, которому вы могли бы научить коллег?"), options: YES_NO },
+      { id: "orgata_mavzu", type: "text", col: "O‘rgatish mavzusi", showIf: { field: "orgata", eq: "ha" }, label: T("Qaysi mavzuda?", "По какой теме?") },
+      { id: "erkin", type: "textarea", col: "Qo‘shimcha fikr", label: T("Yana qo‘shimcha fikringiz bo‘lsa, yozing", "Если есть что добавить, напишите") },
+    ],
+  },
+];
+
+</script>
+<script>
+(function () {
+  "use strict";
+
+  const STORE_KEY = "edunova_sorovnoma_v1";
+  const MAX_BOOKS = 5;
+  const state = { lang: "uz", step: 0, lastStep: 0, v: {}, books: [], startedAt: null };
+  const reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const ENDPOINT = "https://unaodltahuevrfnarfha.supabase.co/functions/v1/sorovnoma";
+  const LIVE_HOSTS = ["edunovaschool9-hue.github.io", "www.edunovaschool.uz"];
+  const hasBackend = LIVE_HOSTS.indexOf(window.location.hostname) > -1;
+
+  let storageOk = false;
+  try {
+    localStorage.setItem("__edunova_t", "1");
+    localStorage.removeItem("__edunova_t");
+    storageOk = true;
+  } catch (e) {
+    storageOk = false;
+  }
+
+  const $app = document.getElementById("app");
+  const $nav = document.getElementById("nav");
+  const $navMsg = document.getElementById("navMsg");
+  const $navBtns = document.getElementById("navBtns");
+
+  /* ---------- helpers ---------- */
+
+  function t(key) {
+    const val = I18N[state.lang][key];
+    if (typeof val === "function") return val.apply(null, Array.prototype.slice.call(arguments, 1));
+    return val;
+  }
+
+  function L(obj) {
+    return obj ? obj[state.lang] || obj.uz : "";
+  }
+
+  function h(tag, attrs) {
+    const el = document.createElement(tag);
+    if (attrs) {
+      Object.keys(attrs).forEach(function (k) {
+        const val = attrs[k];
+        if (val === null || val === undefined || val === false) return;
+        if (k === "class") el.className = val;
+        else if (k.indexOf("on") === 0 && typeof val === "function") el.addEventListener(k.slice(2), val);
+        else el.setAttribute(k, val === true ? "" : String(val));
+      });
+    }
+    for (let i = 2; i < arguments.length; i++) appendChild(el, arguments[i]);
+    return el;
+  }
+
+  function appendChild(el, child) {
+    if (child === null || child === undefined || child === false) return;
+    if (Array.isArray(child)) {
+      child.forEach(function (c) { appendChild(el, c); });
+      return;
+    }
+    el.appendChild(typeof child === "string" ? document.createTextNode(child) : child);
+  }
+
+  function fieldById(id) {
+    for (const st of STEPS) {
+      for (const f of st.fields) if (f.id === id) return f;
+    }
+    return null;
+  }
+
+  /* ---------- storage ---------- */
+
+  function load() {
+    if (!storageOk) return false;
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return false;
+      const s = JSON.parse(raw);
+      if (!s || typeof s !== "object") return false;
+      state.lang = s.lang === "ru" ? "ru" : "uz";
+      const last = Number.isInteger(s.lastStep) ? s.lastStep : 0;
+      state.lastStep = Math.min(Math.max(last, 0), STEPS.length);
+      state.step = 0;
+      state.v = s.v && typeof s.v === "object" ? s.v : {};
+      state.books = Array.isArray(s.books) ? s.books.slice(0, MAX_BOOKS) : [];
+      state.startedAt = s.startedAt || null;
+      return state.lastStep > 0 || Object.keys(state.v).length > 0;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  let saveTimer = null;
+  function save() {
+    if (!storageOk) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () {
+      try {
+        localStorage.setItem(STORE_KEY, JSON.stringify({
+          lang: state.lang, lastStep: state.lastStep, v: state.v, books: state.books, startedAt: state.startedAt,
+        }));
+        flashSaved();
+      } catch (e) { /* storage full or blocked: keep working without draft */ }
+    }, 400);
+  }
+
+  function saveLangOnly() {
+    if (!storageOk) return;
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      const s = raw ? JSON.parse(raw) : {};
+      s.lang = state.lang;
+      localStorage.setItem(STORE_KEY, JSON.stringify(s));
+    } catch (e) { /* ignore */ }
+  }
+
+  function clearSaved() {
+    clearTimeout(saveTimer);
+    if (!storageOk) return;
+    try { localStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ }
+  }
+
+  function flashSaved() {
+    const el = document.getElementById("saved");
+    if (!el || state.step < 1 || state.step > STEPS.length) return;
+    el.textContent = t("saved");
+    el.classList.add("show");
+    clearTimeout(flashSaved.timer);
+    flashSaved.timer = setTimeout(function () { el.classList.remove("show"); }, 1400);
+  }
+
+  /* ---------- controls ---------- */
+
+  function autoGrow(el) {
+    el.style.height = "auto";
+    el.style.height = Math.min(el.scrollHeight + 3, 520) + "px";
+  }
+
+  function textInput(o) {
+    const el = h("input", {
+      class: "inp", type: "text", placeholder: o.placeholder || null,
+      "aria-labelledby": o.labelledby, inputmode: o.inputmode || null, maxlength: o.maxlength || 300,
+      autocomplete: o.autocomplete || "off",
+    });
+    el.value = o.value || "";
+    el.addEventListener("input", function () { o.onInput(el.value); });
+    return el;
+  }
+
+  function textArea(o) {
+    const el = h("textarea", {
+      class: "inp ta", rows: o.rows || 3, placeholder: o.placeholder || null,
+      "aria-labelledby": o.labelledby, maxlength: 4000,
+    });
+    el.value = o.value || "";
+    el.addEventListener("input", function () { o.onInput(el.value); autoGrow(el); });
+    requestAnimationFrame(function () { autoGrow(el); });
+    return el;
+  }
+
+  function pills(o) {
+    const multi = o.multi;
+    let value = o.value;
+    const group = h("div", { class: "pills", role: multi ? "group" : "radiogroup", "aria-labelledby": o.labelledby });
+    o.options.forEach(function (opt) {
+      const on = multi ? Array.isArray(value) && value.indexOf(opt.v) > -1 : value === opt.v;
+      const btn = h("button", {
+        type: "button", class: "pill" + (on ? " on" : ""), "data-v": opt.v,
+        role: multi ? null : "radio",
+        "aria-checked": multi ? null : String(on),
+        "aria-pressed": multi ? String(on) : null,
+      }, h("span", { class: "mark", "aria-hidden": "true" }), h("span", null, L(opt)));
+      btn.addEventListener("click", function () {
+        if (multi) {
+          const arr = Array.isArray(value) ? value.slice() : [];
+          const i = arr.indexOf(opt.v);
+          if (i > -1) arr.splice(i, 1); else arr.push(opt.v);
+          value = arr;
+        } else {
+          value = opt.v;
+        }
+        group.querySelectorAll(".pill").forEach(function (p) {
+          const isOn = multi ? value.indexOf(p.getAttribute("data-v")) > -1 : p.getAttribute("data-v") === value;
+          p.classList.toggle("on", isOn);
+          p.setAttribute(multi ? "aria-pressed" : "aria-checked", String(isOn));
+        });
+        o.onChange(value);
+      });
+      group.appendChild(btn);
+    });
+    return group;
+  }
+
+  function scale(o) {
+    let value = o.value;
+    const row = h("div", { class: "scale-row", role: "radiogroup", "aria-labelledby": o.labelledby });
+    for (let n = 1; n <= 5; n++) {
+      const btn = h("button", { type: "button", class: "sc" + (value === n ? " on" : ""), role: "radio", "aria-checked": String(value === n) }, String(n));
+      btn.addEventListener("click", function () {
+        value = n;
+        row.querySelectorAll(".sc").forEach(function (b, i) {
+          const isOn = i + 1 === n;
+          b.classList.toggle("on", isOn);
+          b.setAttribute("aria-checked", String(isOn));
+        });
+        o.onChange(n);
+      });
+      row.appendChild(btn);
+    }
+    return h("div", { class: "scale" }, row, h("div", { class: "scale-ends" }, h("span", null, t("scaleMin")), h("span", null, t("scaleMax"))));
+  }
+
+  /* ---------- fields ---------- */
+
+  function labelBlock(id, label, req) {
+    return h("div", { class: "q-label", id: id }, label, req ? h("span", { class: "req", "aria-hidden": "true" }, " *") : null);
+  }
+
+  function clearErr(wrap) {
+    wrap.classList.remove("invalid");
+    if (!document.querySelector(".q.invalid")) $navMsg.textContent = "";
+  }
+
+  function renderField(f) {
+    const lblId = "l_" + f.id;
+    const wrap = h("div", { class: "q", "data-field": f.id });
+    wrap.appendChild(labelBlock(lblId, L(f.label), f.req));
+    if (f.help) wrap.appendChild(h("div", { class: "q-help" }, L(f.help)));
+
+    function set(val) {
+      state.v[f.id] = val;
+      save();
+      clearErr(wrap);
+    }
+
+    let control;
+    if (f.type === "text" || f.type === "number") {
+      control = textInput({
+        value: state.v[f.id], placeholder: L(f.ph), labelledby: lblId, onInput: set,
+        inputmode: f.type === "number" ? "numeric" : null,
+        autocomplete: f.id === "fio" ? "name" : null,
+      });
+    } else if (f.type === "textarea") {
+      control = textArea({ value: state.v[f.id], placeholder: L(f.ph), labelledby: lblId, onInput: set });
+    } else if (f.type === "radio" || f.type === "chips") {
+      const multi = f.type === "chips";
+      control = h("div", null);
+      let other = null;
+      const current = state.v[f.id];
+      const hasOther = function (val) { return Array.isArray(val) ? val.indexOf("boshqa") > -1 : val === "boshqa"; };
+      control.appendChild(pills({
+        options: f.options, multi: multi, labelledby: lblId,
+        value: current !== undefined ? current : multi ? [] : null,
+        onChange: function (val) {
+          set(val);
+          if (other) other.hidden = !hasOther(val);
+          applyConditions();
+        },
+      }));
+      if (f.other) {
+        other = textInput({
+          value: state.v[f.id + "__other"], placeholder: t("otherPh"), labelledby: lblId,
+          onInput: function (x) { state.v[f.id + "__other"] = x; save(); },
+        });
+        other.classList.add("other");
+        other.hidden = !hasOther(current);
+        control.appendChild(other);
+      }
+    } else if (f.type === "scale") {
+      control = scale({ value: state.v[f.id], labelledby: lblId, onChange: set });
+    } else if (f.type === "case") {
+      control = caseBox(f, wrap);
+    } else if (f.type === "books") {
+      control = booksBox();
+    }
+
+    wrap.appendChild(control);
+    wrap.appendChild(h("div", { class: "q-err" }, t("required")));
+    return wrap;
+  }
+
+  function caseBox(f, wrap) {
+    const val = state.v[f.id] || {};
+    const box = h("div", { class: "case" });
+    [["s", "caseSituation"], ["a", "caseAction"], ["r", "caseResult"]].forEach(function (pair) {
+      const id = "c_" + f.id + "_" + pair[0];
+      box.appendChild(h("label", { class: "case-lbl", for: id }, t(pair[1])));
+      const ta = textArea({
+        value: val[pair[0]], rows: 2,
+        onInput: function (x) {
+          const cur = state.v[f.id] || {};
+          cur[pair[0]] = x;
+          state.v[f.id] = cur;
+          save();
+          clearErr(wrap);
+        },
+      });
+      ta.id = id;
+      ta.removeAttribute("aria-labelledby");
+      box.appendChild(ta);
+    });
+    box.appendChild(h("div", { class: "q-help case-note" }, t("initialsNote")));
+    return box;
+  }
+
+  function booksBox() {
+    const box = h("div", { class: "books" });
+
+    function redraw(focusLast) {
+      box.innerHTML = "";
+      if (state.books.length === 0) state.books.push({});
+      state.books.forEach(function (b, idx) {
+        const head = h("div", { class: "book-head" }, h("span", { class: "book-n" }, t("bookN", idx + 1)));
+        if (state.books.length > 1) {
+          head.appendChild(h("button", {
+            type: "button", class: "link-btn",
+            onclick: function () { state.books.splice(idx, 1); save(); redraw(false); },
+          }, t("removeBook")));
+        }
+        const card = h("div", { class: "book" }, head);
+        BOOK_FIELDS.forEach(function (bf) { card.appendChild(renderBookField(bf, idx)); });
+        box.appendChild(card);
+      });
+      if (state.books.length < MAX_BOOKS) {
+        box.appendChild(h("button", {
+          type: "button", class: "btn ghost add",
+          onclick: function () { state.books.push({}); save(); redraw(true); },
+        }, t("addBook")));
+      } else {
+        box.appendChild(h("div", { class: "q-help" }, t("booksMax")));
+      }
+      if (focusLast) {
+        const cards = box.querySelectorAll(".book");
+        const last = cards[cards.length - 1];
+        last.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+        const first = last.querySelector("input");
+        if (first) first.focus({ preventScroll: true });
+      }
+    }
+
+    redraw(false);
+    return box;
+  }
+
+  function renderBookField(bf, idx) {
+    const b = state.books[idx];
+    const lblId = "lb_" + idx + "_" + bf.id;
+    const wrap = h("div", { class: "q sub", "data-bf": idx + ":" + bf.id });
+    wrap.appendChild(labelBlock(lblId, L(bf.label), bf.req));
+
+    function set(val) {
+      state.books[idx][bf.id] = val;
+      save();
+      clearErr(wrap);
+    }
+
+    let control;
+    if (bf.type === "text" || bf.type === "number") {
+      control = textInput({ value: b[bf.id], placeholder: L(bf.ph), labelledby: lblId, onInput: set, inputmode: bf.type === "number" ? "numeric" : null });
+    } else if (bf.type === "textarea") {
+      control = textArea({ value: b[bf.id], labelledby: lblId, onInput: set, rows: 2 });
+    } else {
+      const multi = bf.type === "chips";
+      control = pills({ options: bf.options, multi: multi, labelledby: lblId, value: b[bf.id] !== undefined ? b[bf.id] : multi ? [] : null, onChange: set });
+    }
+    wrap.appendChild(control);
+    wrap.appendChild(h("div", { class: "q-err" }, t("required")));
+    return wrap;
+  }
+
+  /* ---------- logic ---------- */
+
+  function isVisible(f) {
+    if (!f.showIf) return true;
+    const cur = state.v[f.showIf.field];
+    return Array.isArray(cur) ? cur.indexOf(f.showIf.eq) > -1 : cur === f.showIf.eq;
+  }
+
+  function applyConditions() {
+    const st = STEPS[state.step - 1];
+    if (!st) return;
+    st.fields.forEach(function (f) {
+      const el = $app.querySelector('[data-field="' + f.id + '"]');
+      if (el) el.hidden = !isVisible(f);
+    });
+  }
+
+  function filled(val) {
+    return typeof val === "string" && val.trim().length > 0;
+  }
+
+  function hasValue(f, val) {
+    if (f.type === "chips") return Array.isArray(val) && val.length > 0;
+    if (f.type === "radio") return typeof val === "string" && val.length > 0;
+    if (f.type === "scale") return typeof val === "number";
+    if (f.type === "case") return !!val && filled(val.s) && filled(val.a) && filled(val.r);
+    return filled(val);
+  }
+
+  function validateBooks() {
+    let ok = true;
+    state.books.forEach(function (b, idx) {
+      BOOK_FIELDS.forEach(function (bf) {
+        if (!bf.req) return;
+        const good = filled(b[bf.id]);
+        const el = $app.querySelector('[data-bf="' + idx + ":" + bf.id + '"]');
+        if (el) el.classList.toggle("invalid", !good);
+        if (!good) ok = false;
+      });
+    });
+    return ok;
+  }
+
+  function validateStep(s) {
+    let firstBad = null;
+    STEPS[s - 1].fields.forEach(function (f) {
+      if (!isVisible(f)) return;
+      if (f.type === "books") {
+        if (!validateBooks() && !firstBad) firstBad = $app.querySelector(".book .q.invalid");
+        return;
+      }
+      if (!f.req) return;
+      const wrap = $app.querySelector('[data-field="' + f.id + '"]');
+      const ok = hasValue(f, state.v[f.id]);
+      wrap.classList.toggle("invalid", !ok);
+      if (!ok && !firstBad) firstBad = wrap;
+    });
+    return firstBad;
+  }
+
+  function fmt(f, val) {
+    if (f.type === "radio") {
+      const opt = f.options.find(function (o) { return o.v === val; });
+      return opt ? opt.uz : "";
+    }
+    if (f.type === "chips") {
+      if (!Array.isArray(val)) return "";
+      const parts = val.filter(function (v) { return v !== "boshqa"; }).map(function (v) {
+        const opt = f.options.find(function (o) { return o.v === v; });
+        return opt ? opt.uz : v;
+      });
+      if (val.indexOf("boshqa") > -1) {
+        const other = (state.v[f.id + "__other"] || "").trim();
+        parts.push(other ? "Boshqa: " + other : "Boshqa");
+      }
+      return parts.join(", ");
+    }
+    if (f.type === "scale") return typeof val === "number" ? val : "";
+    if (f.type === "case") {
+      if (!val) return "";
+      const s = (val.s || "").trim();
+      const a = (val.a || "").trim();
+      const r = (val.r || "").trim();
+      if (!s && !a && !r) return "";
+      return "Vaziyat: " + s + "\nNima qildi: " + a + "\nNatija: " + r;
+    }
+    return typeof val === "string" ? val.trim() : "";
+  }
+
+  function cleanBooks() {
+    return state.books.filter(function (b) { return filled(b.nomi); });
+  }
+
+  function buildPayload() {
+    const rows = [];
+    const booksVisible = isVisible(fieldById("kitoblar"));
+    STEPS.forEach(function (st) {
+      st.fields.forEach(function (f) {
+        if (!isVisible(f)) return;
+        if (f.type === "books") {
+          const list = cleanBooks().map(function (b, i) {
+            let line = (i + 1) + ") " + b.nomi.trim();
+            if (filled(b.muallif)) line += " (" + b.muallif.trim() + ")";
+            if (filled(b.narx)) line += ", " + b.narx.trim() + " so‘m";
+            return line;
+          }).join("\n");
+          rows.push([f.col, list]);
+          return;
+        }
+        rows.push([f.col, fmt(f, state.v[f.id])]);
+      });
+    });
+    const profile = [
+      ["F.I.Sh.", (state.v.fio || "").trim()],
+      ["Fanlar", fmt(fieldById("fanlar"), state.v.fanlar)],
+      ["Sinflar", fmt(fieldById("sinflar"), state.v.sinflar)],
+    ];
+    const books = booksVisible ? cleanBooks().map(function (b) {
+      return profile.concat(BOOK_FIELDS.map(function (bf) { return [bf.col, fmt(bf, b[bf.id])]; }));
+    }) : [];
+    return { lang: state.lang, rows: rows, books: books };
+  }
+
+  /* ---------- navigation ---------- */
+
+  function goTo(step) {
+    state.step = step;
+    if (step >= 1 && step <= STEPS.length) state.lastStep = step;
+    save();
+    render();
+    window.scrollTo(0, 0);
+  }
+
+  function goNext() {
+    const bad = validateStep(state.step);
+    if (bad) {
+      $navMsg.textContent = t("fillRequired");
+      bad.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+      const focusable = bad.querySelector("input, textarea, button");
+      if (focusable) focusable.focus({ preventScroll: true });
+      return;
+    }
+    if (state.step < STEPS.length) goTo(state.step + 1);
+    else submit();
+  }
+
+  function goBack() {
+    goTo(Math.max(0, state.step - 1));
+  }
+
+  function submit() {
+    const btn = document.getElementById("nextBtn");
+    btn.disabled = true;
+    btn.textContent = t("sending");
+    $navMsg.textContent = "";
+    const payload = buildPayload();
+
+    function ok() {
+      clearSaved();
+      state.v = {};
+      state.books = [];
+      state.startedAt = null;
+      state.lastStep = 0;
+      state.step = STEPS.length + 1;
+      render();
+      window.scrollTo(0, 0);
+    }
+
+    function fail() {
+      btn.disabled = false;
+      btn.textContent = t("submit");
+      $navMsg.textContent = t("errorSend");
+    }
+
+    if (hasBackend) {
+      const ctrl = typeof AbortController === "function" ? new AbortController() : null;
+      const timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 25000);
+      fetch(ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: ctrl ? ctrl.signal : undefined,
+      })
+        .then(function (res) {
+          return res.json().catch(function () { return {}; }).then(function (data) {
+            clearTimeout(timer);
+            if (res.ok && data && data.ok) ok(); else fail();
+          });
+        })
+        .catch(function () { clearTimeout(timer); fail(); });
+    } else {
+      window.__lastPayload = payload;
+      setTimeout(ok, 450);
+    }
+  }
+
+  /* ---------- screens ---------- */
+
+  function setProgress(pct) {
+    document.getElementById("pFill").style.width = pct + "%";
+    document.getElementById("pTip").style.left = "max(0px, calc(" + pct + "% - 26px))";
+  }
+
+  function renderIntro(restored) {
+    $nav.hidden = true;
+    const hasDraft = state.lastStep > 0 || Object.keys(state.v).length > 0;
+    $app.appendChild(h("section", { class: "intro" },
+      h("h1", null, t("introTitle")),
+      h("p", { class: "lead" }, t("introLead")),
+      h("p", { class: "intro-sub" }, t("introSections")),
+      h("ol", { class: "intro-list" }, STEPS.map(function (st) { return h("li", null, L(st.title)); })),
+      h("div", { class: "facts" },
+        h("p", null, t("factTime")),
+        h("p", null, storageOk ? t("factSave") : t("factSaveNo")),
+        h("p", null, t("factPrivacy")),
+        h("p", null, t("factReq"))
+      ),
+      hasDraft && restored ? h("p", { class: "restored" }, t("restored")) : null,
+      h("div", { class: "intro-actions" },
+        h("button", {
+          type: "button", class: "btn primary",
+          onclick: function () {
+            if (!state.startedAt) state.startedAt = Date.now();
+            goTo(hasDraft ? Math.min(Math.max(state.lastStep, 1), STEPS.length) : 1);
+          },
+        }, hasDraft ? t("resume") : t("start")),
+        hasDraft ? h("button", {
+          type: "button", class: "btn ghost",
+          onclick: function () {
+            if (!window.confirm(t("restartConfirm"))) return;
+            state.v = {};
+            state.books = [];
+            state.lastStep = 0;
+            state.startedAt = Date.now();
+            goTo(1);
+          },
+        }, t("restart")) : null
+      )
+    ));
+  }
+
+  function renderStep(s) {
+    const st = STEPS[s - 1];
+    $app.appendChild(h("div", { class: "step-no" }, t("stepMeta", s, STEPS.length)));
+    $app.appendChild(h("h2", null, L(st.title)));
+    $app.appendChild(h("p", { class: "hint" }, L(st.hint)));
+    const list = h("div", { class: "qs" });
+    st.fields.forEach(function (f) { list.appendChild(renderField(f)); });
+    $app.appendChild(list);
+    applyConditions();
+
+    $nav.hidden = false;
+    $navMsg.textContent = "";
+    $navBtns.innerHTML = "";
+    $navBtns.appendChild(h("button", { type: "button", class: "btn ghost", onclick: goBack }, t("back")));
+    $navBtns.appendChild(h("button", { type: "button", class: "btn primary", id: "nextBtn", onclick: goNext }, s === STEPS.length ? t("submit") : t("next")));
+  }
+
+  function renderDone() {
+    $nav.hidden = true;
+    $app.appendChild(h("section", { class: "done" },
+      h("h1", null, t("doneTitle")),
+      h("p", { class: "lead" }, t("doneText")),
+      hasBackend ? null : h("p", { class: "facts-note" }, t("demoDone"))
+    ));
+  }
+
+  let restoredOnLoad = false;
+
+  function render() {
+    document.documentElement.lang = state.lang;
+    document.getElementById("brandSub").textContent = t("brandSub");
+    document.querySelectorAll(".lang button").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.getAttribute("data-lang") === state.lang));
+    });
+    const demo = document.getElementById("demo");
+    demo.hidden = hasBackend;
+    if (!hasBackend) demo.textContent = t("demo");
+
+    const total = STEPS.length;
+    const s = state.step;
+    const pct = s <= 0 ? 0 : s > total ? 100 : (s / total) * 100 - 50 / total;
+    setProgress(pct);
+
+    $app.innerHTML = "";
+    if (s <= 0) renderIntro(restoredOnLoad);
+    else if (s > total) renderDone();
+    else renderStep(s);
+  }
+
+  function init() {
+    restoredOnLoad = load();
+    if (reduceMotion) document.documentElement.classList.add("reduce-motion");
+    document.querySelectorAll(".lang button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        const lang = b.getAttribute("data-lang");
+        if (lang === state.lang) return;
+        const y = window.scrollY;
+        state.lang = lang;
+        if (state.step >= 1 && state.step <= STEPS.length) save(); else saveLangOnly();
+        render();
+        window.scrollTo(0, y);
+      });
+    });
+    render();
+  }
+
+  init();
+})();
+
+</script>
+</body>
+</html>
