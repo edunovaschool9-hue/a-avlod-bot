@@ -147,6 +147,25 @@ label{display:block;font-size:12px;color:var(--mu);margin:0 0 4px}
 .mt-act button{flex:1;padding:11px;border-radius:8px;border:1px solid var(--bd,#dfe4ec);background:var(--cd,#fff);color:inherit;font:inherit;cursor:pointer}
 .mt-act .b-ok{background:#1F7A45;border-color:#1F7A45;color:#fff}
 @media(max-width:560px){.mt-grid{grid-template-columns:1fr}}
+.srv-stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:8px;margin-top:12px}
+.srv-stat div{border:1px solid var(--brd);border-radius:10px;padding:8px 10px;background:#fff}
+.srv-stat b{display:block;font-size:22px;line-height:1.15}
+.srv-stat span{font-size:12px;color:var(--mu)}
+.srv-stat .srv-warn b{color:var(--am)}
+.srv-stat .srv-ok b{color:var(--gn)}
+.srv-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.srv-tabs button{border:1px solid var(--brd);background:#fff;color:var(--mu);border-radius:999px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer}
+.srv-tabs button.on{background:var(--tx);border-color:var(--tx);color:#fff}
+.srv-bolim{margin-top:14px;padding-top:10px;border-top:1px solid var(--brd)}
+.srv-bolim h3{font-size:14px;margin:0 0 4px}
+.srv-q{margin:8px 0}
+.srv-q label{margin:0 0 2px}
+.srv-q div{white-space:pre-wrap;word-break:break-word;font-size:14px}
+.srv-kitob{border:1px solid var(--brd);border-radius:10px;background:#FBF8F1;padding:10px;margin:8px 0}
+.srv-sabab{border-left:3px solid var(--brd);padding:2px 0 2px 10px;margin:10px 0}
+.nav{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.nav::-webkit-scrollbar{display:none}
+.nav b{flex:1 0 auto;min-width:48px;padding-left:6px;padding-right:6px}
 </style>
 </head>
 <body>
@@ -174,7 +193,7 @@ label{display:block;font-size:12px;color:var(--mu);margin:0 0 4px}
     <div class="til"><button class="til-btn" data-lang="uz">UZ</button><button class="til-btn" data-lang="ru">RU</button></div>
   </div></div>
   <div class="wrap"><div id="cont"></div></div>
-  <div class="nav"><b data-tab="kun" onclick="ochTab('kun')"><i>📅</i><span data-tl="n_kun">n_kun</span></b><b data-tab="davomat" onclick="ochTab('davomat')"><i>🕗</i><span data-tl="n_davomat">n_davomat</span></b><b data-tab="oqituvchilar" onclick="ochTab('oqituvchilar')"><i>🧑‍🏫</i><span data-tl="n_oqituvchilar">n_oqituvchilar</span></b><b data-tab="oquvchilar" onclick="ochTab('oquvchilar')"><i>👥</i><span data-tl="n_oquvchilar">n_oquvchilar</span></b><b data-tab="pechat" onclick="ochTab('pechat')"><i>🖨️</i><span data-tl="n_pechat">n_pechat</span></b><b data-tab="baho" onclick="ochTab('baho')"><i>⭐</i><span>Baho</span></b><b data-tab="oreyting" onclick="ochTab('oreyting')"><i>🏆</i><span>Faollik</span></b><b data-tab="reyting" onclick="ochTab('reyting')"><i>🏆</i><span data-tl="n_reyting">n_reyting</span></b><b data-tab="shartnoma" onclick="ochTab('shartnoma')"><i>📄</i><span>Shartnoma</span></b><b data-tab="sozlama" onclick="ochTab('sozlama')"><i>⚙️</i><span data-tl="n_sozlama">n_sozlama</span></b></div>
+  <div class="nav"><b data-tab="kun" onclick="ochTab('kun')"><i>📅</i><span data-tl="n_kun">n_kun</span></b><b data-tab="davomat" onclick="ochTab('davomat')"><i>🕗</i><span data-tl="n_davomat">n_davomat</span></b><b data-tab="oqituvchilar" onclick="ochTab('oqituvchilar')"><i>🧑‍🏫</i><span data-tl="n_oqituvchilar">n_oqituvchilar</span></b><b data-tab="oquvchilar" onclick="ochTab('oquvchilar')"><i>👥</i><span data-tl="n_oquvchilar">n_oquvchilar</span></b><b data-tab="pechat" onclick="ochTab('pechat')"><i>🖨️</i><span data-tl="n_pechat">n_pechat</span></b><b data-tab="baho" onclick="ochTab('baho')"><i>⭐</i><span>Baho</span></b><b data-tab="oreyting" onclick="ochTab('oreyting')"><i>🏆</i><span>Faollik</span></b><b data-tab="reyting" onclick="ochTab('reyting')"><i>🏆</i><span data-tl="n_reyting">n_reyting</span></b><b data-tab="shartnoma" onclick="ochTab('shartnoma')"><i>📄</i><span>Shartnoma</span></b><b data-tab="sorovnoma" onclick="ochTab('sorovnoma')"><i>📝</i><span>So‘rov</span></b><b data-tab="sozlama" onclick="ochTab('sozlama')"><i>⚙️</i><span data-tl="n_sozlama">n_sozlama</span></b></div>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -535,6 +554,7 @@ async function ochTab(x){
     else if(x==='oreyting') await chizOreyting();
     else if(x==='reyting') await chizReyting();
     else if(x==='shartnoma') await chizShartnoma();
+    else if(x==='sorovnoma') await chizSorovnoma();
     else await chizSozlama();
   }catch(e){ $('cont').innerHTML='<div class="empty">'+esc(xatoMatn(e))+'</div>'; }
 }
@@ -1292,6 +1312,225 @@ function mshHolat(h){
 }
 const MSH_NOM={ok:'Tasdiqlangan',wait:'Tasdiq kutmoqda',no:'Shartnomasiz',bad:'Rad etilgan'};
 function mshMask(v){ v=String(v||''); if(!v) return ''; return v.length<=4?v:v.slice(0,2)+'\u2022'.repeat(v.length-4)+v.slice(-2); }
+
+/* ---------------- USTOZLAR SO'ROVNOMASI ---------------- */
+const SRV_HAVOLA='https://edunovaschool9-hue.github.io/a-avlod-bot/sorovnoma.html';
+const SRV_BOLIM=[["Siz haqingizda", ["F.I.Sh.", "Telefon/Telegram", "Fanlar", "Sinflar", "Oqim", "Pedagogik staj", "EduNova’da", "Sertifikat/yutuqlar"]], ["Kitoblar va materiallar", ["Asosiy darslik", "Darslik nomi", "Darslik bahosi (1–5)", "Darslikda yetishmaydi", "Qo‘shimcha kitob", "Kitoblar ro‘yxati", "Material tanlash", "Onlayn manbalar", "Voz kechilgan material", "Ideal qo‘llanma"]], ["Darslar va metodika", ["Dars qismlari", "Eng samarali usul", "Keys: yutuq", "Keys: qiyin vaziyat", "Sust o‘quvchilar bilan ish", "Kuchli o‘quvchilar bilan ish", "Bilimni tekshirish", "Nazorat chastotasi", "Uy vazifasi vaqti", "Faollikni oshirish", "Darsga tayyorgarlik vaqti"]], ["Ota-onalar bilan ishlash", ["Aloqa usuli", "Natija haqida xabar", "Natijani ulashish", "Ishonch qozonish usuli", "Ota-ona savollari", "Tayyor xarajatlar", "E’tirozlar", "Keys: ota-ona", "Ota-ona kutishlari"]], ["Muammolar va takliflar", ["Xalaqit beradi", "Xalaqit izohi", "Takliflar", "Kerakli yordam", "Hamkasblarga o‘rgata oladi", "O‘rgatish mavzusi", "Qo‘shimcha fikr"]]];
+const SRV_KITOB=["Kitob nomi", "Muallif/nashriyot", "Qaysi sinflar uchun", "Narx (so‘m)", "Kimda bor", "Qanday olinadi", "Nega shu kitob", "Kuchli tomonlari", "Kamchiliklari", "Natija"];
+const SRV_OLISH=['O‘zlari do‘kondan','Onlayn: Uzum, Asaxiy','O‘qituvchi olib kelib beradi','Maktab orqali','Nusxa ko‘chiriladi'];
+let SRV_D=null, SRV_OQ=null, SRV_KO='javob', SRV_Q='';
+
+async function chizSorovnoma(){
+  const natija=await Promise.all([
+    rpc('ep_sorovnoma_royxat',{p_token:T}),
+    rpc('ep_oqituvchi_royxat',{p_token:T}).catch(()=>null)
+  ]);
+  SRV_D=(natija[0]&&natija[0].royxat)||[];
+  const oq=natija[1];
+  SRV_OQ=(oq&&Array.isArray(oq.oqituvchilar))?oq.oqituvchilar.filter(o=>o.faol):null;
+  srvChiz();
+}
+
+function srvBor(v){ return v!==null && v!==undefined && String(v).trim()!==''; }
+function srvNorm(s){
+  return String(s||'').toLowerCase().replace(/[‘’ʻʼ'`´]/g,'').replace(/x/g,'h')
+    .replace(/[^a-z0-9а-яёқғўҳ\s]/gi,' ').replace(/\s+/g,' ').trim();
+}
+function srvTok(s){ return srvNorm(s).split(' ').filter(w=>w.length>=3 && !/^(ogli|ugli|qizi|kizi)$/.test(w)); }
+function srvMos(a,b){
+  const A=srvTok(a), B=new Set(srvTok(b));
+  if(!A.length||!B.size) return false;
+  const n=A.filter(w=>B.has(w)).length;
+  return n>=2 || (n>=1 && Math.min(A.length,B.size)===1);
+}
+function srvKalit(r){ return srvTok(r.fio).sort().join(' '); }
+function srvVaqt(s){ if(!s) return '—'; const d=new Date(s); return d2(d.getDate())+'.'+d2(d.getMonth()+1)+' · '+d2(d.getHours())+':'+d2(d.getMinutes()); }
+function srvQolgan(){ const R=SRV_D||[]; return SRV_OQ?SRV_OQ.filter(o=>!R.some(r=>srvMos(o.ism,r.fio))):null; }
+
+function srvChiz(){
+  const R=SRV_D||[];
+  let kitobSoni=0; R.forEach(r=>{ kitobSoni+=(r.kitoblar||[]).length; });
+  const ustozlar=new Set(R.map(srvKalit)).size;
+  const qolgan=srvQolgan();
+  let h='<div class="card"><div class="row"><h2 style="flex:1">📝 Ustozlar so‘rovnomasi</h2>'+
+    '<button class="btn sec sm" onclick="srvHavola()">🔗 Havola</button>'+
+    '<button class="btn sec sm" onclick="ochTab(\'sorovnoma\')" title="Yangilash">🔄</button></div>'+
+    '<div class="srv-stat">'+
+      '<div><b>'+R.length+'</b><span>Javob</span></div>'+
+      '<div><b>'+ustozlar+'</b><span>Ustoz</span></div>'+
+      '<div><b>'+kitobSoni+'</b><span>Kitob</span></div>'+
+      (qolgan?'<div class="'+(qolgan.length?'srv-warn':'srv-ok')+'"><b>'+qolgan.length+'</b><span>To‘ldirmagan</span></div>':'')+
+    '</div><div class="srv-tabs">'+
+    [['javob','Javoblar'],['kitob','Kitoblar'],['qolgan','To‘ldirmaganlar']]
+      .map(p=>'<button class="'+(SRV_KO===p[0]?'on':'')+'" onclick="SRV_KO=\''+p[0]+'\';srvChiz()">'+p[1]+'</button>').join('')+
+    '</div></div>';
+
+  if(SRV_KO==='kitob') h+=srvKitobView(R);
+  else if(SRV_KO==='qolgan') h+=srvQolganView(qolgan);
+  else h+='<div class="row" style="margin:0 0 10px"><input type="search" id="srvQ" placeholder="Ism, fan yoki sinf" value="'+esc(SRV_Q)+'" style="flex:1;min-width:180px">'+
+    '<button class="btn sec sm" onclick="srvCSV()">⬇️ CSV</button></div><div id="srvList"></div>';
+
+  $('cont').innerHTML=h;
+  if(SRV_KO==='javob'){
+    const qi=$('srvQ');
+    if(qi) qi.addEventListener('input',()=>{ SRV_Q=qi.value; srvRoyxat(); });
+    srvRoyxat();
+  }
+}
+
+function srvRoyxat(){
+  const box=$('srvList'); if(!box) return;
+  const R=SRV_D||[];
+  const takror={}; R.forEach(r=>{ const k=srvKalit(r); takror[k]=(takror[k]||0)+1; });
+  const q=srvNorm(SRV_Q);
+  const rows=R.filter(r=>!q || srvNorm([r.fio,r.fanlar,r.sinflar].join(' ')).includes(q));
+  if(!rows.length){ box.innerHTML='<div class="empty">'+(R.length?'Topilmadi':'Hali javob yo‘q')+'</div>'; return; }
+  box.innerHTML='<ul class="lst">'+rows.map(r=>{
+    const n=takror[srvKalit(r)]||1, kb=(r.kitoblar||[]).length;
+    return '<li class="it"><div class="hd"><span class="b">'+esc(r.fio)+'</span>'+
+      (n>1?'<span class="pill am">'+n+' marta</span>':'')+
+      '<span class="pill '+(r.til==='ru'?'bl':'gn')+'">'+esc(String(r.til||'uz').toUpperCase())+'</span>'+
+      '<button class="btn sec sm" style="margin-left:auto" onclick="srvKarta('+r.id+')">Ochish</button></div>'+
+      '<div class="xs mu mt">'+esc([r.fanlar, r.sinflar?r.sinflar+'-sinf':'', r.oqim].filter(Boolean).join(' · '))+'</div>'+
+      '<div class="xs mu">'+srvVaqt(r.yaratilgan)+(kb?' · 📚 '+kb+' ta kitob':'')+'</div></li>';
+  }).join('')+'</ul>';
+}
+
+function srvQ(c,v){ return '<div class="srv-q"><label>'+esc(c)+'</label><div>'+esc(v)+'</div></div>'; }
+
+function srvKarta(id){
+  const r=(SRV_D||[]).find(x=>x.id===id); if(!r) return;
+  const j=r.javoblar||{}, kb=r.kitoblar||[], tanish=new Set();
+  let h='<div class="mh"><h2>'+esc(r.fio)+'</h2><button class="x" onclick="modalYop()">×</button></div>'+
+    '<div class="xs mu">'+srvVaqt(r.yaratilgan)+' · '+esc(String(r.til||'uz').toUpperCase())+'</div>';
+  SRV_BOLIM.forEach(b=>{
+    const qatorlar=b[1].filter(c=>{ tanish.add(c); return srvBor(j[c]) && (c!=='Kitoblar ro‘yxati' || !kb.length); });
+    if(qatorlar.length) h+='<div class="srv-bolim"><h3>'+esc(b[0])+'</h3>'+qatorlar.map(c=>srvQ(c,j[c])).join('')+'</div>';
+  });
+  const boshqa=Object.keys(j).filter(k=>!tanish.has(k) && srvBor(j[k]));
+  if(boshqa.length) h+='<div class="srv-bolim"><h3>Boshqa</h3>'+boshqa.map(k=>srvQ(k,j[k])).join('')+'</div>';
+  if(kb.length){
+    h+='<div class="srv-bolim"><h3>📚 Kitoblar ('+kb.length+')</h3>'+kb.map(k=>{
+      const m=k.malumot||{};
+      return '<div class="srv-kitob"><b>'+esc(k.nomi||m['Kitob nomi']||'Nomsiz')+'</b>'+
+        SRV_KITOB.filter(c=>c!=='Kitob nomi' && srvBor(m[c])).map(c=>srvQ(c,m[c])).join('')+'</div>';
+    }).join('')+'</div>';
+  }
+  h+='<div class="row mt"><button class="btn sec sm" onclick="srvNusxa('+r.id+')">📋 Nusxalash</button>'+
+    '<button class="btn dan sm" style="margin-left:auto" onclick="srvOchir('+r.id+')">🗑 O‘chirish</button></div>';
+  modalOch(h);
+}
+
+function srvMatn(r){
+  const j=r.javoblar||{}, kb=r.kitoblar||[];
+  let s=r.fio+' — '+srvVaqt(r.yaratilgan)+'\n';
+  SRV_BOLIM.forEach(b=>{
+    const q=b[1].filter(c=>srvBor(j[c]) && (c!=='Kitoblar ro‘yxati' || !kb.length));
+    if(q.length) s+='\n'+b[0].toUpperCase()+'\n'+q.map(c=>c+': '+j[c]).join('\n')+'\n';
+  });
+  if(kb.length) s+='\nKITOBLAR\n'+kb.map((k,i)=>{ const m=k.malumot||{}; return (i+1)+') '+SRV_KITOB.filter(c=>srvBor(m[c])).map(c=>c+': '+m[c]).join('\n   '); }).join('\n')+'\n';
+  return s;
+}
+function srvNusxaMatn(s,ok){
+  if(navigator.clipboard) navigator.clipboard.writeText(s).then(()=>xabar(ok||'Nusxalandi'),()=>prompt('Nusxalang:',s));
+  else prompt('Nusxalang:',s);
+}
+function srvNusxa(id){ const r=(SRV_D||[]).find(x=>x.id===id); if(r) srvNusxaMatn(srvMatn(r)); }
+function srvHavola(){ srvNusxaMatn(SRV_HAVOLA,'So‘rovnoma havolasi nusxalandi'); }
+
+async function srvOchir(id){
+  const r=(SRV_D||[]).find(x=>x.id===id); if(!r) return;
+  if(!confirm('Bu javob butunlay o‘chirilsinmi?\n'+r.fio+' — '+srvVaqt(r.yaratilgan))) return;
+  try{
+    const d=await rpc('ep_sorovnoma_ochir',{p_token:T,p_id:id});
+    if(!d||!d.ok) throw new Error('Topilmadi');
+    SRV_D=(SRV_D||[]).filter(x=>x.id!==id);
+    modalYop(); srvChiz(); xabar('O‘chirildi');
+  }catch(e){ xabar(xatoMatn(e),'xato'); }
+}
+
+function srvKitobGuruh(R){
+  const g={};
+  R.forEach(r=>(r.kitoblar||[]).forEach(k=>{
+    const m=k.malumot||{}, nomi=String(k.nomi||m['Kitob nomi']||'').trim();
+    const key=srvNorm(nomi)||('#'+k.id);
+    (g[key]=g[key]||{nomi:nomi,items:[]}).items.push({r:r,m:m});
+  }));
+  return Object.values(g).sort((a,b)=>(b.items.length-a.items.length)||a.nomi.localeCompare(b.nomi,'uz'));
+}
+function srvSanoq(items,c){
+  const s={};
+  items.forEach(x=>{
+    const v=String(x.m[c]||'').trim(); if(!v) return;
+    const bor=(c==='Qanday olinadi')?SRV_OLISH.filter(o=>v.indexOf(o)>-1):[v];
+    bor.forEach(o=>{ s[o]=(s[o]||0)+1; });
+  });
+  const k=Object.entries(s).sort((a,b)=>b[1]-a[1]);
+  return k.length?'<div class="row mt">'+k.map(p=>'<span class="pill">'+esc(p[0])+' · '+p[1]+'</span>').join('')+'</div>':'';
+}
+function srvKitobView(R){
+  const G=srvKitobGuruh(R);
+  let h='<div class="row" style="margin:0 0 10px"><span class="xs mu" style="flex:1">'+G.length+' xil kitob, ko‘p tilga olinganlari yuqorida</span>'+
+    '<button class="btn sec sm" onclick="srvKitobCSV()">⬇️ CSV</button></div>';
+  if(!G.length) return h+'<div class="empty">Hali kitob kiritilmagan</div>';
+  G.forEach(g=>{
+    const uniq=c=>Array.from(new Set(g.items.map(x=>String(x.m[c]||'').trim()).filter(Boolean)));
+    const narx=uniq('Narx (so‘m)').map(n=>/^\d+$/.test(n)?pul(n):n);
+    h+='<div class="card"><div class="row"><span class="b" style="flex:1">'+esc(g.nomi||'Nomsiz')+'</span><span class="pill gn">'+g.items.length+' ustoz</span></div>'+
+      '<div class="xs mu mt">'+esc([uniq('Muallif/nashriyot').join(', '), narx.join(', '), uniq('Qaysi sinflar uchun').join(', ')].filter(Boolean).join(' · '))+'</div>'+
+      srvSanoq(g.items,'Kimda bor')+srvSanoq(g.items,'Qanday olinadi')+
+      g.items.map(x=>'<div class="srv-sabab"><b>'+esc(x.r.fio)+'</b>'+
+        ['Nega shu kitob','Kuchli tomonlari','Kamchiliklari','Natija'].filter(c=>srvBor(x.m[c])).map(c=>srvQ(c,x.m[c])).join('')+'</div>').join('')+
+      '</div>';
+  });
+  return h;
+}
+
+function srvQolganView(qolgan){
+  if(!qolgan) return '<div class="empty">O‘qituvchilar ro‘yxatini olib bo‘lmadi</div>';
+  let h='<div class="card"><div class="row"><span class="b" style="flex:1">'+qolgan.length+' / '+SRV_OQ.length+' ustoz hali to‘ldirmagan</span>'+
+    (qolgan.length?'<button class="btn sec sm" onclick="srvQolganNusxa()">📋 Nusxalash</button>':'')+'</div>'+
+    '<div class="xs mu mt">Taxminiy hisob: ism so‘rovnomada boshqacha yozilgan bo‘lsa, ustoz shu ro‘yxatda qolishi mumkin.</div></div>';
+  if(!qolgan.length) return h+'<div class="empty">Hamma ustoz to‘ldirgan</div>';
+  return h+'<ul class="lst">'+qolgan.map(o=>'<li class="it"><div class="hd"><span class="b">'+esc(o.ism)+'</span>'+
+    (o.telefon?'<span class="xs mu" style="margin-left:auto">+'+esc(o.telefon)+'</span>':'')+'</div></li>').join('')+'</ul>';
+}
+function srvQolganNusxa(){
+  const q=srvQolgan()||[];
+  srvNusxaMatn('So‘rovnomani hali to‘ldirmagan ustozlar:\n'+q.map((o,i)=>(i+1)+'. '+o.ism).join('\n')+'\n\n'+SRV_HAVOLA);
+}
+
+function srvCsvKatak(v){
+  let s=String(v==null?'':v);
+  if(/^[=+\-@]/.test(s)) s="'"+s;
+  return '"'+s.replace(/"/g,'""')+'"';
+}
+function srvYukla(nom,qatorlar){
+  const csv='\ufeff'+qatorlar.map(q=>q.map(srvCsvKatak).join(';')).join('\r\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download=nom+'_'+ymd(new Date())+'.csv';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
+}
+function srvCSV(){
+  const R=SRV_D||[];
+  const cols=[]; SRV_BOLIM.forEach(b=>b[1].forEach(c=>cols.push(c)));
+  R.forEach(r=>Object.keys(r.javoblar||{}).forEach(k=>{ if(cols.indexOf(k)<0) cols.push(k); }));
+  const qatorlar=[['ID','Vaqt','Til'].concat(cols)].concat(R.map(r=>{
+    const j=r.javoblar||{};
+    return [r.id, sanaMatn(String(r.yaratilgan||'').slice(0,10))+' '+vaqtMatn(r.yaratilgan), r.til].concat(cols.map(c=>j[c]));
+  }));
+  srvYukla('sorovnoma_javoblar',qatorlar);
+}
+function srvKitobCSV(){
+  const R=SRV_D||[], qatorlar=[['Javob ID','Vaqt','F.I.Sh.'].concat(SRV_KITOB)];
+  R.forEach(r=>(r.kitoblar||[]).forEach(k=>{
+    const m=k.malumot||{};
+    qatorlar.push([r.id, sanaMatn(String(r.yaratilgan||'').slice(0,10))+' '+vaqtMatn(r.yaratilgan), r.fio].concat(SRV_KITOB.map(c=>m[c])));
+  }));
+  srvYukla('sorovnoma_kitoblar',qatorlar);
+}
 
 async function chizShartnoma(){
   MSH_D = await rpc('ep_msh_royxat',{p_token:T});
