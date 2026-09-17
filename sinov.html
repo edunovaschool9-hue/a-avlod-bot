@@ -268,6 +268,18 @@ textarea.field { min-height: 92px; resize: vertical; }
 /* tall answered cards on small phones: let the card grow instead of clipping */
 .card { height: auto; min-height: 100dvh; }
 
+/* rule hint on questions */
+.qoida-btn {
+  display: inline-flex; align-items: center; gap: 6px; margin: -6px 0 12px;
+  border: 1.5px solid var(--line); background: var(--field); color: var(--ink);
+  border-radius: 999px; padding: 6px 12px; font: 600 14px/1.2 var(--font-body); cursor: pointer;
+}
+.qoida-btn[aria-expanded="true"] { border-color: var(--yellow); background: var(--yellow); color: var(--on-yellow); }
+.qoida {
+  margin: 0 0 14px; padding: 10px 12px; border-left: 4px solid var(--yellow); border-radius: 0 10px 10px 0;
+  background: var(--field); font-size: 15px; line-height: 1.45; overflow-wrap: anywhere;
+}
+
 </style>
 </head>
 <body>
@@ -437,6 +449,18 @@ MODULES.push({
   lead: "Milliy sertifikatga tayyorlov: oddiydan murakkabgacha, 3 bosqichda.",
   note: "Mashqlar maktab matematika o‘qituvchisi tavsiya qilgan yondashuv asosida tuzilgan: kichik qadamlar va har bir to‘g‘ri javobga rag‘bat.",
   book: "Mustahkamlash uchun: o‘qituvchi tavsiya qilgan IDC matematika qo‘llanmasining (8–11-sinflar) foizlar bo‘limidagi mashqlarni yeching.",
+  qoidalar: {
+    ulush: "Sonning p% ini topish: son × p ÷ 100. Masalan, 200 ning 15% i: 200 × 15 ÷ 100 = 30.",
+    butun: "Qism va uning foizi ma’lum bo‘lsa: butun = qism × 100 ÷ foiz. Masalan, 20% i 14 bo‘lgan son: 14 × 100 ÷ 20 = 70.",
+    nisbat: "b son a ning necha foizi: b ÷ a × 100. Masalan, 30 tadan 12 tasi: 12 ÷ 30 × 100 = 40%.",
+    ozgarish: "p% ga oshirish: × (1 + p ÷ 100). p% ga kamaytirish: × (1 − p ÷ 100). Necha foizga o‘zgargani: farq ÷ boshlang‘ich qiymat × 100.",
+    ketma: "Ketma-ket o‘zgarishda har bir foiz yangi qiymatdan hisoblanadi: koeffitsiyentlarni ko‘paytiring, masalan × 1,1 × 1,1.",
+    baza: "Foiz doim solishtirilayotgan songa nisbatan olinadi: «A B dan necha foiz ko‘p» bo‘lsa, farqni B ga bo‘ling.",
+    murakkab: "Murakkab foiz: summa × (1 + p ÷ 100)ⁿ, bu yerda n — yillar soni.",
+    aralashma: "Moddaning miqdori = massa × foiz ÷ 100. Suv qo‘shilsa modda o‘zgarmaydi, faqat umumiy massa oshadi.",
+    punkt: "Foiz punkti — ikki foizning oddiy ayirmasi. Necha foizga o‘zgargani — shu ayirmani boshlang‘ich foizga bo‘lib, 100 ga ko‘paytirish.",
+    teskari: "Yakuniy narx va o‘zgarishlar ma’lum bo‘lsa: boshlang‘ich narx = yakuniy narx ÷ koeffitsiyentlar ko‘paytmasi, masalan 32 000 ÷ (0,8 × 0,8).",
+  },
   topics: {
   ulush: "Sonning foizini topish",
   butun: "Butunni topish",
@@ -621,6 +645,155 @@ MODULES.push({
   ],
 });
 
+/* ================= MATEMATIKA: CHIZIQLI TENGLAMALAR ================= */
+MODULES.push({
+  id: "matematika-tenglamalar",
+  fan: "Matematika",
+  nom: "Chiziqli tenglamalar",
+  hook: "x = ?",
+  lead: "Milliy sertifikatga tayyorlov: bir noma’lumli chiziqli tenglamalar, oddiydan murakkabgacha, 3 bosqichda.",
+  note: "Mashqlar matematika o‘qituvchilari tavsiyasi asosida tuzilgan: kichik qadamlar, oddiydan murakkabga.",
+  book: "Mustahkamlash uchun: o‘qituvchi tavsiya qilgan IDC matematika qo‘llanmasining tenglamalar bo‘limidagi mashqlarni yeching.",
+  qoidalar: {
+    bir_qadam: "Qo‘shilgan sonni ayirib, ayirilgan sonni qo‘shib yuboramiz: x + 7 = 12 bo‘lsa, x = 12 − 7 = 5.",
+    kopaytma: "x ga ko‘paytirilgan bo‘lsa bo‘lamiz, bo‘lingan bo‘lsa ko‘paytiramiz: 4x = 28 bo‘lsa x = 7; x ÷ 3 = 8 bo‘lsa x = 24.",
+    ikki_qadam: "Avval qo‘shilgan yoki ayirilgan sonni, keyin ko‘paytuvchini olib tashlang: 3x + 5 = 20, 3x = 15, x = 5.",
+    qavs: "Qavs oldidagi sonni ichidagi har bir hadga ko‘paytiring yoki ikki tomonni shu songa bo‘ling: 3(x − 2) = 12, x − 2 = 4, x = 6.",
+    ikki_tomon: "x li hadlarni bir tomonga, sonlarni boshqa tomonga ishorasini o‘zgartirib o‘tkazing: 5x = 2x + 12, 3x = 12, x = 4.",
+    kasr: "Kasrdan qutulish uchun ikki tomonni maxrajga ko‘paytiring: x/4 = 3 bo‘lsa, x = 12.",
+    masala: "Noma’lumni x deb belgilang, shartni tenglama qilib yozing va yeching. Oxirida javobni shart bilan tekshiring.",
+  },
+  topics: {
+    bir_qadam: "Bir qadamli tenglama",
+    kopaytma: "Ko‘paytma va bo‘linma",
+    ikki_qadam: "Ikki qadamli tenglama",
+    qavs: "Qavsli tenglama",
+    ikki_tomon: "x ikki tomonda",
+    kasr: "Kasrli tenglama",
+    masala: "Matnli masala",
+  },
+  stages: { 1: "Bir qadam", 2: "Ikki qadam va qavslar", 3: "Murakkab va matnli" },
+  cards: [
+    { id: "intro", type: "intro" },
+    {
+      id: "t1", type: "theory", stage: 1, hook: "x + 7 = 12", hookSize: "md",
+      title: "Tenglama — bu tarozi",
+      steps: ["x + 7 = 12", "ikki tomondan 7 ni ayiramiz", "x = 5"],
+      why: "Ikkala tomonga bir xil amal qilsangiz, tenglik buzilmaydi.",
+    },
+    {
+      id: "q1", type: "num", stage: 1, topic: "bir_qadam",
+      q: "x + 9 = 23. x nechaga teng?", answer: 14,
+      explain: "x = 23 − 9 = 14. Tekshiramiz: 14 + 9 = 23.",
+      twin: { q: "x + 2 = 5. x nechaga teng?", answer: 3, explain: "x = 5 − 2 = 3." },
+    },
+    {
+      id: "q2", type: "num", stage: 1, topic: "bir_qadam",
+      q: "x − 6 = 15. x nechaga teng?", answer: 21,
+      explain: "Ayirilgan sonni qo‘shamiz: x = 15 + 6 = 21.",
+      twin: { q: "x − 1 = 4. x nechaga teng?", answer: 5, explain: "x = 4 + 1 = 5." },
+    },
+    {
+      id: "t2", type: "theory", stage: 1, hook: "4x = 28", hookSize: "md",
+      title: "Ko‘paytma bo‘lsa — bo‘lamiz",
+      steps: ["4x = 28", "ikki tomonni 4 ga bo‘lamiz", "x = 7"],
+      why: "Bo‘lingan bo‘lsa, aksincha ko‘paytiramiz: x ÷ 3 = 8 bo‘lsa, x = 24.",
+    },
+    {
+      id: "q3", type: "mcq", stage: 1, topic: "kopaytma",
+      q: "5x = 45. x nechaga teng?",
+      options: ["9", "40", "50", "225"], answer: 0,
+      explain: "x = 45 ÷ 5 = 9.",
+      twin: { q: "2x = 10. x nechaga teng?", options: ["8", "5", "12", "20"], answer: 1, explain: "x = 10 ÷ 2 = 5." },
+    },
+    {
+      id: "q4", type: "num", stage: 1, topic: "kopaytma",
+      q: "x ÷ 3 = 8. x nechaga teng?", answer: 24,
+      explain: "Bo‘lish o‘rniga ko‘paytiramiz: x = 8 × 3 = 24.",
+      twin: { q: "x ÷ 2 = 5. x nechaga teng?", answer: 10, explain: "x = 5 × 2 = 10." },
+    },
+    { id: "s1", type: "stage", stage: 1 },
+    {
+      id: "t3", type: "theory", stage: 2, hook: "3x + 5 = 20", hookSize: "md",
+      title: "Ikki qadam: avval son, keyin ko‘paytuvchi",
+      steps: ["3x + 5 = 20", "3x = 20 − 5 = 15", "x = 15 ÷ 3 = 5"],
+      why: "Tekshiring: 3 × 5 + 5 = 20. Tekshiruv xatoni darhol ko‘rsatadi.",
+    },
+    {
+      id: "q5", type: "num", stage: 2, topic: "ikki_qadam",
+      q: "2x + 7 = 19. x nechaga teng?", answer: 6,
+      explain: "2x = 19 − 7 = 12, x = 12 ÷ 2 = 6.",
+      twin: { q: "2x = 12. x nechaga teng?", answer: 6, explain: "x = 12 ÷ 2 = 6." },
+    },
+    {
+      id: "q6", type: "mcq", stage: 2, topic: "ikki_qadam",
+      q: "4x − 9 = 11. x nechaga teng?",
+      options: ["0,5", "5", "20", "2"], answer: 1,
+      explain: "4x = 11 + 9 = 20, x = 20 ÷ 4 = 5.",
+      twin: { q: "4x = 20. x nechaga teng?", options: ["16", "80", "5", "24"], answer: 2, explain: "x = 20 ÷ 4 = 5." },
+    },
+    {
+      id: "t4", type: "theory", stage: 2, hook: "3(x − 2) = 12", hookSize: "sm",
+      title: "Qavs bo‘lsa — avval ochamiz",
+      steps: ["3(x − 2) = 12", "3x − 6 = 12", "3x = 18, x = 6"],
+      why: "Qavs oldidagi son ichidagi har bir hadga ko‘paytiriladi. Yoki ikki tomonni 3 ga bo‘lish mumkin: x − 2 = 4.",
+    },
+    {
+      id: "q7", type: "num", stage: 2, topic: "qavs",
+      q: "5(x + 1) = 35. x nechaga teng?", answer: 6,
+      explain: "Ikki tomonni 5 ga bo‘lamiz: x + 1 = 7, x = 6.",
+      twin: { q: "x + 1 = 7. x nechaga teng?", answer: 6, explain: "x = 7 − 1 = 6." },
+    },
+    {
+      id: "q8", type: "mcq", stage: 2, topic: "qavs",
+      q: "2(x − 3) = 10. x nechaga teng?",
+      options: ["2", "5", "8", "13"], answer: 2,
+      explain: "2x − 6 = 10, 2x = 16, x = 8. Yoki: x − 3 = 5, x = 8.",
+      twin: { q: "x − 3 = 5. x nechaga teng?", options: ["8", "2", "15", "−2"], answer: 0, explain: "x = 5 + 3 = 8." },
+    },
+    { id: "s2", type: "stage", stage: 2 },
+    {
+      id: "t5", type: "theory", stage: 3, hook: "5x = 2x + 12", hookSize: "sm",
+      title: "x ikki tomonda bo‘lsa",
+      steps: ["5x = 2x + 12", "5x − 2x = 12", "3x = 12, x = 4"],
+      why: "x li hadlarni bir tomonga yig‘amiz. Had tomon almashsa, ishorasi o‘zgaradi.",
+    },
+    {
+      id: "q9", type: "num", stage: 3, topic: "ikki_tomon",
+      q: "7x − 4 = 3x + 16. x nechaga teng?", answer: 5,
+      explain: "7x − 3x = 16 + 4, 4x = 20, x = 5.",
+      twin: { q: "4x = 20. x nechaga teng?", answer: 5, explain: "x = 20 ÷ 4 = 5." },
+    },
+    {
+      id: "t6", type: "theory", stage: 3, hook: "x/4 + 2 = 5", hookSize: "sm",
+      title: "Kasr bo‘lsa — maxrajga ko‘paytiramiz",
+      steps: ["x/4 + 2 = 5", "x/4 = 3", "x = 3 × 4 = 12"],
+      why: "Avval kasrni yolg‘iz qoldiring, keyin ikki tomonni maxrajga ko‘paytiring.",
+    },
+    {
+      id: "q10", type: "num", stage: 3, topic: "kasr",
+      q: "x/5 − 1 = 3. x nechaga teng?", answer: 20,
+      explain: "x/5 = 3 + 1 = 4, x = 4 × 5 = 20.",
+      twin: { q: "x/5 = 4. x nechaga teng?", answer: 20, explain: "x = 4 × 5 = 20." },
+    },
+    {
+      id: "q11", type: "num", stage: 3, topic: "masala",
+      q: "Ali bir sonni o‘yladi, uni 3 ga ko‘paytirib, 8 ni qo‘shdi va 29 hosil bo‘ldi. Ali qaysi sonni o‘ylagan?", answer: 7,
+      explain: "3x + 8 = 29, 3x = 21, x = 7. Tekshiramiz: 7 × 3 + 8 = 29.",
+      twin: { q: "3x + 8 = 29. x nechaga teng?", answer: 7, explain: "3x = 29 − 8 = 21, x = 7." },
+    },
+    {
+      id: "q12", type: "mcq", stage: 3, topic: "masala",
+      q: n("Daftar va ruchka birgalikda 9 000 so‘m turadi. Daftar ruchkadan 3 000 so‘m qimmat. Ruchka necha so‘m?"),
+      options: [n("6 000"), n("3 000"), n("4 500"), n("1 500")], answer: 1,
+      explain: n("Ruchka x, daftar x + 3 000. x + x + 3 000 = 9 000, 2x = 6 000, x = 3 000 so‘m. Daftar esa 6 000 so‘m."),
+      twin: { q: n("2x = 6 000. x nechaga teng?"), options: [n("12 000"), n("3 000"), n("5 998"), n("6 002")], answer: 1, explain: n("x = 6 000 ÷ 2 = 3 000.") },
+    },
+    { id: "s3", type: "stage", stage: 3 },
+    { id: "finish", type: "finish" },
+  ],
+});
+
 /* ================= ONA TILI: KELISHIKLAR ================= */
 MODULES.push({
   id: "ona-tili-kelishiklar",
@@ -630,6 +803,12 @@ MODULES.push({
   lead: "Milliy sertifikatga tayyorlov: kelishiklar va jo‘nalish kelishigining imlosi, 2 bosqichda.",
   note: "Mashqlar ona tili o‘qituvchisi tavsiya qilgan test yondashuvi asosida tuzilgan: qoida, misol, keyin test.",
   book: "Mustahkamlash uchun: o‘qituvchi tavsiya qilgan Davron Akbarning milliy sertifikat test to‘plamidagi kelishik va imlo mashqlarini yeching.",
+  qoidalar: {
+    soroq: "Kelishikni so‘roq bilan aniqlang: kim? nima? — bosh, kimning? — qaratqich, kimni? — tushum, kimga? qayerga? — jo‘nalish, kimda? qayerda? — o‘rin-payt, kimdan? qayerdan? — chiqish.",
+    qaratqich: "Qaratqich -ning: kimning? nimaning? — egalik qo‘shimchali so‘zga bog‘lanadi (maktabning hovlisi). Tushum -ni: kimni? nimani? — fe’lga bog‘lanadi (kitobni o‘qidim).",
+    orin: "-da: qayerda? — ish-harakat joyi (maktabda). -dan: qayerdan? — harakat boshlangan joy (maktabdan).",
+    imlo: "Jo‘nalish kelishigi: k bilan tugasa -ka (terakka), q bilan tugasa -qa (qishloqqa), qolgan hollarda -ga (maktabga, tog‘ga).",
+  },
   topics: {
     soroq: "Kelishikni so‘roq bilan aniqlash",
     qaratqich: "Qaratqich va tushum",
@@ -741,6 +920,12 @@ MODULES.push({
   lead: "Milliy sertifikatga tayyorlov: Amir Temur hayoti, yurishlari va merosi. Sanalar jadval kabi, 2 bosqichda.",
   note: "Mashqlar tarix o‘qituvchisi tavsiya qilgan yondashuv asosida tuzilgan: qisqa va lo‘nda, sana va sxemalar bilan.",
   book: "Mustahkamlash uchun: o‘qituvchi tavsiya qilgan milliy sertifikat qo‘llanmasidagi Amir Temur mavzusini jadval va sxemalar bilan takrorlang.",
+  qoidalar: {
+    hayot: "Amir Temur 1336-yil 9-aprelda Kesh (hozirgi Shahrisabz) yaqinida tug‘ilgan. 1370–1405 yillarda hukmronlik qilgan.",
+    davlat: "1370-yil Balx qurultoyida ulug‘ amir deb e’lon qilingan. Davlat poytaxti — Samarqand.",
+    yurish: "1372 — Xorazmga birinchi yurish, 1388 — Xorazm qo‘shildi, 1398 — Hindiston, 1402 — Anqara jangi (Yildirim Boyazid), 1405 — Xitoy yurishi vaqtida O‘trorda vafot.",
+    meros: "Davlat boshqaruvi va harbiy ish haqidagi qarashlari «Temur tuzuklari» asarida bayon qilingan.",
+  },
   topics: {
     hayot: "Hayot yo‘li va sanalar",
     davlat: "Davlat va poytaxt",
@@ -852,6 +1037,12 @@ MODULES.push({
   lead: "Ikki zamonni farqlashni o‘rganamiz: avval har birini alohida, keyin ularni solishtirib, 3 bosqichda.",
   note: "Mashqlar ingliz tili o‘qituvchisi tavsiya qilgan grammatika kitobi yondashuvida tuzilgan: qoida, misol, mashq.",
   book: "Mustahkamlash uchun: o‘qituvchi tavsiya qilgan Round Up kitobidagi Present Simple va Present Continuous mashqlarini bajaring.",
+  qoidalar: {
+    s: "Present Simple: he / she / it bilan fe’lga -s qo‘shiladi (he plays, she goes). I / you / we / they bilan -s bo‘lmaydi.",
+    savol: "Savol va inkor: he / she / it bilan does / doesn’t, qolganlari bilan do / don’t. Fe’l -s siz qoladi: Does he play?",
+    cont: "Present Continuous: am / is / are + fe’l-ing. I am, he / she / it is, you / we / they are.",
+    farq: "Odat (usually, every day) — Present Simple. Ayni payt (now, today, Look!) — Present Continuous.",
+  },
   topics: {
     s: "He / she / it + -s",
     savol: "Do / Does, don’t / doesn’t",
@@ -982,6 +1173,12 @@ MODULES.push({
   lead: "Когда после ж, ш, ч, щ на конце слова пишется мягкий знак: существительные, глаголы, наречия. 2 этапа.",
   note: "Модуль сделан по запросу учителя русского языка: правило, пример, тест.",
   book: "Для закрепления: выполните упражнения на правописание Ь после шипящих из школьного учебника русского языка.",
+  qoidalar: {
+    rod: "Существительные: женский род — с Ь (ночь, мышь), мужской род — без Ь (врач, нож). Проверка: «моя» или «мой».",
+    mn: "Родительный падеж множественного числа — без Ь: много туч, нет задач, пять груш.",
+    glag: "У глаголов после шипящих на конце всегда Ь: читаешь (ты), беречь (что делать?), режь (повелительная форма).",
+    narech: "Наречия — с Ь (вскачь, сплошь), кроме уж, замуж, невтерпёж. Краткие прилагательные — без Ь: хорош, свеж.",
+  },
   topics: {
     rod: "Род существительных",
     mn: "Множественное число",
@@ -1161,6 +1358,15 @@ window.Reels = (function () {
     $("bar").parentElement.setAttribute("aria-valuenow", String(pct));
   }
 
+  function ruleFor(card) {
+    if (M && M.qoidalar && M.qoidalar[card.topic]) return M.qoidalar[card.topic];
+    const i = CARDS.indexOf(card);
+    for (let k = i - 1; k >= 0; k--) {
+      if (CARDS[k].type === "theory") return CARDS[k].title + (CARDS[k].why ? ". " + CARDS[k].why : "");
+    }
+    return "";
+  }
+
   /* ---------- card builders ---------- */
   function wrapCard(kind, id) {
     const c = el("section", "card " + kind);
@@ -1209,6 +1415,12 @@ window.Reels = (function () {
     const qid = "q_" + card.id + "_" + mode;
     let h = '<div class="chip ' + (mode === "base" ? "" : "chip-soft") + '">' + esc(label) + "</div>";
     h += '<h2 class="question" id="' + qid + '">' + esc(data.q) + "</h2>";
+    const rule = ruleFor(card);
+    if (rule) {
+      const open = mode === "twin";
+      h += '<button type="button" class="qoida-btn" aria-expanded="' + open + '" aria-controls="' + qid + '_q">💡 Qoida</button>' +
+        '<div class="qoida" id="' + qid + '_q"' + (open ? "" : " hidden") + ">" + esc(rule) + "</div>";
+    }
     if (kind === "mcq") {
       h += '<div class="options" role="group" aria-labelledby="' + qid + '">' +
         data.options.map((o, i) => '<button type="button" class="opt" data-i="' + i + '">' + esc(o) + "</button>").join("") +
@@ -1222,6 +1434,15 @@ window.Reels = (function () {
     h += '<div class="feedback" aria-live="polite"></div>';
     inner.innerHTML = h;
 
+    const qb = inner.querySelector(".qoida-btn");
+    if (qb) {
+      qb.addEventListener("click", () => {
+        const box = inner.querySelector(".qoida");
+        const show = box.hidden;
+        box.hidden = !show;
+        qb.setAttribute("aria-expanded", String(show));
+      });
+    }
     const fb = inner.querySelector(".feedback");
     function finish(correct, chosenText) {
       onAnswer(card, mode, correct, fb, data, chosenText);
