@@ -727,7 +727,8 @@ const MENYU: Record<string, { sarl: string; tugma: [string, string][] }> = {
   odam: { sarl: "👥 <b>Odamlar</b>", tugma: [["👨‍👩‍👧 Ota-onalar", "mn:ota-onalar"], ["👩‍🏫 O‘qituvchilar", "mn:o‘qituvchilar"],
     ["🎒 O‘quvchilar", "mn:o‘quvchilar"], ["📝 Arizalar", "mn:arizalar"], ["📣 Chaqirish", "mn:chaqirish"], ["📢 Ommaviy xabar", "mn:xabar"]] },
   hisobot: { sarl: "📊 <b>Hisobotlar</b>", tugma: [["📊 Kunlik hisobot (AI)", "mn:kunlik hisobot"], ["🏆 Faollik reytingi", "mn:reyting"],
-    ["🎫 Talonlar", "mn:talonlar"], ["📄 Listovkalar", "mn:listovkalar"]] },
+    ["🎫 Talonlar", "mn:talonlar"], ["📄 Listovkalar", "mn:listovkalar"],
+    ["🔍 Bot tekshiruvi", "mn:bot tekshiruvi"], ["⭐ Ota-ona bahosi", "mn:baho"]] },
 };
 async function menyuKor(chat: number, k: string) {
   const m = MENYU[k]; if (!m) return;
@@ -1025,6 +1026,20 @@ async function xabar(msg: any) {
       const qq = t.split("\n"); let bb = "";
       for (const q2 of qq) { if ((bb + "\n" + q2).length > 3500) { await send(chat, bb); bb = ""; } bb += (bb ? "\n" : "") + q2; }
       if (bb.trim()) await send(chat, bb, { reply_markup: { inline_keyboard: [[{ text: "📤 O‘qituvchilarga yuborish", callback_data: "bz_yubor" }]] } });
+      return;
+    }
+    if (/^\S*\s*baho$|ota-ona bahosi/i.test(matn)) {
+      const d = await rpc("ep_baho_hisobot_tg", { p_chat_id: chat });
+      if (!d?.ok) { await send(chat, "Ruxsat yo‘q"); return; }
+      const r: any[] = (d.royxat ?? []) as any[];
+      let t = `⭐ <b>Ota-onalar bahosi</b>\nJavob: <b>${d.jami}</b> · o‘rtacha <b>${d.ortacha}</b>/5\n` +
+        `\n1. Xabarlar tushunarli: <b>${d.b1}</b>\n2. Ma’lumot yetarli: <b>${d.b2}</b>\n3. Bot qulay: <b>${d.b3}</b>\n`;
+      if (r.length) t += `\n<b>Oxirgi javoblar</b>\n` + r.slice(0, 15).map((x: any) =>
+        `• ${esc(x.bola ?? "—")} (${esc(x.sinf ?? "")}) — <b>${x.ort}</b>/5` + (x.izoh ? `\n  <i>${esc(x.izoh)}</i>` : "")).join("\n");
+      else t += `\nHali javob yo‘q.`;
+      const qq = t.split("\n"); let bb = "";
+      for (const q2 of qq) { if ((bb + "\n" + q2).length > 3500) { await send(chat, bb); bb = ""; } bb += (bb ? "\n" : "") + q2; }
+      if (bb.trim()) await send(chat, bb);
       return;
     }
     if (/bot tekshiruvi|tekshiruv/i.test(matn)) {
@@ -1640,7 +1655,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v6.9 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v7.0 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
