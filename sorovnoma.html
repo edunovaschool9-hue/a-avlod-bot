@@ -691,7 +691,22 @@ const STEPS = [
   const MAX_BOOKS = 5;
   const state = { lang: "uz", step: 0, lastStep: 0, v: {}, books: [], startedAt: null };
   const reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  const ENDPOINT = "https://unaodltahuevrfnarfha.supabase.co/functions/v1/sorovnoma";
+  const SB_URL = "https://unaodltahuevrfnarfha.supabase.co";
+  const KEY_PAGES = ["baho.html", "imzo.html", "test.html", "index.html", "boshqaruv.html"];
+  let sbKey = null;
+
+  async function getKey() {
+    if (sbKey) return sbKey;
+    for (const page of KEY_PAGES) {
+      try {
+        const res = await fetch(page, { cache: "no-cache" });
+        if (!res.ok) continue;
+        const found = (await res.text()).match(/sb_publishable_[A-Za-z0-9_-]+/);
+        if (found) { sbKey = found[0]; return sbKey; }
+      } catch (e) { /* try next page */ }
+    }
+    throw new Error("KEY");
+  }
   const LIVE_HOSTS = ["edunovaschool9-hue.github.io", "www.edunovaschool.uz"];
   const hasBackend = LIVE_HOSTS.indexOf(window.location.hostname) > -1;
 
@@ -1229,12 +1244,15 @@ const STEPS = [
     if (hasBackend) {
       const ctrl = typeof AbortController === "function" ? new AbortController() : null;
       const timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 25000);
-      fetch(ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        signal: ctrl ? ctrl.signal : undefined,
-      })
+      getKey()
+        .then(function (key) {
+          return fetch(SB_URL + "/rest/v1/rpc/ep_sorovnoma_saqla", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "apikey": key, "Authorization": "Bearer " + key },
+            body: JSON.stringify({ p_malumot: payload }),
+            signal: ctrl ? ctrl.signal : undefined,
+          });
+        })
         .then(function (res) {
           return res.json().catch(function () { return {}; }).then(function (data) {
             clearTimeout(timer);
