@@ -725,7 +725,7 @@ const MENYU: Record<string, { sarl: string; tugma: [string, string][] }> = {
   oquv: { sarl: "📝 <b>O‘quv jarayoni</b>", tugma: [["📝 Xulosalar", "mn:xulosalar"], ["🧪 Test natijalari", "mn:natijalar"],
     ["🧪 Test ochish", "mn:test"], ["📚 Fanlarim", "mn:fanlarim"]] },
   odam: { sarl: "👥 <b>Odamlar</b>", tugma: [["👨‍👩‍👧 Ota-onalar", "mn:ota-onalar"], ["👩‍🏫 O‘qituvchilar", "mn:o‘qituvchilar"],
-    ["🎒 O‘quvchilar", "mn:o‘quvchilar"], ["📝 Arizalar", "mn:arizalar"], ["📣 Chaqirish", "mn:chaqirish"], ["📢 Ommaviy xabar", "mn:xabar"]] },
+    ["🎒 O‘quvchilar", "mn:o‘quvchilar"], ["📝 Arizalar", "mn:arizalar"], ["📣 Chaqirish", "mn:chaqirish"], ["📣 O‘qituvchilarga topshiriq", "mn:ustozlarga topshiriq"], ["📊 Topshiriq javoblari", "mn:topshiriq javoblari"], ["📢 Ommaviy xabar", "mn:xabar"]] },
   hisobot: { sarl: "📊 <b>Hisobotlar</b>", tugma: [["📊 Kunlik hisobot (AI)", "mn:kunlik hisobot"], ["🏆 Faollik reytingi", "mn:reyting"],
     ["🎫 Talonlar", "mn:talonlar"], ["📄 Listovkalar", "mn:listovkalar"],
     ["🔍 Bot tekshiruvi", "mn:bot tekshiruvi"], ["⭐ Ota-ona bahosi", "mn:baho"]] },
@@ -885,6 +885,28 @@ async function xabar(msg: any) {
 <i>${esc(matn)}</i>`, { reply_markup: { inline_keyboard: [[{ text: "✅ Yuborish", callback_data: "omm_ok" }, { text: "✖ Bekor", callback_data: "omm_no" }]] } });
     return;
   }
+  if (st?.holat === "ux_matn" && matn && !matn.startsWith("/") && !KB_MATNLAR.has(matn)) {
+    if (matn.length > 3000) { await send(chat, "Matn juda uzun (3000 belgigacha). Qisqartirib qayta yozing:"); return; }
+    await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: "ux_tasdiq", p_malumot: { matn } });
+    const hz = await rpc("ep_teach_hozir", {});
+    const soni = ((hz?.royxat ?? []) as any[]).filter((x: any) => x.tg).length;
+    await send(chat, `📣 <b>${soni} ta o‘qituvchiga yuborilsinmi?</b>\n\n<i>${esc(matn)}</i>\n\nHar biriga «✅ Tushunarli, oldim» va «❓ Tushunarsiz» tugmalari boradi.`,
+      { reply_markup: { inline_keyboard: [[{ text: "📤 Avval o‘zimga yuborish", callback_data: "uxb_men" }], [{ text: "✅ Yuborish", callback_data: "uxb_ok" }, { text: "✖ Bekor", callback_data: "uxb_no" }]] } });
+    return;
+  }
+  if (st?.holat === "ux_savol" && matn && KB_MATNLAR.has(matn)) {
+    await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: null, p_malumot: null });
+  } else if (st?.holat === "ux_savol" && matn && !matn.startsWith("/")) {
+    await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: null, p_malumot: null });
+    const xid = Number(st.malumot?.id);
+    const r = await rpc("ep_ustoz_xabar_savol", { p_id: xid, p_chat_id: chat, p_savol: matn });
+    await send(chat, r?.ok ? "Savolingiz rahbariyatga yuborildi ✅" : "Xatolik. Qaytadan urinib ko‘ring.", { reply_markup: KB_TEACH });
+    if (r?.ok && r.muallif_chat) {
+      await send(Number(r.muallif_chat), `❓ <b>${esc(r.ism)}</b> topshiriq bo‘yicha savol yubordi:\n\n<i>${esc(matn)}</i>`,
+        { reply_markup: { inline_keyboard: [[{ text: "📊 Javoblar", callback_data: `uxs:${xid}` }]] } });
+    }
+    return;
+  }
   if (st?.holat === "chaqiruv_matn" && !matn.startsWith("/")) {
     await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: null, p_malumot: null });
     await chaqiruvYubor(chat, Number(st.malumot?.kimni), matn); return;
@@ -969,6 +991,12 @@ async function xabar(msg: any) {
   }
 
   if (isAdmin) {
+    if (/ustozlarga topshiriq/i.test(matn)) {
+      await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: "ux_matn", p_malumot: null });
+      await send(chat, "📣 Barcha o‘qituvchilarga yuboriladigan <b>topshiriq matnini</b> yozing.\n\nHar bir o‘qituvchi «✅ Tushunarli, oldim» yoki «❓ Tushunarsiz» deb javob beradi.");
+      return;
+    }
+    if (/topshiriq javoblari/i.test(matn)) { await uxHolat(chat, null); return; }
     if (/kim maktabda/i.test(matn)) { await send(chat, await kimMaktabda()); return; }
     if (/davomat hisoboti/i.test(matn) || matn === "📋 Davomat") { await send(chat, await davomatMatn(false), { reply_markup: { inline_keyboard: [[{ text: "👥 Kelmaganlar ismlari", callback_data: "kelmaganlar" }]] } }); return; }
     if (/chaqirish/i.test(matn)) { await chaqirishRoyxat(chat); return; }
@@ -1099,6 +1127,31 @@ async function xabar(msg: any) {
     case "kutilmoqda": case "kutilmoqda_takror": await send(chat, T.kutilmoqda); break;
     default: await send(chat, T.salom);
   }
+}
+
+// ---------- o'qituvchilarga topshiriq (javob tugmalari bilan) ----------
+const KB_MATNLAR = new Set<string>([
+  ...[...KB_TEACH.keyboard.flat(), ...KB_ADMIN.keyboard.flat()].map((b: any) => String(b.text)),
+  ...Object.values(MENYU).flatMap((m) => m.tugma.map((x) => x[1].slice(3))),
+]);
+async function uxHolat(chat: number, id: number | null, message_id?: number) {
+  const d = await rpc("ep_ustoz_xabar_holat", { p_chat_id: chat, p_id: id });
+  if (!d?.ok) { await send(chat, d?.xato === "yoq" ? "Hali topshiriq yuborilmagan." : "Ruxsat yo‘q"); return; }
+  const qator = (arr: any[]) => arr.map((x: any) => `• ${esc(x.ism)}` + (x.savol ? `\n  <i>${esc(x.savol)}</i>` : "")).join("\n");
+  let t = `📊 <b>Topshiriq javoblari</b> · ${esc(d.vaqt)}\n<i>${esc(d.matn_qisqa)}</i>\n\n` +
+    `✅ Tushunarli: <b>${d.ok_soni}</b>\n❓ Tushunarsiz: <b>${d.no_soni}</b>\n⏳ Javob bermagan: <b>${d.javobsiz_soni}</b>`;
+  const tsz: any[] = d.tushunarsiz ?? [], jsz: any[] = d.javobsiz ?? [], tsh: any[] = d.tushunarli ?? [];
+  if (tsz.length) t += `\n\n<b>❓ Tushunarsiz</b>\n` + qator(tsz);
+  if (jsz.length) t += `\n\n<b>⏳ Javob bermaganlar</b>\n` + qator(jsz);
+  if (tsh.length) t += `\n\n<b>✅ Tushunarli</b>\n` + qator(tsh);
+  if (t.length > 3900) t = t.slice(0, 3900) + "…";
+  const rows: any[] = [[{ text: "🔄 Yangilash", callback_data: `uxs:${d.id}` }]];
+  if (Number(d.javobsiz_soni) > 0) rows.push([{ text: "🔔 Javob bermaganlarga eslatma", callback_data: `uxr:${d.id}` }]);
+  if (message_id) {
+    const r = await tg("editMessageText", { chat_id: chat, message_id, text: t, parse_mode: "HTML", reply_markup: { inline_keyboard: rows } });
+    if (r?.ok || /not modified/i.test(String(r?.description ?? ""))) return;
+  }
+  await send(chat, t, { reply_markup: { inline_keyboard: rows } });
 }
 
 // ---------- tugma bosishlari ----------
@@ -1254,6 +1307,73 @@ async function callback(cq: any) {
       await send(chat, `Javobingiz yuborildi: <i>${esc(j)}</i>`);
       if (d.kim_chat) await send(Number(d.kim_chat), `💬 <b>${esc(d.kimni_ism)}</b>: ${esc(j)}`);
     }
+    return;
+  }
+  if (k === "uxb_no") {
+    await ok("Bekor");
+    await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: null, p_malumot: null });
+    await tg("editMessageText", { chat_id: chat, message_id: cq.message.message_id, text: "Bekor qilindi." });
+    return;
+  }
+  if (k === "uxb_men") {
+    const st = await rpc("ep_tg_holat_ol", { p_chat_id: chat });
+    const matn = String(st?.malumot?.matn ?? "");
+    if (st?.holat !== "ux_tasdiq" || !matn) { await ok("Matn topilmadi, qaytadan boshlang"); return; }
+    await ok("Sizga yuborildi");
+    const rl = await rpc("ep_tg_rol", { p_chat_id: chat });
+    await send(chat, `🧪 <i>Sinov ko‘rinishi — faqat sizga. O‘qituvchilar xabarni aynan shunday ko‘radi:</i>\n\n` +
+      `📣 <b>Rahbariyatdan topshiriq</b>\n\n${esc(matn)}\n\n<i>— ${esc(rl?.ism ?? "")}</i>\n\nTopshiriq tushunarlimi? Tugmani bosing.`,
+      { reply_markup: { inline_keyboard: [[{ text: "✅ Tushunarli, oldim", callback_data: "uxt:ok" }], [{ text: "❓ Tushunarsiz", callback_data: "uxt:no" }]] } });
+    await send(chat, "Hammasi to‘g‘ri bo‘lsa, yuqoridagi xabardagi «✅ Yuborish» tugmasini bosing.");
+    return;
+  }
+  if (k === "uxt") { await ok("Sinov: o‘qituvchi bosganda javobi shu yerda qayd etiladi"); return; }
+  if (k === "uxb_ok") {
+    const st = await rpc("ep_tg_holat_ol", { p_chat_id: chat });
+    const matn = String(st?.malumot?.matn ?? "");
+    if (st?.holat !== "ux_tasdiq" || !matn) { await ok("Matn topilmadi, qaytadan boshlang"); return; }
+    await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: null, p_malumot: null });
+    const r = await rpc("ep_ustoz_xabar_yarat", { p_chat_id: chat, p_matn: matn });
+    await ok(r?.ok ? "Navbatga qo‘yildi" : "Xatolik");
+    if (!r?.ok) {
+      await tg("editMessageText", { chat_id: chat, message_id: cq.message.message_id,
+        text: r?.xato === "ruxsat" ? "Ruxsat yo‘q." : "Yuborilmadi: " + String(r?.xato ?? "xatolik") });
+      return;
+    }
+    await tg("editMessageText", { chat_id: chat, message_id: cq.message.message_id, parse_mode: "HTML",
+      text: `📣 <b>${r.soni} ta o‘qituvchiga</b> navbatga qo‘yildi — 1 daqiqada yetib boradi.\n\n<i>${esc(matn)}</i>`,
+      reply_markup: { inline_keyboard: [[{ text: "📊 Javoblar", callback_data: `uxs:${r.id}` }]] } });
+    return;
+  }
+  if (k === "uxj") {
+    const javob = b === "ok" ? "ok" : "no";
+    const r = await rpc("ep_ustoz_xabar_javob", { p_id: Number(a), p_chat_id: chat, p_javob: javob });
+    if (!r?.ok) { await ok("Bu topshiriq sizga tegishli emas"); return; }
+    await ok(javob === "ok" ? "Qabul qilindi ✅" : "Qabul qilindi");
+    const markup = javob === "ok"
+      ? [[{ text: "✅ Javobingiz: tushunarli", callback_data: "ux_done" }]]
+      : [[{ text: "❓ Javobingiz: tushunarsiz", callback_data: "ux_done" }], [{ text: "✅ Endi tushunarli", callback_data: `uxj:${a}:ok` }]];
+    await tg("editMessageReplyMarkup", { chat_id: chat, message_id: cq.message.message_id, reply_markup: { inline_keyboard: markup } });
+    if (javob === "ok") {
+      const st = await rpc("ep_tg_holat_ol", { p_chat_id: chat });
+      if (st?.holat === "ux_savol") await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: null, p_malumot: null });
+      if (r.eski === "no" && r.muallif_chat) await send(Number(r.muallif_chat), `✅ <b>${esc(r.ism)}</b>: endi topshiriq tushunarli.`);
+      return;
+    }
+    await rpc("ep_tg_holat_qoy", { p_chat_id: chat, p_holat: "ux_savol", p_malumot: { id: Number(a) } });
+    await send(chat, "Nimasi tushunarsiz? Savolingizni bitta xabarda yozing — rahbariyatga yetkazamiz.");
+    if (r.muallif_chat && r.eski !== "no") {
+      await send(Number(r.muallif_chat), `❓ <b>${esc(r.ism)}</b>: topshiriq tushunarsiz.\n<i>${esc(r.matn_qisqa)}</i>`,
+        { reply_markup: { inline_keyboard: [[{ text: "📊 Javoblar", callback_data: `uxs:${a}` }]] } });
+    }
+    return;
+  }
+  if (k === "ux_done") { await ok(); return; }
+  if (k === "uxs") { await ok(); await uxHolat(chat, Number(a), cq.message?.message_id); return; }
+  if (k === "uxr") {
+    const r = await rpc("ep_ustoz_xabar_eslat", { p_chat_id: chat, p_id: Number(a) });
+    await ok(r?.ok ? `${r.soni} ta eslatma navbatga qo‘yildi` : "Xatolik");
+    if (r?.ok) await send(chat, `🔔 ${r.soni} ta o‘qituvchiga eslatma navbatga qo‘yildi — 1 daqiqada yetib boradi.`);
     return;
   }
   if (k === "kelmaganlar") { await ok(); await send(chat, await davomatMatn(true)); return; }
@@ -1655,7 +1775,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v7.1 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v7.2 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
