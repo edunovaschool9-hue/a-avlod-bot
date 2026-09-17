@@ -263,6 +263,11 @@ textarea.field { min-height: 92px; resize: vertical; }
 .h-modules { margin-top: 28px !important; }
 .choice small { display: block; font-weight: 500; color: var(--muted); margin-top: 2px; }
 
+.question, .title, .lead, .lines p, .steps li, .why, .note, .opt, .fb-text, .choice { overflow-wrap: anywhere; word-break: normal; }
+
+/* tall answered cards on small phones: let the card grow instead of clipping */
+.card { height: auto; min-height: 100dvh; }
+
 </style>
 </head>
 <body>
@@ -420,7 +425,7 @@ textarea.field { min-height: 92px; resize: vertical; }
 "use strict";
 
 const NB = "\u00A0";
-const n = (s) => String(s).replace(/ /g, NB);
+const n = (s) => String(s).replace(/(\d) (?=\d{3}(?!\d))/g, "$1" + NB).replace(/(\d) (?=so‘m)/g, "$1" + NB);
 
 const MODULES = [];
 
@@ -1018,7 +1023,9 @@ window.Reels = (function () {
     return same.indexOf(card) + 1;
   }
   function normNum(s) {
-    const v = String(s || "").replace(/[\s\u00A0]/g, "").replace(/so[‘'`ʻ’]?m/gi, "").replace("%", "").replace(",", ".");
+    let v = String(s || "").replace(/[\s\u00A0]/g, "").replace(/so[‘'`ʻ’]?m/gi, "").replace(/%/g, "").replace(/yil/gi, "");
+    if (/^-?\d{1,3}([.,]\d{3})+$/.test(v)) v = v.replace(/[.,]/g, "");
+    else v = v.replace(",", ".");
     if (!/^-?\d+(\.\d+)?$/.test(v)) return NaN;
     return parseFloat(v);
   }
