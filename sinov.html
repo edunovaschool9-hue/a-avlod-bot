@@ -260,13 +260,15 @@ textarea.field { min-height: 92px; resize: vertical; }
 .fb-error:empty { display: none; }
 #s-module { overflow: hidden; }
 
+.h-modules { margin-top: 28px !important; }
+.choice small { display: block; font-weight: 500; color: var(--muted); margin-top: 2px; }
+
 </style>
 </head>
 <body>
 
 <section class="screen s-yellow" id="s-start">
   <div class="wrap">
-    <div class="hook hook-lg" aria-hidden="true">%</div>
     <h1>Ilova sinovi</h1>
     <p class="lead">Ustozlar, bu o‘quvchilar uchun yangi ilovaning sinov versiyasi. Mavzular qisqa kartalarda, telefonda reels kabi suriladi: avval nazariya, keyin savol.</p>
     <p class="lead">Sizdan so‘raymiz:</p>
@@ -276,7 +278,7 @@ textarea.field { min-height: 92px; resize: vertical; }
       <li>Modulni o‘quvchi sifatida 10 daqiqa o‘tib ko‘ring.</li>
       <li>Oxirida fikringizni yozing: nima yoqdi, nima noqulay.</li>
     </ol>
-    <p class="note">Birinchi tayyor modul: matematika, «Foizlar».</p>
+    <p class="note" id="readyModules"></p>
   </div>
   <div class="bar-bottom"><div class="inner"><button type="button" class="btn primary" id="startBtn">Boshlash</button></div></div>
 </section>
@@ -304,7 +306,11 @@ textarea.field { min-height: 92px; resize: vertical; }
   <div class="wrap">
     <h2>Qaysi fandan dars berasiz?</h2>
     <div class="choices" id="subjectList"></div>
-    <p class="msg" id="subjectNote" aria-live="polite"></p>
+    <div id="moduleWrap" hidden>
+      <h2 class="h-modules">Qaysi modulni sinaysiz?</h2>
+      <p class="msg" id="subjectNote" aria-live="polite"></p>
+      <div class="choices" id="moduleList"></div>
+    </div>
   </div>
   <div class="bar-bottom"><div class="inner">
     <button type="button" class="btn ghost" id="subjectBack">Orqaga</button>
@@ -416,7 +422,17 @@ textarea.field { min-height: 92px; resize: vertical; }
 const NB = "\u00A0";
 const n = (s) => String(s).replace(/ /g, NB);
 
-const TOPICS = {
+const MODULES = [];
+
+MODULES.push({
+  id: "matematika-foizlar",
+  fan: "Matematika",
+  nom: "Foizlar",
+  hook: "%",
+  lead: "Milliy sertifikatga tayyorlov: oddiydan murakkabgacha, 3 bosqichda.",
+  note: "Mashqlar maktab matematika o‘qituvchisi tavsiya qilgan yondashuv asosida tuzilgan: kichik qadamlar va har bir to‘g‘ri javobga rag‘bat.",
+  book: "Mustahkamlash uchun: o‘qituvchi tavsiya qilgan IDC matematika qo‘llanmasining (8–11-sinflar) foizlar bo‘limidagi mashqlarni yeching.",
+  topics: {
   ulush: "Sonning foizini topish",
   butun: "Butunni topish",
   nisbat: "Necha foiz tashkil qiladi",
@@ -427,15 +443,13 @@ const TOPICS = {
   aralashma: "Aralashmalar",
   punkt: "Foiz punkti",
   teskari: "Teskari masala",
-};
-
-const STAGES = {
+  },
+  stages: {
   1: "Asoslar",
   2: "O‘zgarishlar",
   3: "Murakkab masalalar",
-};
-
-const CARDS = [
+  },
+  cards: [
   { id: "intro", type: "intro" },
 
   /* ---------- 1-bosqich: Asoslar ---------- */
@@ -599,17 +613,348 @@ const CARDS = [
   },
   { id: "s3", type: "stage", stage: 3 },
   { id: "finish", type: "finish" },
-];
+  ],
+});
+
+/* ================= ONA TILI: KELISHIKLAR ================= */
+MODULES.push({
+  id: "ona-tili-kelishiklar",
+  fan: "Ona tili va adabiyot",
+  nom: "Kelishiklar",
+  hook: "-ga",
+  lead: "Milliy sertifikatga tayyorlov: kelishiklar va jo‘nalish kelishigining imlosi, 2 bosqichda.",
+  note: "Mashqlar ona tili o‘qituvchisi tavsiya qilgan test yondashuvi asosida tuzilgan: qoida, misol, keyin test.",
+  book: "Mustahkamlash uchun: o‘qituvchi tavsiya qilgan Davron Akbarning milliy sertifikat test to‘plamidagi kelishik va imlo mashqlarini yeching.",
+  topics: {
+    soroq: "Kelishikni so‘roq bilan aniqlash",
+    qaratqich: "Qaratqich va tushum",
+    orin: "O‘rin-payt va chiqish",
+    imlo: "-ga, -ka, -qa imlosi",
+  },
+  stages: { 1: "Kelishik va so‘roq", 2: "Imlo: -ga, -ka, -qa" },
+  cards: [
+    { id: "intro", type: "intro" },
+    {
+      id: "t1", type: "theory", stage: 1, hook: "6",
+      title: "O‘zbek tilida 6 ta kelishik bor",
+      steps: [
+        "Bosh: qo‘shimchasiz. Kim? nima?",
+        "Qaratqich: -ning. Kimning? nimaning?",
+        "Tushum: -ni. Kimni? nimani?",
+        "Jo‘nalish: -ga. Kimga? qayerga?",
+        "O‘rin-payt: -da. Kimda? qayerda? qachon?",
+        "Chiqish: -dan. Kimdan? qayerdan?",
+      ],
+      why: "Kelishikni so‘roq bilan aniqlang: qaratqich va tushum qo‘shimchasi ba’zan tushib qoladi.",
+    },
+    {
+      id: "q1", type: "mcq", stage: 1, topic: "qaratqich",
+      q: "«Kitobni o‘qidim» gapidagi «kitobni» so‘zi qaysi kelishikda?",
+      options: ["Qaratqich", "Tushum", "Jo‘nalish", "Bosh"], answer: 1,
+      explain: "Qo‘shimchasi -ni, so‘rog‘i nimani? Bu tushum kelishigi.",
+      twin: { q: "«Nimani?» so‘rog‘iga javob beradigan kelishik qaysi?", options: ["Tushum", "Chiqish", "O‘rin-payt", "Qaratqich"], answer: 0, explain: "Kimni? nimani? so‘roqlari tushum kelishigiga tegishli." },
+    },
+    {
+      id: "q2", type: "mcq", stage: 1, topic: "qaratqich",
+      q: "«Maktabning hovlisi» birikmasidagi «maktabning» so‘zi qaysi kelishikda?",
+      options: ["Tushum", "Chiqish", "Qaratqich", "Jo‘nalish"], answer: 2,
+      explain: "Qo‘shimchasi -ning, so‘rog‘i nimaning? Bu qaratqich kelishigi. U egalik qo‘shimchali so‘zga bog‘lanadi: hovli-si.",
+      twin: { q: "-ning qo‘shimchasi qaysi kelishikka tegishli?", options: ["Qaratqich", "Tushum", "Bosh", "Chiqish"], answer: 0, explain: "-ning qaratqich kelishigining qo‘shimchasi: kimning? nimaning?" },
+    },
+    {
+      id: "t2", type: "theory", stage: 1, hook: "-da ≠ -dan", hookSize: "md",
+      title: "Qayerda? yoki qayerdan?",
+      steps: ["kutubxonada: qayerda? O‘rin-payt", "kutubxonadan: qayerdan? Chiqish"],
+      why: "Bitta «n» harfi ma’noni o‘zgartiradi: ish-harakat joyi yoki boshlangan joyi.",
+    },
+    {
+      id: "q3", type: "mcq", stage: 1, topic: "orin",
+      q: "«Men kutubxonadan keldim» gapidagi «kutubxonadan» so‘zi qaysi kelishikda?",
+      options: ["O‘rin-payt", "Chiqish", "Jo‘nalish", "Tushum"], answer: 1,
+      explain: "Qo‘shimchasi -dan, so‘rog‘i qayerdan? Bu chiqish kelishigi.",
+      twin: { q: "«Men kutubxonada o‘tiribman» gapidagi «kutubxonada» qaysi kelishikda?", options: ["Chiqish", "Bosh", "O‘rin-payt", "Jo‘nalish"], answer: 2, explain: "Qo‘shimchasi -da, so‘rog‘i qayerda? Bu o‘rin-payt kelishigi." },
+    },
+    {
+      id: "q4", type: "mcq", stage: 1, topic: "soroq",
+      q: "Qaysi so‘roq jo‘nalish kelishigiga tegishli?",
+      options: ["qayerda?", "kimning?", "qayerdan?", "qayerga?"], answer: 3,
+      explain: "Jo‘nalish kelishigi: kimga? nimaga? qayerga? Qo‘shimchasi -ga.",
+      twin: { q: "«Maktabga bordim» gapidagi «maktabga» so‘zi qaysi so‘roqqa javob beradi?", options: ["qayerga?", "qayerda?", "nimani?", "kimning?"], answer: 0, explain: "Maktabga: qayerga? Qo‘shimchasi -ga, bu jo‘nalish kelishigi." },
+    },
+    { id: "s1", type: "stage", stage: 1 },
+    {
+      id: "t3", type: "theory", stage: 2, hook: "-ka, -qa", hookSize: "md",
+      title: "Jo‘nalish kelishigi uch xil yoziladi",
+      steps: ["k bilan tugasa: terak + ga = terakka", "q bilan tugasa: qishloq + ga = qishloqqa", "qolgan hollarda: maktabga, bargga, tog‘ga"],
+      why: "Qoida so‘zning oxirgi harfiga qarab ishlaydi.",
+    },
+    {
+      id: "t4", type: "theory", stage: 2, hook: "tog‘ga", hookSize: "md",
+      title: "tog‘ga, bog‘ga: toqqa emas",
+      lines: ["Hozirgi lotin yozuvidagi imlo qoidasiga ko‘ra g‘ bilan tugagan so‘zlarga -ga yoziladi."],
+      why: "Aytilishi «toqqa»ga yaqin bo‘lsa ham, yozuvda tog‘ga. «Toqqa» shakli kirill yozuvidagi eski qoidadan qolgan.",
+    },
+    {
+      id: "q5", type: "mcq", stage: 2, topic: "imlo",
+      q: "Qaysi so‘z to‘g‘ri yozilgan?",
+      options: ["qishloqga", "qishloqka", "qishloqqa", "qishlokqa"], answer: 2,
+      explain: "«Qishloq» q bilan tugaydi, shuning uchun -qa: qishloqqa.",
+      twin: { q: "«Qishloq» so‘zi qaysi harf bilan tugaydi?", options: ["k", "q", "g", "g‘"], answer: 1, explain: "Qishlo-q: oxirgi harf q. q bilan tugagan so‘zga -qa qo‘shiladi." },
+    },
+    {
+      id: "q6", type: "mcq", stage: 2, topic: "imlo",
+      q: "Qaysi so‘z to‘g‘ri yozilgan?",
+      options: ["terakka", "terakga", "terakqa", "terakca"], answer: 0,
+      explain: "«Terak» k bilan tugaydi, shuning uchun -ka: terakka.",
+      twin: { q: "k bilan tugagan so‘zga jo‘nalish kelishigi qanday yoziladi?", options: ["-ga", "-qa", "-ka", "-da"], answer: 2, explain: "k bilan tugasa -ka: tilakka, terakka, eshikka." },
+    },
+    {
+      id: "q7", type: "mcq", stage: 2, topic: "imlo",
+      q: "Hozirgi imlo qoidasiga ko‘ra qaysi yozuv to‘g‘ri?",
+      options: ["toqqa", "tog‘ga", "tog‘qa", "tokka"], answer: 1,
+      explain: "g‘ bilan tugagan so‘zlarga -ga yoziladi: tog‘ga. «Toqqa» eski qoida.",
+      twin: { q: "g‘ bilan tugagan so‘zlarga jo‘nalish kelishigi qanday yoziladi?", options: ["-qa", "-ka", "-ga", "-da"], answer: 2, explain: "k va q dan tashqari barcha hollarda -ga yoziladi: tog‘ga, bog‘ga." },
+    },
+    {
+      id: "q8", type: "mcq", stage: 2, topic: "imlo",
+      q: "Gapni to‘ldiring: «Biz ... bordik» (bog‘ so‘zi jo‘nalish kelishigida).",
+      options: ["boqqa", "bog‘da", "bog‘ga", "bog‘qa"], answer: 2,
+      explain: "Jo‘nalish kelishigi, g‘ bilan tugagan so‘z: bog‘ga. «Bog‘da» esa o‘rin-payt kelishigi.",
+      twin: { q: "Qaysi so‘z «qayerga?» so‘rog‘iga javob beradi?", options: ["bog‘da", "bog‘dan", "bog‘ning", "bog‘ga"], answer: 3, explain: "Qayerga? — jo‘nalish kelishigi: bog‘ga." },
+    },
+    { id: "s2", type: "stage", stage: 2 },
+    { id: "finish", type: "finish" },
+  ],
+});
+
+/* ================= TARIX: AMIR TEMUR ================= */
+MODULES.push({
+  id: "tarix-amir-temur",
+  fan: "Tarix",
+  nom: "Amir Temur",
+  hook: "1336",
+  lead: "Milliy sertifikatga tayyorlov: Amir Temur hayoti, yurishlari va merosi. Sanalar jadval kabi, 2 bosqichda.",
+  note: "Mashqlar tarix o‘qituvchisi tavsiya qilgan yondashuv asosida tuzilgan: qisqa va lo‘nda, sana va sxemalar bilan.",
+  book: "Mustahkamlash uchun: o‘qituvchi tavsiya qilgan milliy sertifikat qo‘llanmasidagi Amir Temur mavzusini jadval va sxemalar bilan takrorlang.",
+  topics: {
+    hayot: "Hayot yo‘li va sanalar",
+    davlat: "Davlat va poytaxt",
+    yurish: "Harbiy yurishlar",
+    meros: "Meros va manbalar",
+  },
+  stages: { 1: "Hayot yo‘li", 2: "Yurishlar va meros" },
+  cards: [
+    { id: "intro", type: "intro" },
+    {
+      id: "t1", type: "theory", stage: 1, hook: "1336",
+      title: "Amir Temur tug‘ildi",
+      lines: ["9-aprel, Kesh (hozirgi Shahrisabz) yaqinidagi Xo‘ja Ilg‘or qishlog‘ida."],
+      why: "Ikki sanani juft eslab qoling: 1336 — tug‘ilgan, 1370 — hukmdor bo‘lgan.",
+    },
+    {
+      id: "t2", type: "theory", stage: 1, hook: "1370",
+      title: "Balx qurultoyi: ulug‘ amir",
+      lines: ["Qurultoyda Amir Temur ulug‘ amir deb e’lon qilindi. Davlat poytaxti Samarqand bo‘ldi."],
+      steps: ["hukmronlik: 1370–1405", "jami: 35 yil"],
+      why: "Taxtga nomigagina chingiziy xonlar o‘tqazilgan: Suyurg‘atmish, keyin Sulton Mahmud.",
+    },
+    {
+      id: "q1", type: "mcq", stage: 1, topic: "hayot",
+      q: "Amir Temur qaysi yili tug‘ilgan?",
+      options: ["1370", "1336", "1402", "1405"], answer: 1,
+      explain: "Amir Temur 1336-yil 9-aprelda Kesh yaqinidagi Xo‘ja Ilg‘or qishlog‘ida tug‘ilgan.",
+      twin: { q: "Amir Temur tug‘ilgan joy: Kesh yaqinidagi Xo‘ja Ilg‘or. Kesh bugun qaysi shahar?", options: ["Shahrisabz", "Samarqand", "Buxoro", "Termiz"], answer: 0, explain: "Kesh — hozirgi Shahrisabz. Tug‘ilgan yili: 1336." },
+    },
+    {
+      id: "q2", type: "mcq", stage: 1, topic: "davlat",
+      q: "1370-yilda Amir Temur qayerdagi qurultoyda ulug‘ amir deb e’lon qilindi?",
+      options: ["Samarqand", "Kesh", "Balx", "O‘tror"], answer: 2,
+      explain: "1370-yil, Balx qurultoyi. Shu yildan hukmronligi boshlangan.",
+      twin: { q: "Balx qurultoyi qaysi yili bo‘lgan?", options: ["1336", "1370", "1388", "1405"], answer: 1, explain: "1370-yil: Balx qurultoyida Amir Temur ulug‘ amir deb e’lon qilingan." },
+    },
+    {
+      id: "q3", type: "mcq", stage: 1, topic: "davlat",
+      q: "Amir Temur davlatining poytaxti qaysi shahar edi?",
+      options: ["Buxoro", "Samarqand", "Hirot", "Kesh"], answer: 1,
+      explain: "Poytaxt Samarqand edi. Amir Temur ham shu yerda dafn etilgan.",
+      twin: { q: "Amir Temur vafotidan keyin Samarqandda dafn etilgan. Uning davlati poytaxti ham shu shahar edi. Qaysi shahar?", options: ["Toshkent", "Termiz", "Samarqand", "Buxoro"], answer: 2, explain: "Samarqand — Amir Temur davlatining poytaxti." },
+    },
+    {
+      id: "q4", type: "num", stage: 1, topic: "hayot", unit: "yil",
+      q: "Amir Temur 1370-yildan 1405-yilgacha hukmronlik qildi. Hukmronligi necha yil davom etgan?",
+      answer: 35,
+      explain: "1405 − 1370 = 35 yil.",
+      twin: { q: "1400-yildan 1405-yilgacha necha yil o‘tgan?", answer: 5, explain: "1405 − 1400 = 5 yil. Xuddi shunday: 1405 − 1370." },
+    },
+    { id: "s1", type: "stage", stage: 1 },
+    {
+      id: "t3", type: "theory", stage: 2, hook: "1372–1404", hookSize: "sm",
+      title: "Yurishlar xronologiyasi",
+      steps: ["1372: Xorazmga birinchi yurish", "1388: Xorazm uzil-kesil qo‘shildi", "1398: Hindiston yurishi", "1402: Anqara jangi", "1404: Xitoy yurishiga chiqildi"],
+      why: "Xorazmga jami besh marta yurish qilingan.",
+    },
+    {
+      id: "t4", type: "theory", stage: 2, hook: "1402",
+      title: "Anqara jangi",
+      lines: ["Amir Temur usmonli sulton Yildirim Boyazid qo‘shinini yengdi."],
+      why: "Bu g‘alabadan so‘ng Fransiya, Angliya va Kastiliya qirollari Amir Temurga tabrik nomalari yuborgan.",
+    },
+    {
+      id: "q5", type: "mcq", stage: 2, topic: "yurish",
+      q: "Anqara jangida (1402) Amir Temur kimga qarshi jang qilgan?",
+      options: ["To‘xtamish", "Amir Husayn", "Yildirim Boyazid", "Sulton Mahmud"], answer: 2,
+      explain: "Anqara jangida usmonli sulton Yildirim Boyazid yengilgan.",
+      twin: { q: "Anqara jangi qaysi yili bo‘lgan?", options: ["1402", "1372", "1398", "1405"], answer: 0, explain: "1402-yil: Anqara jangi, Yildirim Boyazid ustidan g‘alaba." },
+    },
+    {
+      id: "q6", type: "mcq", stage: 2, topic: "yurish",
+      q: "Xorazm Amir Temur davlatiga uzil-kesil qaysi yili qo‘shildi?",
+      options: ["1372", "1388", "1370", "1402"], answer: 1,
+      explain: "Birinchi yurish 1372-yilda bo‘lgan, Xorazm esa 1388-yilda uzil-kesil qo‘shilgan.",
+      twin: { q: "Amir Temur Xorazmga jami necha marta yurish qilgan?", options: ["1", "3", "5", "10"], answer: 2, explain: "Besh marta: birinchisi 1372-yilda, oxiri 1388-yilda." },
+    },
+    {
+      id: "t5", type: "theory", stage: 2, hook: "1405",
+      title: "O‘tror: so‘nggi yurish",
+      lines: ["Xitoyga yurish vaqtida, 18-fevralda O‘tror shahrida vafot etdi va Samarqandda dafn etildi."],
+      why: "Davlat boshqaruvi va harbiy ish haqidagi qarashlari «Temur tuzuklari» asarida bayon qilingan.",
+    },
+    {
+      id: "q7", type: "mcq", stage: 2, topic: "yurish",
+      q: "Amir Temur qaysi shaharda vafot etgan?",
+      options: ["Samarqand", "O‘tror", "Kesh", "Anqara"], answer: 1,
+      explain: "1405-yil 18-fevralda Xitoy yurishi vaqtida O‘tror shahrida vafot etgan.",
+      twin: { q: "Amir Temur 1405-yilda qaysi mamlakatga yurish vaqtida vafot etgan?", options: ["Hindiston", "Eron", "Xitoy", "Misr"], answer: 2, explain: "Xitoy yurishi vaqtida, O‘tror shahrida." },
+    },
+    {
+      id: "q8", type: "mcq", stage: 2, topic: "meros",
+      q: "Amir Temurning davlat boshqaruvi haqidagi qarashlari bayon qilingan asar qaysi?",
+      options: ["«Boburnoma»", "«Xamsa»", "«Temur tuzuklari»", "«Devonu lug‘otit turk»"], answer: 2,
+      explain: "«Temur tuzuklari»: davlat boshqaruvi va harbiy ish haqidagi qarashlar.",
+      twin: { q: "«Temur tuzuklari» asosan nima haqida?", options: ["She’riyat", "Davlat boshqaruvi va harbiy ish", "Tibbiyot", "Astronomiya"], answer: 1, explain: "Unda davlat tuzilishi, boshqaruv va harbiy san’at haqidagi qarashlar bor." },
+    },
+    { id: "s2", type: "stage", stage: 2 },
+    { id: "finish", type: "finish" },
+  ],
+});
+
+/* ================= INGLIZ TILI: PRESENT SIMPLE / CONTINUOUS ================= */
+MODULES.push({
+  id: "ingliz-tili-present",
+  fan: "Ingliz tili",
+  nom: "Present Simple va Continuous",
+  hook: "-s / -ing",
+  lead: "Ikki zamonni farqlashni o‘rganamiz: odat va hozirgi jarayon, 2 bosqichda.",
+  note: "Mashqlar ingliz tili o‘qituvchisi tavsiya qilgan grammatika kitobi yondashuvida tuzilgan: qoida, misol, mashq.",
+  book: "Mustahkamlash uchun: o‘qituvchi tavsiya qilgan Round Up kitobidagi Present Simple va Present Continuous mashqlarini bajaring.",
+  topics: {
+    s: "He / she / it + -s",
+    savol: "Do / Does, don’t / doesn’t",
+    cont: "am / is / are + -ing",
+    farq: "Odat va hozirgi jarayon farqi",
+  },
+  stages: { 1: "Present Simple", 2: "Present Continuous" },
+  cards: [
+    { id: "intro", type: "intro" },
+    {
+      id: "t1", type: "theory", stage: 1, hook: "plays", hookSize: "lg",
+      title: "Present Simple: odat va doimiy ish",
+      steps: ["I / you / we / they play", "he / she / it plays", "savol: Does he play?", "inkor: He doesn’t play."],
+      why: "He, she, it bilan fe’lga -s qo‘shiladi. Eng ko‘p xato aynan shu yerda.",
+    },
+    {
+      id: "t2", type: "theory", stage: 1, hook: "every day", hookSize: "md",
+      title: "Signal so‘zlar",
+      lines: ["always, usually, often, sometimes, never, every day"],
+      why: "Gapda shu so‘zlar bo‘lsa, ko‘pincha Present Simple kerak.",
+    },
+    {
+      id: "q1", type: "mcq", stage: 1, topic: "s",
+      q: "She ___ to school every day.",
+      options: ["go", "goes", "is going", "going"], answer: 1,
+      explain: "She + fe’l + s: goes. «Every day» odatni bildiradi.",
+      twin: { q: "He ___ football. (play)", options: ["play", "playing", "plays", "is play"], answer: 2, explain: "He bilan fe’lga -s qo‘shiladi: plays." },
+    },
+    {
+      id: "q2", type: "mcq", stage: 1, topic: "savol",
+      q: "___ your brother like pizza?",
+      options: ["Do", "Does", "Is", "Are"], answer: 1,
+      explain: "Your brother = he, shuning uchun Does: Does your brother like pizza?",
+      twin: { q: "___ he like pizza?", options: ["Does", "Do", "Is", "Am"], answer: 0, explain: "He bilan savol Does orqali tuziladi." },
+    },
+    {
+      id: "q3", type: "mcq", stage: 1, topic: "savol",
+      q: "They ___ TV in the morning. (not watch)",
+      options: ["doesn’t watch", "don’t watch", "aren’t watch", "not watch"], answer: 1,
+      explain: "They bilan inkor don’t orqali: They don’t watch TV.",
+      twin: { q: "I ___ coffee. (not drink)", options: ["doesn’t drink", "not drink", "don’t drink", "am not drink"], answer: 2, explain: "I bilan inkor don’t: I don’t drink coffee." },
+    },
+    {
+      id: "q4", type: "mcq", stage: 1, topic: "s",
+      q: "Qaysi gap to‘g‘ri?",
+      options: ["My father work in a bank.", "My father works in a bank.", "My father working in a bank.", "My father is work in a bank."], answer: 1,
+      explain: "My father = he, shuning uchun works.",
+      twin: { q: "My father ___ in a bank. (work)", options: ["work", "working", "works", "to work"], answer: 2, explain: "He (my father) bilan fe’lga -s: works." },
+    },
+    { id: "s1", type: "stage", stage: 1 },
+    {
+      id: "t3", type: "theory", stage: 2, hook: "is playing", hookSize: "md",
+      title: "Present Continuous: hozir, ayni paytda",
+      steps: ["I am playing", "he / she / it is playing", "you / we / they are playing"],
+      why: "am / is / are + fe’l-ing. Hozir sodir bo‘layotgan ish uchun.",
+    },
+    {
+      id: "t4", type: "theory", stage: 2, hook: "now", hookSize: "lg",
+      title: "Signal so‘zlar: now, at the moment, Look!, Listen!",
+      lines: ["Look! It is raining.", "I am reading now."],
+      why: "Odat bo‘lsa Present Simple, ayni paytdagi jarayon bo‘lsa Present Continuous.",
+    },
+    {
+      id: "q5", type: "mcq", stage: 2, topic: "cont",
+      q: "Look! The children ___ in the garden.",
+      options: ["play", "plays", "are playing", "is playing"], answer: 2,
+      explain: "Look! — hozir. Children = they, shuning uchun are playing.",
+      twin: { q: "They ___ now. (play)", options: ["are playing", "is playing", "plays", "am playing"], answer: 0, explain: "They bilan are + playing." },
+    },
+    {
+      id: "q6", type: "mcq", stage: 2, topic: "cont",
+      q: "I ___ my homework at the moment.",
+      options: ["do", "am doing", "does", "is doing"], answer: 1,
+      explain: "At the moment — hozir. I bilan am + doing.",
+      twin: { q: "I ___ reading now. (be)", options: ["is", "are", "am", "be"], answer: 2, explain: "I bilan faqat am ishlatiladi: I am reading." },
+    },
+    {
+      id: "q7", type: "mcq", stage: 2, topic: "farq",
+      q: "Qaysi gap to‘g‘ri?",
+      options: [
+        "He usually is walking to school, but today he takes the bus.",
+        "He usually walks to school, but today he is taking the bus.",
+        "He usually walk to school, but today he is taking the bus.",
+        "He usually walks to school, but today he take the bus.",
+      ], answer: 1,
+      explain: "Usually — odat: walks. Today — ayni vaziyat: is taking.",
+      twin: { q: "He usually ___ to school. (walk)", options: ["is walking", "walks", "walk", "walking"], answer: 1, explain: "Usually odatni bildiradi: Present Simple, walks." },
+    },
+    {
+      id: "q8", type: "mcq", stage: 2, topic: "cont",
+      q: "Listen! Someone ___ at the door.",
+      options: ["knocks", "knock", "is knocking", "are knocking"], answer: 2,
+      explain: "Listen! — hozir. Someone birlikda: is knocking.",
+      twin: { q: "Someone ___ now. (knock)", options: ["are knocking", "is knocking", "knock", "knocking"], answer: 1, explain: "Someone birlikda, shuning uchun is + knocking." },
+    },
+    { id: "s2", type: "stage", stage: 2 },
+    { id: "finish", type: "finish" },
+  ],
+});
 
 </script>
 <script>
 window.Reels = (function () {
   "use strict";
 
-  const KEY = "sinov_foizlar_v1";
+  let M = null, KEY = "", CARDS = [], STAGES = {}, TOPICS = {}, TESTS = [];
   let onFeedback = function () {};
   let started = false;
-  const TESTS = CARDS.filter((c) => c.type === "mcq" || c.type === "num");
   const PRAISE = [
     "To‘g‘ri! Usulni to‘g‘ri tanladingiz.",
     "Zo‘r, buni tez topdingiz.",
@@ -695,15 +1040,15 @@ window.Reels = (function () {
   function buildIntro() {
     const { c, inner } = wrapCard("k-intro", "intro");
     inner.innerHTML =
-      '<div class="hook hook-xl" aria-hidden="true">%</div>' +
-      '<h1 class="title">Foizlar</h1>' +
-      '<p class="lead">Milliy sertifikatga tayyorlov: oddiydan murakkabgacha, 3 bosqichda.</p>' +
+      '<div class="hook ' + (String(M.hook).length <= 2 ? "hook-xl" : String(M.hook).length <= 5 ? "hook-lg" : "hook-md") + '" aria-hidden="true">' + esc(M.hook) + "</div>" +
+      '<h1 class="title">' + esc(M.nom) + "</h1>" +
+      '<p class="lead">' + esc(M.lead) + "</p>" +
       '<ul class="how">' +
       "<li>Yuqoriga suring: avval qisqa nazariya, keyin savol.</li>" +
       "<li>Xato qilsangiz, soddaroq misol chiqadi, keyin asl savolga qaytasiz.</li>" +
       "<li>Istalgan payt «Yetarli» ni bosing. Joyingiz saqlanadi.</li>" +
       "</ul>" +
-      '<p class="note">Mashqlar maktab matematika o‘qituvchisi tavsiya qilgan yondashuv asosida tuzilgan: kichik qadamlar va har bir to‘g‘ri javobga rag‘bat.</p>' +
+      '<p class="note">' + esc(M.note) + "</p>" +
       '<p class="swipe">Boshlash uchun yuqoriga suring</p>';
     return c;
   }
@@ -795,7 +1140,7 @@ window.Reels = (function () {
     const first = tests.filter((t) => st.res[t.id] && st.res[t.id].first).length;
     const next = STAGES[card.stage + 1];
     inner.innerHTML =
-      '<div class="hook hook-lg">' + card.stage + "/3</div>" +
+      '<div class="hook hook-lg">' + card.stage + "/" + Object.keys(STAGES).length + "</div>" +
       '<h2 class="title">' + card.stage + "-bosqich tugadi</h2>" +
       '<p class="lead">' + first + " ta savolni birinchi urinishda topdingiz, jami " + tests.length + " tadan.</p>" +
       '<p class="why">' + (first === tests.length
@@ -810,9 +1155,9 @@ window.Reels = (function () {
     const weak = Object.keys(st.weak).filter((k) => st.weak[k] > 0);
     inner.innerHTML =
       '<div class="hook hook-lg">' + readiness() + "%</div>" +
-      '<h2 class="title">Foizlar moduli tugadi</h2>' +
+      '<h2 class="title">' + esc(M.nom) + ": modul tugadi</h2>" +
       '<p class="lead">Bu mavzu bo‘yicha tayyorgarligingiz.' + (weak.length ? " Takrorlash kerak: " + esc(weak.map((w) => TOPICS[w]).join(", ")) + "." : " Takrorlash kerak bo‘lgan mavzu yo‘q.") + "</p>" +
-      '<p class="why">Mustahkamlash uchun: o‘qituvchi tavsiya qilgan IDC matematika qo‘llanmasining (8–11-sinflar) foizlar bo‘limidagi mashqlarni yeching.</p>' +
+      '<p class="why">' + esc(M.book) + "</p>" +
       '<p class="note">Ustoz, endi ilova haqida fikringizni qoldiring.</p>' +
       '<div class="row"><button type="button" class="btn" data-act="feedback">Fikr qoldirish</button>' +
       '<button type="button" class="btn ghost" data-act="profile">Profilni ochish</button></div>';
@@ -921,7 +1266,7 @@ window.Reels = (function () {
       if (!isNaN(base) && base > st.reached) { st.reached = base; save(); }
       $("stageName").textContent = CARDS[base] && CARDS[base].type !== "intro"
         ? stageOfIndex(base) + "-bosqich: " + STAGES[stageOfIndex(base)]
-        : "Foizlar";
+        : M.nom;
     });
   }, { root: feed, threshold: 0.6 });
 
@@ -940,7 +1285,7 @@ window.Reels = (function () {
       '<div class="hook hook-lg">' + session.answered + "</div>" +
       '<p class="lead">Bugun ' + session.answered + " ta savolga javob berdingiz, " + session.firstTry + " tasi birinchi urinishda to‘g‘ri. " + session.cards + " ta karta ko‘rdingiz.</p>" +
       '<p class="why">' + (session.answered ? "Yaxshi ish. Keyingi safar aynan shu joydan davom etasiz." : "Joyingiz saqlandi. Qaytganingizda shu yerdan davom etasiz.") + "</p>" +
-      '<p class="note">Foizlar bo‘yicha tayyorgarlik: ' + pct + "%</p>" +
+      '<p class="note">' + esc(M.nom) + " bo‘yicha tayyorgarlik: " + pct + "%</p>" +
       '<div class="row"><button type="button" class="btn" id="enoughFeedback">Fikr qoldirish</button></div>';
     $("enoughFeedback").addEventListener("click", () => { closeSheet("enough"); onFeedback(); });
     openSheet("enough");
@@ -948,7 +1293,7 @@ window.Reels = (function () {
 
   function openProfile() {
     const pct = readiness();
-    const stages = [1, 2, 3].map((s) => {
+    const stages = Object.keys(STAGES).map(Number).map((s) => {
       const tests = TESTS.filter((t) => t.stage === s);
       const done = tests.filter((t) => st.res[t.id]).length;
       const state = done === tests.length ? "done" : done > 0 || (s === 1) || TESTS.filter((t) => t.stage === s - 1).every((t) => st.res[t.id]) ? "now" : "locked";
@@ -956,7 +1301,7 @@ window.Reels = (function () {
     }).join("");
     const weak = Object.keys(st.weak).filter((k) => st.weak[k] > 0).sort((a, b) => st.weak[b] - st.weak[a]);
     $("profileBody").innerHTML =
-      '<div class="ready"><div class="hook hook-lg">' + pct + '%</div><p class="lead">Foizlar bo‘yicha tayyorgarlik</p></div>' +
+      '<div class="ready"><div class="hook hook-lg">' + pct + '%</div><p class="lead">' + esc(M.nom) + " bo‘yicha tayyorgarlik</p></div>" +
       '<ol class="map">' + stages + "</ol>" +
       "<h3>Takrorlash kerak</h3>" +
       (weak.length
@@ -972,8 +1317,10 @@ window.Reels = (function () {
     clearProgress();
     window.location.reload();
   }
-  function clearProgress() {
-    try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ }
+  function clearProgress(id) {
+    const key = id ? "sinov_" + id + "_v1" : KEY;
+    if (!key) return;
+    try { localStorage.removeItem(key); } catch (e) { /* ignore */ }
   }
 
   /* ---------- init ---------- */
@@ -1015,14 +1362,27 @@ window.Reels = (function () {
     }
   }
 
+  function useModule(mod) {
+    M = mod;
+    KEY = "sinov_" + mod.id + "_v1";
+    CARDS = mod.cards; STAGES = mod.stages; TOPICS = mod.topics;
+    TESTS = CARDS.filter((c) => c.type === "mcq" || c.type === "num");
+    st = { reached: 0, res: {}, weak: {}, done: false };
+    load();
+    $("stageName").textContent = mod.nom;
+  }
+
   function start(opts) {
     if (opts && typeof opts.onFeedback === "function") onFeedback = opts.onFeedback;
     if (started) return;
     started = true;
+    useModule(opts.module);
     init();
   }
 
-  function stats() {
+  function stats(mod) {
+    if (!M && mod) useModule(mod);
+    if (!M) return { savollar: 0, birinchi: 0, jami: 0, tayyorlik: 0, zaif: [] };
     const weak = Object.keys(st.weak).filter((k) => st.weak[k] > 0).map((k) => TOPICS[k]);
     return {
       savollar: answeredCount(),
@@ -1033,7 +1393,6 @@ window.Reels = (function () {
     };
   }
 
-  load();
   return { start: start, stats: stats, clearProgress: clearProgress };
 })();
 
@@ -1045,7 +1404,6 @@ window.Reels = (function () {
   const SB_URL = "https://unaodltahuevrfnarfha.supabase.co";
   const KEY_PAGES = ["baho.html", "imzo.html", "test.html", "index.html", "boshqaruv.html"];
   const STORE = "sinov_v1";
-  const MODUL = "matematika-foizlar";
   const SUBJECTS = [
     "Matematika", "Ona tili va adabiyot", "Ingliz tili", "Rus tili", "Tarix", "Biologiya",
     "Kimyo", "Fizika", "Geografiya", "Huquq", "IT va sun’iy intellekt", "Koreys tili",
@@ -1054,7 +1412,9 @@ window.Reels = (function () {
   const SCREENS = ["start", "teacher", "subject", "module", "feedback", "done"];
 
   const $ = (id) => document.getElementById(id);
-  let S = { step: "start", teacher: null, manual: "", fan: "", startedAt: null, fb: {}, pending: null };
+  let S = { step: "start", teacher: null, manual: "", fan: "", modul: "", startedAt: null, fb: {}, pending: null };
+  const moduleById = (id) => MODULES.find((m) => m.id === id) || null;
+  const moduleForFan = (fan) => MODULES.find((m) => m.fan === fan) || null;
   let sbKey = null;
   let teachers = null;
 
@@ -1116,8 +1476,9 @@ window.Reels = (function () {
     if (step === "teacher") renderTeachers();
     if (step === "subject") renderSubjects();
     if (step === "module") {
+      if (!moduleById(S.modul)) { show("subject"); return; }
       if (!S.startedAt) { S.startedAt = Date.now(); save(); }
-      window.Reels.start({ onFeedback: () => show("feedback") });
+      window.Reels.start({ module: moduleById(S.modul), onFeedback: () => show("feedback") });
     }
     if (step === "feedback") renderFeedback();
     if (step === "done") renderDone();
@@ -1181,31 +1542,54 @@ window.Reels = (function () {
   function renderSubjects() {
     const box = $("subjectList");
     box.innerHTML = "";
-    SUBJECTS.forEach((s) => {
+    SUBJECTS.forEach((sub) => {
       const b = document.createElement("button");
       b.type = "button";
-      b.className = "choice" + (S.fan === s ? " on" : "");
-      b.setAttribute("aria-pressed", String(S.fan === s));
-      b.textContent = s;
-      b.addEventListener("click", () => { S.fan = s; save(); renderSubjects(); });
+      b.className = "choice" + (S.fan === sub ? " on" : "");
+      b.setAttribute("aria-pressed", String(S.fan === sub));
+      b.textContent = sub;
+      b.addEventListener("click", () => {
+        S.fan = sub;
+        const own = moduleForFan(sub);
+        S.modul = own ? own.id : "";
+        save(); renderSubjects();
+      });
       box.appendChild(b);
     });
+
+    const wrap = $("moduleWrap");
     const note = $("subjectNote");
     const go = $("subjectNext");
-    go.disabled = !S.fan;
-    if (!S.fan) { note.textContent = ""; go.textContent = "Modulni boshlash"; return; }
-    if (S.fan === "Matematika") {
-      note.textContent = "Matematika uchun «Foizlar» moduli tayyor. Uni o‘quvchi sifatida o‘tib ko‘ring.";
-      go.textContent = "Modulni boshlash";
-    } else {
-      note.textContent = "Bu fan uchun modul tayyorlanmoqda. Ilova formatini baholash uchun hozir matematika modulini o‘tib ko‘ring: mazmun emas, qulaylik muhim.";
-      go.textContent = "Matematika modulini boshlash";
-    }
+    wrap.hidden = !S.fan;
+    go.disabled = !(S.fan && moduleById(S.modul));
+    if (!S.fan) return;
+    const own = moduleForFan(S.fan);
+    note.textContent = own
+      ? "Faningiz bo‘yicha «" + own.nom + "» moduli tayyor va tanlandi. Xohlasangiz, boshqa modulni ham sinab ko‘ring."
+      : "Bu fan uchun modul hozircha tayyorlanmoqda. Ilova formatini baholash uchun tayyor modullardan birini tanlang: mazmun emas, qulaylik muhim.";
+
+    const list = $("moduleList");
+    list.innerHTML = "";
+    MODULES.forEach((m) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "choice" + (S.modul === m.id ? " on" : "");
+      b.setAttribute("aria-pressed", String(S.modul === m.id));
+      b.innerHTML = "";
+      b.appendChild(document.createTextNode(m.nom));
+      const small = document.createElement("small");
+      small.textContent = m.fan;
+      b.appendChild(small);
+      b.addEventListener("click", () => { S.modul = m.id; save(); renderSubjects(); });
+      list.appendChild(b);
+    });
+    const chosen = moduleById(S.modul);
+    go.textContent = chosen ? "«" + chosen.nom + "» modulini boshlash" : "Modulni tanlang";
   }
 
   /* feedback */
   function renderFeedback() {
-    const st = window.Reels.stats();
+    const st = window.Reels.stats(moduleById(S.modul));
     $("fbSummary").textContent = st.savollar
       ? "Siz " + st.savollar + " ta savolga javob berdingiz (" + st.jami + " tadan), " + st.birinchi + " tasi birinchi urinishda to‘g‘ri."
       : "Siz hali birorta savolga javob bermadingiz. Istasangiz, modulga qaytib bir nechta savolni yechib ko‘ring.";
@@ -1227,13 +1611,13 @@ window.Reels = (function () {
   }
 
   function payload() {
-    const st = window.Reels.stats();
+    const st = window.Reels.stats(moduleById(S.modul));
     const minutes = S.startedAt ? Math.max(1, Math.round((Date.now() - S.startedAt) / 60000)) : null;
     return {
       oqituvchi_id: S.teacher ? S.teacher.id : null,
       fio: teacherName(),
       fan: S.fan,
-      modul: MODUL,
+      modul: S.modul,
       daqiqa: minutes === null ? null : Math.min(minutes, 600),
       savollar: st.savollar,
       birinchi: st.birinchi,
@@ -1294,7 +1678,7 @@ window.Reels = (function () {
     $("teacherNext").addEventListener("click", () => { if (teacherName()) show("subject"); });
 
     $("subjectBack").addEventListener("click", () => show("teacher"));
-    $("subjectNext").addEventListener("click", () => { if (S.fan) show("module"); });
+    $("subjectNext").addEventListener("click", () => { if (S.fan && moduleById(S.modul)) show("module"); });
 
     document.querySelectorAll("[data-baho]").forEach((b) => b.addEventListener("click", () => {
       S.fb.baho = b.dataset.baho; S.pending = null; save(); renderFeedback();
@@ -1320,15 +1704,16 @@ window.Reels = (function () {
 
     $("againBtn").addEventListener("click", () => {
       if (!window.confirm("Modul natijalari va fikr qaytadan boshlanadi. Davom etasizmi?")) return;
-      window.Reels.clearProgress();
+      window.Reels.clearProgress(S.modul);
       const keep = { teacher: S.teacher, manual: S.manual, manualMode: S.manualMode };
-      S = Object.assign({ step: "subject", fan: "", startedAt: null, fb: {}, pending: null }, keep);
+      S = Object.assign({ step: "subject", fan: "", modul: "", startedAt: null, fb: {}, pending: null }, keep);
       save();
       window.location.reload();
     });
   }
 
   load();
+  $("readyModules").textContent = "Tayyor modullar: " + MODULES.map((m) => m.fan.toLowerCase() + " («" + m.nom + "»)").join(", ") + ".";
   wire();
   show(S.step);
   if (S.pending && S.step !== "done") sendFeedback(true);
