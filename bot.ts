@@ -1046,7 +1046,7 @@ async function xabar(msg: any) {
       const d = await rpc("ep_tekshir_hisobot", { p_chat_id: chat });
       if (!d?.ok) { await send(chat, "Ruxsat yo‘q"); return; }
       const r: any[] = (d.royxat ?? []) as any[], js: any[] = (d.javobsiz ?? []) as any[];
-      let t = `🔍 <b>Bot tekshiruvi</b>\nBotdagi ota-onalar: <b>${d.ota_jami}</b>\n✅ Ishlayapti: <b>${d.ok}</b> · ❌ Muammo: <b>${d.xato}</b>\n`;
+      let t = `🔍 <b>Bot tekshiruvi</b>\nBotdagi ota-onalar: <b>${d.ota_jami}</b>\n✅ Ishlayapti: <b>${d.ishlaydi}</b> · ❌ Muammo: <b>${d.muammo}</b>\n`;
       if (r.length) t += `\n<b>Javob berganlar</b>\n` + r.map((x: any) => `${x.javob === "ok" ? "✅" : "❌"} ${esc(x.ism)} · ${esc(x.vaqt)}`).join("\n") + "\n";
       if (js.length) t += `\n<b>⚪ Javob bermaganlar (${js.length})</b>\n` + js.map((x: any) => `• ${esc(x.ism)}` + (x.tel ? ` · ${esc(x.tel)}` : "")).join("\n");
       const qq = t.split("\n"); const bl: string[] = []; let bb = "";
@@ -1655,7 +1655,7 @@ Deno.serve(async (req) => {
     const me = await tg("getMe", {}, OTA);
     return jsonc({ setWebhook: r, bot: me?.result?.username ?? null });
   }
-  if (req.method !== "POST") return new Response("teach-bot v7.0 ok", { headers: CORS });
+  if (req.method !== "POST") return new Response("teach-bot v7.1 ok", { headers: CORS });
   if (CRON && req.headers.get("x-telegram-bot-api-secret-token") !== CRON) return no();
   const upd = await req.json().catch(() => null); if (!upd) return new Response("ok");
   if (q("ota") !== null) {
