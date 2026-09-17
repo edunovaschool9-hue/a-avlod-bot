@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ilova sinovi | EduNova</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --yellow: #FFD23F;
+  --on-yellow: #1F2A33;
+  --ink: #1F2A33;
+  --muted: #56636B;
+  --paper: #F6F8F9;
+  --line: #D5DDE1;
+  --teal: #0B7F7B;
+  --teal-tint: #DDF1EF;
+  --good: #0B7F7B;
+  --card-ink: #1F2A33;
+  --field: #FFFFFF;
+  --font-display: "Unbounded", "Onest", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --font-body: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #EDF1F3;
+    --muted: #A9B6BD;
+    --paper: #141C22;
+    --line: #2C3943;
+    --teal-tint: #12403E;
+    --field: #1C262D;
+    --good: #5ED3C8;
+  }
+}
+:root[data-theme="dark"] {
+  --ink: #EDF1F3;
+  --muted: #A9B6BD;
+  --paper: #141C22;
+  --line: #2C3943;
+  --teal-tint: #12403E;
+  --field: #1C262D;
+  --good: #5ED3C8;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font: 17px/1.5 var(--font-body);
+  -webkit-text-size-adjust: 100%;
+  overflow: hidden;
+}
+[hidden] { display: none !important; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* top overlay */
+.top {
+  position: fixed; left: 0; right: 0; top: 0; z-index: 20;
+  padding: calc(8px + env(safe-area-inset-top)) 14px 8px;
+  display: flex; align-items: center; gap: 10px;
+  pointer-events: none;
+}
+.top > * { pointer-events: auto; }
+.progress { position: fixed; left: 0; right: 0; top: 0; height: 4px; background: rgba(31, 42, 51, 0.12); z-index: 21; }
+.progress span { display: block; height: 100%; width: 0; background: var(--teal); transition: width 0.4s ease; }
+.pill {
+  border: 0; border-radius: 999px; padding: 9px 14px;
+  font: 600 14px/1 var(--font-body); cursor: pointer;
+  background: rgba(255, 255, 255, 0.92); color: #1F2A33;
+  box-shadow: 0 1px 0 rgba(31, 42, 51, 0.15);
+}
+.stage-name { margin: 0 auto; padding: 7px 12px; border-radius: 999px; background: rgba(255, 255, 255, 0.85); text-align: center; font: 600 13px/1.2 var(--font-body); color: #1F2A33; pointer-events: none; max-width: 52vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* feed */
+.feed {
+  height: 100dvh; overflow-y: auto; overscroll-behavior: contain;
+  scroll-snap-type: y mandatory; scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+@media (prefers-reduced-motion: reduce) { .feed { scroll-behavior: auto; } .progress span { transition: none; } }
+.card {
+  min-height: 100dvh; height: 100dvh;
+  scroll-snap-align: start; scroll-snap-stop: always;
+  display: flex; align-items: center;
+  padding: calc(62px + env(safe-area-inset-top)) 22px calc(28px + env(safe-area-inset-bottom));
+  overflow: hidden;
+}
+.inner { width: 100%; max-width: 560px; margin: 0 auto; }
+
+/* card kinds */
+.k-intro, .k-theory { background: var(--yellow); color: var(--on-yellow); }
+.k-test { background: var(--paper); color: var(--ink); }
+.k-stage, .k-finish { background: var(--teal); color: #FFFFFF; }
+
+/* type */
+.hook {
+  font-family: var(--font-display); font-weight: 700; letter-spacing: -0.04em;
+  line-height: 0.92; margin: 0 0 18px; overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+.hook-xl { font-size: clamp(140px, 48vw, 260px); }
+.hook-lg { font-size: clamp(96px, 30vw, 170px); }
+.hook-md { font-size: clamp(44px, 12.5vw, 80px); line-height: 1; letter-spacing: -0.03em; }
+.hook-sm { font-size: clamp(34px, 9.5vw, 58px); line-height: 1.05; letter-spacing: -0.02em; }
+.title { font: 700 clamp(24px, 6.4vw, 32px)/1.15 var(--font-display); letter-spacing: -0.02em; margin: 0 0 12px; }
+.lead { font-size: 18px; margin: 0 0 12px; max-width: 46ch; }
+.lines p { margin: 0 0 6px; font-size: 18px; }
+.why { margin: 14px 0 0; font-size: 16px; max-width: 46ch; opacity: 0.85; }
+.note { margin: 14px 0 0; font-size: 14px; opacity: 0.8; max-width: 46ch; }
+.swipe { margin: 22px 0 0; font-weight: 600; font-size: 15px; }
+.how { margin: 14px 0 0; padding-left: 20px; }
+.how li { margin: 6px 0; }
+.chip {
+  display: inline-block; font: 600 13px/1 var(--font-body);
+  padding: 7px 11px; border-radius: 999px; margin-bottom: 16px;
+  background: rgba(31, 42, 51, 0.1);
+}
+.k-test .chip { background: var(--teal-tint); color: var(--ink); }
+.k-test .chip-soft { background: var(--yellow); color: var(--on-yellow); }
+
+.steps { list-style: none; padding: 12px 14px; margin: 10px 0 0; border-left: 4px solid var(--on-yellow); background: rgba(255, 255, 255, 0.45); border-radius: 0 10px 10px 0; }
+.steps li { font-size: 18px; font-variant-numeric: tabular-nums; margin: 3px 0; }
+
+/* tests */
+.question { font: 700 clamp(21px, 5.6vw, 28px)/1.25 var(--font-display); letter-spacing: -0.01em; margin: 0 0 18px; }
+.options { display: grid; gap: 10px; }
+.opt {
+  width: 100%; text-align: left; cursor: pointer;
+  padding: 14px 16px; min-height: 54px; border-radius: 14px;
+  border: 2px solid var(--line); background: var(--field); color: var(--ink);
+  font: 600 18px/1.2 var(--font-body); font-variant-numeric: tabular-nums;
+  transition: background-color 0.18s, border-color 0.18s;
+}
+.opt:disabled { cursor: default; }
+.opt.is-right { background: var(--teal); border-color: var(--teal); color: #FFFFFF; }
+.opt.is-miss { border-style: dashed; border-color: var(--muted); color: var(--muted); }
+.numrow { display: flex; align-items: center; gap: 10px; }
+.numin {
+  flex: 1; min-width: 0; padding: 14px 16px; border-radius: 14px;
+  border: 2px solid var(--line); background: var(--field); color: var(--ink);
+  font: 600 22px/1.2 var(--font-body); font-variant-numeric: tabular-nums;
+}
+.numin:focus { outline: none; border-color: var(--teal); }
+.numin.is-right { border-color: var(--teal); background: var(--teal-tint); }
+.numin.is-miss { border-style: dashed; border-color: var(--muted); }
+.unit { font-weight: 700; font-size: 18px; }
+.check { margin-top: 10px; }
+.check, .btn {
+  border: 0; border-radius: 14px; padding: 14px 18px; min-height: 52px;
+  font: 700 16px/1 var(--font-body); cursor: pointer;
+  background: var(--ink); color: var(--paper);
+}
+.check:disabled { opacity: 0.45; cursor: default; }
+.k-stage .btn, .k-finish .btn { background: #FFFFFF; color: #1F2A33; }
+.btn.ghost { background: transparent; color: inherit; border: 2px solid currentColor; }
+.btn.next { margin-top: 12px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+.feedback { margin-top: 12px; }
+.fb-text { margin: 6px 0 0; font-size: 16px; max-width: 48ch; }
+.fb-text.good { font-weight: 700; color: var(--good); }
+.fb-text.soft { font-weight: 700; }
+.fb-text.explain { color: var(--muted); }
+.fb-hint { margin: 6px 0 0; font-weight: 600; }
+
+button:focus-visible, input:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+.k-intro button:focus-visible, .k-theory button:focus-visible { outline-color: var(--on-yellow); }
+
+/* sheets */
+.sheet {
+  position: fixed; inset: 0; z-index: 40; background: var(--paper); color: var(--ink);
+  overflow-y: auto; padding: calc(18px + env(safe-area-inset-top)) 22px calc(28px + env(safe-area-inset-bottom));
+}
+.sheet .inner { max-width: 560px; }
+.sheet-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.sheet-head h2 { font: 700 22px/1.2 var(--font-display); margin: 0; }
+.sheet h3 { font: 700 17px/1.3 var(--font-display); margin: 26px 0 8px; }
+.close { border: 2px solid var(--line); background: var(--field); color: var(--ink); border-radius: 12px; padding: 10px 14px; font: 600 15px/1 var(--font-body); cursor: pointer; }
+.sheet .hook { color: var(--teal); }
+.map { list-style: none; padding: 0; margin: 18px 0 0; }
+.node { display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 12px; padding: 10px 0; position: relative; }
+.node + .node::before { content: ""; position: absolute; left: 21px; top: -10px; height: 20px; border-left: 2px solid var(--line); }
+.dot { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font: 700 17px/1 var(--font-display); border: 2px solid var(--line); background: var(--field); }
+.node.done .dot { background: var(--teal); border-color: var(--teal); color: #FFFFFF; }
+.node.now .dot { background: var(--yellow); border-color: var(--yellow); color: var(--on-yellow); }
+.node.locked { opacity: 0.55; }
+.nm { font-weight: 600; }
+.ct { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+.weak { list-style: none; padding: 0; margin: 0; }
+.weak li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.sheet .btn.ghost { margin-top: 22px; color: var(--ink); }
+
+@media (min-width: 900px) {
+  .card { padding-left: 40px; padding-right: 40px; }
+}
+@media (max-height: 640px) {
+  .hook-lg { font-size: clamp(76px, 24vw, 130px); margin-bottom: 10px; }
+  .hook-md { font-size: clamp(36px, 10.5vw, 64px); }
+  .question { margin-bottom: 12px; }
+  .opt { min-height: 46px; padding: 10px 14px; }
+  .why { margin-top: 10px; }
+}
+
+/* ---------- test-app screens ---------- */
+body { overflow: hidden; }
+.screen { position: fixed; inset: 0; overflow-y: auto; background: var(--paper); color: var(--ink); }
+.screen .wrap { max-width: 560px; margin: 0 auto; padding: calc(28px + env(safe-area-inset-top)) 22px calc(120px + env(safe-area-inset-bottom)); }
+.screen.s-yellow { background: var(--yellow); color: var(--on-yellow); }
+.s-module { background: var(--paper); }
+body:not(.in-module) .top, body:not(.in-module) .progress { display: none; }
+.screen h1 { font: 700 clamp(30px, 8.4vw, 44px)/1.08 var(--font-display); letter-spacing: -0.02em; margin: 10px 0 14px; outline: none; }
+.screen h2 { font: 700 clamp(24px, 6.4vw, 32px)/1.15 var(--font-display); letter-spacing: -0.02em; margin: 6px 0 12px; outline: none; }
+.screen .lead { font-size: 18px; }
+.steps-list { margin: 18px 0 0; padding-left: 22px; }
+.steps-list li { margin: 8px 0; font-size: 17px; }
+.choices { display: grid; gap: 8px; margin-top: 14px; }
+.choice {
+  width: 100%; text-align: left; cursor: pointer;
+  padding: 13px 16px; min-height: 50px; border-radius: 14px;
+  border: 2px solid var(--line); background: var(--field); color: var(--ink);
+  font: 600 16px/1.3 var(--font-body);
+}
+.choice.on { border-color: var(--teal); background: var(--teal-tint); }
+.search, .field {
+  width: 100%; padding: 13px 16px; border-radius: 14px; border: 2px solid var(--line);
+  background: var(--field); color: var(--ink); font: 500 16px/1.4 var(--font-body);
+}
+.search:focus, .field:focus { outline: none; border-color: var(--teal); }
+textarea.field { min-height: 92px; resize: vertical; }
+.msg { margin: 12px 0 0; color: var(--muted); font-size: 15px; }
+.linkbtn { background: none; border: 0; padding: 10px 0; color: var(--ink); font: 600 15px/1.2 var(--font-body); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.q { margin-top: 24px; }
+.q-label { font-weight: 700; font-size: 17px; margin-bottom: 8px; display: block; }
+.req { color: var(--teal); }
+.err { color: var(--ink); font-weight: 600; font-size: 14px; margin-top: 6px; }
+.rate { display: flex; gap: 8px; }
+.rate button {
+  width: 54px; height: 54px; border-radius: 14px; border: 2px solid var(--line); background: var(--field); color: var(--ink);
+  font: 700 20px/1 var(--font-display); cursor: pointer;
+}
+.rate button.on { background: var(--teal); border-color: var(--teal); color: #FFFFFF; }
+.rate-ends { display: flex; justify-content: space-between; max-width: 302px; color: var(--muted); font-size: 13px; margin-top: 6px; }
+.seg { display: flex; flex-wrap: wrap; gap: 8px; }
+.seg button { border-radius: 999px; border: 2px solid var(--line); background: var(--field); color: var(--ink); padding: 11px 18px; font: 600 16px/1 var(--font-body); cursor: pointer; }
+.seg button.on { background: var(--teal); border-color: var(--teal); color: #FFFFFF; }
+.summary { margin: 4px 0 0; padding: 12px 14px; border-left: 4px solid var(--yellow); background: var(--field); border-radius: 0 12px 12px 0; }
+.bar-bottom {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  padding: 12px 22px calc(12px + env(safe-area-inset-bottom));
+  background: var(--paper); border-top: 1px solid var(--line);
+}
+.s-yellow .bar-bottom { background: var(--yellow); border-top-color: rgba(31, 42, 51, 0.15); }
+.bar-bottom .inner { max-width: 560px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
+.bar-bottom .btn.primary { flex: 1; }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.fb-error { margin: 0 0 8px; font-weight: 600; font-size: 14px; max-width: 560px; margin-left: auto; margin-right: auto; }
+.fb-error:empty { display: none; }
+#s-module { overflow: hidden; }
+
+</style>
+</head>
+<body>
+
+<section class="screen s-yellow" id="s-start">
+  <div class="wrap">
+    <div class="hook hook-lg" aria-hidden="true">%</div>
+    <h1>Ilova sinovi</h1>
+    <p class="lead">Ustozlar, bu o‘quvchilar uchun yangi ilovaning sinov versiyasi. Mavzular qisqa kartalarda, telefonda reels kabi suriladi: avval nazariya, keyin savol.</p>
+    <p class="lead">Sizdan so‘raymiz:</p>
+    <ol class="steps-list">
+      <li>Ismingizni tanlang.</li>
+      <li>Faningizni tanlang.</li>
+      <li>Modulni o‘quvchi sifatida 10 daqiqa o‘tib ko‘ring.</li>
+      <li>Oxirida fikringizni yozing: nima yoqdi, nima noqulay.</li>
+    </ol>
+    <p class="note">Birinchi tayyor modul: matematika, «Foizlar».</p>
+  </div>
+  <div class="bar-bottom"><div class="inner"><button type="button" class="btn primary" id="startBtn">Boshlash</button></div></div>
+</section>
+
+<section class="screen" id="s-teacher" hidden>
+  <div class="wrap">
+    <h2>Ismingizni tanlang</h2>
+    <input class="search" id="teacherSearch" type="search" placeholder="Ism yoki familiya bo‘yicha qidiring" autocomplete="off" aria-label="Qidirish">
+    <p class="msg" id="teacherMsg" aria-live="polite"></p>
+    <button type="button" class="btn ghost" id="teacherRetry" hidden>Qayta urinish</button>
+    <div class="choices" id="teacherList"></div>
+    <button type="button" class="linkbtn" id="manualToggle">Ismim ro‘yxatda yo‘q</button>
+    <div id="manualWrap" hidden>
+      <label class="q-label" for="manualName">Familiya va ismingiz</label>
+      <input class="field" id="manualName" autocomplete="name">
+    </div>
+  </div>
+  <div class="bar-bottom"><div class="inner">
+    <button type="button" class="btn ghost" id="teacherBack">Orqaga</button>
+    <button type="button" class="btn primary" id="teacherNext" disabled>Davom etish</button>
+  </div></div>
+</section>
+
+<section class="screen" id="s-subject" hidden>
+  <div class="wrap">
+    <h2>Qaysi fandan dars berasiz?</h2>
+    <div class="choices" id="subjectList"></div>
+    <p class="msg" id="subjectNote" aria-live="polite"></p>
+  </div>
+  <div class="bar-bottom"><div class="inner">
+    <button type="button" class="btn ghost" id="subjectBack">Orqaga</button>
+    <button type="button" class="btn primary" id="subjectNext" disabled>Modulni boshlash</button>
+  </div></div>
+</section>
+
+<section class="screen s-module" id="s-module" hidden>
+  <div class="progress" role="progressbar" aria-label="Modul bo‘yicha progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="bar"></span></div>
+  <header class="top">
+    <button type="button" class="pill" id="profileBtn">Profil</button>
+    <span class="stage-name" id="stageName">Foizlar</span>
+    <button type="button" class="pill" id="enoughBtn">Yetarli</button>
+  </header>
+  <main class="feed" id="feed" aria-live="off"></main>
+</section>
+
+<section class="screen" id="s-feedback" hidden>
+  <div class="wrap">
+    <h2>Ilova haqida fikringiz</h2>
+    <p class="summary" id="fbSummary"></p>
+
+    <div class="q" role="radiogroup" aria-labelledby="baho-l">
+      <span class="q-label" id="baho-l">Ilovani 1 dan 5 gacha baholang <span class="req">*</span></span>
+      <div class="rate">
+        <button type="button" role="radio" data-baho="1">1</button>
+        <button type="button" role="radio" data-baho="2">2</button>
+        <button type="button" role="radio" data-baho="3">3</button>
+        <button type="button" role="radio" data-baho="4">4</button>
+        <button type="button" role="radio" data-baho="5">5</button>
+      </div>
+      <div class="rate-ends"><span>Yoqmadi</span><span>Juda yoqdi</span></div>
+      <p class="err" id="baho-err" hidden>Bahoni tanlang</p>
+    </div>
+
+    <div class="q" role="radiogroup" aria-labelledby="mos-l">
+      <span class="q-label" id="mos-l">O‘quvchilaringizga mos keladimi? <span class="req">*</span></span>
+      <div class="seg">
+        <button type="button" role="radio" data-mos="ha">Ha</button>
+        <button type="button" role="radio" data-mos="qisman">Qisman</button>
+        <button type="button" role="radio" data-mos="yoq">Yo‘q</button>
+      </div>
+      <p class="err" id="mos-err" hidden>Javobni tanlang</p>
+    </div>
+
+    <div class="q" role="radiogroup" aria-labelledby="navbat-l">
+      <span class="q-label" id="navbat-l">Tasavvur qiling: bu platformani olish uchun navbat bor. Farzandingiz uchun navbatga turarmidingiz? <span class="req">*</span></span>
+      <div class="seg">
+        <button type="button" role="radio" data-navbat="birinchi">Ha, birinchilardan bo‘lib</button>
+        <button type="button" role="radio" data-navbat="ha">Ha, navbatim kelganda</button>
+        <button type="button" role="radio" data-navbat="bilmayman">Bilmayman</button>
+        <button type="button" role="radio" data-navbat="yoq">Yo‘q</button>
+      </div>
+      <p class="err" id="navbat-err" hidden>Javobni tanlang</p>
+    </div>
+
+    <div class="q">
+      <label class="q-label" for="fb-otaona">Agar siz ota-ona bo‘lsangiz, bu platformaga nima qo‘shishni xohlardingiz?</label>
+      <textarea class="field" id="fb-otaona" maxlength="3000"></textarea>
+    </div>
+
+    <div class="q">
+      <label class="q-label" for="fb-yoqdi">Nima yoqdi?</label>
+      <textarea class="field" id="fb-yoqdi" maxlength="3000"></textarea>
+    </div>
+    <div class="q">
+      <label class="q-label" for="fb-noqulay">Nima noqulay yoki tushunarsiz bo‘ldi?</label>
+      <textarea class="field" id="fb-noqulay" maxlength="3000"></textarea>
+    </div>
+    <div class="q">
+      <label class="q-label" for="fb-qoshish">Ilovaga nima qo‘shish kerak?</label>
+      <textarea class="field" id="fb-qoshish" maxlength="3000"></textarea>
+    </div>
+  </div>
+  <div class="bar-bottom">
+    <p class="fb-error" id="fbError" aria-live="polite"></p>
+    <div class="inner">
+      <button type="button" class="btn ghost" id="fbBack">Modulga qaytish</button>
+      <button type="button" class="btn primary" id="fbSend">Fikrni yuborish</button>
+    </div>
+  </div>
+</section>
+
+<section class="screen s-yellow" id="s-done" hidden>
+  <div class="wrap">
+    <div class="hook hook-lg" aria-hidden="true">✓</div>
+    <h2 id="doneName">Rahmat!</h2>
+    <p class="lead">Fikringiz yuborildi. U ilovani o‘quvchilar uchun yaxshilashga yordam beradi.</p>
+  </div>
+  <div class="bar-bottom"><div class="inner"><button type="button" class="btn ghost" id="againBtn">Qaytadan sinab ko‘rish</button></div></div>
+</section>
+
+<div class="sheet" id="enough" hidden role="dialog" aria-modal="true" aria-labelledby="enoughTitle">
+  <div class="inner">
+    <div class="sheet-head"><h2 id="enoughTitle">Bugungi natija</h2><button type="button" class="close" data-close="enough">Davom etish</button></div>
+    <div id="enoughBody"></div>
+  </div>
+</div>
+<div class="sheet" id="profile" hidden role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+  <div class="inner">
+    <div class="sheet-head"><h2 id="profileTitle">Profil</h2><button type="button" class="close" data-close="profile">Yopish</button></div>
+    <div id="profileBody"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const NB = "\u00A0";
+const n = (s) => String(s).replace(/ /g, NB);
+
+const TOPICS = {
+  ulush: "Sonning foizini topish",
+  butun: "Butunni topish",
+  nisbat: "Necha foiz tashkil qiladi",
+  ozgarish: "Oshirish va kamaytirish",
+  ketma: "Ketma-ket o‘zgarish",
+  baza: "Nimaga nisbatan foiz",
+  murakkab: "Murakkab foiz",
+  aralashma: "Aralashmalar",
+  punkt: "Foiz punkti",
+  teskari: "Teskari masala",
+};
+
+const STAGES = {
+  1: "Asoslar",
+  2: "O‘zgarishlar",
+  3: "Murakkab masalalar",
+};
+
+const CARDS = [
+  { id: "intro", type: "intro" },
+
+  /* ---------- 1-bosqich: Asoslar ---------- */
+  {
+    id: "t1", type: "theory", stage: 1, hook: "1%",
+    title: "Butunning yuzdan bir qismi",
+    lines: [n("100 so‘mning 1% i — 1 so‘m."), n("5 000 so‘mning 1% i — 50 so‘m.")],
+    why: "Har qanday foiz masalasi shu bitta amaldan boshlanadi: 100 ga bo‘lish.",
+  },
+  {
+    id: "t2", type: "theory", stage: 1, hook: "a × p ÷ 100", hookSize: "md",
+    title: "Sonning foizini topish",
+    steps: ["240 ning 15% i", "= 240 × 15 ÷ 100", "= 36"],
+    why: "Tez usul: avval 10% ni toping. 240 ning 10% i 24, 5% i 12, demak 15% i 36.",
+  },
+  {
+    id: "q1", type: "mcq", stage: 1, topic: "ulush",
+    q: "80 ning 25% i nechaga teng?",
+    options: ["20", "25", "32", "40"], answer: 0,
+    explain: "25% — bu chorak qism. 80 ÷ 4 = 20.",
+    twin: { q: "40 ning 50% i nechaga teng?", options: ["80", "20", "50", "10"], answer: 1, explain: "50% — bu yarmi. 40 ÷ 2 = 20." },
+  },
+  {
+    id: "q2", type: "mcq", stage: 1, topic: "ulush",
+    q: "600 ning 5% i nechaga teng?",
+    options: ["3", "60", "30", "300"], answer: 2,
+    explain: "600 ning 10% i 60. 5% esa uning yarmi: 30.",
+    twin: { q: "600 ning 10% i nechaga teng?", options: ["6", "60", "600", "16"], answer: 1, explain: "10% topish uchun 10 ga bo‘lamiz: 600 ÷ 10 = 60." },
+  },
+  {
+    id: "t3", type: "theory", stage: 1, hook: "? = 100%", hookSize: "md",
+    title: "Qismi ma’lum bo‘lsa, butunni topamiz",
+    steps: ["Sonning 20% i 14 ga teng", "son = 14 × 100 ÷ 20", "son = 70"],
+    why: "Chegirma, maosh, test bali: ko‘p masalada aynan butunni qidirasiz.",
+  },
+  {
+    id: "q3", type: "mcq", stage: 1, topic: "butun",
+    q: "Sonning 30% i 45 ga teng. Sonni toping.",
+    options: ["135", "150", "13,5", "75"], answer: 1,
+    explain: "45 × 100 ÷ 30 = 150. Tekshiramiz: 150 ning 10% i 15, 30% i 45.",
+    twin: { q: "Sonning 10% i 15 ga teng. Son nechaga teng?", options: ["150", "1,5", "25", "105"], answer: 0, explain: "10% bu butunning o‘ndan biri. 15 × 10 = 150." },
+  },
+  {
+    id: "t4", type: "theory", stage: 1, hook: "b ÷ a × 100", hookSize: "md",
+    title: "Qism butunning necha foizi?",
+    steps: ["30 o‘quvchidan 12 tasi qiz", "12 ÷ 30 × 100", "= 40%"],
+    why: "Test natijangiz, sinfdagi ulush, statistikalar shunday hisoblanadi.",
+  },
+  {
+    id: "q4", type: "num", stage: 1, topic: "nisbat", unit: "%",
+    q: "Testdagi 25 ta savoldan 21 tasiga to‘g‘ri javob berdingiz. Natijangiz necha foiz?",
+    answer: 84,
+    explain: "21 ÷ 25 = 0,84, ya’ni 84%. Tez usul: 25 × 4 = 100, demak 21 × 4 = 84.",
+    twin: { q: "25 ta savoldan 20 tasi to‘g‘ri. Natija necha foiz?", answer: 80, explain: "20 ÷ 25 = 0,8, ya’ni 80%." },
+  },
+  { id: "s1", type: "stage", stage: 1 },
+
+  /* ---------- 2-bosqich: O‘zgarishlar ---------- */
+  {
+    id: "t5", type: "theory", stage: 2, hook: "+20% −20% ≠ 0", hookSize: "md",
+    title: "Narx 20% oshib, keyin 20% tushsa, joyiga qaytmaydi",
+    steps: ["100 → 120 (+20%)", "120 → 96 (−20%)", "natija: 4% arzonroq"],
+    why: "Ikkinchi foiz yangi narxdan hisoblanadi, eskisidan emas.",
+  },
+  {
+    id: "t6", type: "theory", stage: 2, hook: "× 0,85", hookSize: "md",
+    title: "Oshirish va kamaytirishni bitta ko‘paytirish bilan",
+    lines: ["p% ga oshirish: × (1 + p ÷ 100)", "p% ga kamaytirish: × (1 − p ÷ 100)"],
+    steps: [n("500 000 so‘m, 15% chegirma"), n("500 000 × 0,85 = 425 000")],
+    why: "Ketma-ket o‘zgarishlarda shunchaki koeffitsiyentlarni ko‘paytirasiz.",
+  },
+  {
+    id: "q5", type: "mcq", stage: 2, topic: "ozgarish",
+    q: n("Kurtka 400 000 so‘m edi. 25% chegirma berildi. Yangi narx qancha?"),
+    options: [n("375 000"), n("100 000"), n("300 000"), n("320 000")], answer: 2,
+    explain: n("400 000 × 0,75 = 300 000 so‘m."),
+    twin: { q: n("400 000 so‘mning 25% i qancha?"), options: [n("25 000"), n("100 000"), n("40 000"), n("160 000")], answer: 1, explain: n("25% — chorak qism: 400 000 ÷ 4 = 100 000.") },
+  },
+  {
+    id: "q6", type: "mcq", stage: 2, topic: "ketma",
+    q: n("Maosh 2 000 000 so‘m. Avval 10% oshdi, keyin yana 10% oshdi. Yangi maosh qancha?"),
+    options: [n("2 400 000"), n("2 420 000"), n("2 200 000"), n("2 440 000")], answer: 1,
+    explain: n("2 000 000 × 1,1 = 2 200 000. Keyin 2 200 000 × 1,1 = 2 420 000. Ikkinchi oshish kattaroq sondan hisoblanadi."),
+    twin: { q: n("Maosh 2 000 000 so‘m edi va 10% oshdi. Yangi maosh qancha?"), options: [n("2 010 000"), n("2 100 000"), n("2 200 000"), n("2 020 000")], answer: 2, explain: n("2 000 000 ning 10% i 200 000. Jami 2 200 000.") },
+  },
+  {
+    id: "t7", type: "theory", stage: 2, hook: "25% ≠ 25%", hookSize: "md",
+    title: "A soni B dan 25% ko‘p bo‘lsa, B soni A dan 20% kam",
+    steps: ["B = 80, A = 100, farq 20", "20 ÷ 80 = 25% (A ko‘p)", "20 ÷ 100 = 20% (B kam)"],
+    why: "Foiz doim nimaga nisbatan hisoblanganiga qarang. Testlarda aynan shu yerda chalg‘itishadi.",
+  },
+  {
+    id: "q7", type: "mcq", stage: 2, topic: "baza",
+    q: "Ali 120 ball, Vali 100 ball oldi. Vali Alidan necha foiz kam ball olgan?",
+    options: ["20%", "≈16,7%", "12%", "25%"], answer: 1,
+    explain: "Farq 20 ball. Solishtirish Alining baliga: 20 ÷ 120 = 1/6 ≈ 16,7%.",
+    twin: { q: "Ali 120 ball, Vali 100 ball oldi. Ali Validan necha foiz ko‘p ball olgan?", options: ["20%", "12%", "≈16,7%", "120%"], answer: 0, explain: "Farq 20 ball. Solishtirish Valining baliga: 20 ÷ 100 = 20%." },
+  },
+  {
+    id: "q8", type: "num", stage: 2, topic: "ozgarish", unit: "%",
+    q: n("Narx 50 000 so‘mdan 60 000 so‘mga oshdi. Narx necha foizga oshgan?"),
+    answer: 20,
+    explain: n("(60 000 − 50 000) ÷ 50 000 × 100 = 20%."),
+    twin: { q: "Narx 100 so‘mdan 110 so‘mga oshdi. Necha foizga oshgan?", answer: 10, explain: "Farq 10 so‘m. 10 ÷ 100 × 100 = 10%." },
+  },
+  { id: "s2", type: "stage", stage: 2 },
+
+  /* ---------- 3-bosqich: Murakkab masalalar ---------- */
+  {
+    id: "t8", type: "theory", stage: 3, hook: "72", 
+    title: "Pul qachon ikki barobar bo‘ladi?",
+    lines: ["Omonat yiliga r% o‘ssa, u taxminan 72 ÷ r yilda ikki barobar bo‘ladi."],
+    steps: ["yiliga 12%", "72 ÷ 12 = 6", "≈ 6 yilda ikki barobar"],
+    why: "Bu «72 qoidasi»: murakkab foizni kalkulyatorsiz taxmin qilish usuli.",
+  },
+  {
+    id: "t9", type: "theory", stage: 3, hook: "a × (1 + p÷100)ⁿ", hookSize: "sm",
+    title: "Murakkab foiz: har yil foiz yangi summadan",
+    steps: [n("1 000 000 so‘m, yiliga 20%, 2 yil"), n("1 000 000 × 1,2 × 1,2"), n("= 1 440 000 so‘m")],
+    why: "Oddiy foizda ikki yilda 400 000 qo‘shilardi. Murakkab foizda 440 000 qo‘shiladi.",
+  },
+  {
+    id: "q9", type: "mcq", stage: 3, topic: "murakkab",
+    q: n("Omonat 5 000 000 so‘m, yiliga 10% murakkab foiz. 2 yildan keyin qancha bo‘ladi?"),
+    options: [n("6 000 000"), n("5 500 000"), n("6 100 000"), n("6 050 000")], answer: 3,
+    explain: n("5 000 000 × 1,1 = 5 500 000. 5 500 000 × 1,1 = 6 050 000."),
+    twin: { q: n("5 000 000 so‘m bir yilda 10% o‘sdi. Qancha bo‘ldi?"), options: [n("5 500 000"), n("5 050 000"), n("6 000 000"), n("5 100 000")], answer: 0, explain: n("5 000 000 ning 10% i 500 000. Jami 5 500 000.") },
+  },
+  {
+    id: "t10", type: "theory", stage: 3, hook: "20 g", 
+    title: "Suv qo‘shsangiz, tuz miqdori o‘zgarmaydi",
+    steps: ["200 g eritmada 10% tuz = 20 g", "50 g suv qo‘shildi: jami 250 g", "20 ÷ 250 = 8%"],
+    why: "Aralashma masalasida avval o‘zgarmaydigan miqdorni toping.",
+  },
+  {
+    id: "q10", type: "mcq", stage: 3, topic: "aralashma",
+    q: "300 g eritmada 20% shakar bor. Unga 100 g suv qo‘shildi. Endi shakar necha foiz?",
+    options: ["20%", "10%", "15%", "16%"], answer: 2,
+    explain: "Shakar: 300 × 0,2 = 60 g. Yangi massa 400 g. 60 ÷ 400 = 15%.",
+    twin: { q: "300 g eritmada 20% shakar bor. Shakar necha gramm?", options: ["20 g", "60 g", "30 g", "600 g"], answer: 1, explain: "300 × 20 ÷ 100 = 60 g." },
+  },
+  {
+    id: "t11", type: "theory", stage: 3, hook: "2 punkt ≠ 2%", hookSize: "md",
+    title: "Foiz punkti va foiz — boshqa-boshqa narsa",
+    steps: ["stavka 20% → 22%", "farq: 2 foiz punkt", "o‘sish: 2 ÷ 20 = 10%"],
+    why: "Bank, saylov, statistika savollarida aynan shu so‘z bilan chalg‘itishadi.",
+  },
+  {
+    id: "q11", type: "mcq", stage: 3, topic: "punkt",
+    q: "Bank stavkasi 16% dan 20% ga ko‘tarildi. Stavka necha foizga oshgan?",
+    options: ["4%", "20%", "25%", "36%"], answer: 2,
+    explain: "(20 − 16) ÷ 16 = 0,25, ya’ni 25%. 4 esa foiz punkt.",
+    twin: { q: "Stavka 10% dan 15% ga ko‘tarildi. Necha foiz punktga oshdi?", options: ["5", "50", "15", "1,5"], answer: 0, explain: "15 − 10 = 5 foiz punkt." },
+  },
+  {
+    id: "q12", type: "num", stage: 3, topic: "teskari", unit: "so‘m",
+    q: n("Tovar narxi ikki marta ketma-ket 20% ga tushirildi va 32 000 so‘m bo‘ldi. Boshlang‘ich narx qancha edi?"),
+    answer: 50000,
+    explain: n("x × 0,8 × 0,8 = 32 000, demak x = 32 000 ÷ 0,64 = 50 000 so‘m."),
+    twin: { q: n("Narx 20% tushirilib, 40 000 so‘m bo‘ldi. Boshlang‘ich narx qancha edi?"), answer: 50000, explain: n("x × 0,8 = 40 000, demak x = 50 000 so‘m.") },
+  },
+  { id: "s3", type: "stage", stage: 3 },
+  { id: "finish", type: "finish" },
+];
+
+</script>
+<script>
+window.Reels = (function () {
+  "use strict";
+
+  const KEY = "sinov_foizlar_v1";
+  let onFeedback = function () {};
+  let started = false;
+  const TESTS = CARDS.filter((c) => c.type === "mcq" || c.type === "num");
+  const PRAISE = [
+    "To‘g‘ri! Usulni to‘g‘ri tanladingiz.",
+    "Zo‘r, buni tez topdingiz.",
+    "Ana! Siz buni bilar ekansiz.",
+    "Aniq hisob. Keyingisi biroz qiyinroq.",
+  ];
+  const reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+  /* ---------- state ---------- */
+  let st = { reached: 0, res: {}, weak: {}, done: false };
+  let session = { cards: 0, answered: 0, firstTry: 0, seen: new Set() };
+  let praiseIx = 0;
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return;
+      const s = JSON.parse(raw);
+      if (s && typeof s === "object") {
+        st.reached = Number.isInteger(s.reached) ? Math.min(Math.max(s.reached, 0), CARDS.length - 1) : 0;
+        st.res = s.res && typeof s.res === "object" ? s.res : {};
+        st.weak = s.weak && typeof s.weak === "object" ? s.weak : {};
+        st.done = !!s.done;
+      }
+    } catch (e) { /* start fresh */ }
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) { /* progress stays in memory */ }
+  }
+
+  /* ---------- helpers ---------- */
+  const $ = (id) => document.getElementById(id);
+  const feed = $("feed");
+
+  function el(tag, cls, html) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html !== undefined) e.innerHTML = html;
+    return e;
+  }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+  function readiness() {
+    let score = 0;
+    TESTS.forEach((t) => {
+      const r = st.res[t.id];
+      if (!r) return;
+      if (r.first) score += 1;
+      else if (r.retry) score += 0.5;
+    });
+    return Math.round((score / TESTS.length) * 100);
+  }
+  function answeredCount() { return TESTS.filter((t) => st.res[t.id]).length; }
+  function stageOfIndex(i) {
+    for (let k = i; k >= 0; k--) if (CARDS[k].stage) return CARDS[k].stage;
+    return 1;
+  }
+  function numberOfTest(card) {
+    const same = TESTS.filter((t) => t.stage === card.stage);
+    return same.indexOf(card) + 1;
+  }
+  function normNum(s) {
+    const v = String(s || "").replace(/[\s\u00A0]/g, "").replace(/so[‘'`ʻ’]?m/gi, "").replace("%", "").replace(",", ".");
+    if (!/^-?\d+(\.\d+)?$/.test(v)) return NaN;
+    return parseFloat(v);
+  }
+  function updateProgress() {
+    const pct = Math.round((answeredCount() / TESTS.length) * 100);
+    $("bar").style.width = pct + "%";
+    $("bar").parentElement.setAttribute("aria-valuenow", String(pct));
+  }
+
+  /* ---------- card builders ---------- */
+  function wrapCard(kind, id) {
+    const c = el("section", "card " + kind);
+    c.dataset.id = id;
+    const inner = el("div", "inner");
+    c.appendChild(inner);
+    return { c, inner };
+  }
+
+  function buildIntro() {
+    const { c, inner } = wrapCard("k-intro", "intro");
+    inner.innerHTML =
+      '<div class="hook hook-xl" aria-hidden="true">%</div>' +
+      '<h1 class="title">Foizlar</h1>' +
+      '<p class="lead">Milliy sertifikatga tayyorlov: oddiydan murakkabgacha, 3 bosqichda.</p>' +
+      '<ul class="how">' +
+      "<li>Yuqoriga suring: avval qisqa nazariya, keyin savol.</li>" +
+      "<li>Xato qilsangiz, soddaroq misol chiqadi, keyin asl savolga qaytasiz.</li>" +
+      "<li>Istalgan payt «Yetarli» ni bosing. Joyingiz saqlanadi.</li>" +
+      "</ul>" +
+      '<p class="note">Mashqlar maktab matematika o‘qituvchisi tavsiya qilgan yondashuv asosida tuzilgan: kichik qadamlar va har bir to‘g‘ri javobga rag‘bat.</p>' +
+      '<p class="swipe">Boshlash uchun yuqoriga suring</p>';
+    return c;
+  }
+
+  function buildTheory(card) {
+    const { c, inner } = wrapCard("k-theory", card.id);
+    let h = '<div class="chip">' + card.stage + "-bosqich: " + esc(STAGES[card.stage]) + "</div>";
+    h += '<div class="hook ' + (card.hookSize ? "hook-" + card.hookSize : "hook-lg") + '">' + esc(card.hook) + "</div>";
+    h += '<h2 class="title">' + esc(card.title) + "</h2>";
+    if (card.lines) h += '<div class="lines">' + card.lines.map((l) => "<p>" + esc(l) + "</p>").join("") + "</div>";
+    if (card.steps) h += '<ol class="steps">' + card.steps.map((s) => "<li>" + esc(s) + "</li>").join("") + "</ol>";
+    if (card.why) h += '<p class="why">' + esc(card.why) + "</p>";
+    inner.innerHTML = h;
+    return c;
+  }
+
+  function buildTest(card, mode) {
+    // mode: "base" | "twin" | "retry"
+    const data = mode === "twin" ? card.twin : card;
+    const kind = card.type;
+    const { c, inner } = wrapCard("k-test", card.id + ":" + mode);
+    let label = card.stage + "-bosqich, " + numberOfTest(card) + "-savol";
+    if (mode === "twin") label = "Soddaroq misol";
+    if (mode === "retry") label = "Endi asl savol";
+    const qid = "q_" + card.id + "_" + mode;
+    let h = '<div class="chip ' + (mode === "base" ? "" : "chip-soft") + '">' + esc(label) + "</div>";
+    h += '<h2 class="question" id="' + qid + '">' + esc(data.q) + "</h2>";
+    if (kind === "mcq") {
+      h += '<div class="options" role="group" aria-labelledby="' + qid + '">' +
+        data.options.map((o, i) => '<button type="button" class="opt" data-i="' + i + '">' + esc(o) + "</button>").join("") +
+        "</div>";
+    } else {
+      h += '<form class="numform" novalidate><label class="sr" for="' + qid + '_in">Javob</label>' +
+        '<div class="numrow"><input id="' + qid + '_in" class="numin" inputmode="decimal" autocomplete="off" placeholder="Javobni yozing">' +
+        (card.unit ? '<span class="unit">' + esc(card.unit) + "</span>" : "") + "</div>" +
+        '<button type="submit" class="check">Tekshirish</button></form>';
+    }
+    h += '<div class="feedback" aria-live="polite"></div>';
+    inner.innerHTML = h;
+
+    const fb = inner.querySelector(".feedback");
+    function finish(correct, chosenText) {
+      onAnswer(card, mode, correct, fb, data, chosenText);
+    }
+
+    if (kind === "mcq") {
+      inner.querySelectorAll(".opt").forEach((b) => {
+        b.addEventListener("click", () => {
+          if (c.dataset.locked) return;
+          c.dataset.locked = "1";
+          const i = Number(b.dataset.i);
+          const correct = i === data.answer;
+          const reveal = correct || mode !== "base";
+          inner.querySelectorAll(".opt").forEach((x) => {
+            x.disabled = true;
+            if (reveal && Number(x.dataset.i) === data.answer) x.classList.add("is-right");
+          });
+          if (!correct) b.classList.add("is-miss");
+          finish(correct, b.textContent);
+        });
+      });
+    } else {
+      const form = inner.querySelector("form");
+      const input = inner.querySelector("input");
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (c.dataset.locked) return;
+        const v = normNum(input.value);
+        if (isNaN(v)) {
+          fb.innerHTML = '<p class="fb-hint">Faqat sonni yozing, masalan 84.</p>';
+          input.focus();
+          return;
+        }
+        fb.innerHTML = "";
+        c.dataset.locked = "1";
+        input.disabled = true;
+        form.querySelector(".check").disabled = true;
+        const correct = Math.abs(v - data.answer) < 1e-6;
+        input.classList.add(correct ? "is-right" : "is-miss");
+        finish(correct, input.value);
+      });
+    }
+    return c;
+  }
+
+  function buildStage(card) {
+    const { c, inner } = wrapCard("k-stage", card.id);
+    const tests = TESTS.filter((t) => t.stage === card.stage);
+    const first = tests.filter((t) => st.res[t.id] && st.res[t.id].first).length;
+    const next = STAGES[card.stage + 1];
+    inner.innerHTML =
+      '<div class="hook hook-lg">' + card.stage + "/3</div>" +
+      '<h2 class="title">' + card.stage + "-bosqich tugadi</h2>" +
+      '<p class="lead">' + first + " ta savolni birinchi urinishda topdingiz, jami " + tests.length + " tadan.</p>" +
+      '<p class="why">' + (first === tests.length
+        ? "Hammasi birinchi urinishda. Ajoyib natija."
+        : "Xatolar ham foydali bo‘ldi: har biridan keyin soddaroq qadam bilan yechimga keldingiz.") + "</p>" +
+      (next ? '<p class="swipe">Keyingisi: ' + esc(next) + ". Yuqoriga suring</p>" : "");
+    return c;
+  }
+
+  function buildFinish() {
+    const { c, inner } = wrapCard("k-finish", "finish");
+    const weak = Object.keys(st.weak).filter((k) => st.weak[k] > 0);
+    inner.innerHTML =
+      '<div class="hook hook-lg">' + readiness() + "%</div>" +
+      '<h2 class="title">Foizlar moduli tugadi</h2>' +
+      '<p class="lead">Bu mavzu bo‘yicha tayyorgarligingiz.' + (weak.length ? " Takrorlash kerak: " + esc(weak.map((w) => TOPICS[w]).join(", ")) + "." : " Takrorlash kerak bo‘lgan mavzu yo‘q.") + "</p>" +
+      '<p class="why">Mustahkamlash uchun: o‘qituvchi tavsiya qilgan IDC matematika qo‘llanmasining (8–11-sinflar) foizlar bo‘limidagi mashqlarni yeching.</p>' +
+      '<p class="note">Ustoz, endi ilova haqida fikringizni qoldiring.</p>' +
+      '<div class="row"><button type="button" class="btn" data-act="feedback">Fikr qoldirish</button>' +
+      '<button type="button" class="btn ghost" data-act="profile">Profilni ochish</button></div>';
+    inner.querySelector('[data-act="feedback"]').addEventListener("click", () => onFeedback());
+    inner.querySelector('[data-act="profile"]').addEventListener("click", openProfile);
+    st.done = true;
+    save();
+    return c;
+  }
+
+  function buildCard(card, mode) {
+    if (card.type === "intro") return buildIntro();
+    if (card.type === "theory") return buildTheory(card);
+    if (card.type === "stage") return buildStage(card);
+    if (card.type === "finish") return buildFinish();
+    return buildTest(card, mode || "base");
+  }
+
+  /* ---------- flow ---------- */
+  let cursor = 0; // index of next base card to append
+
+  function appendUntilTest() {
+    while (cursor < CARDS.length) {
+      const card = CARDS[cursor];
+      const node = buildCard(card, "base");
+      node.dataset.base = String(cursor);
+      feed.appendChild(node);
+      observer.observe(node);
+      cursor++;
+      if ((card.type === "mcq" || card.type === "num") && !st.res[card.id]) break;
+    }
+  }
+
+  function addNext(nodeAfter, card, mode) {
+    const node = buildCard(card, mode);
+    node.dataset.base = String(CARDS.indexOf(card));
+    if (nodeAfter && nodeAfter.nextSibling) feed.insertBefore(node, nodeAfter.nextSibling);
+    else feed.appendChild(node);
+    observer.observe(node);
+    return node;
+  }
+
+  function hint(fb, text, cls) {
+    const p = el("p", "fb-text " + (cls || ""));
+    p.textContent = text;
+    fb.appendChild(p);
+  }
+
+  function nextButton(fb, target) {
+    const b = el("button", "btn next", "Keyingi karta");
+    b.type = "button";
+    b.addEventListener("click", () => {
+      const t = typeof target === "function" ? target() : target;
+      if (t) t.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+    });
+    fb.appendChild(b);
+  }
+
+  function onAnswer(card, mode, correct, fb, data, chosen) {
+    session.answered++;
+    const node = fb.closest(".card");
+    if (mode === "base") {
+      if (correct) {
+        session.firstTry++;
+        st.res[card.id] = { first: true };
+        hint(fb, PRAISE[praiseIx++ % PRAISE.length], "good");
+        hint(fb, data.explain, "explain");
+        save(); updateProgress();
+        appendUntilTest();
+        nextButton(fb, () => node.nextElementSibling);
+      } else {
+        st.weak[card.topic] = (st.weak[card.topic] || 0) + 1;
+        save();
+        hint(fb, "Hozircha emas. Keling, soddaroq misoldan boshlaymiz, keyin shu savolga qaytamiz.", "soft");
+        const twin = addNext(node, card, "twin");
+        nextButton(fb, twin);
+      }
+    } else if (mode === "twin") {
+      hint(fb, correct ? "Ko‘rdingizmi, qila olasiz. Endi asl savolni qayta yeching." : "Yechimni ko‘rib chiqing, keyin asl savolga qaytamiz.", correct ? "good" : "soft");
+      hint(fb, data.explain, "explain");
+      const retry = addNext(node, card, "retry");
+      nextButton(fb, retry);
+    } else {
+      if (correct) {
+        st.res[card.id] = { first: false, retry: true };
+        st.weak[card.topic] = Math.max(0, (st.weak[card.topic] || 1) - 1);
+        hint(fb, "Mana! Kichik qadamdan keyin asl savol ham yechildi.", "good");
+      } else {
+        st.res[card.id] = { first: false, retry: false };
+        st.weak[card.topic] = (st.weak[card.topic] || 0) + 1;
+        hint(fb, "Bu mavzuni profilda takrorlash uchun belgiladik.", "soft");
+      }
+      hint(fb, data.explain, "explain");
+      save(); updateProgress();
+      appendUntilTest();
+      nextButton(fb, () => node.nextElementSibling);
+    }
+  }
+
+  /* ---------- visibility & saving position ---------- */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (!en.isIntersecting) return;
+      const base = Number(en.target.dataset.base);
+      if (!session.seen.has(en.target)) { session.seen.add(en.target); session.cards++; }
+      if (!isNaN(base) && base > st.reached) { st.reached = base; save(); }
+      $("stageName").textContent = CARDS[base] && CARDS[base].type !== "intro"
+        ? stageOfIndex(base) + "-bosqich: " + STAGES[stageOfIndex(base)]
+        : "Foizlar";
+    });
+  }, { root: feed, threshold: 0.6 });
+
+  /* ---------- overlays ---------- */
+  function openSheet(id) {
+    const s = $(id);
+    s.hidden = false;
+    const focusable = s.querySelector("button");
+    if (focusable) focusable.focus();
+  }
+  function closeSheet(id) { $(id).hidden = true; }
+
+  function openEnough() {
+    const pct = readiness();
+    $("enoughBody").innerHTML =
+      '<div class="hook hook-lg">' + session.answered + "</div>" +
+      '<p class="lead">Bugun ' + session.answered + " ta savolga javob berdingiz, " + session.firstTry + " tasi birinchi urinishda to‘g‘ri. " + session.cards + " ta karta ko‘rdingiz.</p>" +
+      '<p class="why">' + (session.answered ? "Yaxshi ish. Keyingi safar aynan shu joydan davom etasiz." : "Joyingiz saqlandi. Qaytganingizda shu yerdan davom etasiz.") + "</p>" +
+      '<p class="note">Foizlar bo‘yicha tayyorgarlik: ' + pct + "%</p>" +
+      '<div class="row"><button type="button" class="btn" id="enoughFeedback">Fikr qoldirish</button></div>';
+    $("enoughFeedback").addEventListener("click", () => { closeSheet("enough"); onFeedback(); });
+    openSheet("enough");
+  }
+
+  function openProfile() {
+    const pct = readiness();
+    const stages = [1, 2, 3].map((s) => {
+      const tests = TESTS.filter((t) => t.stage === s);
+      const done = tests.filter((t) => st.res[t.id]).length;
+      const state = done === tests.length ? "done" : done > 0 || (s === 1) || TESTS.filter((t) => t.stage === s - 1).every((t) => st.res[t.id]) ? "now" : "locked";
+      return '<li class="node ' + state + '"><span class="dot">' + (state === "done" ? "✓" : s) + '</span><span class="nm">' + esc(STAGES[s]) + '</span><span class="ct">' + done + "/" + tests.length + "</span></li>";
+    }).join("");
+    const weak = Object.keys(st.weak).filter((k) => st.weak[k] > 0).sort((a, b) => st.weak[b] - st.weak[a]);
+    $("profileBody").innerHTML =
+      '<div class="ready"><div class="hook hook-lg">' + pct + '%</div><p class="lead">Foizlar bo‘yicha tayyorgarlik</p></div>' +
+      '<ol class="map">' + stages + "</ol>" +
+      "<h3>Takrorlash kerak</h3>" +
+      (weak.length
+        ? '<ul class="weak">' + weak.map((w) => "<li>" + esc(TOPICS[w]) + '<span class="ct">' + st.weak[w] + " xato</span></li>").join("") + "</ul>"
+        : '<p class="why">Hozircha yo‘q. Xato qilgan mavzular shu yerda chiqadi.</p>') +
+      '<button type="button" class="btn ghost" id="resetBtn">Boshidan boshlash</button>';
+    $("resetBtn").addEventListener("click", resetAll);
+    openSheet("profile");
+  }
+
+  function resetAll() {
+    if (!window.confirm("Modul natijalari o‘chiriladi. Boshidan boshlaysizmi?")) return;
+    clearProgress();
+    window.location.reload();
+  }
+  function clearProgress() {
+    try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ }
+  }
+
+  /* ---------- init ---------- */
+  function init() {
+    load();
+    // rebuild answered path without twins, then continue to first unanswered test
+    appendUntilTest();
+    updateProgress();
+
+    $("enoughBtn").addEventListener("click", openEnough);
+    $("profileBtn").addEventListener("click", openProfile);
+    document.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => closeSheet(b.dataset.close)));
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") { closeSheet("enough"); closeSheet("profile"); }
+    });
+
+    // restore answered state visuals for tests already done
+    feed.querySelectorAll(".k-test").forEach((node) => {
+      const id = node.dataset.id.split(":")[0];
+      const r = st.res[id];
+      if (!r) return;
+      const card = CARDS.find((c) => c.id === id);
+      node.dataset.locked = "1";
+      const fb = node.querySelector(".feedback");
+      if (card.type === "mcq") {
+        node.querySelectorAll(".opt").forEach((x) => { x.disabled = true; if (Number(x.dataset.i) === card.answer) x.classList.add("is-right"); });
+      } else {
+        const inp = node.querySelector("input");
+        inp.value = String(card.answer); inp.disabled = true; inp.classList.add("is-right");
+        node.querySelector(".check").disabled = true;
+      }
+      hint(fb, r.first ? "Birinchi urinishda topilgan." : "Soddaroq misoldan keyin yechilgan.", r.first ? "good" : "soft");
+      hint(fb, card.explain, "explain");
+    });
+
+    const target = feed.querySelector('[data-base="' + st.reached + '"]');
+    if (target && st.reached > 0) {
+      requestAnimationFrame(() => target.scrollIntoView({ behavior: "auto", block: "start" }));
+    }
+  }
+
+  function start(opts) {
+    if (opts && typeof opts.onFeedback === "function") onFeedback = opts.onFeedback;
+    if (started) return;
+    started = true;
+    init();
+  }
+
+  function stats() {
+    const weak = Object.keys(st.weak).filter((k) => st.weak[k] > 0).map((k) => TOPICS[k]);
+    return {
+      savollar: answeredCount(),
+      birinchi: TESTS.filter((t) => st.res[t.id] && st.res[t.id].first).length,
+      jami: TESTS.length,
+      tayyorlik: readiness(),
+      zaif: weak,
+    };
+  }
+
+  load();
+  return { start: start, stats: stats, clearProgress: clearProgress };
+})();
+
+</script>
+<script>
+(function () {
+  "use strict";
+
+  const SB_URL = "https://unaodltahuevrfnarfha.supabase.co";
+  const KEY_PAGES = ["baho.html", "imzo.html", "test.html", "index.html", "boshqaruv.html"];
+  const STORE = "sinov_v1";
+  const MODUL = "matematika-foizlar";
+  const SUBJECTS = [
+    "Matematika", "Ona tili va adabiyot", "Ingliz tili", "Rus tili", "Tarix", "Biologiya",
+    "Kimyo", "Fizika", "Geografiya", "Huquq", "IT va sun’iy intellekt", "Koreys tili",
+    "Boshlang‘ich sinf", "Boshqa fan",
+  ];
+  const SCREENS = ["start", "teacher", "subject", "module", "feedback", "done"];
+
+  const $ = (id) => document.getElementById(id);
+  let S = { step: "start", teacher: null, manual: "", fan: "", startedAt: null, fb: {}, pending: null };
+  let sbKey = null;
+  let teachers = null;
+
+  /* ---------- storage ---------- */
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORE);
+      if (raw) {
+        const s = JSON.parse(raw);
+        if (s && typeof s === "object") S = Object.assign(S, s);
+      }
+    } catch (e) { /* fresh start */ }
+    if (SCREENS.indexOf(S.step) < 0) S.step = "start";
+    if (!S.fb || typeof S.fb !== "object") S.fb = {};
+  }
+  function save() {
+    try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) { /* keep in memory */ }
+  }
+
+  /* ---------- network ---------- */
+  async function getKey() {
+    if (sbKey) return sbKey;
+    for (const page of KEY_PAGES) {
+      try {
+        const res = await fetch(page, { cache: "no-cache" });
+        if (!res.ok) continue;
+        const found = (await res.text()).match(/sb_publishable_[A-Za-z0-9_-]+/);
+        if (found) { sbKey = found[0]; return sbKey; }
+      } catch (e) { /* try next page */ }
+    }
+    throw new Error("KEY");
+  }
+
+  async function rpc(fn, args) {
+    const key = await getKey();
+    const ctrl = typeof AbortController === "function" ? new AbortController() : null;
+    const timer = setTimeout(() => { if (ctrl) ctrl.abort(); }, 20000);
+    try {
+      const res = await fetch(SB_URL + "/rest/v1/rpc/" + fn, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "apikey": key, "Authorization": "Bearer " + key },
+        body: JSON.stringify(args || {}),
+        signal: ctrl ? ctrl.signal : undefined,
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data || data.ok !== true) throw new Error((data && data.message) || "HTTP " + res.status);
+      return data;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  /* ---------- screens ---------- */
+  function show(step) {
+    S.step = step;
+    save();
+    SCREENS.forEach((s) => { $("s-" + s).hidden = s !== step; });
+    document.body.classList.toggle("in-module", step === "module");
+    if (step === "teacher") renderTeachers();
+    if (step === "subject") renderSubjects();
+    if (step === "module") {
+      if (!S.startedAt) { S.startedAt = Date.now(); save(); }
+      window.Reels.start({ onFeedback: () => show("feedback") });
+    }
+    if (step === "feedback") renderFeedback();
+    if (step === "done") renderDone();
+    const screen = $("s-" + step);
+    if (step !== "module") screen.scrollTop = 0;
+    const heading = screen.querySelector("h1, h2");
+    if (heading) { heading.setAttribute("tabindex", "-1"); heading.focus({ preventScroll: true }); }
+  }
+
+  function teacherName() {
+    return S.teacher ? S.teacher.ism : (S.manual || "").trim();
+  }
+
+  /* teacher */
+  async function renderTeachers() {
+    const box = $("teacherList");
+    const msg = $("teacherMsg");
+    $("manualWrap").hidden = !S.manualMode;
+    $("manualName").value = S.manual || "";
+    updateTeacherNext();
+    if (teachers) { drawTeachers(); return; }
+    box.innerHTML = "";
+    msg.textContent = "Ro‘yxat yuklanmoqda…";
+    $("teacherRetry").hidden = true;
+    try {
+      const d = await rpc("ep_sinov_oqituvchilar", {});
+      teachers = Array.isArray(d.royxat) ? d.royxat : [];
+      msg.textContent = teachers.length ? "" : "Ro‘yxat bo‘sh. «Ismim ro‘yxatda yo‘q» ni bosing.";
+      drawTeachers();
+    } catch (e) {
+      msg.textContent = "Ro‘yxat yuklanmadi. Internetni tekshirib, qayta urining yoki ismingizni o‘zingiz yozing.";
+      $("teacherRetry").hidden = false;
+    }
+  }
+
+  function drawTeachers() {
+    const q = ($("teacherSearch").value || "").toLowerCase().trim();
+    const box = $("teacherList");
+    box.innerHTML = "";
+    (teachers || []).filter((t) => !q || String(t.ism).toLowerCase().indexOf(q) > -1).forEach((t) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "choice" + (S.teacher && S.teacher.id === t.id ? " on" : "");
+      b.setAttribute("aria-pressed", String(!!(S.teacher && S.teacher.id === t.id)));
+      b.textContent = t.ism;
+      b.addEventListener("click", () => {
+        S.teacher = { id: t.id, ism: t.ism };
+        S.manualMode = false; S.manual = "";
+        $("manualWrap").hidden = true;
+        save(); drawTeachers(); updateTeacherNext();
+      });
+      box.appendChild(b);
+    });
+  }
+
+  function updateTeacherNext() {
+    $("teacherNext").disabled = !teacherName();
+  }
+
+  /* subject */
+  function renderSubjects() {
+    const box = $("subjectList");
+    box.innerHTML = "";
+    SUBJECTS.forEach((s) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "choice" + (S.fan === s ? " on" : "");
+      b.setAttribute("aria-pressed", String(S.fan === s));
+      b.textContent = s;
+      b.addEventListener("click", () => { S.fan = s; save(); renderSubjects(); });
+      box.appendChild(b);
+    });
+    const note = $("subjectNote");
+    const go = $("subjectNext");
+    go.disabled = !S.fan;
+    if (!S.fan) { note.textContent = ""; go.textContent = "Modulni boshlash"; return; }
+    if (S.fan === "Matematika") {
+      note.textContent = "Matematika uchun «Foizlar» moduli tayyor. Uni o‘quvchi sifatida o‘tib ko‘ring.";
+      go.textContent = "Modulni boshlash";
+    } else {
+      note.textContent = "Bu fan uchun modul tayyorlanmoqda. Ilova formatini baholash uchun hozir matematika modulini o‘tib ko‘ring: mazmun emas, qulaylik muhim.";
+      go.textContent = "Matematika modulini boshlash";
+    }
+  }
+
+  /* feedback */
+  function renderFeedback() {
+    const st = window.Reels.stats();
+    $("fbSummary").textContent = st.savollar
+      ? "Siz " + st.savollar + " ta savolga javob berdingiz (" + st.jami + " tadan), " + st.birinchi + " tasi birinchi urinishda to‘g‘ri."
+      : "Siz hali birorta savolga javob bermadingiz. Istasangiz, modulga qaytib bir nechta savolni yechib ko‘ring.";
+    document.querySelectorAll("[data-baho]").forEach((b) => {
+      const on = String(S.fb.baho) === b.dataset.baho;
+      b.classList.toggle("on", on); b.setAttribute("aria-checked", String(on));
+    });
+    document.querySelectorAll("[data-mos]").forEach((b) => {
+      const on = S.fb.mos === b.dataset.mos;
+      b.classList.toggle("on", on); b.setAttribute("aria-checked", String(on));
+    });
+    document.querySelectorAll("[data-navbat]").forEach((b) => {
+      const on = S.fb.navbat === b.dataset.navbat;
+      b.classList.toggle("on", on); b.setAttribute("aria-checked", String(on));
+    });
+    ["otaona", "yoqdi", "noqulay", "qoshish"].forEach((k) => { $("fb-" + k).value = S.fb[k] || ""; });
+    $("fbError").textContent = S.pending ? "Oldingi fikr yuborilmagan edi. «Fikrni yuborish» ni qayta bosing." : "";
+    $("baho-err").hidden = true; $("mos-err").hidden = true; $("navbat-err").hidden = true;
+  }
+
+  function payload() {
+    const st = window.Reels.stats();
+    const minutes = S.startedAt ? Math.max(1, Math.round((Date.now() - S.startedAt) / 60000)) : null;
+    return {
+      oqituvchi_id: S.teacher ? S.teacher.id : null,
+      fio: teacherName(),
+      fan: S.fan,
+      modul: MODUL,
+      daqiqa: minutes === null ? null : Math.min(minutes, 600),
+      savollar: st.savollar,
+      birinchi: st.birinchi,
+      tayyorlik: st.tayyorlik,
+      zaif: st.zaif,
+      baho: Number(S.fb.baho),
+      mos: S.fb.mos,
+      navbat: S.fb.navbat,
+      otaona: (S.fb.otaona || "").trim(),
+      yoqdi: (S.fb.yoqdi || "").trim(),
+      noqulay: (S.fb.noqulay || "").trim(),
+      qoshish: (S.fb.qoshish || "").trim(),
+      qurilma: (window.innerWidth <= 820 ? "telefon" : "kompyuter") + ", " + window.innerWidth + "px",
+    };
+  }
+
+  async function sendFeedback(auto) {
+    const btn = $("fbSend");
+    const err = $("fbError");
+    const data = S.pending || payload();
+    btn.disabled = true;
+    btn.textContent = "Yuborilmoqda…";
+    err.textContent = "";
+    try {
+      await rpc("ep_sinov_saqla", { p_malumot: data });
+      S.pending = null;
+      S.sentAt = Date.now();
+      save();
+      show("done");
+    } catch (e) {
+      S.pending = data;
+      save();
+      err.textContent = "Fikr yuborilmadi. Internetni tekshirib, «Fikrni yuborish» ni qayta bosing. Yozganlaringiz saqlandi.";
+      if (auto && S.step !== "feedback") show("feedback");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Fikrni yuborish";
+    }
+  }
+
+  function renderDone() {
+    $("doneName").textContent = teacherName() ? teacherName() + ", rahmat!" : "Rahmat!";
+  }
+
+  /* ---------- wiring ---------- */
+  function wire() {
+    $("startBtn").addEventListener("click", () => show("teacher"));
+
+    $("teacherSearch").addEventListener("input", drawTeachers);
+    $("teacherRetry").addEventListener("click", () => { teachers = null; renderTeachers(); });
+    $("manualToggle").addEventListener("click", () => {
+      S.manualMode = true; S.teacher = null; save();
+      $("manualWrap").hidden = false; drawTeachers(); updateTeacherNext();
+      $("manualName").focus();
+    });
+    $("manualName").addEventListener("input", (e) => { S.manual = e.target.value; save(); updateTeacherNext(); });
+    $("teacherBack").addEventListener("click", () => show("start"));
+    $("teacherNext").addEventListener("click", () => { if (teacherName()) show("subject"); });
+
+    $("subjectBack").addEventListener("click", () => show("teacher"));
+    $("subjectNext").addEventListener("click", () => { if (S.fan) show("module"); });
+
+    document.querySelectorAll("[data-baho]").forEach((b) => b.addEventListener("click", () => {
+      S.fb.baho = b.dataset.baho; S.pending = null; save(); renderFeedback();
+    }));
+    document.querySelectorAll("[data-mos]").forEach((b) => b.addEventListener("click", () => {
+      S.fb.mos = b.dataset.mos; S.pending = null; save(); renderFeedback();
+    }));
+    document.querySelectorAll("[data-navbat]").forEach((b) => b.addEventListener("click", () => {
+      S.fb.navbat = b.dataset.navbat; S.pending = null; save(); renderFeedback();
+    }));
+    ["otaona", "yoqdi", "noqulay", "qoshish"].forEach((k) => $("fb-" + k).addEventListener("input", (e) => {
+      S.fb[k] = e.target.value; S.pending = null; save();
+    }));
+    $("fbBack").addEventListener("click", () => show("module"));
+    $("fbSend").addEventListener("click", () => {
+      let ok = true;
+      if (!S.fb.baho) { $("baho-err").hidden = false; ok = false; }
+      if (!S.fb.mos) { $("mos-err").hidden = false; ok = false; }
+      if (!S.fb.navbat) { $("navbat-err").hidden = false; ok = false; }
+      if (!ok) { $("fbError").textContent = "Belgilangan savollarga javob bering: baho, mos keladimi, navbat."; return; }
+      sendFeedback(false);
+    });
+
+    $("againBtn").addEventListener("click", () => {
+      if (!window.confirm("Modul natijalari va fikr qaytadan boshlanadi. Davom etasizmi?")) return;
+      window.Reels.clearProgress();
+      const keep = { teacher: S.teacher, manual: S.manual, manualMode: S.manualMode };
+      S = Object.assign({ step: "subject", fan: "", startedAt: null, fb: {}, pending: null }, keep);
+      save();
+      window.location.reload();
+    });
+  }
+
+  load();
+  wire();
+  show(S.step);
+  if (S.pending && S.step !== "done") sendFeedback(true);
+})();
+
+</script>
+</body>
+</html>

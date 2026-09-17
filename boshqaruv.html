@@ -193,7 +193,7 @@ label{display:block;font-size:12px;color:var(--mu);margin:0 0 4px}
     <div class="til"><button class="til-btn" data-lang="uz">UZ</button><button class="til-btn" data-lang="ru">RU</button></div>
   </div></div>
   <div class="wrap"><div id="cont"></div></div>
-  <div class="nav"><b data-tab="kun" onclick="ochTab('kun')"><i>📅</i><span data-tl="n_kun">n_kun</span></b><b data-tab="davomat" onclick="ochTab('davomat')"><i>🕗</i><span data-tl="n_davomat">n_davomat</span></b><b data-tab="oqituvchilar" onclick="ochTab('oqituvchilar')"><i>🧑‍🏫</i><span data-tl="n_oqituvchilar">n_oqituvchilar</span></b><b data-tab="oquvchilar" onclick="ochTab('oquvchilar')"><i>👥</i><span data-tl="n_oquvchilar">n_oquvchilar</span></b><b data-tab="pechat" onclick="ochTab('pechat')"><i>🖨️</i><span data-tl="n_pechat">n_pechat</span></b><b data-tab="baho" onclick="ochTab('baho')"><i>⭐</i><span>Baho</span></b><b data-tab="oreyting" onclick="ochTab('oreyting')"><i>🏆</i><span>Faollik</span></b><b data-tab="reyting" onclick="ochTab('reyting')"><i>🏆</i><span data-tl="n_reyting">n_reyting</span></b><b data-tab="shartnoma" onclick="ochTab('shartnoma')"><i>📄</i><span>Shartnoma</span></b><b data-tab="sorovnoma" onclick="ochTab('sorovnoma')"><i>📝</i><span>So‘rov</span></b><b data-tab="sozlama" onclick="ochTab('sozlama')"><i>⚙️</i><span data-tl="n_sozlama">n_sozlama</span></b></div>
+  <div class="nav"><b data-tab="kun" onclick="ochTab('kun')"><i>📅</i><span data-tl="n_kun">n_kun</span></b><b data-tab="davomat" onclick="ochTab('davomat')"><i>🕗</i><span data-tl="n_davomat">n_davomat</span></b><b data-tab="oqituvchilar" onclick="ochTab('oqituvchilar')"><i>🧑‍🏫</i><span data-tl="n_oqituvchilar">n_oqituvchilar</span></b><b data-tab="oquvchilar" onclick="ochTab('oquvchilar')"><i>👥</i><span data-tl="n_oquvchilar">n_oquvchilar</span></b><b data-tab="pechat" onclick="ochTab('pechat')"><i>🖨️</i><span data-tl="n_pechat">n_pechat</span></b><b data-tab="baho" onclick="ochTab('baho')"><i>⭐</i><span>Baho</span></b><b data-tab="oreyting" onclick="ochTab('oreyting')"><i>🏆</i><span>Faollik</span></b><b data-tab="reyting" onclick="ochTab('reyting')"><i>🏆</i><span data-tl="n_reyting">n_reyting</span></b><b data-tab="shartnoma" onclick="ochTab('shartnoma')"><i>📄</i><span>Shartnoma</span></b><b data-tab="sorovnoma" onclick="ochTab('sorovnoma')"><i>📝</i><span>So‘rov</span></b><b data-tab="sinov" onclick="ochTab('sinov')"><i>🧪</i><span>Sinov</span></b><b data-tab="sozlama" onclick="ochTab('sozlama')"><i>⚙️</i><span data-tl="n_sozlama">n_sozlama</span></b></div>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -555,6 +555,7 @@ async function ochTab(x){
     else if(x==='reyting') await chizReyting();
     else if(x==='shartnoma') await chizShartnoma();
     else if(x==='sorovnoma') await chizSorovnoma();
+    else if(x==='sinov') await chizSinov();
     else await chizSozlama();
   }catch(e){ $('cont').innerHTML='<div class="empty">'+esc(xatoMatn(e))+'</div>'; }
 }
@@ -1530,6 +1531,120 @@ function srvKitobCSV(){
     qatorlar.push([r.id, sanaMatn(String(r.yaratilgan||'').slice(0,10))+' '+vaqtMatn(r.yaratilgan), r.fio].concat(SRV_KITOB.map(c=>m[c])));
   }));
   srvYukla('sorovnoma_kitoblar',qatorlar);
+}
+
+/* ---------------- ILOVA SINOVI ---------------- */
+const SNV_HAVOLA='https://edunovaschool9-hue.github.io/a-avlod-bot/sinov.html';
+let SNV_D=null, SNV_OQ=null, SNV_KO='fikr';
+
+async function chizSinov(){
+  const natija=await Promise.all([
+    rpc('ep_sinov_royxat',{p_token:T}),
+    rpc('ep_oqituvchi_royxat',{p_token:T}).catch(()=>null)
+  ]);
+  SNV_D=(natija[0]&&natija[0].royxat)||[];
+  const oq=natija[1];
+  SNV_OQ=(oq&&Array.isArray(oq.oqituvchilar))?oq.oqituvchilar.filter(o=>o.faol):null;
+  snvChiz();
+}
+function snvMos(m){ return m==='ha'?'Ha':m==='qisman'?'Qisman':m==='yoq'?'Yo‘q':'—'; }
+function snvMosRang(m){ return m==='ha'?'gn':m==='qisman'?'am':m==='yoq'?'rd':''; }
+function snvNavbat(v){ return v==='birinchi'?'Birinchilardan bo‘lib':v==='ha'?'Navbati kelganda':v==='bilmayman'?'Bilmaydi':v==='yoq'?'Yo‘q':'—'; }
+function snvNavbatRang(v){ return v==='birinchi'||v==='ha'?'gn':v==='bilmayman'?'am':v==='yoq'?'rd':''; }
+function snvQolgan(){
+  const R=SNV_D||[];
+  if(!SNV_OQ) return null;
+  const ids=new Set(R.map(r=>r.oqituvchi_id).filter(Boolean));
+  return SNV_OQ.filter(o=>!ids.has(o.id) && !R.some(r=>!r.oqituvchi_id && srvMos(o.ism,r.fio)));
+}
+function snvChiz(){
+  const R=SNV_D||[];
+  const baholi=R.filter(r=>r.baho);
+  const ortacha=baholi.length?(baholi.reduce((s,r)=>s+Number(r.baho),0)/baholi.length).toFixed(1):'—';
+  const mos={ha:0,qisman:0,yoq:0}; R.forEach(r=>{ if(mos[r.mos]!==undefined) mos[r.mos]++; });
+  const navbatda=R.filter(r=>r.navbat==='birinchi'||r.navbat==='ha').length;
+  const birinchilar=R.filter(r=>r.navbat==='birinchi').length;
+  const qolgan=snvQolgan();
+  let h='<div class="card"><div class="row"><h2 style="flex:1">🧪 Ilova sinovi</h2>'+
+    '<button class="btn sec sm" onclick="srvNusxaMatn(SNV_HAVOLA,\'Sinov havolasi nusxalandi\')">🔗 Havola</button>'+
+    '<button class="btn sec sm" onclick="ochTab(\'sinov\')" title="Yangilash">🔄</button></div>'+
+    '<div class="srv-stat">'+
+      '<div><b>'+R.length+'</b><span>Fikr</span></div>'+
+      '<div><b>'+ortacha+'</b><span>O‘rtacha baho</span></div>'+
+      '<div><b>'+mos.ha+'/'+mos.qisman+'/'+mos.yoq+'</b><span>Mos: ha/qisman/yo‘q</span></div>'+
+      '<div><b>'+navbatda+'</b><span>Navbatga turardi ('+birinchilar+' ta birinchilardan)</span></div>'+
+      (qolgan?'<div class="'+(qolgan.length?'srv-warn':'srv-ok')+'"><b>'+qolgan.length+'</b><span>Sinamagan</span></div>':'')+
+    '</div><div class="srv-tabs">'+
+    [['fikr','Fikrlar'],['qolgan','Sinamaganlar']]
+      .map(p=>'<button class="'+(SNV_KO===p[0]?'on':'')+'" onclick="SNV_KO=\''+p[0]+'\';snvChiz()">'+p[1]+'</button>').join('')+
+    '</div></div>';
+
+  if(SNV_KO==='qolgan'){
+    if(!qolgan) h+='<div class="empty">O‘qituvchilar ro‘yxatini olib bo‘lmadi</div>';
+    else if(!qolgan.length) h+='<div class="empty">Hamma ustoz sinab ko‘rgan</div>';
+    else h+='<div class="row" style="margin:0 0 10px"><span class="xs mu" style="flex:1">'+qolgan.length+' / '+SNV_OQ.length+' ustoz hali sinamagan</span>'+
+      '<button class="btn sec sm" onclick="snvQolganNusxa()">📋 Nusxalash</button></div>'+
+      '<ul class="lst">'+qolgan.map(o=>'<li class="it"><div class="hd"><span class="b">'+esc(o.ism)+'</span></div></li>').join('')+'</ul>';
+  } else {
+    h+='<div class="row" style="margin:0 0 10px"><span class="xs mu" style="flex:1">Yangi fikrlar yuqorida</span>'+
+      '<button class="btn sec sm" onclick="snvCSV()">⬇️ CSV</button></div>';
+    if(!R.length) h+='<div class="empty">Hali fikr yo‘q. Havolani ustozlarga yuboring.</div>';
+    else h+='<ul class="lst">'+R.map(r=>{
+      const nat=(r.savollar!=null?r.birinchi+'/'+r.savollar+' birinchi urinishda':'')+(r.tayyorlik!=null?' · '+r.tayyorlik+'%':'');
+      return '<li class="it"><div class="hd"><span class="b">'+esc(r.fio)+'</span>'+
+        '<span class="pill">'+esc(String(r.baho))+'/5</span>'+
+        '<span class="pill '+snvMosRang(r.mos)+'">'+snvMos(r.mos)+'</span>'+
+        (r.navbat?'<span class="pill '+snvNavbatRang(r.navbat)+'">Navbat: '+snvNavbat(r.navbat)+'</span>':'')+
+        '<button class="btn sec sm" style="margin-left:auto" onclick="snvKarta('+r.id+')">Ochish</button></div>'+
+        '<div class="xs mu mt">'+esc([r.fan, r.daqiqa!=null?r.daqiqa+' daqiqa':'', nat].filter(Boolean).join(' · '))+'</div>'+
+        '<div class="xs mu">'+srvVaqt(r.yaratilgan)+'</div></li>';
+    }).join('')+'</ul>';
+  }
+  $('cont').innerHTML=h;
+}
+function snvKarta(id){
+  const r=(SNV_D||[]).find(x=>x.id===id); if(!r) return;
+  const m=r.malumot||{};
+  const zaif=Array.isArray(m.zaif)&&m.zaif.length?m.zaif.join(', '):'';
+  let h='<div class="mh"><h2>'+esc(r.fio)+'</h2><button class="x" onclick="modalYop()">×</button></div>'+
+    '<div class="xs mu">'+srvVaqt(r.yaratilgan)+(m.qurilma?' · '+esc(m.qurilma):'')+'</div>'+
+    '<div class="srv-bolim"><h3>Sinov</h3>'+
+      srvQ('Fan', r.fan||'—')+srvQ('Modul', r.modul||'—')+
+      srvQ('Vaqt', r.daqiqa!=null?r.daqiqa+' daqiqa':'—')+
+      srvQ('Natija', r.savollar!=null?(r.birinchi+' / '+r.savollar+' birinchi urinishda, tayyorlik '+r.tayyorlik+'%'):'—')+
+      (zaif?srvQ('Qiyin bo‘lgan mavzular', zaif):'')+'</div>'+
+    '<div class="srv-bolim"><h3>Fikr</h3>'+
+      srvQ('Baho', r.baho+' / 5')+srvQ('O‘quvchilarga mos', snvMos(r.mos))+
+      srvQ('Farzandi uchun navbatga turarmidi', snvNavbat(r.navbat))+
+      (m.otaona?srvQ('Ota-ona sifatida nima qo‘shardi', m.otaona):'')+
+      (m.yoqdi?srvQ('Nima yoqdi', m.yoqdi):'')+
+      (m.noqulay?srvQ('Nima noqulay', m.noqulay):'')+
+      (m.qoshish?srvQ('Nima qo‘shish kerak', m.qoshish):'')+'</div>'+
+    '<div class="row mt"><button class="btn dan sm" style="margin-left:auto" onclick="snvOchir('+r.id+')">🗑 O‘chirish</button></div>';
+  modalOch(h);
+}
+async function snvOchir(id){
+  const r=(SNV_D||[]).find(x=>x.id===id); if(!r) return;
+  if(!confirm('Bu fikr butunlay o‘chirilsinmi?\n'+r.fio+' — '+srvVaqt(r.yaratilgan))) return;
+  try{
+    const d=await rpc('ep_sinov_ochir',{p_token:T,p_id:id});
+    if(!d||!d.ok) throw new Error('Topilmadi');
+    SNV_D=(SNV_D||[]).filter(x=>x.id!==id);
+    modalYop(); snvChiz(); xabar('O‘chirildi');
+  }catch(e){ xabar(xatoMatn(e),'xato'); }
+}
+function snvQolganNusxa(){
+  const q=snvQolgan()||[];
+  srvNusxaMatn('Ilovani hali sinab ko‘rmagan ustozlar:\n'+q.map((o,i)=>(i+1)+'. '+o.ism).join('\n')+'\n\n'+SNV_HAVOLA);
+}
+function snvCSV(){
+  const R=SNV_D||[];
+  const qatorlar=[['ID','Vaqt','F.I.Sh.','Fan','Modul','Daqiqa','Savollar','Birinchi urinishda','Tayyorlik %','Baho','Mos','Navbatga turarmidi','Ota-ona sifatida qo‘shardi','Nima yoqdi','Nima noqulay','Nima qo‘shish kerak','Qiyin mavzular','Qurilma']];
+  R.forEach(r=>{
+    const m=r.malumot||{};
+    qatorlar.push([r.id, sanaMatn(String(r.yaratilgan||'').slice(0,10))+' '+vaqtMatn(r.yaratilgan), r.fio, r.fan, r.modul, r.daqiqa, r.savollar, r.birinchi, r.tayyorlik, r.baho, snvMos(r.mos), snvNavbat(r.navbat), m.otaona, m.yoqdi, m.noqulay, m.qoshish, Array.isArray(m.zaif)?m.zaif.join(', '):'', m.qurilma]);
+  });
+  srvYukla('ilova_sinovi',qatorlar);
 }
 
 async function chizShartnoma(){
